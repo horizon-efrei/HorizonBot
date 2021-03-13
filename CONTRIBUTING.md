@@ -1,128 +1,81 @@
-# Contributor Covenant Code of Conduct
+# Contribuer
 
-## Our Pledge
+*Inspiré des [directives de contributions de Skyra]*
 
-We as members, contributors, and leaders pledge to make participation in our
-community a harassment-free experience for everyone, regardless of age, body
-size, visible or invisible disability, ethnicity, sex characteristics, gender
-identity and expression, level of experience, education, socio-economic status,
-nationality, personal appearance, race, religion, or sexual identity
-and orientation.
+## Préambule
 
-We pledge to act and interact in ways that contribute to an open, welcoming,
-diverse, inclusive, and healthy community.
+N'ayez pas peur de contribuer ! Ce n'est pas grave si vous faites une erreur, on est la pour apprendre ! Le principe
+d'une Pull Request est justement de pouvoir s'améliorer mutuellement et de faire évoluer le code ensemble. Si vous avez
+un doute, créez votre PR quand même en faisant part de votre doute dans le message, ou venez me voir en privé sur
+Discord (`noftaly#0359`).\
+Sur votre PR, n'ayez pas peur de faire autant de commits que vous en avez besoin, ils seront de toute façon squash
+(= réunis) en un seul commit avant de merge.
 
-## Our Standards
+## Directives
 
-Examples of behavior that contributes to a positive environment for our
-community include:
+**Les issues sont uniquement pour signaler des bugs ou proposer des suggestions. Si vous avez une question concernant
+le bot ou son développement, contactez-moi sur Discord (`noftaly#0359`) ou ouvrez une Discussion GitHub**.
 
-* Demonstrating empathy and kindness toward other people
-* Being respectful of differing opinions, viewpoints, and experiences
-* Giving and gracefully accepting constructive feedback
-* Accepting responsibility and apologizing to those affected by our mistakes,
-  and learning from the experience
-* Focusing on what is best not just for us as individuals, but for the
-  overall community
+Pour contribuer à ce repo, n'hésitez pas à créer un nouveau fork et à soumettre une Pull Request, en suivant ces
+instructions :
 
-Examples of unacceptable behavior include:
+1. Forkez, clonez, et selectionnez la branche `master`.
+1. **Créez une nouvelle branche sur votre fork.**
+1. Faites vos changements.
+1. Assurez-vous que le lint passe avec `npm run lint`.
+1. Pensez-bien à tester vos changements de manière **intensive**.
+1. Commitez vos changements en respectant le plus que possible le style *[conventional commits]* (regardez les commits
+précédents sur le repo), et pushez-les.
+1. Soumettez une Pull Request [ici]! Assurez-vous que votre PR fait bien un changement dans un domaine : 1 PR = 1
+changement (ne faites pas 3 commandes et 4 bugfixes en une seule PR).
 
-* The use of sexualized language or imagery, and sexual attention or
-  advances of any kind
-* Trolling, insulting or derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or email
-  address, without their explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
-  professional setting
+⚠️ Vos commits, commentaires, messages de logs dans la console, variables et tout autre objet compris directement dans
+le code, doivent être en **anglais**.\
+Les messages visibles par les utilisateurs (envoyés par discord), votre PR, vos issues etc. doivent être en
+**français**.
 
-## Enforcement Responsibilities
+## Lancer MonkaBot localement
 
-Community leaders are responsible for clarifying and enforcing our standards of
-acceptable behavior and will take appropriate and fair corrective action in
-response to any behavior that they deem inappropriate, threatening, offensive,
-or harmful.
+Pour lancer MonkaBot localement, il faut suivre ces étapes :
 
-Community leaders have the right and responsibility to remove, edit, or reject
-comments, commits, code, wiki edits, issues, and other contributions that are
-not aligned to this Code of Conduct, and will communicate reasons for moderation
-decisions when appropriate.
+1. Installez [Node.js].
+1. Renommez le fichier `.env.example` à la racine du projet, en `.env`.
+1. Remplissez ce fichier avec vos tokens et votre configuration.
+1. Installez les dependences avec `npm install`.
+1. Lancez MonkaBot en mode "développement" avec `npm run dev`.
 
-## Scope
+D'autres commandes importantes :
 
-This Code of Conduct applies within all community spaces, and also applies when
-an individual is officially representing the community in public spaces.
-Examples of representing our community include using an official e-mail address,
-posting via an official social media account, or acting as an appointed
-representative at an online or offline event.
+```bash
+# Lancer les tests de style de code ('lint')
+$ npm run lint
 
-## Enforcement
+# Appliquer automatiquement les règles de style de code
+$ npm run lint:fix
 
-Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement on the [discord].
-All complaints will be reviewed and investigated promptly and fairly.
+# Lancer MonkaBot en mode de développement
+$ npm run dev
 
-All community leaders are obligated to respect the privacy and security of the
-reporter of any incident.
+# Lancer MonkaBot en mode de production
+$ npm start
+```
 
-## Enforcement Guidelines
+## Concept de MonkaBot
 
-Community leaders will follow these Community Impact Guidelines in determining
-the consequences for any action they deem in violation of this Code of Conduct:
+Il y a certaines directives à prendre en compte avant que vos changements soient acceptés. _Ce n'est pas une liste
+exhaustive, mais ca peut vous donner une idée de ce à quoi penser avant de faire vos changements._
 
-### 1. Correction
+- MonkaBot ne doit pas changer le comportement par défaut de Sapphire ou Discord.js.
+- Les fonctionnalités de MonkaBot doivent être utiles à la majorité des utilisateurs. Mais ne laissez pas cela vous
+arrêter : votre idée est surement très bonne aussi !
+- Pensez que vous développez une fonctionnalité pour un discord d'entraide et de révision, pas une communauté de jeu.
+Ainsi, inutile d'ajouter des commandes "fun" ou qui n'ont rien à voir avec le thème du discord.
+- Tout doit suivre nos règles ESLint dans la mesure du possible, et les tests de lint doivent passer, même si cela vous
+oblige à désactiver quelques règles **localement, pas dans le fichier `.eslintrc.js`**.
 
-**Community Impact**: Use of inappropriate language or other behavior deemed
-unprofessional or unwelcome in the community.
+<!-- Link Dump -->
 
-**Consequence**: A private, written warning from community leaders, providing
-clarity around the nature of the violation and an explanation of why the
-behavior was inappropriate. A public apology may be requested.
-
-### 2. Warning
-
-**Community Impact**: A violation through a single incident or series
-of actions.
-
-**Consequence**: A warning with consequences for continued behavior. No
-interaction with the people involved, including unsolicited interaction with
-those enforcing the Code of Conduct, for a specified period of time. This
-includes avoiding interactions in community spaces as well as external channels
-like social media. Violating these terms may lead to a temporary or
-permanent ban.
-
-### 3. Temporary Ban
-
-**Community Impact**: A serious violation of community standards, including
-sustained inappropriate behavior.
-
-**Consequence**: A temporary ban from any sort of interaction or public
-communication with the community for a specified period of time. No public or
-private interaction with the people involved, including unsolicited interaction
-with those enforcing the Code of Conduct, is allowed during this period.
-Violating these terms may lead to a permanent ban.
-
-### 4. Permanent Ban
-
-**Community Impact**: Demonstrating a pattern of violation of community
-standards, including sustained inappropriate behavior,  harassment of an
-individual, or aggression toward or disparagement of classes of individuals.
-
-**Consequence**: A permanent ban from any sort of public interaction within
-the community.
-
-## Attribution
-
-This Code of Conduct is adapted from the [Contributor Covenant][homepage],
-version 2.0, available at
-https://www.contributor-covenant.org/version/2/0/code_of_conduct.html.
-
-Community Impact Guidelines were inspired by [Mozilla's code of conduct
-enforcement ladder](https://github.com/mozilla/diversity).
-
-[homepage]: https://www.contributor-covenant.org
-[discord]: https://discord.gg/WTGdnn4yzv
-
-For answers to common questions about this code of conduct, see the FAQ at
-https://www.contributor-covenant.org/faq. Translations are available at
-https://www.contributor-covenant.org/translations.
+[directives de contributions de Skyra]: https://github.com/skyra-project/skyra/blob/75df79bd409f78d224e50a39acdf3e2a10679cd4/.github/CONTRIBUTING.md
+[conventional commits]: https://www.conventionalcommits.org/en/v1.0.0/
+[ici]: https://github.com/noftaly/monkabot/pulls
+[Node.js]: https://nodejs.org/en/download/
