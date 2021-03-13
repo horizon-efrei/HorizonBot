@@ -1,6 +1,6 @@
 <h2 align="center">MonkaBot</h2>
 <p align="center">
-    🦉 Le bot discord de <a href="https://discord.gg/WTGdnn4yzv">EFREI Révisions Entraide (ERE)</a>
+    🦉 Le bot du discord EFREI Révisions Entraide (ERE)
 </p>
 
 ## Rapport de bug et suggestions
