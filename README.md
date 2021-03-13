@@ -1,4 +1,3 @@
-<p align="center"><img width=400px src="https://www.efrei.fr/wp-content/themes/efrei/images/logo-efrei-bleu-v3.png"></p>
 <h2 align="center">MonkaBot</h2>
 <p align="center">
     🦉 Le bot discord de <a href="https://discord.gg/WTGdnn4yzv">EFREI Révisions Entraide (ERE)</a>
