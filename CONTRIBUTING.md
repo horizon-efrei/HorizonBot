@@ -4,11 +4,11 @@
 
 ## Préambule
 
-N'ayez pas peur de contribuer ! Ce n'est pas grave si vous faites une erreur, on est la pour apprendre ! Le principe
+N'ayez pas peur de contribuer ! Ce n'est pas grave si vous faites une erreur, on est là pour apprendre ! Le principe
 d'une Pull Request est justement de pouvoir s'améliorer mutuellement et de faire évoluer le code ensemble. Si vous avez
 un doute, créez votre PR quand même en faisant part de votre doute dans le message, ou venez me voir en privé sur
 Discord (`noftaly#0359`).\
-Sur votre PR, n'ayez pas peur de faire autant de commits que vous en avez besoin, ils seront de toute façon squash
+Sur votre PR, n'ayez pas peur de faire autant de commits dont vous avez besoin, ils seront de toute façon squash
 (= réunis) en un seul commit avant de merge.
 
 ## Directives
@@ -26,13 +26,12 @@ instructions :
 1. Pensez-bien à tester vos changements de manière **intensive**.
 1. Commitez vos changements en respectant le plus que possible le style *[conventional commits]* (regardez les commits
 précédents sur le repo), et pushez-les.
-1. Soumettez une Pull Request [ici]! Assurez-vous que votre PR fait bien un changement dans un domaine : 1 PR = 1
+1. Soumettez une Pull Request! Assurez-vous que votre PR fait bien un changement dans un domaine précis : 1 PR = 1
 changement (ne faites pas 3 commandes et 4 bugfixes en une seule PR).
 
-⚠️ Vos commits, commentaires, messages de logs dans la console, variables et tout autre objet compris directement dans
-le code, doivent être en **anglais**.\
-Les messages visibles par les utilisateurs (envoyés par discord), votre PR, vos issues etc. doivent être en
-**français**.
+⚠️ Utilisez l'anglais pour vos commits, les commentaires dans votre code, les messages de logs dans la console, les
+variables et tout autre objet compris directement dans le code.\
+Les messages visibles par les utilisateurs (envoyés par discord), votre PR, vos issues etc. doivent être en **français**.
 
 ## Lancer MonkaBot localement
 
@@ -62,20 +61,18 @@ $ npm start
 
 ## Concept de MonkaBot
 
-Il y a certaines directives à prendre en compte avant que vos changements soient acceptés. _Ce n'est pas une liste
-exhaustive, mais ca peut vous donner une idée de ce à quoi penser avant de faire vos changements._
+Il y a certaines directives à prendre en compte avant que vos changements soient acceptés. *Ce n'est pas une liste
+exhaustive, mais ca peut vous donner une idée de ce à quoi penser avant de faire vos changements.*
 
-- MonkaBot ne doit pas changer le comportement par défaut de Sapphire ou Discord.js.
 - Les fonctionnalités de MonkaBot doivent être utiles à la majorité des utilisateurs. Mais ne laissez pas cela vous
 arrêter : votre idée est surement très bonne aussi !
 - Pensez que vous développez une fonctionnalité pour un discord d'entraide et de révision, pas une communauté de jeu.
 Ainsi, inutile d'ajouter des commandes "fun" ou qui n'ont rien à voir avec le thème du discord.
-- Tout doit suivre nos règles ESLint dans la mesure du possible, et les tests de lint doivent passer, même si cela vous
-oblige à désactiver quelques règles **localement, pas dans le fichier `.eslintrc.js`**.
+- Votre code doit suivre nos règles ESLint dans la mesure du possible, et les tests de lint doivent passer, même si
+cela vous oblige à désactiver quelques règles **localement, pas dans le fichier `.eslintrc.js`**.
 
 <!-- Link Dump -->
 
 [directives de contributions de Skyra]: https://github.com/skyra-project/skyra/blob/75df79bd409f78d224e50a39acdf3e2a10679cd4/.github/CONTRIBUTING.md
 [conventional commits]: https://www.conventionalcommits.org/en/v1.0.0/
-[ici]: https://github.com/noftaly/monkabot/pulls
 [Node.js]: https://nodejs.org/en/download/
