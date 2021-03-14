@@ -5,6 +5,8 @@ export const ping = {
     aliases: ['ping', 'pong', 'ms'],
     description: "Permet de connaître la latence de MonkaBot et de l'API Discord.",
     enabled: true,
+    usage: 'ping',
+    examples: ['ping'],
   },
   messages: {
     firstMessage: 'Ping !',
@@ -17,6 +19,8 @@ export const statistics = {
     aliases: ['statistiques', 'statistique', 'statistics', 'statistic', 'stats', 'stat', 'botinfo'],
     description: 'Affiche des statistiques et diverses informations sur MonkaBot, comme son temps de fonctionnement, sa version etc.',
     enabled: true,
+    usage: 'statistiques',
+    examples: ['statistiques'],
   },
   messages: {
     embed: {

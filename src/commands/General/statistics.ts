@@ -1,17 +1,17 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { CommandOptions } from '@sapphire/framework';
-import { Command } from '@sapphire/framework';
 import dayjs from 'dayjs';
 import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
+import MonkaCommand from '@/lib/MonkaCommand';
 import pkg from '@/root/package.json';
 import { getGitRev } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)
-export default class StatisticsCommand extends Command {
+export default class StatisticsCommand extends MonkaCommand {
   public async run(message: Message): Promise<void> {
     const totalCommands = this.context.stores.get('commands').size;
     const embedMessages = config.messages.embed;
