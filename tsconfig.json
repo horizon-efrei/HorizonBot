@@ -14,17 +14,25 @@
     "noImplicitAny": true,
     "outDir": "./dist",
     "paths": {
-			"@/root/*": ["./*"],
+			"@/app": ["./src"],
 			"@/app/*": ["./src/*"],
+			"@/commands": ["./src/commands"],
 			"@/commands/*": ["./src/commands/*"],
+			"@/config": ["./config"],
 			"@/config/*": ["./config/*"],
-			"@/config": ["./config"]
+			"@/lib": ["./src/lib"],
+			"@/lib/*": ["./src/lib/*"],
+			"@/root": ["."],
+			"@/root/*": ["./*"],
+			"@/types": ["./src/lib/types"],
+			"@/types/*": ["./src/lib/types/*"],
+			"@/utils": ["src/lib/utils"],
 		},
     "pretty": false,
     "removeComments": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "target": "es2017"
+    "target": "es2019"
   },
   "include": ["./src/**/*.ts", "./config/**/*.ts"],
   "exclude": ["node_modules/", "typings/"]

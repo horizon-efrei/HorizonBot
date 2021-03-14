@@ -8,7 +8,7 @@ import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import pkg from '@/root/package.json';
-import getGitRev from '../../utils/getGitRev';
+import { getGitRev } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class StatisticsCommand extends Command {

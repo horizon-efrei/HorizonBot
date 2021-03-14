@@ -53,9 +53,12 @@
   },
   "_moduleAliases": {
     "@/app": "./dist/src",
-    "@/root": "./dist/",
     "@/commands": "./dist/src/commands",
-    "@/config": "./dist/config"
+    "@/config": "./dist/config",
+    "@/lib": "./dist/src/lib",
+    "@/root": "./dist/",
+    "@/types": "./dist/src/lib/types",
+    "@/utils": "./dist/src/lib/utils"
   },
   "engines": {
     "node": ">=12.0.0"
