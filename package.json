@@ -15,6 +15,10 @@
   "author": "Elliot 'noftaly' Maisl",
   "contributors": [],
   "license": "MIT",
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/noftaly/MonkaBot"
+  },
   "dependencies": {
     "@sapphire/decorators": "^2.0.5",
     "@sapphire/discord-utilities": "^2.0.5",
@@ -25,6 +29,7 @@
     "@sapphire/time-utilities": "^1.2.10",
     "@sapphire/utilities": "^1.4.5",
     "common-tags": "^1.8.0",
+    "dayjs": "^1.10.4",
     "discord.js": "^12.5.1",
     "dotenv": "^8.2.0",
     "module-alias": "^2.2.2",
@@ -48,6 +53,7 @@
   },
   "_moduleAliases": {
     "@/app": "./dist/src",
+    "@/root": "./dist/",
     "@/commands": "./dist/src/commands",
     "@/config": "./dist/config"
   },

@@ -14,6 +14,7 @@
     "noImplicitAny": true,
     "outDir": "./dist",
     "paths": {
+			"@/root/*": ["./*"],
 			"@/app/*": ["./src/*"],
 			"@/commands/*": ["./src/commands/*"],
 			"@/config/*": ["./config/*"],
