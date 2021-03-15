@@ -7,7 +7,7 @@ import 'dayjs/locale/fr';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import MonkaClient from '@/app/MonkaClient';
+import MonkaClient from '@/structures/MonkaClient';
 
 console.log('Starting MonkaBot...');
 
