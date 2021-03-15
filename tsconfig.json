@@ -22,6 +22,8 @@
 			"@/config/*": ["./config/*"],
 			"@/lib": ["./src/lib"],
 			"@/lib/*": ["./src/lib/*"],
+			"@/resolvers": ["./src/lib/resolvers"],
+			"@/resolvers/*": ["./src/lib/resolvers/*"],
 			"@/root": ["."],
 			"@/root/*": ["./*"],
 			"@/structures": ["./src/lib/structures"],

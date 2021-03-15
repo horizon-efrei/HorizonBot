@@ -1,5 +1,30 @@
 import { stripIndent } from 'common-tags';
 
+export const help = {
+  options: {
+    aliases: ['help', 'aide'],
+    description: "Permet de voir la liste des commandes de MonkaBot, ou d'avoir des informations sur une commande en particulier.",
+    enabled: true,
+    usage: 'help [commande]',
+    examples: ['help', 'aide statistique'],
+  },
+  messages: {
+    commandInfo: {
+      title: ':star: Commande "{command.name}"',
+      description: '❯ Description',
+      usage: '❯ Utilisation',
+      usableBy: '❯ Utilisable par',
+      aliases: '❯ Aliases',
+      examples: '❯ Exemples',
+    },
+    commandsList: {
+      title: 'Commandes de MonkaBot ({amount})',
+      description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande.",
+      category: '❯ {categoryName}',
+    },
+  },
+};
+
 export const ping = {
   options: {
     aliases: ['ping', 'pong', 'ms'],
