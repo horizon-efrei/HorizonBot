@@ -3,7 +3,7 @@ import type { CommandOptions } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import pupa from 'pupa';
 import { ping as config } from '@/config/commands/general';
-import MonkaCommand from '@/lib/MonkaCommand';
+import MonkaCommand from '@/structures/MonkaCommand';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class PingCommand extends MonkaCommand {

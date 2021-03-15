@@ -6,8 +6,8 @@ import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import MonkaCommand from '@/lib/MonkaCommand';
 import pkg from '@/root/package.json';
+import MonkaCommand from '@/structures/MonkaCommand';
 import { getGitRev } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)

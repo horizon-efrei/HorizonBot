@@ -24,6 +24,8 @@
 			"@/lib/*": ["./src/lib/*"],
 			"@/root": ["."],
 			"@/root/*": ["./*"],
+			"@/structures": ["./src/lib/structures"],
+			"@/structures/*": ["./src/lib/structures/*"],
 			"@/types": ["./src/lib/types"],
 			"@/types/*": ["./src/lib/types/*"],
 			"@/utils": ["src/lib/utils"],
