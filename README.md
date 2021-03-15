@@ -31,8 +31,11 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
 - **`src` :**
   - **`commands` :** Dossier où se trouvent toutes les commandes, rangées dans des sous-dossiers correspondant à leurs catégories.
   - **`events` :** Dossier où se trouvent tous les gestionnaires d'évènement.
-  - **`types` :** Fichiers contenant les typings TypeScript nécessaires pour MonkaBot.
-  - **`utils` :** Dossier contenant différentes fonctions utilitaires.
+  - **`lib` :** Dossier contenant plusieurs fichiers utiles dans le code.
+    - **`resolvers` :** Types customs pour les arguments des commandes.
+    - **`structures` :** Différentes classes utilisées à travers MonkaBot.
+    - **`types` :** Fichiers contenant les typings TypeScript nécessaires pour MonkaBot.
+    - **`utils` :** Dossier contenant différentes fonctions utilitaires.
 
 ## Crédits
 
