@@ -1,7 +1,6 @@
 import path from 'path';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, Command, CommandOptions } from '@sapphire/framework';
-import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { help as config } from '@/config/commands/general';
@@ -9,10 +8,11 @@ import settings from '@/config/settings';
 import commandResolver from '@/resolvers/command';
 import MonkaCommand from '@/structures/MonkaCommand';
 import type MonkaCommandStore from '@/structures/MonkaCommandStore';
+import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class HelpCommand extends MonkaCommand {
-  public async run(message: Message, args: Args): Promise<void> {
+  public async run(message: GuildMessage, args: Args): Promise<void> {
     const requestedCommand = await args.pickResult(commandResolver);
     const embed = new MessageEmbed().setColor(settings.colors.default);
 
