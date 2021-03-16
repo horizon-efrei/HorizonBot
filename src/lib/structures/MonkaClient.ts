@@ -3,8 +3,11 @@ import { oneLine } from 'common-tags';
 import type { GuildChannel, PermissionString, TextChannel } from 'discord.js';
 import { Intents } from 'discord.js';
 import settings from '@/config/settings';
+import ConfigurationManager from './ConfigurationManager';
 
 export default class MonkaClient extends SapphireClient {
+  configurationManager: ConfigurationManager;
+
   constructor() {
     super({
       caseInsensitiveCommands: true,
@@ -24,6 +27,9 @@ export default class MonkaClient extends SapphireClient {
         ],
       },
     });
+
+    this.configurationManager = new ConfigurationManager(this);
+    void this.configurationManager.loadAll();
 
     this.logger.info('Client initialization finished!');
   }
