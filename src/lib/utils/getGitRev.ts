@@ -3,6 +3,10 @@ import path from 'path';
 
 let cachedCommit = '';
 
+/**
+ * Get the current git commit hash.
+ * @returns Promise<string>
+ */
 export default async function getGitRev(): Promise<string> {
   if (cachedCommit)
     return cachedCommit;
