@@ -34,7 +34,8 @@
     "dotenv": "^8.2.0",
     "module-alias": "^2.2.2",
     "pupa": "^2.1.1",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.0",

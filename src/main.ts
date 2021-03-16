@@ -1,3 +1,4 @@
+import 'source-map-support/register';
 import '@sapphire/plugin-logger/register';
 import 'dotenv/config';
 import 'module-alias/register';
