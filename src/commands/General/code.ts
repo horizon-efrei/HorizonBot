@@ -43,11 +43,11 @@ export default class CodeCommand extends MonkaCommand {
     }
 
     const lang = await args.pickResult('codeLanguage');
-    if (!lang.success) {
+    if (lang.error) {
       // TODO: This is trash (both typings and handling).
       interface UserErrorWithParameter extends UserError { parameter: string }
       const { parameter } = (lang.error as UserErrorWithParameter);
-      if (parameter === 'info') {
+      if (['info', 'infos', 'information', 'informations'].includes(parameter)) {
         await this._showInfos(message);
         return;
       }
@@ -58,7 +58,7 @@ export default class CodeCommand extends MonkaCommand {
     const shouldWrap = args.getFlags('wrap');
 
     const codeArg = await args.restResult('code');
-    if (!codeArg.success) {
+    if (codeArg.error) {
       await message.channel.send(config.messages.noCode);
       return;
     }

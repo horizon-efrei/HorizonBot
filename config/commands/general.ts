@@ -11,8 +11,8 @@ export const code = {
       • Je ne peux pas faire cette commande un nombre illimité de fois : elle est cappée à 200 utilisations par jour, en tout. Merci de ne pas en abuser pour que tout le monde puisse en profiter ! :) (ne vous étonnez pas si elle ne répond plus quand vous l'executez : vous l'avez surement trop spammée.)
     `,
     enabled: true,
-    usage: 'run <langage> [--wrap] <code>',
-    examples: ['run'],
+    usage: 'run info|<langage> [--wrap] <code>',
+    examples: ['code info', 'run java --wrap System.out.println("Test");', 'run js console.log("test");'],
   },
   messages: {
     noMoreCredits: 'Cette commande peut malheureusement être utilisée maximum 200 fois par jour en tout, et ce quota a été atteint... Réessaye à partir de 13h !',
