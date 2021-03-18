@@ -1,4 +1,4 @@
-<h2 align="center">MonkaBot</h2>
+<h1 align="center">MonkaBot</h1>
 <p align="center">
     🦉 Le bot du discord EFREI Révisions Entraide (ERE)
 </p>
@@ -14,13 +14,12 @@ Pour tout autre question, vous pouvez créer une [Discussion GitHub].
 
 ## Développement et contributions
 
-Nos Pull Request (PR) sont ouvertes à toute contribution ! Vous pouvez regarder notre [guide de contributions] avant de commencer à travailler sur MonkaBot : il vous aidera à tout mettre en place et à vous assurer que votre PR puisse être merge rapidement.
+Nos Pull Request (PR) sont ouvertes à toutes contributions ! Vous pouvez regarder notre [guide de contributions] avant de commencer à travailler sur MonkaBot : il vous aidera à tout mettre en place et à vous assurer que votre PR puisse être merge rapidement.
 
 ## Informations
 
 MonkaBot est un bot Discord développé en TypeScript (un dérivé de JavaScript avec un typage plus fort). Il utilise la librairie [discord.js] pour les appels à l'API Discord.
-Il utilise également le framework [Sapphire], par-dessus discord.js.
-Ce framework sert notamment à gérer les évènements, les commandes et les arguments...
+Il utilise également le framework [Sapphire], par-dessus discord.js. Ce framework sert notamment à gérer les évènements, les commandes et les arguments...
 
 Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter la [License] (MIT).
 
@@ -29,10 +28,11 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
 - **`dist`** *(pas sur GitHub)* **:** Dossier où se trouve le code transpilé de MonkaBot, après avoir lancé `npm run build` (ou `npm start`).
 - **`config` :** Dossier où se trouvent tous les fichiers de configuration de MonkaBot.
 - **`src` :**
+  - **`arguments` :** Dossier où se trouvent tous les arguments customs.
   - **`commands` :** Dossier où se trouvent toutes les commandes, rangées dans des sous-dossiers correspondant à leurs catégories.
   - **`events` :** Dossier où se trouvent tous les gestionnaires d'évènement.
   - **`lib` :** Dossier contenant plusieurs fichiers utiles dans le code.
-    - **`resolvers` :** Types customs pour les arguments des commandes.
+    - **`models` :** Fichiers des schemas mongoose.
     - **`structures` :** Différentes classes utilisées à travers MonkaBot.
     - **`types` :** Fichiers contenant les typings TypeScript nécessaires pour MonkaBot.
     - **`utils` :** Dossier contenant différentes fonctions utilitaires.
