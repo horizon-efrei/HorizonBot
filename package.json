@@ -55,11 +55,9 @@
   },
   "_moduleAliases": {
     "@/app": "./dist/src",
-    "@/commands": "./dist/src/commands",
     "@/config": "./dist/config",
     "@/lib": "./dist/src/lib",
     "@/models": "./dist/src/lib/models",
-    "@/resolvers": "./dist/src/lib/resolvers",
     "@/root": "./dist/",
     "@/structures": "./dist/src/lib/structures",
     "@/types": "./dist/src/lib/types",

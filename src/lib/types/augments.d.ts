@@ -10,4 +10,8 @@ declare module '@sapphire/framework' {
   interface SapphireClient {
     configurationManager: ConfigurationManager;
   }
+
+  interface ArgType {
+    command: MonkaCommand;
+  }
 }

@@ -5,7 +5,6 @@ import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { help as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import commandResolver from '@/resolvers/command';
 import MonkaCommand from '@/structures/MonkaCommand';
 import type MonkaCommandStore from '@/structures/MonkaCommandStore';
 import type { GuildMessage } from '@/types';
@@ -13,7 +12,7 @@ import type { GuildMessage } from '@/types';
 @ApplyOptions<CommandOptions>(config.options)
 export default class HelpCommand extends MonkaCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
-    const requestedCommand = await args.pickResult(commandResolver);
+    const requestedCommand = await args.pickResult('command');
     const embed = new MessageEmbed().setColor(settings.colors.default);
 
     if (requestedCommand.success) {
