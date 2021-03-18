@@ -12,3 +12,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Created "statistics" command
 - Created "help" command
 - Created "setup" command
+- Created an anti-swear system
+- Created "code" command
