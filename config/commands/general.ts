@@ -51,6 +51,19 @@ export const help = {
   },
 };
 
+export const latex = {
+  options: {
+    aliases: ['latex', 'tex', 'math'],
+    description: 'Permet de formatter du texte LaTeX proprement.',
+    enabled: true,
+    usage: 'latex <latex>',
+    examples: ['latex \\int_{a}^{b} f(x) dx'],
+  },
+  messages: {
+    noEquationGiven: "Tu as oublié d'ajouter une équation à formatter !",
+  },
+};
+
 export const ping = {
   options: {
     aliases: ['ping', 'pong', 'ms'],

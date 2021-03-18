@@ -9,6 +9,7 @@ export default {
     swears: ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
   },
   apis: {
+    latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',
     compiler: 'https://api.jdoodle.com/v1/execute',
     compilerCredits: 'https://api.jdoodle.com/v1/credit-spent',
   },
