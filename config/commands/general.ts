@@ -1,5 +1,31 @@
 import { stripIndent } from 'common-tags';
 
+export const code = {
+  options: {
+    aliases: ['code', 'run'],
+    description: stripIndent`
+      Permet d'exécuter du code directement depuis Discord.
+      • Pour certains langages (Java, C, C++...), tu peux ajouter le drapeau \`--wrap\` pour automatiquement ajouter la fonction/classe \`main\` autour de ton code.
+      • Tu peux écrire ton code directement après le langage, ou dans un bloc de code Markdown.
+      • Pour voir la liste des langages supportés, tape \`{prefix}code info\`.
+      • Je ne peux pas faire cette commande un nombre illimité de fois : elle est cappée à 200 utilisations par jour, en tout. Merci de ne pas en abuser pour que tout le monde puisse en profiter ! :) (ne vous étonnez pas si elle ne répond plus quand vous l'executez : vous l'avez surement trop spammée.)
+    `,
+    enabled: true,
+    usage: 'run <langage> [--wrap] <code>',
+    examples: ['run'],
+  },
+  messages: {
+    noMoreCredits: 'Cette commande peut malheureusement être utilisée maximum 200 fois par jour en tout, et ce quota a été atteint... Réessaye à partir de 13h !',
+    unknownLanguage: 'Le langage que tu as spécifié (`{parameter}`) est invalide. Il se peut que je ne le supporte pas ou que tu ais oublié de le spécifier.',
+    noCode: "Tu as oublié d'ajouter du code à exécuter !",
+    result: "Résultat de l'éxecution du code de {message.member} en {lang.value.display}. (Temps CPU : {response.data.cpuTime} / Memoire : {memory})",
+    informationBlock: stripIndent`
+      Abbréviations : {formattedSlugs}
+      Version : {lang.version}
+    `,
+  },
+};
+
 export const help = {
   options: {
     aliases: ['help', 'aide'],

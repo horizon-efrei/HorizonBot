@@ -20,7 +20,10 @@ export default class HelpCommand extends MonkaCommand {
       const information = config.messages.commandInfo;
       embed.setTitle(pupa(information.title, { command }))
         .addField(information.usage, `\`${settings.prefix}${command.usage}\``)
-        .addField(information.description, command.description);
+        .addField(
+          information.description,
+          pupa(command.description, { prefix: settings.prefix }),
+        );
 
       if (command.aliases.length > 1)
         embed.addField(information.aliases, `\`${command.aliases.join('`, `')}\``);

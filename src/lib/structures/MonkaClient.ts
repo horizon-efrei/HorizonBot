@@ -1,4 +1,5 @@
 import { LogLevel, SapphireClient } from '@sapphire/framework';
+import axios from 'axios';
 import { oneLine } from 'common-tags';
 import type { GuildChannel, PermissionString, TextChannel } from 'discord.js';
 import { Intents } from 'discord.js';
@@ -7,6 +8,7 @@ import ConfigurationManager from './ConfigurationManager';
 
 export default class MonkaClient extends SapphireClient {
   configurationManager: ConfigurationManager;
+  remainingCompilerApiCredits = 0;
 
   constructor() {
     super({
@@ -30,6 +32,8 @@ export default class MonkaClient extends SapphireClient {
 
     this.configurationManager = new ConfigurationManager(this);
     void this.configurationManager.loadAll();
+
+    void this._loadCompilerApiCredits();
 
     this.logger.info('Client initialization finished!');
   }
@@ -74,5 +78,21 @@ export default class MonkaClient extends SapphireClient {
           }
       }
     }
+  }
+
+  private async _loadCompilerApiCredits(): Promise<void> {
+    const response = await axios.post(settings.apis.compilerCredits, {
+      clientId: process.env.COMPILERAPI_ID,
+      clientSecret: process.env.COMPILERAPI_SECRET,
+    });
+
+    if (response.status >= 300 || typeof response.data?.used === 'undefined') {
+      this.logger.error('Unable to load remaining CompilerApi credits, command will not be available.');
+      this.logger.error('data', response.data);
+      return;
+    }
+
+    this.remainingCompilerApiCredits = 200 - response.data.used;
+    this.logger.info(`CompilerApi: ${200 - this.remainingCompilerApiCredits}/200 credits used (${this.remainingCompilerApiCredits} remaining).`);
   }
 }

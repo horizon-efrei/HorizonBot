@@ -28,6 +28,7 @@
     "@sapphire/plugin-logger": "^1.0.9",
     "@sapphire/time-utilities": "^1.2.11",
     "@sapphire/utilities": "^1.4.6",
+    "axios": "^0.21.1",
     "common-tags": "^1.8.0",
     "dayjs": "^1.10.4",
     "discord.js": "^12.5.1",

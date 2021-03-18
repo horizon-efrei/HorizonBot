@@ -20,3 +20,11 @@ export interface GuildMessage extends Message {
   readonly guild: Guild;
   readonly member: GuildMember;
 }
+
+export interface CodeLanguageResult {
+  display: string;
+  language: string;
+  slugs: string[];
+  version: string;
+  versionIndex: string;
+}
