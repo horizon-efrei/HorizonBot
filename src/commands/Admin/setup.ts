@@ -19,7 +19,7 @@ export default class SetupCommand extends MonkaCommand {
       case 'modos':
       case 'mod':
       case 'mods':
-        await this.context.client.configurationManager.set(ConfigEntries.ModeratorFeedback, message.channel);
+        await this.context.client.configManager.set(ConfigEntries.ModeratorFeedback, message.channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
       default:

@@ -10,7 +10,7 @@ declare module 'discord.js' {
 
 declare module '@sapphire/framework' {
   interface SapphireClient {
-    configurationManager: ConfigurationManager;
+    configManager: ConfigurationManager;
     remainingCompilerApiCredits: number;
   }
 

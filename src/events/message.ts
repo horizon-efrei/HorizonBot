@@ -13,7 +13,7 @@ export default class MessageEvent extends Event {
     // Swearing check
     const swear = settings.configuration.swears.find(swr => message.cleanContent.split(' ').includes(swr));
     if (swear) {
-      const logChannel = await this.context.client.configurationManager.get(ConfigEntries.ModeratorFeedback);
+      const logChannel = await this.context.client.configManager.get(ConfigEntries.ModeratorFeedback);
       await message.member.send(pupa(config.messages.swearUserAlert, { message, swear }));
       if (logChannel)
         await logChannel.send(pupa(config.messages.swearModAlert, { message, swear }));

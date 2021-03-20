@@ -7,7 +7,7 @@ import settings from '@/config/settings';
 import ConfigurationManager from './ConfigurationManager';
 
 export default class MonkaClient extends SapphireClient {
-  configurationManager: ConfigurationManager;
+  configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
 
   constructor() {
@@ -30,8 +30,8 @@ export default class MonkaClient extends SapphireClient {
       },
     });
 
-    this.configurationManager = new ConfigurationManager(this);
-    void this.configurationManager.loadAll();
+    this.configManager = new ConfigurationManager(this);
+    void this.configManager.loadAll();
 
     void this._loadCompilerApiCredits();
 
