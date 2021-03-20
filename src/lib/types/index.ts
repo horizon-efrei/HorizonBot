@@ -6,6 +6,7 @@ import type {
  NewsChannel,
  TextChannel,
 } from 'discord.js';
+import type MonkaClient from '../structures/MonkaClient';
 
 export type MonkaCommandOptions = CommandOptions & {
   usage: string;
@@ -17,6 +18,7 @@ export type GuildTextBasedChannel = NewsChannel | TextChannel;
 
 export interface GuildMessage extends Message {
   channel: GuildTextBasedChannel;
+  readonly client: MonkaClient;
   readonly guild: Guild;
   readonly member: GuildMember;
 }
