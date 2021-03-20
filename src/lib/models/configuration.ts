@@ -8,7 +8,10 @@ const ConfigurationSchema = new Schema({
     required: true,
     enum: ConfigEntries,
     default: ConfigEntries.ModeratorFeedback,
-    unique: true,
+  },
+  guild: {
+    type: String,
+    required: true,
   },
   value: {
     type: String,

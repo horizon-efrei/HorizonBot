@@ -8,6 +8,7 @@ export enum ConfigEntries {
 /** Interface for the "Configuration"'s mongoose schema */
 export interface ConfigurationBase {
   name: ConfigEntries;
+  guild: string;
   value: string;
 }
 
