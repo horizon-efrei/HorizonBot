@@ -45,7 +45,7 @@ export const help = {
     },
     commandsList: {
       title: 'Commandes de MonkaBot ({amount})',
-      description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande.",
+      description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande en particulier.",
       category: '❯ {categoryName}',
     },
   },

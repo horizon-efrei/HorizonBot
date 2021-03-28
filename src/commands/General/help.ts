@@ -34,7 +34,7 @@ export default class HelpCommand extends MonkaCommand {
       const amount = this.context.stores.get('commands').size;
 
       embed.setTitle(pupa(information.title, { amount }))
-        .setDescription(pupa(information.description, { helpCommand: '.help' }));
+        .setDescription(pupa(information.description, { helpCommand: `${settings.prefix}help <commande>` }));
 
       const categories = (this.context.stores
         .get('commands') as MonkaCommandStore)
