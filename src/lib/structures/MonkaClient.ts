@@ -5,11 +5,13 @@ import type { GuildChannel, PermissionString, TextChannel } from 'discord.js';
 import { Intents } from 'discord.js';
 import settings from '@/config/settings';
 import ConfigurationManager from '@/structures/ConfigurationManager';
+import type FlaggedMessage from '@/structures/FlaggedMessage';
 import TaskStore from './TaskStore';
 
 export default class MonkaClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
+  flaggedMessages: FlaggedMessage[];
 
   constructor() {
     super({
@@ -32,6 +34,8 @@ export default class MonkaClient extends SapphireClient {
     });
 
     this.stores.register(new TaskStore());
+
+    this.flaggedMessages = [];
     this.configManager = new ConfigurationManager(this);
     void this.configManager.loadAll();
 
