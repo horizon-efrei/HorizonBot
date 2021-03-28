@@ -26,6 +26,9 @@ module.exports = {
     // We don't necessarily want to use `this` in our class methods (such as `Command#run`),
     // but neither do we want them to be static.
     'class-methods-use-this': 'off',
+
+    // Sometimes we need to have a callback with `Promise<void>` in a callback that requires `void`.
+    '@typescript-eslint/no-misused-promises': 'off',
   },
   settings: {
     'import/parsers': {
