@@ -9,16 +9,13 @@ import { Piece } from '@sapphire/pieces';
  * @example
  * ```typescript
  * // TypeScript:
- * import { Task, Tasks, PieceContext } from '@/structures/Task';
+ * import { Task } from '@/structures/Task';
+ * import type { TaskOptions } from '@/structures/Task';
  *
  * // Define a class extending `Task`, then export it.
- * // NOTE: You can use `export default` or `export =` too.
- * export class MyTask extends Task<Events.Ready> {
- *   public constructor(context: PieceContext) {
- *     super(context, { interval: 10_000 }); // Every 10 seconds
- *   }
- *
- *   public run() {
+ * @ApplyOptions<TaskOptions>({ delay: 10_000 })
+ * export default class MyTask extends Task {
+ *   public run(): void {
  *     this.context.logger.info('Task ran!');
  *   }
  * }
@@ -26,23 +23,24 @@ import { Piece } from '@sapphire/pieces';
  */
 export default abstract class Task extends Piece {
   public readonly delay: number;
-  #schedule: NodeJS.Timeout;
-  #callback: (() => Promise<void>) | null;
+
+  private _schedule: NodeJS.Timeout;
+  private readonly _callback: (() => Promise<void>) | null;
 
   constructor(context: PieceContext, options: TaskOptions = {}) {
     super(context, options);
 
     this.delay = options.delay ?? 10_000;
-    this.#callback = this._run.bind(this);
+    this._callback = this._run.bind(this);
   }
 
   public onLoad(): void {
-    this.#schedule = setInterval(this.#callback, this.delay);
+    this._schedule = setInterval(this._callback, this.delay);
   }
 
   public onUnload(): void {
-    if (this.#schedule)
-      clearInterval(this.#schedule);
+    if (this._schedule)
+      clearInterval(this._schedule);
   }
 
   public toJSON(): Record<PropertyKey, unknown> {
