@@ -1,6 +1,9 @@
 import { oneLine, stripIndent } from 'common-tags';
 
 export default {
+  global: {
+    oops: ":warning: Oups... Quelque chose s'est mal passé en réalisant cette action. Il se peut qu'elle ne se soit pas complètement terminée, voire pas commencée. Désolé !",
+  },
   antiSwear: {
     swearModAlert: stripIndent`
       {message.member} à dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte. Si ce message est inapproprié, réagissez avec :white_check_mark: à ce message pour le flagger.

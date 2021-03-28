@@ -5,6 +5,7 @@ import messages from '@/config/messages';
 import settings from '@/config/settings';
 import type { GuildMessage, GuildTextBasedChannel } from '@/types';
 import { ConfigEntries } from '@/types/database';
+import { noop } from '@/utils';
 
 export default class FlaggedMessage {
   logChannel: GuildTextBasedChannel;
@@ -64,8 +65,10 @@ export default class FlaggedMessage {
             this.approvedDate = Date.now();
 
             void this._alertUser();
-          } catch {
-            this.context.logger.error('Error occured');
+          } catch (error: unknown) {
+            this.context.logger.error('An error occured while trying to confirm a flagged message...');
+            this.context.logger.error(error);
+            this.botMessage.channel.send(messages.global.oops).catch(noop);
           }
         });
     } else {
