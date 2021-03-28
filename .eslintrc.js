@@ -9,11 +9,6 @@ module.exports = {
     project: './tsconfig.eslint.json',
   },
   rules: {
-    // `node/file-extension-in-import` has too many false positives with `.json`.
-    'node/file-extension-in-import': 'off',
-    'import/extensions': ['error', 'never', { ts: 'never', json: 'always' }],
-    'import/no-unresolved': 'off',
-
     // It cannot resolve TypeScript's path aliases. See https://github.com/mysticatea/eslint-plugin-node/issues/233
     'node/no-missing-import': 'off',
 
@@ -26,9 +21,6 @@ module.exports = {
     // We don't necessarily want to use `this` in our class methods (such as `Command#run`),
     // but neither do we want them to be static.
     'class-methods-use-this': 'off',
-
-    // Sometimes we need to have a callback with `Promise<void>` in a callback that requires `void`.
-    '@typescript-eslint/no-misused-promises': 'off',
   },
   settings: {
     'import/parsers': {
