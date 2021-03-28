@@ -4,7 +4,8 @@ import { oneLine } from 'common-tags';
 import type { GuildChannel, PermissionString, TextChannel } from 'discord.js';
 import { Intents } from 'discord.js';
 import settings from '@/config/settings';
-import ConfigurationManager from './ConfigurationManager';
+import ConfigurationManager from '@/structures/ConfigurationManager';
+import TaskStore from './TaskStore';
 
 export default class MonkaClient extends SapphireClient {
   configManager: ConfigurationManager;
@@ -30,6 +31,7 @@ export default class MonkaClient extends SapphireClient {
       },
     });
 
+    this.stores.register(new TaskStore());
     this.configManager = new ConfigurationManager(this);
     void this.configManager.loadAll();
 
