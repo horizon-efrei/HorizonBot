@@ -20,7 +20,12 @@ export default {
     swearUserAlert: oneLine`
       Bonjour {message.member}, je suis le bot du discord de révision d'Efrei. Tu as tenu un propos innaproprié
       ("{swear}") dans {message.channel}. On s'efforce à garder ce serveur sérieux et amical, on t'invite donc à
-      supprimer ce message ou cette insulte le plus rapidement possible. Merci !\n{message.url}
+      supprimer ce message ou enlever cette insulte le plus rapidement possible. Merci !\n{message.url}
+    `,
+    swearUserAlertPublic: oneLine`
+      Bonjour {message.member}. Tu as tenu un propos innaproprié ("{swear}") dans ce salon. On s'efforce à garder ce
+      serveur sérieux et amical, on t'invite donc à supprimer ce message ou enlever cette insulte le plus rapidement
+      possible. Merci !\n{message.url}
     `,
   },
 };

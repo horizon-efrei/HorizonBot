@@ -77,8 +77,11 @@ export default class FlaggedMessage {
   }
 
   private async _alertUser(): Promise<void> {
-    await this.message.member.send(
-      pupa(messages.antiSwear.swearUserAlert, { message: this.message, swear: this.swear }),
-    );
+    const payload = { message: this.message, swear: this.swear };
+    try {
+      await this.message.member.send(pupa(messages.antiSwear.swearUserAlert, payload));
+    } catch {
+      await this.message.channel.send(pupa(messages.antiSwear.swearUserAlertPublic, payload));
+    }
   }
 }
