@@ -21,6 +21,8 @@ module.exports = {
     // We don't necessarily want to use `this` in our class methods (such as `Command#run`),
     // but neither do we want them to be static.
     'class-methods-use-this': 'off',
+
+    'no-await-in-loop': 'off',
   },
   settings: {
     'import/parsers': {

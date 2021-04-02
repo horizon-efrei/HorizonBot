@@ -4,9 +4,34 @@ import type {
  GuildMember,
  Message,
  NewsChannel,
+ Role,
  TextChannel,
 } from 'discord.js';
 import type MonkaClient from '../structures/MonkaClient';
+
+/* ************ */
+/*  Util types  */
+/* ************ */
+
+export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+
+/* ********************************************** */
+/*  Define the core-js "Array#uniqueBy" polyfill  */
+/* ********************************************** */
+
+type Resolver<T> = (item: T) => unknown;
+type Indexer<T> = number | symbol | keyof T;
+type ValueResolver<T> = Indexer<T> | Resolver<T>;
+
+declare global {
+  interface Array<T> {
+    uniqueBy(valueResolver?: ValueResolver<T>): T[];
+  }
+}
+
+/* ******************************************* */
+/*  Custom Types used all across the codebase  */
+/* ******************************************* */
 
 export type MonkaCommandOptions = CommandOptions & {
   usage: string;
@@ -29,4 +54,9 @@ export interface CodeLanguageResult {
   slugs: string[];
   version: string;
   versionIndex: string;
+}
+
+export interface ReactionRolePair {
+  reaction: string;
+  role: Role;
 }

@@ -1,9 +1,10 @@
-import 'source-map-support/register';
 import '@sapphire/plugin-logger/register';
+import 'core-js/proposals/array-unique';
+import 'dayjs/locale/fr';
 import 'dotenv/config';
 import 'module-alias/register';
 import 'reflect-metadata';
-import 'dayjs/locale/fr';
+import 'source-map-support/register';
 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
