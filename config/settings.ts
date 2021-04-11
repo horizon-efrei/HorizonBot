@@ -7,6 +7,7 @@ export default {
   },
   configuration: {
     swears: ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
+    stop: new Set(['stop', 'cancel', 'retour']),
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',

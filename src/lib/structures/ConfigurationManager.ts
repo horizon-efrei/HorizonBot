@@ -7,6 +7,7 @@ import type { ConfigurationDocument } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class ConfigurationManager {
+  // TODO: Make this linear, not nested.
   channels: Collection<string, Record<ConfigEntries, GuildTextBasedChannel>>;
 
   constructor(public readonly client: MonkaClient) {}
@@ -23,6 +24,7 @@ export default class ConfigurationManager {
   public async get(guildID: string, channel: ConfigEntries): Promise<GuildTextBasedChannel> {
     if (this.channels.get(guildID)?.[channel])
       return this.channels.get(guildID)[channel];
+
     const result = await Configuration.findOne({ guild: guildID, name: ConfigEntries.ModeratorFeedback }).catch(nullop);
     if (result?.value) {
       const resolvedChannel = this.client.channels.resolve(result.value);

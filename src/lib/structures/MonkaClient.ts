@@ -4,13 +4,16 @@ import { oneLine } from 'common-tags';
 import type { GuildChannel, PermissionString, TextChannel } from 'discord.js';
 import { Intents } from 'discord.js';
 import settings from '@/config/settings';
+import ReactionRole from '@/models/reactionRole';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
-import TaskStore from './TaskStore';
+import TaskStore from '@/structures/TaskStore';
+import { nullop } from '@/utils';
 
 export default class MonkaClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
+  reactionRolesIds: string[];
   flaggedMessages: FlaggedMessage[];
 
   constructor() {
@@ -35,11 +38,13 @@ export default class MonkaClient extends SapphireClient {
 
     this.stores.register(new TaskStore());
 
+    this.reactionRolesIds = [];
     this.flaggedMessages = [];
     this.configManager = new ConfigurationManager(this);
     void this.configManager.loadAll();
 
     void this._loadCompilerApiCredits();
+    void this._loadReactionRoles();
 
     this.logger.info('Client initialization finished!');
   }
@@ -100,5 +105,14 @@ export default class MonkaClient extends SapphireClient {
 
     this.remainingCompilerApiCredits = 200 - response.data.used;
     this.logger.info(`CompilerApi: ${200 - this.remainingCompilerApiCredits}/200 credits used (${this.remainingCompilerApiCredits} remaining).`);
+  }
+
+  private async _loadReactionRoles(): Promise<void> {
+    const reactionRoles = await ReactionRole.find().catch(nullop);
+    if (reactionRoles) {
+      this.reactionRolesIds.push(
+        ...reactionRoles.map(document => document?.messageId).filter(Boolean),
+      );
+    }
   }
 }

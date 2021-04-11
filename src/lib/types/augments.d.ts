@@ -2,7 +2,8 @@ import type ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import type MonkaCommand from '@/structures/MonkaCommand';
 import type TaskStore from '@/structures/TaskStore';
-import type { CodeLanguageResult } from '@/types';
+import type { CodeLanguageResult, GuildTextBasedChannel } from '@/types';
+
 
 declare module 'discord.js' {
   interface Client {
@@ -22,6 +23,7 @@ declare module '@sapphire/framework' {
   interface SapphireClient {
     configManager: ConfigurationManager;
     remainingCompilerApiCredits: number;
+    reactionRolesIds: string[];
     flaggedMessages: FlaggedMessage[];
   }
 
@@ -29,5 +31,6 @@ declare module '@sapphire/framework' {
     code: string;
     codeLanguage: CodeLanguageResult;
     command: MonkaCommand;
+    guildTextBasedChannel: GuildTextBasedChannel;
   }
 }
