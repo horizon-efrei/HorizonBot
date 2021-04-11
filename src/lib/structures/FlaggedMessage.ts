@@ -66,13 +66,13 @@ export default class FlaggedMessage {
 
             void this._alertUser();
           } catch (error: unknown) {
-            this.context.logger.error('An error occured while trying to confirm a flagged message...');
+            this.context.logger.error('[Anti Swear] An error occured while trying to confirm a flagged message...');
             this.context.logger.error(error);
             this.botMessage.channel.send(messages.global.oops).catch(noop);
           }
         });
     } else {
-      this.context.logger.warn(`A swear was detected but no log channel was found, unable to report. Setup a log channel with "${settings.prefix}setup mod"`);
+      this.context.logger.warn(`[Anti Swear] A swear was detected but no log channel was found, unable to report. Setup a log channel with "${settings.prefix}setup mod"`);
     }
   }
 

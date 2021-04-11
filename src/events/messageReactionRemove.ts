@@ -28,13 +28,13 @@ export default class MessageReactionRemoveEvent extends Event {
 
       const givenRole = message.guild.roles.cache.get(givenRoleId);
       if (!givenRole) {
-        this.context.logger.warn(`The role with id ${givenRoleId} does not exists !`);
+        this.context.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exists !`);
         return;
       }
 
       const member = message.guild.members.cache.get(user.id);
       if (!member) {
-        this.context.logger.warn(`An error has occured while trying to get member with id ${user.id}`);
+        this.context.logger.warn(`[Reaction Roles] An error has occured while trying to get member with id ${user.id}`);
         return;
       }
 

@@ -46,13 +46,13 @@ export default class MonkaClient extends SapphireClient {
     void this._loadCompilerApiCredits();
     void this._loadReactionRoles();
 
-    this.logger.info('Client initialization finished!');
+    this.logger.info('[Main] Client initialization finished!');
   }
 
   public checkValidity(): void {
     // Check tokens.
     if (!process.env.SENTRY_TOKEN)
-      this.logger.warn('Disabling Sentry as the DSN was not set in the environment variables (SENTRY_TOKEN).');
+      this.logger.warn('[Main] Disabling Sentry as the DSN was not set in the environment variables (SENTRY_TOKEN).');
 
     // Check permissions
     const permissions: PermissionString[] = [
@@ -68,6 +68,7 @@ export default class MonkaClient extends SapphireClient {
       // Check guild-level permissions
       if (!guild.me?.hasPermission(permissions)) {
         this.logger.warn(oneLine`
+          [Main]
           MonkaBot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does
           not contain one of the following: ${permissions.join(', ')}.
         `);
@@ -83,6 +84,7 @@ export default class MonkaClient extends SapphireClient {
         const channelPermissions = channel.permissionsFor(guild.me)?.toArray();
         if (channelPermissions && !permissions.every(perm => channelPermissions.includes(perm))) {
           this.logger.warn(oneLine`
+            [Main]
             MonkaBot is missing permission(s) ${permissions.filter(perm => !channelPermissions.includes(perm)).join(', ')}
             in channel "#${channel.name}" in guild "${guild.name}"
           `);
@@ -98,13 +100,12 @@ export default class MonkaClient extends SapphireClient {
     });
 
     if (response.status >= 300 || typeof response.data?.used === 'undefined') {
-      this.logger.error('Unable to load remaining CompilerApi credits, command will not be available.');
-      this.logger.error('data', response.data);
+      this.logger.error('[Compiler API] Unable to load remaining CompilerApi credits, command will not be available.');
       return;
     }
 
     this.remainingCompilerApiCredits = 200 - response.data.used;
-    this.logger.info(`CompilerApi: ${200 - this.remainingCompilerApiCredits}/200 credits used (${this.remainingCompilerApiCredits} remaining).`);
+    this.logger.info(`[Compiler API] ${200 - this.remainingCompilerApiCredits}/200 credits used (${this.remainingCompilerApiCredits} remaining).`);
   }
 
   private async _loadReactionRoles(): Promise<void> {

@@ -30,7 +30,7 @@ const main = async (): Promise<void> => {
 
   try {
     await client.login(process.env.DISCORD_TOKEN);
-    client.logger.info('Logged in!');
+    client.logger.info('[Main] Logged in!');
   } catch (error: unknown) {
     client.logger.fatal(error as Error);
     client.destroy();

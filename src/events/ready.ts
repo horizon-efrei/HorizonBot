@@ -9,7 +9,7 @@ export default class ReadyEvent extends Event {
   public async run(): Promise<void> {
     this.context.client.checkValidity();
 
-    this.context.logger.info('Caching reactions roles...');
+    this.context.logger.info('[Reaction Roles] Caching reactions roles...');
     const reactionRoles = await ReactionRole.find();
     for (const rr of reactionRoles) {
       const channel = this.context.client.channels.cache.get(rr.channelId);
