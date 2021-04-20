@@ -34,10 +34,10 @@ export const setup = {
 export const reactionRole = {
   options: {
     aliases: ['reactionrole', 'rr', 'autorole', 'ar'],
-    description: 'Permet de définir les salons particuliers que MonkaBot peut utiliser pour envoyer des messages.',
+    description: "Permet de créer des menus de réaction, sur lesquels les utilisateurs peuvent utiliser des réactions pour s'ajouter des rôles.",
     enabled: true,
-    usage: 'setup [salon]',
-    examples: ['setup mod'],
+    usage: 'reactionrole <start | list | remove | help>',
+    examples: ['reactionrole start', 'rr start #salon-annonces', 'autorole list', 'ar remove 188341077902753794', 'rr help'],
   },
   messages: {
     // Create the menu
