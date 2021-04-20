@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import type { ConfigurationDocument, ConfigurationModel } from '@/types/database';
 import { ConfigEntries } from '@/types/database';
 
-const ConfigurationSchema = new Schema({
+const ConfigurationSchema = new Schema<ConfigurationDocument, ConfigurationModel>({
   name: {
     type: String,
     required: true,

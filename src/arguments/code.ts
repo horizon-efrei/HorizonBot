@@ -1,7 +1,6 @@
 import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
 
-// eslint-disable-next-line unicorn/no-unsafe-regex
 const MARKDOWN_FENCED_BLOCK_REGEX = /^```(?:[\S]+)?\n(?<code>[^`]*)```$/imu;
 
 export default class CodeArgument extends Argument<string> {
