@@ -25,6 +25,7 @@ declare module '@sapphire/framework' {
     remainingCompilerApiCredits: number;
     reactionRolesIds: string[];
     flaggedMessages: FlaggedMessage[];
+    intersectionRoles: string[];
   }
 
   interface ArgType {

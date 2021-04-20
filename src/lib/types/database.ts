@@ -39,3 +39,20 @@ export interface ReactionRoleDocument extends ReactionRoleBase, Document {}
 
 /** Interface for the "ReactionRole"'s mongoose model */
 export type ReactionRoleModel = Model<ReactionRoleDocument>;
+
+/* ********************************* */
+/*  RoleIntersection Database Types  */
+/* ********************************* */
+
+/** Interface for the "RoleIntersection"'s mongoose schema */
+export interface RoleIntersectionBase {
+  roleId: string;
+  guildId: string;
+  expiration: number;
+}
+
+/** Interface for the "RoleIntersection"'s mongoose document */
+export interface RoleIntersectionDocument extends RoleIntersectionBase, Document {}
+
+/** Interface for the "RoleIntersection"'s mongoose model */
+export type RoleIntersectionModel = Model<RoleIntersectionDocument>;
