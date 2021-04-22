@@ -14,6 +14,6 @@ export default class MessageUpdateEvent extends Event {
     if (flaggedMessage && !swear)
       await flaggedMessage.remove();
     else if (!flaggedMessage && swear)
-      new FlaggedMessage(newMessage, swear);
+      await new FlaggedMessage(newMessage, swear).start();
   }
 }

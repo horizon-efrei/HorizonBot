@@ -56,3 +56,24 @@ export interface RoleIntersectionDocument extends RoleIntersectionBase, Document
 
 /** Interface for the "RoleIntersection"'s mongoose model */
 export type RoleIntersectionModel = Model<RoleIntersectionDocument>;
+
+/* ********************************* */
+/*  FlaggedMessage Database Types  */
+/* ********************************* */
+
+/** Interface for the "RoleIntersection"'s mongoose schema */
+export interface FlaggedMessageBase {
+  guildId: string;
+  channelId: string;
+  messageId: string;
+  alertMessageId: string;
+  swear: string;
+  approved: boolean;
+  approvedDate: number;
+}
+
+/** Interface for the "RoleIntersection"'s mongoose document */
+export interface FlaggedMessageDocument extends FlaggedMessageBase, Document {}
+
+/** Interface for the "RoleIntersection"'s mongoose model */
+export type FlaggedMessageModel = Model<FlaggedMessageDocument>;

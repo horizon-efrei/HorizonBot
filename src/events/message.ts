@@ -27,6 +27,6 @@ export default class MessageEvent extends Event {
     // Swearing check
     const swear = settings.configuration.swears.find(swr => message.cleanContent.split(' ').includes(swr));
     if (swear)
-      new FlaggedMessage(message, swear);
+      await new FlaggedMessage(message, swear).start();
   }
 }
