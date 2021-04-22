@@ -8,6 +8,7 @@ export default {
   configuration: {
     swears: ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
     stop: new Set(['stop', 'cancel', 'retour']),
+    enableCompilerApi: true,
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
   },
   apis: {

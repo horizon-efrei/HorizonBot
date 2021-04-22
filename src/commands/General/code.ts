@@ -10,8 +10,6 @@ import MonkaCommand from '@/structures/MonkaCommand';
 import type { GuildMessage } from '@/types';
 import { convertSize } from '@/utils';
 
-const USE_API = false;
-
 const wraps = new Map([
   ['c', '#include <stdio.h>\nint main() { {code} }'],
   ['cpp', '#include <iostream>\nint main() { {code} }'],
@@ -45,8 +43,7 @@ export default class CodeCommand extends MonkaCommand {
     const lang = await args.pickResult('codeLanguage');
     if (lang.error) {
       // TODO: This is trash (both typings and handling).
-      interface UserErrorWithParameter extends UserError { parameter: string }
-      const { parameter } = (lang.error as UserErrorWithParameter);
+      const { parameter } = (lang.error as UserError & { parameter: string });
       if (['info', 'infos', 'information', 'informations'].includes(parameter)) {
         await this._showInfos(message);
         return;
@@ -69,7 +66,7 @@ export default class CodeCommand extends MonkaCommand {
     void message.channel.startTyping();
 
     let response = { data: { cpuTime: 0, memory: 0, output: code } };
-    if (USE_API) {
+    if (settings.configuration.enableCompilerApi) {
       this.context.client.remainingCompilerApiCredits--;
       response = await axios.post(settings.apis.compiler, {
         script: code,
