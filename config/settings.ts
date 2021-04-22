@@ -25,13 +25,6 @@ export default {
       versionIndex: '3',
     },
     {
-      language: 'brainfuck',
-      slugs: ['brainfuck', 'bf'],
-      display: 'Brainfuck',
-      version: 'bfc-0.1',
-      versionIndex: '0',
-    },
-    {
       language: 'c',
       slugs: ['c', 'clang'],
       display: 'C',
@@ -72,13 +65,6 @@ export default {
       display: 'Java',
       version: 'JDK 11.0.4',
       versionIndex: '3',
-    },
-    {
-      language: 'kotlin',
-      slugs: ['kotlin', 'kt'],
-      display: 'Kotlin',
-      version: '1.3.50 (JRE 11.0.4)',
-      versionIndex: '2',
     },
     {
       language: 'nodejs',

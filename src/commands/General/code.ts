@@ -11,10 +11,10 @@ import type { GuildMessage } from '@/types';
 import { convertSize } from '@/utils';
 
 const wraps = new Map([
-  ['c', '#include <stdio.h>\nint main() { {code} }'],
+  ['c', '#include <stdio.h>\n#include <stdlib.h>\nint main() { {code} }'],
   ['cpp', '#include <iostream>\nint main() { {code} }'],
   ['java', 'public class Main {\n\tpublic static void main(String[] args) {\n\t{code}\n\t}\n}'],
-  ['kotlin', 'fun main(args: Array<String>) {\n{code}\n}'],
+  ['javascript', ';(async () => { {code} } )();'],
 ]);
 
 @ApplyOptions<CommandOptions>({
@@ -22,6 +22,7 @@ const wraps = new Map([
   quotes: [],
   strategyOptions: {
     flags: ['wrap'],
+    options: ['input'],
   },
   preconditions: [{
     name: 'Cooldown',
@@ -53,6 +54,7 @@ export default class CodeCommand extends MonkaCommand {
     }
 
     const shouldWrap = args.getFlags('wrap');
+    const input = args.getOption('input');
 
     const codeArg = await args.restResult('code');
     if (codeArg.error) {
@@ -70,6 +72,7 @@ export default class CodeCommand extends MonkaCommand {
       this.context.client.remainingCompilerApiCredits--;
       response = await axios.post(settings.apis.compiler, {
         script: code,
+        stdin: input,
         language: lang.value.language,
         versionIndex: lang.value.versionIndex,
         clientId: process.env.COMPILERAPI_ID,
@@ -81,7 +84,7 @@ export default class CodeCommand extends MonkaCommand {
     await message.channel.send(pupa(config.messages.result, {
       message,
       lang,
-      response,
+      cpuTime: response.data.cpuTime ?? 0,
       memory: convertSize(response.data.memory),
     }));
     // Ph (placeholder) prevents Discord from taking the first line as a language identifier for markdown and remove it
