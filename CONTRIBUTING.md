@@ -38,6 +38,7 @@ Les messages visibles par les utilisateurs (envoyés par discord), votre PR, vos
 Pour lancer MonkaBot localement, il faut suivre ces étapes :
 
 1. Installez [Node.js].
+1. Installez [MongoDB Community Edition].
 1. Renommez le fichier `.env.example` à la racine du projet, en `.env`.
 1. Remplissez ce fichier avec vos tokens et votre configuration.
 1. Installez les dependences avec `npm install`.
@@ -76,3 +77,4 @@ cela vous oblige à désactiver quelques règles **localement, pas dans le fichi
 [directives de contributions de Skyra]: https://github.com/skyra-project/skyra/blob/75df79bd409f78d224e50a39acdf3e2a10679cd4/.github/CONTRIBUTING.md
 [conventional commits]: https://www.conventionalcommits.org/en/v1.0.0/
 [Node.js]: https://nodejs.org/en/download/
+[MongoDB Community Edition]: https://docs.mongodb.com/manual/installation/
