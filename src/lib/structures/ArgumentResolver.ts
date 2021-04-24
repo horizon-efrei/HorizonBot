@@ -54,7 +54,6 @@ export default {
       return null;
 
     const channel = guild.channels.cache.get(channelID);
-    console.log('DEBUG ~ file: ArgumentResolver.ts ~ line 57 ~ resolveMessageByLink ~ channel', channel);
     if (!channel
       || !channel.viewable
       || !(isNewsChannel(channel) || isTextChannel(channel))
