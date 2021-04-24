@@ -6,10 +6,15 @@ export default {
     default: '#439bf2',
   },
   configuration: {
-    swears: ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
+    swears: ['fleur', 'arbre', 'tulipe'], // ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
     stop: new Set(['stop', 'cancel', 'retour']),
     enableCompilerApi: true,
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
+    flagMessageReaction: '🚩',
+  },
+  roles: {
+    // TODO: Move that to per-guild configuration (managed by ConfigurationManager)
+    staff: '822900204742770749',
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',

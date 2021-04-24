@@ -8,12 +8,12 @@ export default class MessageUpdateEvent extends Event {
       return;
 
     // Swearing check
-    const flaggedMessage = this.context.client.flaggedMessages.find(msg => msg.message.id === newMessage.id);
+    const flaggedMessage = this.context.client.waitingFlaggedMessages.find(msg => msg.message.id === newMessage.id);
     const swear = FlaggedMessage.getSwear(newMessage);
 
     if (flaggedMessage && !swear)
       await flaggedMessage.remove();
     else if (!flaggedMessage && swear)
-      await new FlaggedMessage(newMessage, swear).start();
+      await new FlaggedMessage(newMessage, { swear }).start();
   }
 }

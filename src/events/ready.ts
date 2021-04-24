@@ -27,7 +27,7 @@ export default class ReadyEvent extends Event {
     }
 
     this.context.logger.info('[Anti Swear] Caching alert messages...');
-    const flaggedMessages = await FlaggedMessageDB.find();
+    let flaggedMessages = await FlaggedMessageDB.find({ approved: false });
     for (const flaggedMessage of flaggedMessages) {
       const logChannel = await this.context.client.configManager.get(
         flaggedMessage.guildId,
@@ -37,7 +37,8 @@ export default class ReadyEvent extends Event {
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await FlaggedMessageDB.findByIdAndDelete(flaggedMessage._id);
-          this.context.client.flaggedMessages = this.context.client.flaggedMessages
+          flaggedMessages = flaggedMessages.filter(msg => msg._id !== flaggedMessage._id);
+          this.context.client.waitingFlaggedMessages = this.context.client.waitingFlaggedMessages
             .filter(elt => elt.message.id !== flaggedMessage.messageId);
         });
     }
@@ -46,7 +47,7 @@ export default class ReadyEvent extends Event {
     // FIXME: dont await each in the loop, parse them all in parallel and bulk-add them after.
     for (const flaggedMessage of flaggedMessages) {
       const parsedFlaggedMessage = await FlaggedMessage.fromDocument(flaggedMessage);
-      this.context.client.flaggedMessages.push(parsedFlaggedMessage);
+      this.context.client.waitingFlaggedMessages.push(parsedFlaggedMessage);
     }
   }
 }

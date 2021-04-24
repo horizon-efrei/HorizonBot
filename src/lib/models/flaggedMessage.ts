@@ -14,13 +14,22 @@ const FlaggedMessageSchema = new Schema<FlaggedMessageDocument, FlaggedMessageMo
     type: String,
     required: true,
   },
-  alertMessageId: {
+  authorId: {
     type: String,
     required: true,
   },
+  alertMessageId: {
+    type: String,
+  },
   swear: {
     type: String,
-    required: true,
+  },
+  isManual: {
+    type: Boolean,
+    default: false,
+  },
+  manualModeratorId: {
+    type: String,
   },
   approved: {
     type: Boolean,

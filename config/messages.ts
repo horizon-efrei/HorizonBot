@@ -11,6 +11,12 @@ export default {
       En savoir plus : *TODO*.
       {message.url}
     `,
+    manualSwearAlert: stripIndent`
+      {message.member} à envoyé un message jugé innaproprié par {manualModerator} dans {message.channel}. Il a donc été sommé en MP.
+
+      En savoir plus : *TODO*.
+      {message.url}
+    `,
     swearModAlertUpdate: stripIndent`
       *~~{message.member} à dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte.~~* {moderator} a flaggé ce message et l'utilisateur a été sommé en MP.
 
@@ -26,6 +32,16 @@ export default {
       Bonjour {message.member}. Tu as tenu un propos innaproprié ("{swear}") dans ce salon. On s'efforce à garder ce
       serveur sérieux et amical, on t'invite donc à supprimer ce message ou enlever cette insulte le plus rapidement
       possible. Merci !\n{message.url}
+    `,
+    swearManualUserAlert: oneLine`
+      Bonjour {message.member}, je suis le bot du discord de révision d'Efrei. Tu as tenu un propos innaproprié
+      dans {message.channel}. On s'efforce à garder ce serveur sérieux et amical, on t'invite donc à supprimer
+      ce message ou enlever cette insulte le plus rapidement possible. Merci !\n{message.url}
+    `,
+    swearManualUserAlertPublic: oneLine`
+      Bonjour {message.member}. Tu as tenu un propos innaproprié dans ce salon. On s'efforce à garder ce serveur
+      sérieux et amical, on t'invite donc à supprimer ce message ou enlever cette insulte le plus rapidement possible.
+      Merci !\n{message.url}
     `,
   },
 };

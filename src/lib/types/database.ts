@@ -66,8 +66,11 @@ export interface FlaggedMessageBase {
   guildId: string;
   channelId: string;
   messageId: string;
-  alertMessageId: string;
-  swear: string;
+  authorId: string;
+  alertMessageId?: string;
+  swear?: string;
+  isManual?: boolean;
+  manualModeratorId?: string;
   approved: boolean;
   approvedDate: number;
 }

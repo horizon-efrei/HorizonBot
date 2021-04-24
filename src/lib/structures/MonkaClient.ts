@@ -14,7 +14,7 @@ export default class MonkaClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
   reactionRolesIds: string[];
-  flaggedMessages: FlaggedMessage[];
+  waitingFlaggedMessages: FlaggedMessage[];
   intersectionRoles: string[];
 
   constructor() {
@@ -40,7 +40,7 @@ export default class MonkaClient extends SapphireClient {
     this.stores.register(new TaskStore());
 
     this.reactionRolesIds = [];
-    this.flaggedMessages = [];
+    this.waitingFlaggedMessages = [];
     this.intersectionRoles = [];
     this.configManager = new ConfigurationManager(this);
     void this.configManager.loadAll();

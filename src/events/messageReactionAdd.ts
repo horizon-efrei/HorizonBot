@@ -1,9 +1,11 @@
 import { Event } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
 import messages from '@/config/messages';
+import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
 import type { GuildMessage } from '@/types';
 import { noop } from '@/utils';
+import FlaggedMessage from '../lib/structures/FlaggedMessage';
 
 export default class MessageReactionAddEvent extends Event {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
@@ -13,14 +15,27 @@ export default class MessageReactionAddEvent extends Event {
     const message = reaction.message as GuildMessage;
     const member = message.guild.members.cache.get(user.id);
 
+    // If a moderator is flagging a message
+    if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagMessageReaction
+      && member.roles.cache.has(settings.roles.staff))
+      await this._flagMessage(reaction, member, message);
+
     // If we are reacting to a reaction role
     if (this.context.client.reactionRolesIds.includes(reaction.message.id))
       await this._handleReactionRole(reaction, member, message);
 
     // If we are reacting to a flag message alert
-    if (this.context.client.flaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
+    if (this.context.client.waitingFlaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
       && reaction.emoji.name === '✅')
       await this._handleModeratorFlag(reaction, member, message);
+  }
+
+  private async _flagMessage(
+    _reaction: MessageReaction,
+    member: GuildMember,
+    message: GuildMessage,
+  ): Promise<void> {
+    await new FlaggedMessage(message, { manualModerator: member }).start(true);
   }
 
   private async _handleReactionRole(
@@ -65,7 +80,7 @@ export default class MessageReactionAddEvent extends Event {
     if (reaction.emoji.name !== '✅')
       return;
 
-    const flagMessage = this.context.client.flaggedMessages.find(msg => msg.alertMessage.id === message.id);
+    const flagMessage = this.context.client.waitingFlaggedMessages.find(msg => msg.alertMessage.id === message.id);
     try {
       await flagMessage.approve(member);
     } catch (error: unknown) {

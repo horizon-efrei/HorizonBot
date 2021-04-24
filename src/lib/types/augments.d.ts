@@ -24,7 +24,7 @@ declare module '@sapphire/framework' {
     configManager: ConfigurationManager;
     remainingCompilerApiCredits: number;
     reactionRolesIds: string[];
-    flaggedMessages: FlaggedMessage[];
+    waitingFlaggedMessages: FlaggedMessage[];
     intersectionRoles: string[];
   }
 
