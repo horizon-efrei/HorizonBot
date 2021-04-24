@@ -9,8 +9,10 @@ export default class CleanupRoleIntersectionsTask extends Task {
     const roles = (await RoleIntersections.find({ expiration: { $lte: Date.now() } }))
       .map(({ guildId, roleId }) => this.context.client.guilds.resolve(guildId).roles.resolve(roleId));
 
-    this.context.logger.info(`[Intersection Roles] Removed ${roles.length} role ("${roles.map(r => r.name).join('", "')}") as it was mentionned and has expired.`);
-    for (const role of roles)
-      await role.delete();
+    if (roles.length > 0) {
+      this.context.logger.info(`[Intersection Roles] Removed ${roles.length} role ("${roles.map(r => r.name).join('", "')}") as it was mentionned and has expired.`);
+      for (const role of roles)
+        await role.delete();
+    }
   }
 }
