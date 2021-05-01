@@ -4,6 +4,10 @@ export default {
   prefix: '!',
   colors: {
     default: '#439bf2',
+    green: '#32a852',
+    yellow: '#e0c748',
+    orange: '#f27938',
+    red: '#eb2d1c',
   },
   configuration: {
     swears: ['fleur', 'arbre', 'tulipe'], // ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],

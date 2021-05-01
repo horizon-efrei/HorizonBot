@@ -2,7 +2,7 @@ import type ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import type MonkaCommand from '@/structures/MonkaCommand';
 import type TaskStore from '@/structures/TaskStore';
-import type { CodeLanguageResult, GuildTextBasedChannel } from '@/types';
+import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
 
 
 declare module 'discord.js' {
@@ -30,6 +30,7 @@ declare module '@sapphire/framework' {
 
   interface ArgType {
     code: string;
+    hour: HourMinutes;
     codeLanguage: CodeLanguageResult;
     command: MonkaCommand;
     guildTextBasedChannel: GuildTextBasedChannel;

@@ -60,3 +60,8 @@ export interface ReactionRolePair {
   reaction: string;
   role: Role;
 }
+
+export interface HourMinutes {
+  hour: number;
+  minutes: number;
+}

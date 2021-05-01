@@ -7,6 +7,7 @@ import type { Document, Model } from 'mongoose';
 /** Enum for the "Configuration"'s mongoose schema */
 export enum ConfigEntries {
   ModeratorFeedback = 'moderator-feedback-channel',
+  ClassAnnoucement = 'class-announcement',
 }
 
 /** Interface for the "Configuration"'s mongoose schema */

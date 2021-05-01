@@ -22,6 +22,11 @@ export default class SetupCommand extends MonkaCommand {
         await this.context.client.configManager.set(ConfigEntries.ModeratorFeedback, message.channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
+      case 'class':
+      case 'cours':
+        await this.context.client.configManager.set(ConfigEntries.ClassAnnoucement, message.channel);
+        await message.channel.send(config.messages.successfullyDefined);
+        break;
       default:
         await message.channel.send(config.messages.unknown);
     }
