@@ -11,6 +11,10 @@ export default class HourArgument extends Argument<HourMinutes> {
 
     if (!hour)
       return this.error({ parameter: arg });
-    return this.ok({ hour, minutes });
+    return this.ok({
+      hour,
+      minutes,
+      formatted: `${hour}h${minutes.toString().padStart(2, '0')}`,
+    });
   }
 }

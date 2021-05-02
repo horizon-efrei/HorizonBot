@@ -64,4 +64,5 @@ export interface ReactionRolePair {
 export interface HourMinutes {
   hour: number;
   minutes: number;
+  formatted: string;
 }
