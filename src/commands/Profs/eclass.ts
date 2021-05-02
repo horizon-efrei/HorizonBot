@@ -4,8 +4,8 @@ import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommand
 import dayjs from 'dayjs';
 import { MessageEmbed } from 'discord.js';
 import twemoji from 'twemoji';
-import settings from '@/config/settings';
 import { eclass as config } from '@/config/commands/profs';
+import settings from '@/config/settings';
 import MonkaSubCommand from '@/structures/MonkaSubCommand';
 import type { GuildMessage } from '@/types';
 import { ConfigEntries } from '@/types/database';
@@ -24,14 +24,16 @@ const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
 })
 export default class EclassCommand extends MonkaSubCommand {
   public async create(message: GuildMessage, args: Args): Promise<void> {
+    // Parse all arguments first
+    // #region Arguments
     const classChannel = await args.pickResult('guildTextBasedChannel');
     if (classChannel.error) {
       await message.channel.send('Pas de channel.');
       return;
     }
 
-    const subject = await args.pickResult('string');
-    if (subject.error) {
+    const topic = await args.pickResult('string');
+    if (topic.error) {
       await message.channel.send('Pas de sujet.');
       return;
     }
@@ -54,8 +56,8 @@ export default class EclassCommand extends MonkaSubCommand {
       return;
     }
 
-    const prof = await args.pickResult('member');
-    if (prof.error) {
+    const professor = await args.pickResult('member');
+    if (professor.error) {
       await message.channel.send('Pas de prof.');
       return;
     }
@@ -65,17 +67,19 @@ export default class EclassCommand extends MonkaSubCommand {
       await message.channel.send('Pas de role.');
       return;
     }
+    // #endregion Arguments
 
     date.value.setHours(hour.value.hour);
     date.value.setMinutes(hour.value.minutes);
     const formattedDate = dayjs(date.value).format('DD/MM [à] HH:mm');
 
+    // All channels start with an emote followed by the subject's name
     const fullName = classChannel.value.name.split('-');
     const baseEmoji = fullName.shift();
-    const matiere = fullName.map(capitalize).join(' ');
+    const subject = fullName.map(capitalize).join(' ');
 
-    const image = EMOJI_URL_REGEX.exec(twemoji.parse(baseEmoji) as string)?.groups?.url;
-    const name = `${matiere}: ${subject.value} (${formattedDate})`;
+    const image = EMOJI_URL_REGEX.exec(twemoji.parse(baseEmoji))?.groups?.url;
+    const name = `${subject}: ${topic.value} (${formattedDate})`;
 
     const role = message.guild.roles.cache.find(r => r.name === name);
     if (role) {
@@ -84,24 +88,28 @@ export default class EclassCommand extends MonkaSubCommand {
     }
 
     const channel = await this.context.client.configManager.get(message.guild.id, ConfigEntries.ClassAnnoucement);
+    if (!channel) {
+      this.context.logger.warn(`[e-class] A new e-class was planned but no annoucement channel was found, unable to create. Setup an annoucement channel with "${settings.prefix}setup class"`);
+      await message.channel.send(`Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configurez-en un en écrivant \`${settings.prefix}setup class\` dans le bon salon.`);
+      return;
+    }
     await message.channel.send('Le cours a été créé ! 😊');
 
     const embed = new MessageEmbed()
       .setColor(settings.colors.green)
-      .setTitle(`${matiere} - ${subject.value}`)
-      .setDescription(`Un nouveau cours en **${matiere}** a été planifié sur Ef'Réussite !`)
+      .setTitle(`${subject} - ${topic.value}`)
+      .setDescription(`Un nouveau cours en **${subject}** a été planifié sur Ef'Réussite !`)
       .setThumbnail(image)
       .setAuthor("Ef'Réussite - Nouveau cours !", 'https://yt3.ggpht.com/ytc/AAUvwngHtCyPFpnVnqxb8JZRilKSen1ffGb1rxWsQywl=s176-c-k-c0x00ffffff-no-rj')
       .addField('Date et heure :', `${formattedDate}`)
-      .addField('Durée :', `${duration.value.hour}h${duration.value.minutes.toString().padStart(2, '0')}`)
-      .addField('Professeur :', prof.value)
+      .addField('Durée :', duration.value.formatted)
+      .addField('Professeur :', professor.value)
       .setFooter('Réagis avec ✔️ pour être notifié du cours !');
 
-      await channel.send(embed).then(async sentMessage => sentMessage.react('✅'));
+    const sentMessage = await channel.send(embed);
+    await sentMessage.react('✅');
 
-    await message.guild.roles.create({
-      data: { name, color: 'WHITE' },
-    });
+    await message.guild.roles.create({ data: { name, color: '#fff', mentionable: true } });
   }
 
   public async start(message: GuildMessage, args: Args): Promise<void> {
