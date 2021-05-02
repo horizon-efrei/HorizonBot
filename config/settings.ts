@@ -11,6 +11,7 @@ export default {
     enableCompilerApi: true,
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
     flagMessageReaction: '🚩',
+    flagNeededAnswer: '📝',
   },
   roles: {
     // TODO: Move that to per-guild configuration (managed by ConfigurationManager)

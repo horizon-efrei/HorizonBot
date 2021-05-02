@@ -1,6 +1,7 @@
 import { Event } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
 import messages from '@/config/messages';
+import Profs from '@/config/profs';
 import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
 import type { GuildMessage } from '@/types';
@@ -28,6 +29,20 @@ export default class MessageReactionAddEvent extends Event {
     if (this.context.client.waitingFlaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
       && reaction.emoji.name === '✅')
       await this._handleModeratorFlag(reaction, member, message);
+
+    // If somebody needs an answer quickly
+    if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagNeededAnswer) {
+      // Getting eProfRole's id
+      const eProfRoleId = new Profs().findProf(message.channel.id);
+      if (!eProfRoleId) // If eProf not found
+        return;
+      // Getting a random eProf from ${eProfRoleId}
+      const eProf: GuildMember = message.guild.roles.cache.get(eProfRoleId).members.random();
+      // Channel version
+      await message.channel.send(`${eProf} we need you !`);
+      // DM version (not recommended because DM-pings are so annoying !!! :D)
+      await eProf.send(`${member} needs you in ${message.channel}`);
+    }
   }
 
   private async _flagMessage(
