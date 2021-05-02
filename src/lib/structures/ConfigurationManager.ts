@@ -2,8 +2,7 @@ import { Collection } from 'discord.js';
 import Configuration from '@/models/configuration';
 import type MonkaClient from '@/structures/MonkaClient';
 import type { GuildTextBasedChannel } from '@/types';
-import { ConfigEntries } from '@/types/database';
-import type { ConfigurationDocument } from '@/types/database';
+import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class ConfigurationManager {
