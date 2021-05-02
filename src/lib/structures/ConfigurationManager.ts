@@ -25,7 +25,7 @@ export default class ConfigurationManager {
     if (this.channels.get(guildID)?.[channel])
       return this.channels.get(guildID)[channel];
 
-    const result = await Configuration.findOne({ guild: guildID, name: ConfigEntries.ModeratorFeedback }).catch(nullop);
+    const result = await Configuration.findOne({ guild: guildID, name: channel }).catch(nullop);
     if (result?.value) {
       const resolvedChannel = this.client.channels.resolve(result.value);
       if (resolvedChannel.isText() && resolvedChannel.type !== 'dm') {
