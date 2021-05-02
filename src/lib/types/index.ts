@@ -66,3 +66,9 @@ export interface HourMinutes {
   minutes: number;
   formatted: string;
 }
+
+export interface DurationPart {
+  number: string;
+  unit: string;
+}
+
