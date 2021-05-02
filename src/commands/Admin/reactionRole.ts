@@ -9,26 +9,21 @@ import pupa from 'pupa';
 import { reactionRole as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
+import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import ArgumentResolver from '@/structures/ArgumentResolver';
 import MonkaSubCommand from '@/structures/MonkaSubCommand';
-import type { GuildMessage, GuildTextBasedChannel, ReactionRolePair } from '@/types';
+import type {
+  GuildMessage,
+  GuildTextBasedChannel,
+  ReactionRolePair,
+  ReactionRoleReturnPayload,
+} from '@/types';
 import {
   commaListAnd,
   firstAndRest,
   generateSubcommands,
   nullop,
 } from '@/utils';
-
-interface ReactionRoleReturnPayload {
-  isError: boolean;
-  errorPayload?: {
-    reactions?: string[];
-    roles?: string[];
-  };
-  reactionRoles: ReactionRolePair[];
-}
-
-const STOP_ERROR = 'stop_error';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
@@ -50,13 +45,13 @@ export default class SetupCommand extends MonkaSubCommand {
     // 1. Ask all the necessary questions
     try {
       if (!channel)
-        channel = await this._promptChannel(message);
+        channel = await ArgumentPrompter.promptTextChannel(message);
 
       [title, description] = await this._promptTitle(message);
 
-      roles = await this._promptRolesSafe(message);
+      roles = await this._promptReactionRolesSafe(message);
     } catch (error: unknown) {
-      if ((error as Error).message === STOP_ERROR) {
+      if ((error as Error).message === 'STOP') {
         await message.channel.send(config.messages.stoppedPrompting);
         return;
       }
@@ -136,7 +131,7 @@ export default class SetupCommand extends MonkaSubCommand {
   public async remove(message: GuildMessage, args: Args): Promise<void> {
     let givenMessage = (await args.pickResult('message')).value;
     while (!givenMessage)
-      givenMessage = await this._promptMessage(message);
+      givenMessage = await ArgumentPrompter.promptMessage(message);
 
     const isRrMenu = this.context.client.reactionRolesIds.includes(givenMessage.id);
     if (!isRrMenu) {
@@ -158,35 +153,6 @@ export default class SetupCommand extends MonkaSubCommand {
     await message.channel.send(embed);
   }
 
-  private async _promptMessage(message: GuildMessage): Promise<GuildMessage> {
-    const handler = new MessagePrompter(
-      config.messages.removePrompt,
-      MessagePrompterStrategies.Message,
-      { timeout: 60 * 1000 },
-    );
-    const result = await handler.run(message.channel, message.author) as GuildMessage;
-    if (settings.configuration.stop.has(result.content))
-      throw new Error(STOP_ERROR);
-
-    return await ArgumentResolver.resolveMessageByID(result.content, result.channel)
-      ?? await ArgumentResolver.resolveMessageByLink(result.content, result.guild, result.author);
-  }
-
-  private async _promptChannel(message: GuildMessage): Promise<GuildTextBasedChannel> {
-    const handler = new MessagePrompter(
-      config.messages.channelPrompt,
-      MessagePrompterStrategies.Message,
-      { timeout: 60 * 1000 },
-    );
-    const result = await handler.run(message.channel, message.author) as GuildMessage;
-    if (settings.configuration.stop.has(result.content))
-      throw new Error(STOP_ERROR);
-
-    const query = result.content.split(' ').join('-');
-    return ArgumentResolver.resolveChannelByID(query, result.guild)
-      ?? ArgumentResolver.resolveChannelByQuery(query, result.guild);
-  }
-
   private async _promptTitle(message: GuildMessage): Promise<[title: string, description: string]> {
     const handler = new MessagePrompter(
       config.messages.titlePrompt,
@@ -195,16 +161,16 @@ export default class SetupCommand extends MonkaSubCommand {
     );
     const result = await handler.run(message.channel, message.author) as GuildMessage;
     if (settings.configuration.stop.has(result.content))
-      throw new Error(STOP_ERROR);
+      throw new Error('STOP');
 
     return firstAndRest(result.content, '\n');
   }
 
-  private async _promptRolesSafe(message: GuildMessage): Promise<ReactionRolePair[]> {
-    let roles = await this._promptRoles(message);
+  private async _promptReactionRolesSafe(message: GuildMessage): Promise<ReactionRolePair[]> {
+    let roles = await this._promptReactionRoles(message);
 
     while (roles.isError || roles.reactionRoles.length === 0) {
-      roles = await this._promptRoles(message);
+      roles = await this._promptReactionRoles(message);
 
       if (roles.isError) {
         if (roles.errorPayload.reactions.length > 0) {
@@ -228,7 +194,7 @@ export default class SetupCommand extends MonkaSubCommand {
     return roles.reactionRoles;
   }
 
-  private async _promptRoles(message: GuildMessage): Promise<ReactionRoleReturnPayload> {
+  private async _promptReactionRoles(message: GuildMessage): Promise<ReactionRoleReturnPayload> {
     const handler = new MessagePrompter(
       config.messages.rolesPrompt,
       MessagePrompterStrategies.Message,
@@ -236,7 +202,7 @@ export default class SetupCommand extends MonkaSubCommand {
     );
     const result = await handler.run(message.channel, message.author) as GuildMessage;
     if (settings.configuration.stop.has(result.content))
-      throw new Error(STOP_ERROR);
+      throw new Error('STOP');
 
     const lines = result.content.split('\n').filter(Boolean).slice(0, 20);
     const payload: ReactionRoleReturnPayload = { isError: false, errorPayload: {}, reactionRoles: [] };

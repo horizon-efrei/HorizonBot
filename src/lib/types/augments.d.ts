@@ -30,9 +30,10 @@ declare module '@sapphire/framework' {
 
   interface ArgType {
     code: string;
-    hour: HourMinutes;
     codeLanguage: CodeLanguageResult;
     command: MonkaCommand;
+    duration: number;
     guildTextBasedChannel: GuildTextBasedChannel;
+    hour: HourMinutes;
   }
 }

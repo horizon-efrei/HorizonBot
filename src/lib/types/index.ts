@@ -72,3 +72,11 @@ export interface DurationPart {
   unit: string;
 }
 
+export interface ReactionRoleReturnPayload {
+  isError: boolean;
+  errorPayload?: {
+    reactions?: string[];
+    roles?: string[];
+  };
+  reactionRoles: ReactionRolePair[];
+}

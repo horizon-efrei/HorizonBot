@@ -44,4 +44,31 @@ export default {
       Merci !\n{message.url}
     `,
   },
+  prompts: {
+    promptChannel: 'Entrez un salon:',
+    promptInvalidChannel: 'Ce salon est invalide. Entrez un salon:',
+
+    promptMessage: 'Entrez un message:',
+    promptInvalidMessage: 'Ce message est invalide. Entrez un message:',
+
+    promptText: 'Entrez du texte:',
+    promptInvalidText: 'Ce texte est invalide. Entrez un texte:',
+
+    promptDate: 'Entrez une date:',
+    promptInvalidDate: 'Cette date est invalide. Entrez une date:',
+
+    promptHour: 'Entrez une heure:',
+    promptInvalidHour: 'Cette heure est invalide. Entrez une heure:',
+
+    promptDuration: 'Entrez une durée:',
+    promptInvalidDuration: 'Cette durée est invalide. Entrez une durée:',
+
+    promptMember: 'Entrez un membre:',
+    promptInvalidMember: 'Ce membre est invalide. Entrez un membre:',
+
+    promptRole: 'Entrez un role:',
+    promptInvalidRole: 'Ce role est invalide. Entrez un role:',
+
+    stoppedPrompting: 'Tu as bien abandonné la commande !',
+  },
 };
