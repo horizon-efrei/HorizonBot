@@ -19,6 +19,7 @@ export default {
   roles: {
     // TODO: Move that to per-guild configuration (managed by ConfigurationManager)
     staff: '822900204742770749',
+    eprof: '838842486498656307',
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',
