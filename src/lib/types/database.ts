@@ -42,9 +42,11 @@ export interface EclassBase {
   textChannel: string;
   guild: string;
   topic: string;
+  subject: string;
   date: number;
   duration: number;
   professor: string;
+  classRole: string;
   targetRole: string;
   announcementMessage: string;
   status: EclassStatus;

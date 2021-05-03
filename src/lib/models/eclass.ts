@@ -15,6 +15,10 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     type: String,
     required: true,
   },
+  subject: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Number,
     required: true,
@@ -24,6 +28,10 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     required: true,
   },
   professor: {
+    type: String,
+    required: true,
+  },
+  classRole: {
     type: String,
     required: true,
   },

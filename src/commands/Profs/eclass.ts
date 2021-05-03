@@ -12,7 +12,7 @@ import Eclass from '@/models/eclass';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import MonkaSubCommand from '@/structures/MonkaSubCommand';
 import type { GuildMessage, GuildTextBasedChannel, HourMinutes } from '@/types';
-import { ConfigEntries } from '@/types/database';
+import { ConfigEntries, EclassStatus } from '@/types/database';
 import { capitalize, generateSubcommands } from '@/utils';
 
 const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
@@ -43,7 +43,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
     const date = await args.pickResult('date');
     if (date.error) {
-      await message.channel.send('Pas de sujet.');
+      await message.channel.send('Pas de date.');
       return;
     }
 
@@ -145,16 +145,24 @@ export default class EclassCommand extends MonkaSubCommand {
       return;
     }
 
-    const channel = await this.context.client.configManager.get(message.guild.id, ConfigEntries.ClassAnnoucement);
-    await channel.send(`🔔 ${role.value} 🔔`);
+    const announcementChannel = await this.context.client.configManager
+      .get(message.guild.id, ConfigEntries.ClassAnnoucement);
+    await announcementChannel.send(`🔔 ${role.value} 🔔`);
+
+    const eclass = await Eclass.findOneAndUpdate({ classRole: role.value.id }, { status: EclassStatus.InProgress });
+    const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+    const announcementEmbed = announcementMessage.embeds[0];
+    announcementEmbed.setColor(settings.colors.orange);
+    announcementEmbed.fields.find(field => field.name === 'Date et heure :').value += ' [En cours]';
+    await announcementMessage.edit(announcementEmbed);
 
     const embed = new MessageEmbed()
       .setColor('#5bb78f')
-      .setTitle('Le cours va commencer !')
-      .setThumbnail('https://yt3.ggpht.com/ytc/AAUvwngHtCyPFpnVnqxb8JZRilKSen1ffGb1rxWsQywl=s176-c-k-c0x00ffffff-no-rj')
-      .setAuthor("Ef'Réussite")
+      .setTitle(`Le cours en ${eclass.subject} va commencer !`)
+      .setAuthor("Ef'Réussite - Un cours commence !", 'https://yt3.ggpht.com/ytc/AAUvwngHtCyPFpnVnqxb8JZRilKSen1ffGb1rxWsQywl=s176-c-k-c0x00ffffff-no-rj')
+      .setDescription(`Le cours en **${eclass.subject}** sur "**${eclass.topic}**" présenté par <@!${eclass.professor}> commence :) Le salon textuel associé est <#${eclass.textChannel}>`)
       .setFooter("C'est maintenant 😊");
-    await channel.send(embed).then(async sentMessage => sentMessage.react('🥳'));
+    await announcementChannel.send(embed);
 
     // TODO: Send messages to members in DM
   }
@@ -189,8 +197,7 @@ export default class EclassCommand extends MonkaSubCommand {
     const image = EMOJI_URL_REGEX.exec(twemoji.parse(baseEmoji))?.groups?.url;
     const name = `${subject}: ${topic} (${formattedDate})`;
 
-    const role = message.guild.roles.cache.find(r => r.name === name);
-    if (role) {
+    if (message.guild.roles.cache.some(r => r.name === name)) {
       await message.channel.send('Désolé mais ce cours semble déjà être prévu 😭');
       return;
     }
@@ -210,21 +217,23 @@ export default class EclassCommand extends MonkaSubCommand {
       .setThumbnail(image)
       .setAuthor("Ef'Réussite - Nouveau cours !", 'https://yt3.ggpht.com/ytc/AAUvwngHtCyPFpnVnqxb8JZRilKSen1ffGb1rxWsQywl=s176-c-k-c0x00ffffff-no-rj')
       .addField('Date et heure :', formattedDate)
-      .addField('Durée :', dayjs.duration(duration).humanize())
+      .addField('Durée :', dayjs.duration(duration * 1000).humanize())
       .addField('Professeur :', professor)
-      .setFooter('Réagis avec ✔️ pour être notifié du cours !');
+      .setFooter('Réagis avec :white_check_mark: pour être notifié du cours !');
     const announcementMessage = await channel.send(embed);
     await announcementMessage.react('✅');
 
-    await message.guild.roles.create({ data: { name, color: '#fff', mentionable: true } });
+    const role = await message.guild.roles.create({ data: { name, color: '#ffffff', mentionable: true } });
 
     await Eclass.create({
       textChannel: classChannel.id,
       guild: classChannel.guild.id,
       topic,
+      subject,
       date: date.getTime(),
       duration,
       professor: professor.id,
+      classRole: role.id,
       targetRole: targetRole.id,
       announcementMessage: announcementMessage.id,
     });
