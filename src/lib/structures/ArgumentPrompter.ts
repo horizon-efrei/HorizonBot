@@ -9,150 +9,177 @@ import type { GuildMessage, GuildTextBasedChannel, HourMinutes } from '@/types';
 // Overwrite 'appliedMessage' and 'response' in 'IMessagePrompterExplicitMessageReturn' for them
 // to be GuildMessages rather than Messages
 type PrompterMessageResult = Omit<IMessagePrompterExplicitMessageReturn, 'appliedMessage' | 'response'> & { response: GuildMessage; appliedMessage: GuildMessage };
+type PrompterText = Record<'base' | 'invalid', string>;
 
-async function prompt(
-  message: GuildMessage,
-  messageArray: GuildMessage[],
-  text: string,
-): Promise<GuildMessage> {
-  const handler = new MessagePrompter(
-    text,
-    MessagePrompterStrategies.Message,
-    { timeout: 60 * 1000, explicitReturn: true },
-  );
-  const { response, appliedMessage } = await handler.run(message.channel, message.author) as PrompterMessageResult;
-  if (messageArray)
-    messageArray.push(response, appliedMessage);
+export default class ArgumentPrompter {
+  constructor(
+    private readonly _message: GuildMessage,
+    private readonly _messageArray?: GuildMessage[],
+  ) {}
 
-  if (settings.configuration.stop.has(response.content))
-    throw new Error('STOP');
-  return response;
-}
+  public async autoPromptTextChannel(prompts: PrompterText): Promise<GuildTextBasedChannel> {
+    let response = await this.promptTextChannel(prompts);
+    while (!response)
+      response = await this.promptTextChannel(prompts, true);
+    return response;
+  }
 
-export default {
-  async promptTextChannel(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<GuildTextBasedChannel> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidChannel : messages.prompts.promptChannel,
+  public async autoPromptMessage(prompts: PrompterText): Promise<GuildMessage> {
+    let response = await this.promptMessage(prompts);
+    while (!response)
+      response = await this.promptMessage(prompts, true);
+    return response;
+  }
+
+  public async autoPromptText(prompts: PrompterText): Promise<string> {
+    let response = await this.promptText(prompts);
+    while (!response)
+      response = await this.promptText(prompts, true);
+    return response;
+  }
+
+  public async autoPromptDate(prompts: PrompterText): Promise<Date> {
+    let response = await this.promptDate(prompts);
+    while (!response)
+      response = await this.promptDate(prompts, true);
+    return response;
+  }
+
+  public async autoPromptHour(prompts: PrompterText): Promise<HourMinutes> {
+    let response = await this.promptHour(prompts);
+    while (!response)
+      response = await this.promptHour(prompts, true);
+    return response;
+  }
+
+  public async autoPromptDuration(prompts: PrompterText): Promise<number> {
+    let response = await this.promptDuration(prompts);
+    while (!response)
+      response = await this.promptDuration(prompts, true);
+    return response;
+  }
+
+  public async autoPromptMember(prompts: PrompterText): Promise<GuildMember> {
+    let response = await this.promptMember(prompts);
+    while (!response)
+      response = await this.promptMember(prompts, true);
+    return response;
+  }
+
+  public async autoPromptRole(prompts: PrompterText): Promise<Role> {
+    let response = await this.promptRole(prompts);
+    while (!response)
+      response = await this.promptRole(prompts, true);
+    return response;
+  }
+
+  public async promptTextChannel(prompts: PrompterText, previousIsFailure = false): Promise<GuildTextBasedChannel> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.channel.invalid} ${prompts.base || messages.prompts.channel.base}`
+        : prompts.base || messages.prompts.channel.base,
     );
 
-    if (message.mentions.channels.size > 0 && message.mentions.channels.first().isText())
-      return message.mentions.channels.first();
+    if (this._message.mentions.channels.size > 0 && this._message.mentions.channels.first().isText())
+      return this._message.mentions.channels.first();
 
     const query = response.content.split(' ').join('-');
     return ArgumentResolver.resolveChannelByID(query, response.guild)
       ?? ArgumentResolver.resolveChannelByQuery(query, response.guild);
-  },
+  }
 
-  async promptMessage(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<GuildMessage> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidMessage : messages.prompts.promptMessage,
+  public async promptMessage(prompts: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.message.invalid} ${prompts.base || messages.prompts.message.base}`
+        : prompts.base || messages.prompts.message.base,
     );
 
     return await ArgumentResolver.resolveMessageByID(response.content, response.channel)
       ?? await ArgumentResolver.resolveMessageByLink(response.content, response.guild, response.author);
-  },
+  }
 
-  async promptText(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<string> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidText : messages.prompts.promptText,
+  public async promptText(prompts: PrompterText, previousIsFailure = false): Promise<string> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.text.invalid} ${prompts.base || messages.prompts.text.base}`
+        : prompts.base || messages.prompts.text.base,
     );
 
     return response.content;
-  },
+  }
 
-  async promptDate(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<Date> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidDate : messages.prompts.promptDate,
+  public async promptDate(prompts: PrompterText, previousIsFailure = false): Promise<Date> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.date.invalid} ${prompts.base || messages.prompts.date.base}`
+        : prompts.base || messages.prompts.date.base,
     );
 
     return ArgumentResolver.resolveDate(response.content);
-  },
+  }
 
-  async promptHour(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<HourMinutes> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidHour : messages.prompts.promptHour,
+  public async promptHour(prompts: PrompterText, previousIsFailure = false): Promise<HourMinutes> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.hour.invalid} ${prompts.base || messages.prompts.hour.base}`
+        : prompts.base || messages.prompts.hour.base,
     );
 
     return ArgumentResolver.resolveHour(response.content);
-  },
+  }
 
-  async promptDuration(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<number> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidDuration : messages.prompts.promptDuration,
+  public async promptDuration(prompts: PrompterText, previousIsFailure = false): Promise<number> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.duration.invalid} ${prompts.base || messages.prompts.duration.base}`
+        : prompts.base || messages.prompts.duration.base,
     );
 
     return ArgumentResolver.resolveDuration(response.content);
-  },
+  }
 
-  async promptMember(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<GuildMember> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidMember : messages.prompts.promptMember,
+  public async promptMember(prompts: PrompterText, previousIsFailure = false): Promise<GuildMember> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.member.invalid} ${prompts.base || messages.prompts.member.base}`
+        : prompts.base || messages.prompts.member.base,
     );
 
-    if (message.mentions.members.size > 0)
-      return message.mentions.members.first();
+    if (this._message.mentions.members.size > 0)
+      return this._message.mentions.members.first();
 
-    return ArgumentResolver.resolveMemberByQuery(response.content, message.guild)
-      ?? await ArgumentResolver.resolveMemberByID(response.content, message.guild);
-  },
+    return ArgumentResolver.resolveMemberByQuery(response.content, this._message.guild)
+      ?? await ArgumentResolver.resolveMemberByID(response.content, this._message.guild);
+  }
 
-  async promptRole(
-    message: GuildMessage,
-    messageArray?: GuildMessage[],
-    previousIsFailure = false,
-  ): Promise<Role> {
-    const response = await prompt(
-      message,
-      messageArray,
-      previousIsFailure ? messages.prompts.promptInvalidRole : messages.prompts.promptRole,
+  public async promptRole(prompts: PrompterText, previousIsFailure = false): Promise<Role> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts.invalid || messages.prompts.role.invalid} ${prompts.base || messages.prompts.role.base}`
+        : prompts.base || messages.prompts.role.base,
     );
 
-    if (message.mentions.roles.size > 0)
-      return message.mentions.roles.first();
+    if (this._message.mentions.roles.size > 0)
+      return this._message.mentions.roles.first();
 
-    return ArgumentResolver.resolveRoleByID(response.content, message.guild)
-      ?? ArgumentResolver.resolveRoleByQuery(response.content, message.guild);
-  },
-};
+    return ArgumentResolver.resolveRoleByID(response.content, this._message.guild)
+      ?? ArgumentResolver.resolveRoleByQuery(response.content, this._message.guild);
+  }
+
+  private async _prompt(text: string): Promise<GuildMessage> {
+    const handler = new MessagePrompter(
+      text,
+      MessagePrompterStrategies.Message,
+      { timeout: 60 * 1000, explicitReturn: true },
+    );
+    const { response, appliedMessage } = await handler
+      .run(this._message.channel, this._message.author) as PrompterMessageResult;
+    if (this._messageArray)
+      this._messageArray.push(response, appliedMessage);
+
+    if (settings.configuration.stop.has(response.content))
+      throw new Error('STOP');
+    return response;
+  }
+}

@@ -45,29 +45,38 @@ export default {
     `,
   },
   prompts: {
-    promptChannel: 'Entrez un salon:',
-    promptInvalidChannel: 'Ce salon est invalide. Entrez un salon:',
-
-    promptMessage: 'Entrez un message:',
-    promptInvalidMessage: 'Ce message est invalide. Entrez un message:',
-
-    promptText: 'Entrez du texte:',
-    promptInvalidText: 'Ce texte est invalide. Entrez un texte:',
-
-    promptDate: 'Entrez une date:',
-    promptInvalidDate: 'Cette date est invalide. Entrez une date:',
-
-    promptHour: 'Entrez une heure:',
-    promptInvalidHour: 'Cette heure est invalide. Entrez une heure:',
-
-    promptDuration: 'Entrez une durée:',
-    promptInvalidDuration: 'Cette durée est invalide. Entrez une durée:',
-
-    promptMember: 'Entrez un membre:',
-    promptInvalidMember: 'Ce membre est invalide. Entrez un membre:',
-
-    promptRole: 'Entrez un role:',
-    promptInvalidRole: 'Ce role est invalide. Entrez un role:',
+    channel: {
+      base: 'Entrez un salon (mentionnez-le ou entrez son nom ou son ID) :',
+      invalid: 'Ce salon est invalide.',
+    },
+    message: {
+      base: 'Entrez un message (son ID ou son URL) :',
+      invalid: 'Ce message est invalide.',
+    },
+    text: {
+      base: 'Entrez du texte :',
+      invalid: 'Ce texte est invalide.',
+    },
+    date: {
+      base: 'Entrez une date (au format "jj/MM")  :',
+      invalid: 'Cette date est invalide.',
+    },
+    hour: {
+      base: 'Entrez une heure (au format "HH:mm") :',
+      invalid: 'Cette heure est invalide.',
+    },
+    duration: {
+      base: 'Entrez une durée (en anglais ou en francais).\nVous pouvez par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Vous pouvez également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
+      invalid: 'Cette durée est invalide.',
+    },
+    member: {
+      base: 'Entrez un membre (mentionnez-le ou entrez son pseudo ou son ID) :',
+      invalid: 'Ce membre est invalide.',
+    },
+    role: {
+      base: 'Entrez un rôle (mentionnez-le ou entrez son nom ou son ID) :',
+      invalid: 'Ce rôle est invalide.',
+    },
 
     stoppedPrompting: 'Tu as bien abandonné la commande !',
   },
