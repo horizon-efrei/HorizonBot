@@ -17,78 +17,78 @@ export default class ArgumentPrompter {
     private readonly _messageArray?: GuildMessage[],
   ) {}
 
-  public async autoPromptTextChannel(prompts: PrompterText): Promise<GuildTextBasedChannel> {
+  public async autoPromptTextChannel(prompts?: PrompterText): Promise<GuildTextBasedChannel> {
     let response = await this.promptTextChannel(prompts);
     while (!response)
       response = await this.promptTextChannel(prompts, true);
     return response;
   }
 
-  public async autoPromptMessage(prompts: PrompterText): Promise<GuildMessage> {
+  public async autoPromptMessage(prompts?: PrompterText): Promise<GuildMessage> {
     let response = await this.promptMessage(prompts);
     while (!response)
       response = await this.promptMessage(prompts, true);
     return response;
   }
 
-  public async autoPromptText(prompts: PrompterText): Promise<string> {
+  public async autoPromptText(prompts?: PrompterText): Promise<string> {
     let response = await this.promptText(prompts);
     while (!response)
       response = await this.promptText(prompts, true);
     return response;
   }
 
-  public async autoPromptDate(prompts: PrompterText): Promise<Date> {
+  public async autoPromptDate(prompts?: PrompterText): Promise<Date> {
     let response = await this.promptDate(prompts);
     while (!response)
       response = await this.promptDate(prompts, true);
     return response;
   }
 
-  public async autoPromptHour(prompts: PrompterText): Promise<HourMinutes> {
+  public async autoPromptHour(prompts?: PrompterText): Promise<HourMinutes> {
     let response = await this.promptHour(prompts);
     while (!response)
       response = await this.promptHour(prompts, true);
     return response;
   }
 
-  public async autoPromptDuration(prompts: PrompterText): Promise<number> {
+  public async autoPromptDuration(prompts?: PrompterText): Promise<number> {
     let response = await this.promptDuration(prompts);
     while (!response)
       response = await this.promptDuration(prompts, true);
     return response;
   }
 
-  public async autoPromptMember(prompts: PrompterText): Promise<GuildMember> {
+  public async autoPromptMember(prompts?: PrompterText): Promise<GuildMember> {
     let response = await this.promptMember(prompts);
     while (!response)
       response = await this.promptMember(prompts, true);
     return response;
   }
 
-  public async autoPromptRole(prompts: PrompterText): Promise<Role> {
+  public async autoPromptRole(prompts?: PrompterText): Promise<Role> {
     let response = await this.promptRole(prompts);
     while (!response)
       response = await this.promptRole(prompts, true);
     return response;
   }
 
-  public async promptTextChannel(prompts: PrompterText, previousIsFailure = false): Promise<GuildTextBasedChannel> {
+  public async promptTextChannel(prompts?: PrompterText, previousIsFailure = false): Promise<GuildTextBasedChannel> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.channel.invalid} ${prompts.base || messages.prompts.channel.base}`
         : prompts.base || messages.prompts.channel.base,
     );
 
-    if (this._message.mentions.channels.size > 0 && this._message.mentions.channels.first().isText())
-      return this._message.mentions.channels.first();
+    if (response.mentions.channels.size > 0 && response.mentions.channels.first().isText())
+      return response.mentions.channels.first();
 
     const query = response.content.split(' ').join('-');
     return ArgumentResolver.resolveChannelByID(query, response.guild)
       ?? ArgumentResolver.resolveChannelByQuery(query, response.guild);
   }
 
-  public async promptMessage(prompts: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
+  public async promptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.message.invalid} ${prompts.base || messages.prompts.message.base}`
@@ -99,7 +99,7 @@ export default class ArgumentPrompter {
       ?? await ArgumentResolver.resolveMessageByLink(response.content, response.guild, response.author);
   }
 
-  public async promptText(prompts: PrompterText, previousIsFailure = false): Promise<string> {
+  public async promptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.text.invalid} ${prompts.base || messages.prompts.text.base}`
@@ -109,7 +109,7 @@ export default class ArgumentPrompter {
     return response.content;
   }
 
-  public async promptDate(prompts: PrompterText, previousIsFailure = false): Promise<Date> {
+  public async promptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.date.invalid} ${prompts.base || messages.prompts.date.base}`
@@ -119,7 +119,7 @@ export default class ArgumentPrompter {
     return ArgumentResolver.resolveDate(response.content);
   }
 
-  public async promptHour(prompts: PrompterText, previousIsFailure = false): Promise<HourMinutes> {
+  public async promptHour(prompts?: PrompterText, previousIsFailure = false): Promise<HourMinutes> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.hour.invalid} ${prompts.base || messages.prompts.hour.base}`
@@ -129,7 +129,7 @@ export default class ArgumentPrompter {
     return ArgumentResolver.resolveHour(response.content);
   }
 
-  public async promptDuration(prompts: PrompterText, previousIsFailure = false): Promise<number> {
+  public async promptDuration(prompts?: PrompterText, previousIsFailure = false): Promise<number> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.duration.invalid} ${prompts.base || messages.prompts.duration.base}`
@@ -139,32 +139,32 @@ export default class ArgumentPrompter {
     return ArgumentResolver.resolveDuration(response.content);
   }
 
-  public async promptMember(prompts: PrompterText, previousIsFailure = false): Promise<GuildMember> {
+  public async promptMember(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMember> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.member.invalid} ${prompts.base || messages.prompts.member.base}`
         : prompts.base || messages.prompts.member.base,
     );
 
-    if (this._message.mentions.members.size > 0)
-      return this._message.mentions.members.first();
+    if (response.mentions.members.size > 0)
+      return response.mentions.members.first();
 
-    return ArgumentResolver.resolveMemberByQuery(response.content, this._message.guild)
-      ?? await ArgumentResolver.resolveMemberByID(response.content, this._message.guild);
+    return ArgumentResolver.resolveMemberByQuery(response.content, response.guild)
+      ?? await ArgumentResolver.resolveMemberByID(response.content, response.guild);
   }
 
-  public async promptRole(prompts: PrompterText, previousIsFailure = false): Promise<Role> {
+  public async promptRole(prompts?: PrompterText, previousIsFailure = false): Promise<Role> {
     const response = await this._prompt(
       previousIsFailure
         ? `${prompts.invalid || messages.prompts.role.invalid} ${prompts.base || messages.prompts.role.base}`
         : prompts.base || messages.prompts.role.base,
     );
 
-    if (this._message.mentions.roles.size > 0)
-      return this._message.mentions.roles.first();
+    if (response.mentions.roles.size > 0)
+      return response.mentions.roles.first();
 
-    return ArgumentResolver.resolveRoleByID(response.content, this._message.guild)
-      ?? ArgumentResolver.resolveRoleByQuery(response.content, this._message.guild);
+    return ArgumentResolver.resolveRoleByID(response.content, response.guild)
+      ?? ArgumentResolver.resolveRoleByQuery(response.content, response.guild);
   }
 
   private async _prompt(text: string): Promise<GuildMessage> {
