@@ -14,6 +14,8 @@ import { Permissions } from 'discord.js';
 import type { GuildMessage, GuildTextBasedChannel, HourMinutes } from '@/types';
 import { getDuration, nullop } from '@/utils';
 
+const DATE_REGEX = /^(?<day>\d{1,2})[/-](?<month>\d{1,2})$/imu;
+
 export default {
   resolveChannelByID(argument: string, guild: Guild): GuildTextBasedChannel {
     const channelID = ChannelMentionRegex.exec(argument) ?? SnowflakeRegex.exec(argument);
@@ -47,7 +49,8 @@ export default {
 
   resolveMemberByQuery(query: string, guild: Guild): GuildMember {
     const queryLower = query.toLowerCase();
-    return guild.members.cache.array().find(member => member.user.username.toLowerCase() === queryLower);
+    return guild.members.cache.find(member =>
+      member.user.username.toLowerCase() === queryLower || member.displayName.toLowerCase() === queryLower);
   },
 
   async resolveMessageByID(argument: string, channel: GuildTextBasedChannel): Promise<GuildMessage> {
@@ -78,19 +81,24 @@ export default {
   },
 
   resolveDate(argument: string): Date {
-    const parsed = new Date(argument);
-    parsed.setFullYear(new Date().getFullYear());
-    parsed.setHours(0, 0, 0, 0);
+    if (!DATE_REGEX.test(argument))
+      return null;
 
-    const time = parsed.getTime();
+    const groups = DATE_REGEX.exec(argument)?.groups;
+    const date = new Date();
+    date.setMonth(Number.parseInt(groups?.month, 10) - 1);
+    date.setDate(Number.parseInt(groups?.day, 10));
+    date.setHours(0, 0, 0, 0);
+
+    const time = date.getTime();
     if (Number.isNaN(time))
       return null;
 
-      return parsed;
+    return date;
   },
 
   resolveHour(argument: string): HourMinutes {
-    const HOUR_REGEX = /(?<hour>\d{1,2})[h:]?(?<minutes>\d{2})?/imu;
+    const HOUR_REGEX = /^(?<hour>\d{1,2})[h:]?(?<minutes>\d{2})?$/imu;
     const hour = Number.parseInt(HOUR_REGEX.exec(argument)?.groups?.hour, 10);
     const minutes = Number.parseInt(HOUR_REGEX.exec(argument)?.groups?.minutes, 10) || 0;
 
