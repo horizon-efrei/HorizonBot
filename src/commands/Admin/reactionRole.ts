@@ -32,7 +32,7 @@ import {
     start: { aliases: ['make', 'setup', 'create', 'add'] },
     list: { aliases: ['liste', 'show'] },
     remove: { aliases: ['delete', 'supprimer', 'supprime', 'suppr', 'rm', 'rem', 'del'] },
-    help: { default: true },
+    help: { aliases: ['aide'], default: true },
   }),
 })
 export default class SetupCommand extends MonkaSubCommand {
@@ -45,7 +45,7 @@ export default class SetupCommand extends MonkaSubCommand {
     // 1. Ask all the necessary questions
     try {
       if (!channel)
-        channel = await ArgumentPrompter.promptTextChannel(message);
+        channel = await new ArgumentPrompter(message).promptTextChannel();
 
       [title, description] = await this._promptTitle(message);
 
@@ -130,8 +130,10 @@ export default class SetupCommand extends MonkaSubCommand {
 
   public async remove(message: GuildMessage, args: Args): Promise<void> {
     let givenMessage = (await args.pickResult('message')).value;
-    while (!givenMessage)
-      givenMessage = await ArgumentPrompter.promptMessage(message);
+    if (!givenMessage) {
+      const argumentPrompter = new ArgumentPrompter(message);
+      givenMessage = await argumentPrompter.autoPromptMessage();
+    }
 
     const isRrMenu = this.context.client.reactionRolesIds.includes(givenMessage.id);
     if (!isRrMenu) {
