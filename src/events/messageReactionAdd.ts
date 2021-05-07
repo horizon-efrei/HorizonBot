@@ -2,6 +2,7 @@ import { Event } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
+import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
 import type { GuildMessage } from '@/types';
 import { noop } from '@/utils';
@@ -14,6 +15,10 @@ export default class MessageReactionAddEvent extends Event {
 
     const message = reaction.message as GuildMessage;
     const member = message.guild.members.cache.get(user.id);
+    if (!member) {
+      this.context.logger.warn('[Message Reaction Add] Abort even due to unresolved member.');
+      return;
+    }
 
     // If a moderator is flagging a message
     if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagMessageReaction
@@ -24,9 +29,14 @@ export default class MessageReactionAddEvent extends Event {
     if (this.context.client.reactionRolesIds.includes(reaction.message.id))
       await this._handleReactionRole(reaction, member, message);
 
+    // If we are reacting to an eclass role
+    if (this.context.client.eclassRolesIds.includes(reaction.message.id)
+      && reaction.emoji.name === settings.emojis.yes)
+      await this._handleEclassRole(reaction, member, message);
+
     // If we are reacting to a flag message alert
     if (this.context.client.waitingFlaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
-      && reaction.emoji.name === '✅')
+      && reaction.emoji.name === settings.emojis.yes)
       await this._handleModeratorFlag(reaction, member, message);
   }
 
@@ -62,13 +72,31 @@ export default class MessageReactionAddEvent extends Event {
       return;
     }
 
-    if (!member) {
-      this.context.logger.warn(`[Reaction Roles] An error has occured while trying to get member with id ${member.id}`);
+    if (!member.roles.cache.get(givenRole.id))
+      member.roles.add(givenRole).catch(noop);
+  }
+
+  private async _handleEclassRole(
+    _reaction: MessageReaction,
+    member: GuildMember,
+    message: GuildMessage,
+  ): Promise<void> {
+    const document = await Eclass.findOne({ announcementMessage: message.id });
+    if (!document) {
+      this.context.client.eclassRolesIds = this.context.client.eclassRolesIds.filter(elt => elt !== message.id);
       return;
     }
 
-    if (!member.roles.cache.get(givenRole.id))
+    const givenRole = message.guild.roles.cache.get(document.classRole);
+    if (!givenRole) {
+      this.context.logger.warn(`[e-class] The role with id ${document.classRole} does not exists !`);
+      return;
+    }
+
+    if (!member.roles.cache.get(givenRole.id)) {
       member.roles.add(givenRole).catch(noop);
+      member.send(messages.eclass.subscribed).catch(noop);
+    }
   }
 
   private async _handleModeratorFlag(
@@ -77,7 +105,7 @@ export default class MessageReactionAddEvent extends Event {
     message: GuildMessage,
   ): Promise<void> {
     // Wait for a moderator to approve the suppression of the message
-    if (reaction.emoji.name !== '✅')
+    if (reaction.emoji.name !== settings.emojis.yes)
       return;
 
     const flagMessage = this.context.client.waitingFlaggedMessages.find(msg => msg.alertMessage.id === message.id);

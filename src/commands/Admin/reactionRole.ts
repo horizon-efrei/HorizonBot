@@ -70,8 +70,8 @@ export default class SetupCommand extends MonkaSubCommand {
         }),
       );
     const handler = new MessagePrompter(confirmationEmbed, MessagePrompterStrategies.Confirm, {
-      confirmEmoji: '✅',
-      cancelEmoji: '❌',
+      confirmEmoji: settings.emojis.yes,
+      cancelEmoji: settings.emojis.no,
       timeout: 60 * 1000,
     });
     const isConfirmed = await handler.run(message.channel, message.author).catch(nullop);

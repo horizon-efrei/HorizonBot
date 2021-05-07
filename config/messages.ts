@@ -44,6 +44,10 @@ export default {
       Merci !\n{message.url}
     `,
   },
+  eclass: {
+    subscribed: "Tu t'es bien inscrit au cours de \"{subject)\" ({topic}) ! Je te le rappellerai un peu avant :)",
+    unsubscribed: "Tu t'es bien désinscrit du cours de \"{subject}\" ({topic}) !",
+  },
   prompts: {
     channel: {
       base: 'Entrez un salon (mentionnez-le ou entrez son nom ou son ID) :',

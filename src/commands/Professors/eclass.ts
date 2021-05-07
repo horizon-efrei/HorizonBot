@@ -47,7 +47,7 @@ export default class EclassCommand extends MonkaSubCommand {
       return;
     }
 
-    const date = await args.pickResult('date');
+    const date = await args.pickResult('day');
     if (date.error) {
       await message.channel.send(config.messages.prompts.date.invalid);
       return;
@@ -218,7 +218,7 @@ export default class EclassCommand extends MonkaSubCommand {
       await message.channel.send(`Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configurez-en un en écrivant \`${settings.prefix}setup class\` dans le bon salon.`);
       return;
     }
-    await message.channel.send('Le cours a été créé ! 😊');
+    await message.channel.send('Le cours a été créé !');
 
     const embed = new MessageEmbed()
       .setColor(settings.colors.green)
@@ -231,8 +231,9 @@ export default class EclassCommand extends MonkaSubCommand {
       .addField('Professeur :', professor)
       .setFooter('Réagis avec :white_check_mark: pour être notifié du cours !');
     const announcementMessage = await channel.send(embed);
-    await announcementMessage.react('✅');
+    await announcementMessage.react(settings.emojis.yes);
 
+    this.context.client.eclassRolesIds.push(announcementMessage.id);
     const role = await message.guild.roles.create({ data: { name, color: '#ffffff', mentionable: true } });
 
     await Eclass.create({

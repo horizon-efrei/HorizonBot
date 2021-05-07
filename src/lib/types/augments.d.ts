@@ -24,6 +24,7 @@ declare module '@sapphire/framework' {
     configManager: ConfigurationManager;
     remainingCompilerApiCredits: number;
     reactionRolesIds: string[];
+    eclassRolesIds: string[];
     waitingFlaggedMessages: FlaggedMessage[];
     intersectionRoles: string[];
   }
@@ -32,6 +33,7 @@ declare module '@sapphire/framework' {
     code: string;
     codeLanguage: CodeLanguageResult;
     command: MonkaCommand;
+    day: Date;
     duration: number;
     guildTextBasedChannel: GuildTextBasedChannel;
     hour: HourMinutes;

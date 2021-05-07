@@ -45,6 +45,7 @@ export interface EclassBase {
   subject: string;
   date: number;
   duration: number;
+  end: number;
   professor: string;
   classRole: string;
   targetRole: string;

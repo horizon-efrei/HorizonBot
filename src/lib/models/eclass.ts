@@ -27,6 +27,10 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     type: Number,
     required: true,
   },
+  end: {
+    type: Number,
+    default(this: EclassDocument): number { return this.date + this.duration; },
+  },
   professor: {
     type: String,
     required: true,
