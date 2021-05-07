@@ -4,6 +4,7 @@ import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommand
 import dayjs from 'dayjs';
 import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
+import pupa from 'pupa';
 import twemoji from 'twemoji';
 import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
@@ -23,14 +24,14 @@ const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
   subCommands: generateSubcommands({
     create: { aliases: ['add'] },
     setup: { aliases: ['build', 'make'] },
-    start: { aliases: ['start'] },
-    help: { default: true },
+    start: { aliases: ['begin'] },
+    help: { aliases: ['aide'], default: true },
   }),
 })
 export default class EclassCommand extends MonkaSubCommand {
   public async create(message: GuildMessage, args: Args): Promise<void> {
     if (!message.member.roles.cache.has(settings.roles.eprof)) {
-      await message.channel.send('Seul les professeurs peuvent effectuer cette action !');
+      await message.channel.send(config.messages.onlyProfessor);
       return;
     }
 
@@ -89,7 +90,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
   public async setup(message: GuildMessage): Promise<void> {
     if (!message.member.roles.cache.has(settings.roles.eprof)) {
-      await message.channel.send('Seul les professeurs peuvent effectuer cette action !');
+      await message.channel.send(config.messages.onlyProfessor);
       return;
     }
 
@@ -134,18 +135,18 @@ export default class EclassCommand extends MonkaSubCommand {
   public async start(message: GuildMessage, args: Args): Promise<void> {
     const role = await args.pickResult('role');
     if (role.error) {
-      await message.channel.send('Pas de role.');
+      await message.channel.send(config.messages.prompts.targetRole.invalid);
       return;
     }
 
     const eclass = await Eclass.findOneAndUpdate({ classRole: role.value.id }, { status: EclassStatus.InProgress });
     const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
     if (!professor) {
-      await message.channel.send(':x: Impossible de retrouver le professeur pour ce cours !');
+      await message.channel.send(config.messages.unresolvedProfessor);
       return;
     }
     if (message.author.id !== professor.id) {
-      await message.channel.send(`Vous n'êtes pas le professeur à l'origine de ce cours, vous ne pouvez donc pas le commencer ! Seul ${professor.displayName} peut le commencer.`);
+      await message.channel.send(pupa(config.messages.notOriginalProfessor, { professor }));
       return;
     }
 
@@ -171,8 +172,13 @@ export default class EclassCommand extends MonkaSubCommand {
     // TODO: Send messages to members in DM
   }
 
-  public help(): void {
-    console.log('help');
+  public async help(message: GuildMessage, _args: Args): Promise<void> {
+    const embed = new MessageEmbed()
+      .setTitle(config.messages.helpEmbedTitle)
+      .addFields(config.messages.helpEmbedDescription)
+      .setColor(settings.colors.default);
+
+    await message.channel.send(embed);
   }
 
   private async _createClass(
