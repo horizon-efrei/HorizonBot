@@ -25,5 +25,37 @@ export const eclass = {
       Abbréviations : {formattedSlugs}
       Version : {lang.version}
     `,
+    prompts: {
+      classChannel: {
+        base: 'Entrez le salon associé au cours que vous souhaitez donner (mentionnez-le ou entrez son nom ou son ID) :',
+        invalid: 'Ce salon est invalide.',
+      },
+      topic: {
+        base: 'Entrez le sujet du cours que vous souhaitez donner (nom du chapitre, thème du cours...) :',
+        invalid: 'Ce sujet est invalide.',
+      },
+      date: {
+        base: 'Entrez la date du cours que vous souhaitez donner (au format "jj/MM") :',
+        invalid: 'Cette date est invalide.',
+      },
+      hour: {
+        base: "Entrez l'heure de début du cours que vous souhaitez donner (au format \"HH:mm\") :",
+        invalid: 'Cette heure est invalide.',
+      },
+      duration: {
+        base: 'Entrez une durée pour votre cours (en anglais ou en francais).\nVous pouvez par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Vous pouvez également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
+        invalid: 'Cette durée est invalide.',
+      },
+      professor: {
+        base: 'Entrez le professeur qui va donner le cours (mentionnez-le ou entrez son pseudo ou son ID) :',
+        invalid: 'Ce membre est invalide.',
+      },
+      targetRole: {
+        base: 'Entrez le rôle visé (L1, L2...) (mentionnez-le ou entrez son nom ou son ID) :',
+        invalid: 'Ce rôle est invalide.',
+      },
+
+      stoppedPrompting: "Tu as bien abandonné la commande ! Aucun cours n'a été créé.",
+    },
   },
 };

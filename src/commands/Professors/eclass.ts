@@ -5,7 +5,7 @@ import dayjs from 'dayjs';
 import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import twemoji from 'twemoji';
-import { eclass as config } from '@/config/commands/profs';
+import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
@@ -36,43 +36,43 @@ export default class EclassCommand extends MonkaSubCommand {
 
     const classChannel = await args.pickResult('guildTextBasedChannel');
     if (classChannel.error) {
-      await message.channel.send('Pas de channel.');
+      await message.channel.send(config.messages.prompts.classChannel.invalid);
       return;
     }
 
     const topic = await args.pickResult('string');
     if (topic.error) {
-      await message.channel.send('Pas de sujet.');
+      await message.channel.send(config.messages.prompts.topic.invalid);
       return;
     }
 
     const date = await args.pickResult('date');
     if (date.error) {
-      await message.channel.send('Pas de date.');
+      await message.channel.send(config.messages.prompts.date.invalid);
       return;
     }
 
     const hour = await args.pickResult('hour');
     if (hour.error) {
-      await message.channel.send("Pas d'heure.");
+      await message.channel.send(config.messages.prompts.hour.invalid);
       return;
     }
 
     const duration = await args.pickResult('duration');
     if (duration.error) {
-      await message.channel.send('Pas de durée.');
+      await message.channel.send(config.messages.prompts.duration.invalid);
       return;
     }
 
     const professor = await args.pickResult('member');
     if (professor.error) {
-      await message.channel.send('Pas de prof.');
+      await message.channel.send(config.messages.prompts.professor.invalid);
       return;
     }
 
     const targetRole = await args.pickResult('role');
     if (targetRole.error) {
-      await message.channel.send('Pas de role.');
+      await message.channel.send(config.messages.prompts.targetRole.invalid);
       return;
     }
 
@@ -103,32 +103,15 @@ export default class EclassCommand extends MonkaSubCommand {
 
     try {
       const allMessages: GuildMessage[] = [];
+      const prompter = new ArgumentPrompter(message, allMessages);
 
-      classChannel = await ArgumentPrompter.promptTextChannel(message, allMessages);
-      while (!classChannel)
-        classChannel = await ArgumentPrompter.promptTextChannel(message, allMessages, true);
-
-      topic = await ArgumentPrompter.promptText(message, allMessages);
-
-      date = await ArgumentPrompter.promptDate(message, allMessages);
-      while (!date)
-        date = await ArgumentPrompter.promptDate(message, allMessages, true);
-
-      hour = await ArgumentPrompter.promptHour(message, allMessages);
-      while (!hour)
-        hour = await ArgumentPrompter.promptHour(message, allMessages, true);
-
-      duration = await ArgumentPrompter.promptDuration(message, allMessages);
-      while (!duration)
-        duration = await ArgumentPrompter.promptDuration(message, allMessages, true);
-
-      professor = await ArgumentPrompter.promptMember(message, allMessages);
-      while (!professor)
-        professor = await ArgumentPrompter.promptMember(message, allMessages, true);
-
-      targetRole = await ArgumentPrompter.promptRole(message, allMessages);
-      if (!targetRole)
-        targetRole = await ArgumentPrompter.promptRole(message, allMessages, true);
+      classChannel = await prompter.autoPromptTextChannel(config.messages.prompts.classChannel);
+      topic = await prompter.autoPromptText(config.messages.prompts.topic);
+      date = await prompter.autoPromptDate(config.messages.prompts.date);
+      hour = await prompter.autoPromptHour(config.messages.prompts.hour);
+      duration = await prompter.autoPromptDuration(config.messages.prompts.duration);
+      professor = await prompter.autoPromptMember(config.messages.prompts.professor);
+      targetRole = await prompter.autoPromptRole(config.messages.prompts.targetRole);
     } catch (error: unknown) {
       if ((error as Error).message === 'STOP') {
         await message.channel.send(messages.prompts.stoppedPrompting);
