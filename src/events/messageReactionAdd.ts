@@ -1,9 +1,9 @@
 import { Event } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
 import messages from '@/config/messages';
-import Profs from '@/config/profs';
 import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
+import Profs from '@/structures/profs';
 import type { GuildMessage } from '@/types';
 import { noop } from '@/utils';
 import FlaggedMessage from '../lib/structures/FlaggedMessage';
@@ -39,11 +39,10 @@ export default class MessageReactionAddEvent extends Event {
       // On obtient un id au hasard pour ne ping qu'un seul prof
       const eProf: GuildMember = message.guild.roles.cache.get(eProfRoleId).members.random();
 
-      // Enlever la ligne 44 ou la ligne 46
       // Si on veut ping le prof dans le channel où se situe le message
-      await message.channel.send(`${eProf} we need you !`);
+      await message.channel.send(`${eProf} nous avons besoin de toi !`);
       // Si on veut envoyer automatiquement un MP au prof (Plus efficace mais plus intrusif !!! :D)
-      await eProf.send(`${member} a besoin de toi là-bas : ${message.channel}`);
+      await eProf.send(`${member} a besoin de toi là-bas : ${message.channel}`).catch(noop);
     }
   }
 

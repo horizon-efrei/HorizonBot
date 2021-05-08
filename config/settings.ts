@@ -15,9 +15,9 @@ export default {
   },
   channels: {
     eProfsId: {
-      info: 'eProfInfoId',
-      maths: 'eProfMathId',
-      physique: 'eProfPhysiqueId',
+      info: '',
+      maths: '',
+      physique: '',
     },
     matieresId: {
       info: ['799660807881359380', '799660606525407232', '694637242496450582', '836219855833268227', '799660540011216896'],
