@@ -30,18 +30,20 @@ export default class MessageReactionAddEvent extends Event {
       && reaction.emoji.name === '✅')
       await this._handleModeratorFlag(reaction, member, message);
 
-    // If somebody needs an answer quickly
+    // Si quelqu'un a besoin d'un professeur en urgence, un modérateur pourra 'flag' sa question
     if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagNeededAnswer) {
-      // Getting eProfRole's id
+      // On obtient les ids de tous les e-profs correspondants à la matière
       const eProfRoleId = new Profs().findProf(message.channel.id);
-      if (!eProfRoleId) // If eProf not found
+      if (!eProfRoleId) // Si aucun prof n'a été trouvé, l'event s'arrête
         return;
-      // Getting a random eProf from ${eProfRoleId}
+      // On obtient un id au hasard pour ne ping qu'un seul prof
       const eProf: GuildMember = message.guild.roles.cache.get(eProfRoleId).members.random();
-      // Channel version
+
+      // Enlever la ligne 44 ou la ligne 46
+      // Si on veut ping le prof dans le channel où se situe le message
       await message.channel.send(`${eProf} we need you !`);
-      // DM version (not recommended because DM-pings are so annoying !!! :D)
-      await eProf.send(`${member} needs you in ${message.channel}`);
+      // Si on veut envoyer automatiquement un MP au prof (Plus efficace mais plus intrusif !!! :D)
+      await eProf.send(`${member} a besoin de toi là-bas : ${message.channel}`);
     }
   }
 

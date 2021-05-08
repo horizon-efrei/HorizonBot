@@ -13,6 +13,18 @@ export default {
     flagMessageReaction: '🚩',
     flagNeededAnswer: '📝',
   },
+  channels: {
+    eProfsId: {
+      info: 'eProfInfoId',
+      maths: 'eProfMathId',
+      physique: 'eProfPhysiqueId',
+    },
+    matieresId: {
+      info: ['799660807881359380', '799660606525407232', '694637242496450582', '836219855833268227', '799660540011216896'],
+      maths: ['694637521254219839', '808432914287165471', '808432941301760062'],
+      physique: ['808432662732996628', '808432809697345606', '808432842249076808'],
+    },
+  },
   roles: {
     // TODO: Move that to per-guild configuration (managed by ConfigurationManager)
     staff: '822900204742770749',
