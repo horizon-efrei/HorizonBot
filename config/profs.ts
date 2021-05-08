@@ -24,7 +24,7 @@ export default class Profs {
         ]);
     }
 
-    findProf: Find = (channelId: string): string => {
+    public findProf(channelId: string): string {
         for (const i of this.laMap) {
             if (i.includes(channelId))
                 return this.laMap.get(i[0]);
