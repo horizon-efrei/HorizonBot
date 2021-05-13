@@ -1,12 +1,18 @@
+import type { GuildMember } from 'discord.js';
 import type { Document, Model } from 'mongoose';
 
 /* ****************************** */
 /*  Configuration Database Types  */
 /* ****************************** */
 
+// #region Configuration Database Types
 /** Enum for the "Configuration"'s mongoose schema */
 export enum ConfigEntries {
   ModeratorFeedback = 'moderator-feedback-channel',
+  ClassAnnoucementL1 = 'class-announcement-l1',
+  ClassAnnoucementL2 = 'class-announcement-l2',
+  ClassAnnoucementL3 = 'class-announcement-l3',
+  ClassAnnoucementGeneral = 'class-announcement-general',
 }
 
 /** Interface for the "Configuration"'s mongoose schema */
@@ -21,11 +27,59 @@ export interface ConfigurationDocument extends ConfigurationBase, Document {}
 
 /** Interface for the "Configuration"'s mongoose model */
 export type ConfigurationModel = Model<ConfigurationDocument>;
+// #endregion
+
+/* ****************************** */
+/*  Eclass Database Types  */
+/* ****************************** */
+
+// #region Eclass Database Types
+/** Enum for the "Eclass"'s mongoose schema */
+export enum EclassStatus {
+  Planned,
+  InProgress,
+  Finished,
+  Canceled,
+}
+
+/** Interface for the "Eclass"'s mongoose schema */
+export interface EclassBase {
+  classChannel: string;
+  guild: string;
+  topic: string;
+  subject: string;
+  date: number;
+  duration: number;
+  end: number;
+  professor: string;
+  classRole: string;
+  targetRole: string;
+  announcementMessage: string;
+  announcementChannel: ConfigEntries;
+  status: EclassStatus;
+  reminded: boolean;
+  classId: string;
+  subscribers: string[];
+}
+
+export type PrettyEclass = Omit<EclassBase, 'date' | 'duration' | 'end'> & { date: string; duration: string; end: string };
+
+/** Interface for the "Eclass"'s mongoose document */
+export interface EclassDocument extends EclassBase, Document {
+  toData(): PrettyEclass;
+}
+
+/** Interface for the "Eclass"'s mongoose model */
+export interface EclassModel extends Model<EclassDocument> {
+  generateId(topic: string, professor: GuildMember, date: Date): string;
+}
+// #endregion
 
 /* ***************************** */
 /*  ReactionRole Database Types  */
 /* ***************************** */
 
+// #region ReactionRole Database Types
 /** Interface for the "ReactionRole"'s mongoose schema */
 export interface ReactionRoleBase {
   messageId: string;
@@ -39,11 +93,13 @@ export interface ReactionRoleDocument extends ReactionRoleBase, Document {}
 
 /** Interface for the "ReactionRole"'s mongoose model */
 export type ReactionRoleModel = Model<ReactionRoleDocument>;
+// #endregion
 
 /* ********************************* */
 /*  RoleIntersection Database Types  */
 /* ********************************* */
 
+// #region RoleIntersection Database Types
 /** Interface for the "RoleIntersection"'s mongoose schema */
 export interface RoleIntersectionBase {
   roleId: string;
@@ -56,12 +112,14 @@ export interface RoleIntersectionDocument extends RoleIntersectionBase, Document
 
 /** Interface for the "RoleIntersection"'s mongoose model */
 export type RoleIntersectionModel = Model<RoleIntersectionDocument>;
+// #endregion
 
 /* ********************************* */
 /*  FlaggedMessage Database Types  */
 /* ********************************* */
 
-/** Interface for the "RoleIntersection"'s mongoose schema */
+// #region FlaggedMessage Database Types
+/** Interface for the "FlaggedMessage"'s mongoose schema */
 export interface FlaggedMessageBase {
   guildId: string;
   channelId: string;
@@ -75,8 +133,9 @@ export interface FlaggedMessageBase {
   approvedDate: number;
 }
 
-/** Interface for the "RoleIntersection"'s mongoose document */
+/** Interface for the "FlaggedMessage"'s mongoose document */
 export interface FlaggedMessageDocument extends FlaggedMessageBase, Document {}
 
-/** Interface for the "RoleIntersection"'s mongoose model */
+/** Interface for the "FlaggedMessage"'s mongoose model */
 export type FlaggedMessageModel = Model<FlaggedMessageDocument>;
+// #endregion

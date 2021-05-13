@@ -4,6 +4,7 @@ import { oneLine } from 'common-tags';
 import type { GuildChannel, PermissionString, TextChannel } from 'discord.js';
 import { Intents } from 'discord.js';
 import settings from '@/config/settings';
+import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
@@ -14,6 +15,7 @@ export default class MonkaClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
   reactionRolesIds: string[];
+  eclassRolesIds: string[];
   waitingFlaggedMessages: FlaggedMessage[];
   intersectionRoles: string[];
 
@@ -40,6 +42,7 @@ export default class MonkaClient extends SapphireClient {
     this.stores.register(new TaskStore());
 
     this.reactionRolesIds = [];
+    this.eclassRolesIds = [];
     this.waitingFlaggedMessages = [];
     this.intersectionRoles = [];
     this.configManager = new ConfigurationManager(this);
@@ -47,6 +50,7 @@ export default class MonkaClient extends SapphireClient {
 
     void this._loadCompilerApiCredits();
     void this._loadReactionRoles();
+    void this._loadEclassRoles();
 
     this.logger.info('[Main] Client initialization finished!');
   }
@@ -99,7 +103,7 @@ export default class MonkaClient extends SapphireClient {
     const response = await axios.post(settings.apis.compilerCredits, {
       clientId: process.env.COMPILERAPI_ID,
       clientSecret: process.env.COMPILERAPI_SECRET,
-    });
+    }).catch(_ => ({ status: 521, data: {} }));
 
     if (response.status >= 300 || typeof response.data?.used === 'undefined') {
       this.logger.error('[Compiler API] Unable to load remaining CompilerApi credits, command will not be available.');
@@ -115,6 +119,15 @@ export default class MonkaClient extends SapphireClient {
     if (reactionRoles) {
       this.reactionRolesIds.push(
         ...reactionRoles.map(document => document?.messageId).filter(Boolean),
+      );
+    }
+  }
+
+  private async _loadEclassRoles(): Promise<void> {
+    const eclassRoles = await Eclass.find().catch(nullop);
+    if (eclassRoles) {
+      this.eclassRolesIds.push(
+        ...eclassRoles.map(document => document?.announcementMessage).filter(Boolean),
       );
     }
   }

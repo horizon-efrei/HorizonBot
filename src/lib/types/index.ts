@@ -7,7 +7,7 @@ import type {
  Role,
  TextChannel,
 } from 'discord.js';
-import type MonkaClient from '../structures/MonkaClient';
+import type MonkaClient from '@/structures/MonkaClient';
 
 /* ************ */
 /*  Util types  */
@@ -61,6 +61,16 @@ export interface ReactionRolePair {
   role: Role;
 }
 
+export interface HourMinutes {
+  hour: number;
+  minutes: number;
+  formatted: string;
+}
+
+export interface DurationPart {
+  number: string;
+  unit: string;
+}
 
 export interface ReactionRoleReturnPayload {
   isError: boolean;

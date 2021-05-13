@@ -7,7 +7,7 @@ import FlaggedMessageDB from '@/models/flaggedMessage';
 import type { GuildMessage, GuildTextBasedChannel } from '@/types';
 import type { FlaggedMessageDocument } from '@/types/database';
 import { ConfigEntries } from '@/types/database';
-import { nullop } from '../utils';
+import { nullop } from '@/utils';
 
 type FlaggedMessageData =
   | { manualModerator: GuildMember } & { swear?: never }
