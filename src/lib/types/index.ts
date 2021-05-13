@@ -60,3 +60,13 @@ export interface ReactionRolePair {
   reaction: string;
   role: Role;
 }
+
+
+export interface ReactionRoleReturnPayload {
+  isError: boolean;
+  errorPayload?: {
+    reactions?: string[];
+    roles?: string[];
+  };
+  reactionRoles: ReactionRolePair[];
+}
