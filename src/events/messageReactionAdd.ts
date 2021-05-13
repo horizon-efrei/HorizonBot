@@ -27,7 +27,7 @@ export default class MessageReactionAddEvent extends Event {
 
     // If we are reacting to a flag message alert
     if (this.context.client.waitingFlaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
-      && reaction.emoji.name === '✅')
+      && reaction.emoji.name === settings.emojis.yes)
       await this._handleModeratorFlag(reaction, member, message);
 
     // Si quelqu'un a besoin d'un professeur en urgence, un modérateur pourra 'flag' sa question
@@ -93,7 +93,7 @@ export default class MessageReactionAddEvent extends Event {
     message: GuildMessage,
   ): Promise<void> {
     // Wait for a moderator to approve the suppression of the message
-    if (reaction.emoji.name !== '✅')
+    if (reaction.emoji.name !== settings.emojis.yes)
       return;
 
     const flagMessage = this.context.client.waitingFlaggedMessages.find(msg => msg.alertMessage.id === message.id);

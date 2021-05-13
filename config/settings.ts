@@ -34,6 +34,11 @@ export default {
     compiler: 'https://api.jdoodle.com/v1/execute',
     compilerCredits: 'https://api.jdoodle.com/v1/credit-spent',
   },
+  emojis: {
+    yes: '✅',
+    no: '❌',
+    remove: '🗑️',
+  },
   languages: [
     {
       language: 'bash',

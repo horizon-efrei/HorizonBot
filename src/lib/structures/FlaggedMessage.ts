@@ -163,7 +163,7 @@ export default class FlaggedMessage {
     if (this.logChannel) {
       const payload = { message: this.message, swear: this.swear };
       this.alertMessage = await this.logChannel.send(pupa(messages.antiSwear.swearModAlert, payload)) as GuildMessage;
-      await this.alertMessage.react('✅');
+      await this.alertMessage.react(settings.emojis.yes);
     } else {
       this.context.logger.warn(`[Anti Swear] A swear was detected but no log channel was found, unable to report. Setup a log channel with "${settings.prefix}setup mod"`);
     }
