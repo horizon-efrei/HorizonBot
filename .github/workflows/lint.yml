@@ -24,13 +24,9 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install ESLint
+      - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npm install -g eslint
-
-      - name: Install ESLint Configs and Plugins
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: npm install eslint-config-noftalint @typescript-eslint/eslint-plugin eslint-plugin-import eslint-plugin-node eslint-plugin-unicorn @typescript-eslint/parser typescript
+        run: npm ci
 
       - name: Run ESLint
         run: npm run lint
