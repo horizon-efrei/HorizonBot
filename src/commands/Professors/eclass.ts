@@ -28,6 +28,7 @@ const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
     help: { aliases: ['aide'], default: true },
   }),
 })
+
 export default class EclassCommand extends MonkaSubCommand {
   public async create(message: GuildMessage, args: Args): Promise<void> {
     if (!message.member.roles.cache.has(settings.roles.eprof)) {

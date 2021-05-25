@@ -4,7 +4,7 @@ import { ConfigEntries } from '@/types/database';
 
 const ConfigurationSchema = new Schema<ConfigurationDocument, ConfigurationModel>({
   name: {
-    type: String,
+    type: String, 
     required: true,
     enum: ConfigEntries,
     default: ConfigEntries.ModeratorFeedback,
@@ -18,5 +18,6 @@ const ConfigurationSchema = new Schema<ConfigurationDocument, ConfigurationModel
     required: true,
   },
 });
+
 
 export default model<ConfigurationDocument, ConfigurationModel>('Configuration', ConfigurationSchema);

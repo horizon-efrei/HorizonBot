@@ -124,3 +124,23 @@ export interface FlaggedMessageDocument extends FlaggedMessageBase, Document {}
 /** Interface for the "FlaggedMessage"'s mongoose model */
 export type FlaggedMessageModel = Model<FlaggedMessageDocument>;
 // #endregion
+
+/* ****************************** */
+/*  Configuration Database Types  */
+/* ****************************** */
+
+// #region Configuration Database Types
+/** Interface for the "Configuration"'s mongoose schema */
+export interface SavedMessagesBase {
+  name: string;
+  channelId: string;
+  guild: string;
+  messageId: string;
+}
+
+/** Interface for the "Configuration"'s mongoose document */
+export interface SavedMessagesDocument extends SavedMessagesBase, Document {}
+
+/** Interface for the "Configuration"'s mongoose model */
+export type SavedMessagesModel = Model<SavedMessagesDocument>;
+// #endregion
