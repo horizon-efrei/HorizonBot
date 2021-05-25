@@ -38,6 +38,9 @@ export default class MessageReactionRemoveEvent extends Event {
       this.context.client.reactionRolesIds = this.context.client.reactionRolesIds.filter(elt => elt !== message.id);
       return;
     }
+    if (!document.reactionRolePairs.some(pair => pair.reaction === reaction.emoji.toString()))
+      return;
+
 
     const { reaction: emoji, role: givenRoleId } = document.reactionRolePairs
       .find(elt => elt.reaction === reaction.emoji.toString());
