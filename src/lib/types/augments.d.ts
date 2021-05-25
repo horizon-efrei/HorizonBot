@@ -2,7 +2,7 @@ import type ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import type MonkaCommand from '@/structures/MonkaCommand';
 import type TaskStore from '@/structures/TaskStore';
-import type { CodeLanguageResult, GuildTextBasedChannel } from '@/types';
+import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
 
 
 declare module 'discord.js' {
@@ -24,6 +24,7 @@ declare module '@sapphire/framework' {
     configManager: ConfigurationManager;
     remainingCompilerApiCredits: number;
     reactionRolesIds: string[];
+    eclassRolesIds: string[];
     waitingFlaggedMessages: FlaggedMessage[];
     intersectionRoles: string[];
   }
@@ -32,6 +33,9 @@ declare module '@sapphire/framework' {
     code: string;
     codeLanguage: CodeLanguageResult;
     command: MonkaCommand;
+    day: Date;
+    duration: number;
     guildTextBasedChannel: GuildTextBasedChannel;
+    hour: HourMinutes;
   }
 }

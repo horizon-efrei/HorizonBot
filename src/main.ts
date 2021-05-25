@@ -8,6 +8,7 @@ import 'source-map-support/register';
 
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import isBetween from 'dayjs/plugin/isBetween';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import mongoose from 'mongoose';
 import MonkaClient from '@/structures/MonkaClient';
@@ -17,6 +18,7 @@ console.log('Starting MonkaBot...');
 dayjs.locale('fr');
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
+dayjs.extend(isBetween);
 
 const main = async (): Promise<void> => {
   await mongoose.connect(process.env.MONGO_URI, {

@@ -3,7 +3,13 @@ import type { CodeLanguageResult } from '@/types';
 export default {
   prefix: '!',
   colors: {
+    primary: '#5bb78f',
     default: '#439bf2',
+    white: '#ffffff',
+    green: '#32a852',
+    yellow: '#e0c748',
+    orange: '#f27938',
+    red: '#eb2d1c',
   },
   configuration: {
     swears: ['fleur', 'arbre', 'tulipe'], // ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
@@ -12,6 +18,9 @@ export default {
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
     flagMessageReaction: '🚩',
     flagNeededAnswer: '📝',
+    dateFormat: 'DD/MM [à] HH:mm',
+    eclassRoleFormat: '{subject}: {topic} ({formattedDate})',
+    eclassReminderTime: 15 * 60 * 1000, // 15 minutes
   },
   channels: {
     eProfsId: {
@@ -28,11 +37,17 @@ export default {
   roles: {
     // TODO: Move that to per-guild configuration (managed by ConfigurationManager)
     staff: '822900204742770749',
+    eprof: '838842486498656307',
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',
     compiler: 'https://api.jdoodle.com/v1/execute',
     compilerCredits: 'https://api.jdoodle.com/v1/credit-spent',
+  },
+  emojis: {
+    yes: '✅',
+    no: '❌',
+    remove: '🗑️',
   },
   languages: [
     {
