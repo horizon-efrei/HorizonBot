@@ -102,3 +102,17 @@ export const statistics = {
     },
   },
 };
+
+export const vocalCount = {
+  options: {
+    aliases: ['vocal-count', 'voc-count', 'vocount'],
+    description: 'Affiche le nombre de personnes connectées dans un salon vocal choisit, ou dans le tient.',
+    enabled: true,
+    usage: 'vocalcount [#mention salon | ID salon | nom salon]',
+    examples: ['vocalcount', 'vocount Linux'],
+  },
+  messages: {
+    invalidUse: "Tu n'as pas spécifié de salon vocal, et tu n'es dans aucun salon !",
+    count: 'Il y a {count} personne{plural} connectée{plural} dans ce salon vocal !',
+  },
+};

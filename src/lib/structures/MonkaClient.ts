@@ -35,6 +35,7 @@ export default class MonkaClient extends SapphireClient {
           Intents.FLAGS.GUILD_MEMBERS, // Access to GuildMemberAdd/GuildMemberRemove events.
           Intents.FLAGS.GUILD_MESSAGES, // Access to Message, MessageDelete and MessageUpdate events.
           Intents.FLAGS.GUILD_MESSAGE_REACTIONS, // Access to MessageReactionAdd events.
+          Intents.FLAGS.GUILD_VOICE_STATES, // Access to VoiceStateUpdate events.
         ],
       },
     });
