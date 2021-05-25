@@ -76,8 +76,8 @@ export default class ArgumentPrompter {
   public async promptTextChannel(prompts?: PrompterText, previousIsFailure = false): Promise<GuildTextBasedChannel> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.channel.invalid} ${prompts.base || messages.prompts.channel.base}`
-        : prompts.base || messages.prompts.channel.base,
+        ? `${prompts?.invalid || messages.prompts.channel.invalid} ${prompts?.base || messages.prompts.channel.base}`
+        : prompts?.base || messages.prompts.channel.base,
     );
 
     if (response.mentions.channels.size > 0 && response.mentions.channels.first().isText())
@@ -91,8 +91,8 @@ export default class ArgumentPrompter {
   public async promptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.message.invalid} ${prompts.base || messages.prompts.message.base}`
-        : prompts.base || messages.prompts.message.base,
+        ? `${prompts?.invalid || messages.prompts.message.invalid} ${prompts?.base || messages.prompts.message.base}`
+        : prompts?.base || messages.prompts.message.base,
     );
 
     return await ArgumentResolver.resolveMessageByID(response.content, response.channel)
@@ -102,8 +102,8 @@ export default class ArgumentPrompter {
   public async promptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.text.invalid} ${prompts.base || messages.prompts.text.base}`
-        : prompts.base || messages.prompts.text.base,
+        ? `${prompts?.invalid || messages.prompts.text.invalid} ${prompts?.base || messages.prompts.text.base}`
+        : prompts?.base || messages.prompts.text.base,
     );
 
     return response.content;
@@ -112,8 +112,8 @@ export default class ArgumentPrompter {
   public async promptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.date.invalid} ${prompts.base || messages.prompts.date.base}`
-        : prompts.base || messages.prompts.date.base,
+        ? `${prompts?.invalid || messages.prompts.date.invalid} ${prompts?.base || messages.prompts.date.base}`
+        : prompts?.base || messages.prompts.date.base,
     );
 
     return ArgumentResolver.resolveDate(response.content);
@@ -122,8 +122,8 @@ export default class ArgumentPrompter {
   public async promptHour(prompts?: PrompterText, previousIsFailure = false): Promise<HourMinutes> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.hour.invalid} ${prompts.base || messages.prompts.hour.base}`
-        : prompts.base || messages.prompts.hour.base,
+        ? `${prompts?.invalid || messages.prompts.hour.invalid} ${prompts?.base || messages.prompts.hour.base}`
+        : prompts?.base || messages.prompts.hour.base,
     );
 
     return ArgumentResolver.resolveHour(response.content);
@@ -132,8 +132,8 @@ export default class ArgumentPrompter {
   public async promptDuration(prompts?: PrompterText, previousIsFailure = false): Promise<number> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.duration.invalid} ${prompts.base || messages.prompts.duration.base}`
-        : prompts.base || messages.prompts.duration.base,
+        ? `${prompts?.invalid || messages.prompts.duration.invalid} ${prompts?.base || messages.prompts.duration.base}`
+        : prompts?.base || messages.prompts.duration.base,
     );
 
     return ArgumentResolver.resolveDuration(response.content);
@@ -142,8 +142,8 @@ export default class ArgumentPrompter {
   public async promptMember(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMember> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.member.invalid} ${prompts.base || messages.prompts.member.base}`
-        : prompts.base || messages.prompts.member.base,
+        ? `${prompts?.invalid || messages.prompts.member.invalid} ${prompts?.base || messages.prompts.member.base}`
+        : prompts?.base || messages.prompts.member.base,
     );
 
     if (response.mentions.members.size > 0)
@@ -156,8 +156,8 @@ export default class ArgumentPrompter {
   public async promptRole(prompts?: PrompterText, previousIsFailure = false): Promise<Role> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts.invalid || messages.prompts.role.invalid} ${prompts.base || messages.prompts.role.base}`
-        : prompts.base || messages.prompts.role.base,
+        ? `${prompts?.invalid || messages.prompts.role.invalid} ${prompts?.base || messages.prompts.role.base}`
+        : prompts?.base || messages.prompts.role.base,
     );
 
     if (response.mentions.roles.size > 0)
