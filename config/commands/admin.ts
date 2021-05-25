@@ -72,6 +72,13 @@ export const reactionRole = {
     listEmbedTitle: 'Liste des menus de réaction de la guilde "{message.guild.name}" ({total})',
     listEmbedDescription: '• [{title}]({url}) ({total} roles)\n',
 
+    // Remove a menu
+    removedMenu: 'Ce menu a bien été supprimé !',
+    removePrompt: "Entre l'identifiant (ID) du message qui contient le menu que tu souhaites supprimer.",
+
+    // Edit a menu
+    editedMenu: 'Ce menu a bien été modifié !',
+
     // Add a role to a menu
     reactionAlreadyUsed: 'Cette réaction est déjà utilisée dans ce menu !',
     roleAlreadyUsed: 'Ce rôle est déjà utilisé dans ce menu !',
@@ -82,16 +89,15 @@ export const reactionRole = {
     roleNotUsed: "Ce rôle n'est pas dans ce menu !",
     removedPairSuccessfuly: "C'est fait ! Cette paire à bien été supprimée du menu {rrMessage.url}",
 
-    // Remove a menu
-    removedMenu: 'Ce menu a bien été supprimé !',
-    removePrompt: "Entre l'identifiant (ID) du message qui contient le menu que tu souhaites supprimer.",
-
     // Help page
     helpEmbedTitle: 'Aide des menus de réaction-rôle',
     helpEmbedDescription: [
-      { name: 'Créer un menu', value: '`rr start [identifiant du salon]`' },
+      { name: 'Créer un menu', value: '`rr start [identifiant du salon]` puis répondre aux questions' },
       { name: 'Lister les menus', value: '`rr list`' },
       { name: 'Supprimer un menu', value: '`rr remove <identifiant du message>`' },
+      { name: 'Modifier un menu', value: '`rr edit <identifiant du message>` puis répondre aux questions' },
+      { name: 'Ajouter une paire à un menu', value: '`rr addpair <identifiant du message> <emoji> <role>`' },
+      { name: "Enlever une paire d'un menu", value: '`rr removepair <identifiant du message> <role>`' },
       { name: "Page d'aide", value: '`rr help`' },
     ],
   },

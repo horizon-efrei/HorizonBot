@@ -29,10 +29,11 @@ import {
   generateDashLessAliases: true,
   subCommands: generateSubcommands({
     start: { aliases: ['make', 'setup', 'create', 'add'] },
+    list: { aliases: ['liste', 'show'] },
+    edit: { aliases: ['change', 'modify'] },
     addPair: { aliases: [] },
     removePair: { aliases: ['deletePair', 'suppr', 'rmPair', 'remPair', 'delPair'] },
-    list: { aliases: ['liste', 'show'] },
-    remove: { aliases: ['delete', 'supprimer', 'supprime', 'suppr', 'rm', 'rem', 'del'] },
+    remove: { aliases: ['delete', 'rm', 'rem', 'del'] },
     help: { aliases: ['aide'], default: true },
   }),
 })
@@ -100,6 +101,68 @@ export default class SetupCommand extends MonkaSubCommand {
 
     this.context.client.reactionRolesIds.push(document.messageId);
     await ReactionRole.create(document);
+  }
+
+  public async list(message: GuildMessage, _args: Args): Promise<void> {
+    const reactionRoles = await ReactionRole.find({ guildId: message.guild.id });
+    if (!reactionRoles || reactionRoles.length === 0) {
+      await message.channel.send(config.messages.noMenus);
+      return;
+    }
+
+    let description = '';
+    for (const rr of reactionRoles) {
+      const rrChannel = message.guild.channels.resolve(rr.channelId) as GuildTextBasedChannel;
+      const rrMessage = await rrChannel?.messages.fetch(rr.messageId).catch(nullop);
+      if (!rrMessage)
+        continue;
+
+      description += pupa(config.messages.listEmbedDescription, {
+        title: rrMessage.embeds[0].title,
+        url: rrMessage.url,
+        total: rr.reactionRolePairs.length,
+      });
+    }
+
+    const embed = new MessageEmbed()
+      .setTitle(pupa(config.messages.listEmbedTitle, { message, total: reactionRoles.length }))
+      .setDescription(description);
+    await message.channel.send(embed);
+  }
+
+  public async remove(message: GuildMessage, args: Args): Promise<void> {
+    let givenMessage = (await args.pickResult('message')).value;
+    if (!givenMessage) {
+      const argumentPrompter = new ArgumentPrompter(message);
+      givenMessage = await argumentPrompter.autoPromptMessage();
+    }
+
+    const isRrMenu = this.context.client.reactionRolesIds.includes(givenMessage.id);
+    if (!isRrMenu) {
+      await message.channel.send(config.messages.notAMenu);
+      return;
+    }
+
+    // We delete it, and the "messageDelete" event will take care of the rest.
+    await givenMessage.delete();
+    await message.channel.send(config.messages.removedMenu);
+  }
+
+  public async edit(message: GuildMessage, args: Args): Promise<void> {
+    let givenMessage = (await args.pickResult('message')).value;
+    if (!givenMessage) {
+      const argumentPrompter = new ArgumentPrompter(message);
+      givenMessage = await argumentPrompter.autoPromptMessage();
+    }
+
+    const [title, description] = await this._promptTitle(message);
+
+    const embed = givenMessage.embeds[0];
+    embed.setTitle(title);
+    embed.setDescription(description);
+    await givenMessage.edit(embed);
+
+    await message.channel.send(config.messages.editedMenu);
   }
 
   public async addPair(message: GuildMessage, args: Args): Promise<void> {
@@ -172,51 +235,6 @@ export default class SetupCommand extends MonkaSubCommand {
     document.reactionRolePairs.pull(pair);
     await document.save();
     await message.channel.send(pupa(config.messages.removedPairSuccessfuly, { rrMessage }));
-  }
-
-  public async list(message: GuildMessage, _args: Args): Promise<void> {
-    const reactionRoles = await ReactionRole.find({ guildId: message.guild.id });
-    if (!reactionRoles || reactionRoles.length === 0) {
-      await message.channel.send(config.messages.noMenus);
-      return;
-    }
-
-    let description = '';
-    for (const rr of reactionRoles) {
-      const rrChannel = message.guild.channels.resolve(rr.channelId) as GuildTextBasedChannel;
-      const rrMessage = await rrChannel?.messages.fetch(rr.messageId).catch(nullop);
-      if (!rrMessage)
-        continue;
-
-      description += pupa(config.messages.listEmbedDescription, {
-        title: rrMessage.embeds[0].title,
-        url: rrMessage.url,
-        total: rr.reactionRolePairs.length,
-      });
-    }
-
-    const embed = new MessageEmbed()
-      .setTitle(pupa(config.messages.listEmbedTitle, { message, total: reactionRoles.length }))
-      .setDescription(description);
-    await message.channel.send(embed);
-  }
-
-  public async remove(message: GuildMessage, args: Args): Promise<void> {
-    let givenMessage = (await args.pickResult('message')).value;
-    if (!givenMessage) {
-      const argumentPrompter = new ArgumentPrompter(message);
-      givenMessage = await argumentPrompter.autoPromptMessage();
-    }
-
-    const isRrMenu = this.context.client.reactionRolesIds.includes(givenMessage.id);
-    if (!isRrMenu) {
-      await message.channel.send(config.messages.notAMenu);
-      return;
-    }
-
-    // We delete it, and the "messageDelete" event will take care of the rest.
-    await givenMessage.delete();
-    await message.channel.send(config.messages.removedMenu);
   }
 
   public async help(message: GuildMessage, _args: Args): Promise<void> {
