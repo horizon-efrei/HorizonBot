@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args } from '@sapphire/framework';
+import { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import dayjs from 'dayjs';
 import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
+
 import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
@@ -12,9 +14,10 @@ import Eclass from '@/models/eclass';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import EclassManager from '@/structures/EclassManager';
 import MonkaSubCommand from '@/structures/MonkaSubCommand';
-import type { GuildMessage, GuildTextBasedChannel, HourMinutes } from '@/types';
-import { EclassStatus } from '@/types/database';
-import { generateSubcommands, nullop } from '@/utils';
+import { GuildMessage } from '@/types';
+import type { GuildTextBasedChannel, HourMinutes } from '@/types';
+import { EclassDocument, EclassStatus } from '@/types/database';
+import { generateSubcommands, nullop, ValidateEclassArgument } from '@/utils';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
@@ -28,7 +31,7 @@ import { generateSubcommands, nullop } from '@/utils';
     start: { aliases: ['begin'] },
     edit: { aliases: ['modify'] },
     cancel: { aliases: ['archive'] },
-    finish: { aliases: ['end'] },
+    finish: { aliases: ['end', 'stop'] },
     help: { aliases: ['aide'], default: true },
   }),
   preconditions: [{
@@ -144,33 +147,17 @@ export default class EclassCommand extends MonkaSubCommand {
     });
   }
 
-  public async start(message: GuildMessage, args: Args): Promise<void> {
-    // Get the class ID
-    const classId = await args.pickResult('string');
-    if (classId.error) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
+  public async help(message: GuildMessage, _args: Args): Promise<void> {
+    const embed = new MessageEmbed()
+      .setTitle(config.messages.helpEmbedTitle)
+      .addFields(config.messages.helpEmbedDescription)
+      .setColor(settings.colors.default);
 
-    // Fetch the class document from the database
-    const eclass = await Eclass.findOne({ classId: classId.value });
-    if (!eclass) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
+    await message.channel.send(embed);
+  }
 
-    // Check if the professor is the right one
-    if (message.member.id !== eclass.professor && message.member.roles.cache.has(settings.roles.staff)) {
-      await message.channel.send(config.messages.editUnauthorized);
-      return;
-    }
-
-    // If the class is already started/finished/cancel, you cannot start it.
-    if (eclass.status !== EclassStatus.Planned) {
-      await message.channel.send(pupa(config.messages.alreadyStarted, { status: EclassManager.toStatus(eclass) }));
-      return;
-    }
-
+  @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
+  public async start(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
     // Fetch the member
     const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
     if (!professor) {
@@ -181,46 +168,10 @@ export default class EclassCommand extends MonkaSubCommand {
     // Start the class & confirm.
     await EclassManager.startClass(eclass);
     await message.channel.send(config.messages.successfullyStarted);
-    // TODO: Send messages to members in DM
   }
 
-  public async help(message: GuildMessage, _args: Args): Promise<void> {
-    const embed = new MessageEmbed()
-      .setTitle(config.messages.helpEmbedTitle)
-      .addFields(config.messages.helpEmbedDescription)
-      .setColor(settings.colors.default);
-
-    await message.channel.send(embed);
-  }
-
-  // eslint-disable-next-line complexity
-  public async edit(message: GuildMessage, args: Args): Promise<void> {
-    // Get the class ID
-    const classId = await args.pickResult('string');
-    if (classId.error) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
-
-    // Fetch the class document from the database
-    let eclass = await Eclass.findOne({ classId: classId.value });
-    if (!eclass) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
-
-    // Check if the professor is the right one
-    if (message.member.id !== eclass.professor && message.member.roles.cache.has(settings.roles.staff)) {
-      await message.channel.send(config.messages.editUnauthorized);
-      return;
-    }
-
-    // If the class is already started/finished/cancel, you cannot edit it.
-    if (eclass.status !== EclassStatus.Planned) {
-      await message.channel.send(pupa(config.messages.notEditable, { status: EclassManager.toStatus(eclass) }));
-      return;
-    }
-
+  @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
+  public async edit(message: GuildMessage, args: Args, eclass: EclassDocument): Promise<void> {
     // Resolve the given arguments & validate them
     const shouldPing = args.getFlags('ping');
     const property = await args.pickResult('string');
@@ -374,7 +325,7 @@ export default class EclassCommand extends MonkaSubCommand {
         duration,
         professor: await message.guild.members.fetch(eclass.professor),
         classChannel,
-        classId: classId.value,
+        classId: eclass.classId,
       }),
     });
     // Edit the role
@@ -392,65 +343,15 @@ export default class EclassCommand extends MonkaSubCommand {
       await classChannel.send(pupa(notificationMessage, payload));
   }
 
-  public async cancel(message: GuildMessage, args: Args): Promise<void> {
-    // Get the class ID
-    const classId = await args.pickResult('string');
-    if (classId.error) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
-
-    // Fetch the class document from the database
-    const eclass = await Eclass.findOne({ classId: classId.value });
-    if (!eclass) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
-
-    // Check if the professor is the right one
-    if (message.member.id !== eclass.professor && message.member.roles.cache.has(settings.roles.staff)) {
-      await message.channel.send(config.messages.cancelUnauthorized);
-      return;
-    }
-
-    // If the class is already canceled/finished, you cannot cancel it.
-    if (eclass.status === EclassStatus.Canceled || eclass.status === EclassStatus.Finished) {
-      await message.channel.send(pupa(config.messages.notCancellable, { status: EclassManager.toStatus(eclass) }));
-      return;
-    }
-
+  @ValidateEclassArgument({ statusIn: [EclassStatus.Planned, EclassStatus.InProgress] })
+  public async cancel(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
     // Cancel the class & confirm.
     await EclassManager.cancelClass(eclass);
     await message.channel.send(config.messages.successfullyCanceled);
   }
 
-  public async finish(message: GuildMessage, args: Args): Promise<void> {
-    // Get the class ID
-    const classId = await args.pickResult('string');
-    if (classId.error) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
-
-    // Fetch the class document from the database
-    const eclass = await Eclass.findOne({ classId: classId.value });
-    if (!eclass) {
-      await message.channel.send(config.messages.invalidClassId);
-      return;
-    }
-
-    // Check if the professor is the right one
-    if (message.member.id !== eclass.professor && message.member.roles.cache.has(settings.roles.staff)) {
-      await message.channel.send(config.messages.finishUnauthorized);
-      return;
-    }
-
-    // If the class is not started, you cannot finish it.
-    if (eclass.status !== EclassStatus.InProgress) {
-      await message.channel.send(config.messages.notFinishable);
-      return;
-    }
-
+  @ValidateEclassArgument({ statusIn: [EclassStatus.InProgress] })
+  public async finish(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
     // Fetch the member
     const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
     if (!professor) {

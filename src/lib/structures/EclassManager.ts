@@ -269,13 +269,4 @@ export default class EclassManager {
 
     member.send(pupa(config.messages.unsubscribed, { subject: eclass.subject, topic: eclass.topic })).catch(noop);
   }
-
-  public static toStatus(eclass: EclassDocument): string {
-    switch (eclass.status) {
-      case EclassStatus.Planned: return config.messages.statuses.planned;
-      case EclassStatus.InProgress: return config.messages.statuses.inProgress;
-      case EclassStatus.Finished: return config.messages.statuses.finished;
-      case EclassStatus.Canceled: return config.messages.statuses.canceled;
-    }
-  }
 }

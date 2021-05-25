@@ -19,6 +19,8 @@ export const eclass = {
     onlyProfessor: 'Seul les professeurs peuvent effectuer cette action !',
     unresolvedProfessor: ':x: Impossible de retrouver le professeur pour ce cours !',
     unconfiguredChannel: "Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configurez-en un en tapant la commande `setup class` dans le bon salon.",
+    editUnauthorized: "Tu ne peux pas modifier un cours qui n'est pas a toi !",
+    statusIncompatible: 'Tu ne peux pas faire cette action alors que le cours {status}',
 
     // Statuses
     statuses: {
@@ -58,8 +60,6 @@ export const eclass = {
     },
 
     // Edit subcommand
-    editUnauthorized: "Tu n'es pas autorisé à modifier ce cours !",
-    notEditable: 'Ce cours {status}, tu ne peux donc pas le modifier !',
     invalidEditProperty: 'Cette propriété est invalide. Choisissez parmi "sujet", "date", "heure", "durée", "professeur", "rôle".',
 
     editedTopic: 'Vous avez bien modifié le thème du cours en "{eclass.topic}".',
@@ -82,8 +82,6 @@ export const eclass = {
 
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
-    startUnauthorized: "Tu n'es pas autorisé à lancer ce cours !",
-    alreadyStarted: 'Ce cours {status}, tu ne peux donc pas le re-lancer !',
     startClassNotification: ':bell: <@&{classRole}>, le cours commence !',
     remindClassNotification: ':bell: <@&{classRole}> rappel : le cours commence dans {duration}',
     remindClassPrivateNotification: ":bell: Tu t'es inscrit au cours \"{eclass.topic}\". Il va commencer dans environ 15 minutes ! Tien-toi prêt :\\)",
@@ -105,7 +103,6 @@ export const eclass = {
     // Cancel subcommand
     successfullyCanceled: 'Le cours a bien été archivé !',
     cancelUnauthorized: "Tu n'es pas autorisé à archiver ce cours !",
-    notCancellable: "Ce cours {status}, tu ne peux donc pas l'archiver !",
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
 
     // Subscribing
