@@ -1,5 +1,5 @@
 import type { GuildMember } from 'discord.js';
-import type { Document, Model } from 'mongoose';
+import type { Document, Model, Types } from 'mongoose';
 
 /* ****************************** */
 /*  Configuration Database Types  */
@@ -89,7 +89,9 @@ export interface ReactionRoleBase {
 }
 
 /** Interface for the "ReactionRole"'s mongoose document */
-export interface ReactionRoleDocument extends ReactionRoleBase, Document {}
+export interface ReactionRoleDocument extends Omit<ReactionRoleBase, 'reactionRolePairs'>, Document {
+  reactionRolePairs: Types.Array<{ role: string; reaction: string }>;
+}
 
 /** Interface for the "ReactionRole"'s mongoose model */
 export type ReactionRoleModel = Model<ReactionRoleDocument>;

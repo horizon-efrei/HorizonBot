@@ -1,10 +1,9 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { EmojiRegex, MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
+import { MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
 import type { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { MessageEmbed } from 'discord.js';
 import difference from 'lodash.difference';
-import nodeEmoji from 'node-emoji';
 import pupa from 'pupa';
 import { reactionRole as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
@@ -30,6 +29,8 @@ import {
   generateDashLessAliases: true,
   subCommands: generateSubcommands({
     start: { aliases: ['make', 'setup', 'create', 'add'] },
+    addPair: { aliases: [] },
+    removePair: { aliases: ['deletePair', 'suppr', 'rmPair', 'remPair', 'delPair'] },
     list: { aliases: ['liste', 'show'] },
     remove: { aliases: ['delete', 'supprimer', 'supprime', 'suppr', 'rm', 'rem', 'del'] },
     help: { aliases: ['aide'], default: true },
@@ -99,6 +100,78 @@ export default class SetupCommand extends MonkaSubCommand {
 
     this.context.client.reactionRolesIds.push(document.messageId);
     await ReactionRole.create(document);
+  }
+
+  public async addPair(message: GuildMessage, args: Args): Promise<void> {
+    const rrMessage = (await args.pickResult('message'))?.value as GuildMessage;
+    if (!rrMessage) {
+      await message.channel.send(config.messages.notAMessage);
+      return;
+    }
+
+    const document = await ReactionRole.findOne({ messageId: rrMessage.id });
+    if (!rrMessage) {
+      await message.channel.send(config.messages.notAMenu);
+      return;
+    }
+
+    const emojiQuery = (await args.pickResult('string'))?.value;
+    const reaction = ArgumentResolver.resolveEmoji(emojiQuery, message.guild);
+    if (!reaction) {
+      await message.channel.send(config.messages.invalidReaction);
+      return;
+    }
+    if (document.reactionRolePairs.some(pair => pair.reaction === reaction)) {
+      await message.channel.send(config.messages.reactionAlreadyUsed);
+      return;
+    }
+
+    const role = (await args.pickResult('role'))?.value;
+    if (!role) {
+      await message.channel.send(config.messages.invalidRole);
+      return;
+    }
+    if (document.reactionRolePairs.some(pair => pair.role === role.id)) {
+      await message.channel.send(config.messages.roleAlreadyUsed);
+      return;
+    }
+
+    await rrMessage.react(emojiQuery);
+
+    document.reactionRolePairs.push({ reaction, role: role.id });
+    await document.save();
+    await message.channel.send(pupa(config.messages.addedPairSuccessfuly, { reaction, role, rrMessage }));
+  }
+
+  public async removePair(message: GuildMessage, args: Args): Promise<void> {
+    const rrMessage = (await args.pickResult('message'))?.value as GuildMessage;
+    if (!rrMessage) {
+      await message.channel.send(config.messages.notAMessage);
+      return;
+    }
+
+    const document = await ReactionRole.findOne({ messageId: rrMessage.id });
+    if (!rrMessage) {
+      await message.channel.send(config.messages.notAMenu);
+      return;
+    }
+
+    const role = (await args.pickResult('role'))?.value;
+    if (!role) {
+      await message.channel.send(config.messages.invalidRole);
+      return;
+    }
+    const pair = document.reactionRolePairs.find(rrp => rrp.role === role.id);
+    if (!pair) {
+      await message.channel.send(config.messages.roleNotUsed);
+      return;
+    }
+
+    await rrMessage.reactions.cache.get(pair.reaction).remove();
+
+    document.reactionRolePairs.pull(pair);
+    await document.save();
+    await message.channel.send(pupa(config.messages.removedPairSuccessfuly, { rrMessage }));
   }
 
   public async list(message: GuildMessage, _args: Args): Promise<void> {
@@ -214,8 +287,7 @@ export default class SetupCommand extends MonkaSubCommand {
       const [emojiQuery, roleQuery] = firstAndRest(line, ' ');
 
       // Resolve the emoji, either from a standard emoji, or from a custom guild emoji.
-      const emoji = nodeEmoji.find(emojiQuery)?.emoji
-        || message.guild.emojis.cache.get(EmojiRegex.exec(emojiQuery)?.[3])?.toString();
+      const emoji = ArgumentResolver.resolveEmoji(emojiQuery, result.guild);
       if (!emoji) {
         this.context.logger.warn(`[Reaction Roles] Emoji ${emojiQuery} not found (resolve to base emoji/guild emote's cache) (guild: ${message.guild.id}).`);
         continue;

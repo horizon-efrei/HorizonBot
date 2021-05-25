@@ -1,5 +1,6 @@
 import {
   ChannelMentionRegex,
+  EmojiRegex,
   isNewsChannel,
   isTextChannel,
   MessageLinkRegex,
@@ -12,8 +13,9 @@ import type {
   GuildMember,
   Role,
   User,
- } from 'discord.js';
+} from 'discord.js';
 import { Permissions } from 'discord.js';
+import nodeEmoji from 'node-emoji';
 import type { GuildMessage, GuildTextBasedChannel, HourMinutes } from '@/types';
 import { getDuration, nullop } from '@/utils';
 
@@ -81,6 +83,11 @@ export default {
 
     const message = await channel.messages.fetch(messageID).catch(nullop) as GuildMessage;
     return message;
+  },
+
+  resolveEmoji(argument: string, guild: Guild): string {
+    return nodeEmoji.find(argument)?.emoji
+      || guild.emojis.cache.get(EmojiRegex.exec(argument)?.[3])?.toString();
   },
 
   resolveDate(argument: string): Date {

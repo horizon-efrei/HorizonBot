@@ -40,6 +40,12 @@ export const reactionRole = {
     examples: ['reactionrole start', 'rr start #salon-annonces', 'autorole list', 'ar remove 188341077902753794', 'rr help'],
   },
   messages: {
+    // Global
+    notAMessage: "Cet identifiant de message n'est pas valide. Il faut entrer le lien vers le message, ou son ID.",
+    notAMenu: "Ce message n'est pas un menu de réaction.",
+    invalidReaction: "Cette réaction n'est pas valide",
+    invalidRole: "Ce rôle n'est pas valide",
+
     // Create the menu
     channelPrompt: 'Dans quel salon veux-tu créer ce menu ? Tu peux entrer son nom, son ID, ou le mentionner.',
     titlePrompt: 'Entre le titre du menu sur la première ligne, puis la description sur les suivantes.',
@@ -66,8 +72,17 @@ export const reactionRole = {
     listEmbedTitle: 'Liste des menus de réaction de la guilde "{message.guild.name}" ({total})',
     listEmbedDescription: '• [{title}]({url}) ({total} roles)\n',
 
+    // Add a role to a menu
+    reactionAlreadyUsed: 'Cette réaction est déjà utilisée dans ce menu !',
+    roleAlreadyUsed: 'Ce rôle est déjà utilisé dans ce menu !',
+    addedPairSuccessfuly: "C'est fait ! La réaction {reaction} donnera le rôle \"{role.name}\" sur le menu {rrMessage.url}",
+
+    // Remove a role from a menu
+    reactionNotUsed: "Cette réaction n'est pas dans ce menu !",
+    roleNotUsed: "Ce rôle n'est pas dans ce menu !",
+    removedPairSuccessfuly: "C'est fait ! Cette paire à bien été supprimée du menu {rrMessage.url}",
+
     // Remove a menu
-    notAMenu: "Ce message n'est pas un menu de réaction.",
     removedMenu: 'Ce menu a bien été supprimé !',
     removePrompt: "Entre l'identifiant (ID) du message qui contient le menu que tu souhaites supprimer.",
 
