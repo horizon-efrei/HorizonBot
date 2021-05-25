@@ -61,6 +61,6 @@ export default class PingRoleIntersectionCommand extends MonkaCommand {
     );
 
     if (!isPersistent)
-      this.context.client.intersectionRoles.push(newRole.id);
+      this.context.client.intersectionRoles.add(newRole.id);
   }
 }

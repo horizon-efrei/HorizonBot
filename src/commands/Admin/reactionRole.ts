@@ -99,7 +99,7 @@ export default class SetupCommand extends MonkaSubCommand {
       reactionRolePairs: roles.map(({ reaction, role }) => ({ reaction, role: role.id })),
     };
 
-    this.context.client.reactionRolesIds.push(document.messageId);
+    this.context.client.reactionRolesIds.add(document.messageId);
     await ReactionRole.create(document);
   }
 
@@ -137,7 +137,7 @@ export default class SetupCommand extends MonkaSubCommand {
       givenMessage = await argumentPrompter.autoPromptMessage();
     }
 
-    const isRrMenu = this.context.client.reactionRolesIds.includes(givenMessage.id);
+    const isRrMenu = this.context.client.reactionRolesIds.has(givenMessage.id);
     if (!isRrMenu) {
       await message.channel.send(config.messages.notAMenu);
       return;

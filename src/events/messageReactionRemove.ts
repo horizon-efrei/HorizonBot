@@ -20,11 +20,11 @@ export default class MessageReactionRemoveEvent extends Event {
     }
 
     // If we are reacting to a reaction role
-    if (this.context.client.reactionRolesIds.includes(reaction.message.id))
+    if (this.context.client.reactionRolesIds.has(reaction.message.id))
       await this._handleReactionRole(reaction, member, message);
 
     // If we are reacting to an eclass role
-    if (this.context.client.eclassRolesIds.includes(reaction.message.id) && reaction.emoji.name === settings.emojis.yes)
+    if (this.context.client.eclassRolesIds.has(reaction.message.id) && reaction.emoji.name === settings.emojis.yes)
       await this._handleEclassRole(reaction, member, message);
   }
 
@@ -35,7 +35,7 @@ export default class MessageReactionRemoveEvent extends Event {
   ): Promise<void> {
     const document = await ReactionRole.findOne({ messageId: message.id });
     if (!document) {
-      this.context.client.reactionRolesIds = this.context.client.reactionRolesIds.filter(elt => elt !== message.id);
+      this.context.client.reactionRolesIds.delete(message.id);
       return;
     }
     if (!document.reactionRolePairs.some(pair => pair.reaction === reaction.emoji.toString()))
@@ -66,7 +66,7 @@ export default class MessageReactionRemoveEvent extends Event {
   ): Promise<void> {
     const document = await Eclass.findOne({ announcementMessage: message.id });
     if (!document) {
-      this.context.client.reactionRolesIds = this.context.client.reactionRolesIds.filter(elt => elt !== message.id);
+      this.context.client.reactionRolesIds.delete(message.id);
       return;
     }
 

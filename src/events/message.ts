@@ -12,8 +12,8 @@ export default class MessageEvent extends Event {
     const mentionnedTempIntersectionRoles = this.context.client.intersectionRoles
       .filter(r => message.mentions.roles.has(r))
       .map(roleId => message.guild.roles.resolve(roleId));
-    if (mentionnedTempIntersectionRoles.length > 0) {
-      this.context.logger.info(`[Intersection Roles] ${mentionnedTempIntersectionRoles.length} role was just mentionned by ${message.author.username}. It will expire in two days.`);
+    if (mentionnedTempIntersectionRoles.size > 0) {
+      this.context.logger.info(`[Intersection Roles] ${mentionnedTempIntersectionRoles.size} role was just mentionned by ${message.author.username}. It will expire in two days.`);
 
       for (const role of mentionnedTempIntersectionRoles) {
         await RoleIntersections.findOneAndUpdate(

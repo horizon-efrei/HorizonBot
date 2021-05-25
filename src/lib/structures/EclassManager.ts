@@ -92,7 +92,7 @@ export default class EclassManager {
     });
     // Add the reaction & cache the message
     await announcementMessage.react(settings.emojis.yes);
-    Store.injectedContext.client.eclassRolesIds.push(announcementMessage.id);
+    Store.injectedContext.client.eclassRolesIds.add(announcementMessage.id);
 
     // Create the role
     const role = await message.guild.roles.create({ data: { name, color: settings.colors.white, mentionable: true } });
@@ -186,8 +186,7 @@ export default class EclassManager {
     await announcementMessage.edit(announcementEmbed);
     await announcementMessage.reactions.removeAll();
     // Remove from cache
-    Store.injectedContext.client.eclassRolesIds = Store.injectedContext.client.eclassRolesIds
-      .filter(elt => elt !== announcementMessage.id);
+    Store.injectedContext.client.eclassRolesIds.delete(announcementMessage.id);
 
     // Remove the associated role
     await Store.injectedContext.client

@@ -15,20 +15,6 @@ import type MonkaClient from '@/structures/MonkaClient';
 
 export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
-/* ********************************************** */
-/*  Define the core-js "Array#uniqueBy" polyfill  */
-/* ********************************************** */
-
-type Resolver<T> = (item: T) => unknown;
-type Indexer<T> = number | symbol | keyof T;
-type ValueResolver<T> = Indexer<T> | Resolver<T>;
-
-declare global {
-  interface Array<T> {
-    uniqueBy(valueResolver?: ValueResolver<T>): T[];
-  }
-}
-
 /* ******************************************* */
 /*  Custom Types used all across the codebase  */
 /* ******************************************* */

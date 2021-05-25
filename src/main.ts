@@ -1,5 +1,6 @@
 import '@sapphire/plugin-logger/register';
 import 'core-js/proposals/array-unique';
+import 'core-js/proposals/collection-methods';
 import 'dayjs/locale/fr';
 import 'dotenv/config';
 import 'module-alias/register';

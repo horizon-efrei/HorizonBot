@@ -14,10 +14,10 @@ import { nullop } from '@/utils';
 export default class MonkaClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
-  reactionRolesIds: string[];
-  eclassRolesIds: string[];
+  reactionRolesIds: Set<string>;
+  eclassRolesIds: Set<string>;
   waitingFlaggedMessages: FlaggedMessage[];
-  intersectionRoles: string[];
+  intersectionRoles: Set<string>;
 
   constructor() {
     super({
@@ -42,10 +42,11 @@ export default class MonkaClient extends SapphireClient {
 
     this.stores.register(new TaskStore());
 
-    this.reactionRolesIds = [];
-    this.eclassRolesIds = [];
+    this.reactionRolesIds = new Set();
+    this.eclassRolesIds = new Set();
     this.waitingFlaggedMessages = [];
-    this.intersectionRoles = [];
+    this.intersectionRoles = new Set();
+
     this.configManager = new ConfigurationManager(this);
     void this.configManager.loadAll();
 
@@ -118,18 +119,18 @@ export default class MonkaClient extends SapphireClient {
   private async _loadReactionRoles(): Promise<void> {
     const reactionRoles = await ReactionRole.find().catch(nullop);
     if (reactionRoles) {
-      this.reactionRolesIds.push(
-        ...reactionRoles.map(document => document?.messageId).filter(Boolean),
-      );
+      this.reactionRolesIds.addAll(...reactionRoles
+        .map(document => document?.messageId)
+        .filter(Boolean));
     }
   }
 
   private async _loadEclassRoles(): Promise<void> {
     const eclassRoles = await Eclass.find().catch(nullop);
     if (eclassRoles) {
-      this.eclassRolesIds.push(
-        ...eclassRoles.map(document => document?.announcementMessage).filter(Boolean),
-      );
+      this.eclassRolesIds.addAll(...eclassRoles
+        .map(document => document?.announcementMessage)
+        .filter(Boolean));
     }
   }
 }

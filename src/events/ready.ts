@@ -22,8 +22,7 @@ export default class ReadyEvent extends Event {
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await ReactionRole.findByIdAndDelete(rr._id);
-          this.context.client.reactionRolesIds = this.context.client.reactionRolesIds
-            .filter(elt => elt !== rr.messageId);
+          this.context.client.reactionRolesIds.delete(rr.messageId);
         });
     }
 
@@ -36,8 +35,7 @@ export default class ReadyEvent extends Event {
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await ReactionRole.findByIdAndDelete(eclass._id);
-          this.context.client.reactionRolesIds = this.context.client.reactionRolesIds
-            .filter(elt => elt !== eclass.announcementMessage);
+          this.context.client.reactionRolesIds.delete(eclass.announcementMessage);
         });
     }
 

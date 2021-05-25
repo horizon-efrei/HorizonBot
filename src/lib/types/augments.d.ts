@@ -23,10 +23,10 @@ declare module '@sapphire/framework' {
   interface SapphireClient {
     configManager: ConfigurationManager;
     remainingCompilerApiCredits: number;
-    reactionRolesIds: string[];
-    eclassRolesIds: string[];
+    reactionRolesIds: Set<string>;
+    eclassRolesIds: Set<string>;
     waitingFlaggedMessages: FlaggedMessage[];
-    intersectionRoles: string[];
+    intersectionRoles: Set<string>;
   }
 
   interface ArgType {
