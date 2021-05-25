@@ -31,14 +31,13 @@ import { generateSubcommands, nullop } from '@/utils';
     finish: { aliases: ['end'] },
     help: { aliases: ['aide'], default: true },
   }),
+  preconditions: [{
+    name: 'customRole',
+    context: { role: settings.roles.eprof, message: config.messages.onlyProfessor },
+  }],
 })
 export default class EclassCommand extends MonkaSubCommand {
   public async create(message: GuildMessage, args: Args): Promise<void> {
-    if (!message.member.roles.cache.has(settings.roles.eprof)) {
-      await message.channel.send(config.messages.onlyProfessor);
-      return;
-    }
-
     const classChannel = await args.pickResult('guildTextBasedChannel');
     if (classChannel.error) {
       await message.channel.send(config.messages.prompts.classChannel.invalid);
@@ -99,11 +98,6 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   public async setup(message: GuildMessage): Promise<void> {
-    if (!message.member.roles.cache.has(settings.roles.eprof)) {
-      await message.channel.send(config.messages.onlyProfessor);
-      return;
-    }
-
     let classChannel: GuildTextBasedChannel;
     let topic: string;
     let date: Date;
