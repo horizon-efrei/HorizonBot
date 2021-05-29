@@ -33,11 +33,11 @@ export const eclass = {
     // Help subcommand
     helpEmbedTitle: 'Aide de la commande de cours',
     helpEmbedDescription: [
-      { name: "Créer un cours à partir d'arguments donnés", value: '`!cours create <#salon | salon | ID> <sujet> <date> <heure> <durée> <@professeur | professeur | ID> <@role-audience | role audience | ID>`' },
+      { name: "Créer un cours à partir d'arguments donnés", value: '`!cours create <#salon | salon | ID> <sujet> <date> <heure> <durée> <@professeur | professeur | ID> <@role-audience | role audience | ID> <oui/non enregistré>`' },
       { name: 'Créer un cours de manière intéractive', value: '`!cours setup`' },
       { name: 'Commencer un cours', value: '`!cours start ID-cours`' },
       { name: 'Terminer un cours manuellement', value: '`!cours finish ID-cours`' },
-      { name: 'Modifier un cours', value: '`!cours edit ID-cours <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle"' },
+      { name: 'Modifier un cours', value: '`!cours edit ID-cours <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
       { name: 'Annuler un cours', value: '`!cours cancel ID-cours`' },
       { name: "Page d'aide", value: '`!cours help`' },
     ],
@@ -56,6 +56,8 @@ export const eclass = {
       date: 'Date et heure',
       duration: 'Durée prévue',
       professor: 'Professeur',
+      recorded: 'Enregistré',
+      recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
       footer: 'ID : {eclass.classId}',
     },
 
@@ -79,6 +81,10 @@ export const eclass = {
 
     editedRole: 'Vous avez bien modifié le rôle visé en "{eclass.role}".',
     pingEditedRole: '{role}, le cours a été modifié : le rôle visé est maintenant "{eclass.role}".',
+
+    editedRecorded: "Vous avez bien modifié le statut d'enregistrement du cours en `{eclass.isRecorded}`.",
+    pingEditedRecorded: '{role}, le cours a été modifié : ',
+    pingEditedRecordedValues: ['il ne sera plus enregistré.', 'il sera maintenant enregistré.'],
 
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
@@ -138,6 +144,10 @@ export const eclass = {
       targetRole: {
         base: 'Entrez le rôle visé (L1, L2...) (mentionnez-le ou entrez son nom ou son ID) :',
         invalid: 'Ce rôle est invalide.',
+      },
+      recorded: {
+        base: 'Entrez si oui ou non le cours sera enregistré (oui/o/yes/y | non/no/n) :',
+        invalid: 'Cette valeur est invalide.',
       },
 
       stoppedPrompting: "Tu as bien abandonné la commande ! Aucun cours n'a été créé.",

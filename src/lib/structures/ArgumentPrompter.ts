@@ -73,6 +73,13 @@ export default class ArgumentPrompter {
     return response;
   }
 
+  public async autoPromptBoolean(prompts?: PrompterText): Promise<boolean> {
+    let response = await this.promptBoolean(prompts);
+    while (!response)
+      response = await this.promptBoolean(prompts, true);
+    return response;
+  }
+
   public async promptTextChannel(prompts?: PrompterText, previousIsFailure = false): Promise<GuildTextBasedChannel> {
     const response = await this._prompt(
       previousIsFailure
@@ -165,6 +172,15 @@ export default class ArgumentPrompter {
 
     return ArgumentResolver.resolveRoleByID(response.content, response.guild)
       ?? ArgumentResolver.resolveRoleByQuery(response.content, response.guild);
+  }
+
+  public async promptBoolean(prompts?: PrompterText, previousIsFailure = false): Promise<boolean> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts?.invalid || messages.prompts.role.invalid} ${prompts?.base || messages.prompts.role.base}`
+        : prompts?.base || messages.prompts.role.base,
+    );
+    return ArgumentResolver.resolveBoolean(response.content);
   }
 
   private async _prompt(text: string): Promise<GuildMessage> {

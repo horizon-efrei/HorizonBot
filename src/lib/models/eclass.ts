@@ -72,6 +72,10 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     default: false,
   },
   subscribers: [String],
+  isRecorded: {
+    type: Boolean,
+    default: false,
+  },
 }, { timestamps: true });
 
 const pad = (n: number): string => n.toString().padStart(2, '0');

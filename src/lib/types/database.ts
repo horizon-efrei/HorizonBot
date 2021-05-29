@@ -60,6 +60,7 @@ export interface EclassBase {
   reminded: boolean;
   classId: string;
   subscribers: string[];
+  isRecorded: boolean;
 }
 
 export type PrettyEclass = Omit<EclassBase, 'date' | 'duration' | 'end'> & { date: string; duration: string; end: string };

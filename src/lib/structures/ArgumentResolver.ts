@@ -16,6 +16,7 @@ import type {
 } from 'discord.js';
 import { Permissions } from 'discord.js';
 import nodeEmoji from 'node-emoji';
+import settings from '@/config/settings';
 import type { GuildMessage, GuildTextBasedChannel, HourMinutes } from '@/types';
 import { getDuration, nullop } from '@/utils';
 
@@ -83,6 +84,14 @@ export default {
 
     const message = await channel.messages.fetch(messageID).catch(nullop) as GuildMessage;
     return message;
+  },
+
+  resolveBoolean(argument: string): boolean {
+    if (settings.configuration.booleanTruths.includes(argument))
+      return true;
+    if (settings.configuration.booleanFalses.includes(argument))
+      return false;
+    return null;
   },
 
   resolveEmoji(argument: string, guild: Guild): string {

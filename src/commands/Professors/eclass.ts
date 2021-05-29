@@ -90,6 +90,12 @@ export default class EclassCommand extends MonkaSubCommand {
       return;
     }
 
+    const isRecorded = await args.pickResult('boolean');
+    if (isRecorded.error) {
+      await message.channel.send(config.messages.prompts.recorded.invalid);
+      return;
+    }
+
     await EclassManager.createClass(message, {
       date: date.value,
       classChannel: classChannel.value,
@@ -97,6 +103,7 @@ export default class EclassCommand extends MonkaSubCommand {
       duration: duration.value,
       professor: professor.value,
       targetRole: targetRole.value,
+      isRecorded: isRecorded.value,
     });
   }
 
@@ -108,6 +115,7 @@ export default class EclassCommand extends MonkaSubCommand {
     let duration: number;
     let professor: GuildMember;
     let targetRole: Role;
+    let isRecorded: boolean;
 
     try {
       const allMessages: GuildMessage[] = [];
@@ -129,6 +137,7 @@ export default class EclassCommand extends MonkaSubCommand {
       duration = await prompter.autoPromptDuration(config.messages.prompts.duration);
       professor = await prompter.autoPromptMember(config.messages.prompts.professor);
       targetRole = await prompter.autoPromptRole(config.messages.prompts.targetRole);
+      isRecorded = await prompter.autoPromptBoolean(config.messages.prompts.recorded);
     } catch (error: unknown) {
       if ((error as Error).message === 'STOP') {
         await message.channel.send(messages.prompts.stoppedPrompting);
@@ -144,6 +153,7 @@ export default class EclassCommand extends MonkaSubCommand {
       duration,
       professor,
       targetRole,
+      isRecorded,
     });
   }
 
@@ -171,6 +181,7 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
+  // eslint-disable-next-line complexity
   public async edit(message: GuildMessage, args: Args, eclass: EclassDocument): Promise<void> {
     // Resolve the given arguments & validate them
     const shouldPing = args.getFlags('ping');
@@ -303,6 +314,26 @@ export default class EclassCommand extends MonkaSubCommand {
         break;
       }
 
+      case 'record':
+      case 'recorded':
+      case 'enregistre':
+      case 'enregistré': {
+        const isRecorded = await args.pickResult('boolean');
+        if (isRecorded.error) {
+          await message.channel.send(config.messages.prompts.recorded.invalid);
+          return;
+        }
+
+        eclass = await Eclass.findByIdAndUpdate(
+          eclass._id,
+          { isRecorded: isRecorded.value },
+          { new: true },
+        );
+        updateMessage = config.messages.editedRecorded;
+        notificationMessage = `${config.messages.pingEditedRecorded}${config.messages.pingEditedRecordedValues[Number(isRecorded.value)]}`;
+        break;
+      }
+
       default:
         await message.channel.send(config.messages.invalidEditProperty);
         return;
@@ -315,20 +346,22 @@ export default class EclassCommand extends MonkaSubCommand {
     // Edit the announcement embed
     const formattedDate = dayjs(eclass.date).format(settings.configuration.dateFormat);
     const classChannel = message.guild.channels.resolve(eclass.classChannel) as GuildTextBasedChannel;
-    const { subject, topic, duration } = eclass;
     await originalMessage.edit({
       content: originalMessage.content,
       embed: EclassManager.createAnnoucementEmbed({
-        subject,
-        topic,
+        subject: eclass.subject,
+        topic: eclass.topic,
         formattedDate,
-        duration,
+        duration: eclass.duration,
         professor: await message.guild.members.fetch(eclass.professor),
         classChannel,
         classId: eclass.classId,
+        isRecorded: eclass.isRecorded,
       }),
     });
+
     // Edit the role
+    const { subject, topic } = eclass;
     const originalRole = message.guild.roles.resolve(eclass.classRole);
     const newRoleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic, formattedDate });
     if (originalRole.name !== newRoleName)

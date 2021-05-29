@@ -29,6 +29,7 @@ interface EclassCreationOptions {
   duration: number;
   professor: GuildMember;
   targetRole: Role;
+  isRecorded: boolean;
 }
 
 interface EclassEmbedOptions {
@@ -39,6 +40,7 @@ interface EclassEmbedOptions {
   professor: GuildMember;
   classChannel: GuildTextBasedChannel;
   classId: string;
+  isRecorded: boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -46,7 +48,7 @@ export default class EclassManager {
   public static async createClass(
     message: GuildMessage,
     {
-      date, classChannel, topic, duration, professor, targetRole,
+      date, classChannel, topic, duration, professor, targetRole, isRecorded,
     }: EclassCreationOptions,
   ): Promise<void> {
     // Prepare the date
@@ -85,6 +87,7 @@ export default class EclassManager {
       professor,
       classChannel,
       classId: '',
+      isRecorded,
     });
     const announcementMessage = await channel.send({
       content: pupa(config.messages.newClassNotification, { targetRole }),
@@ -111,6 +114,7 @@ export default class EclassManager {
       announcementMessage: announcementMessage.id,
       announcementChannel: classAnnoucement[target],
       classId: Eclass.generateId(topic, professor, date),
+      isRecorded,
     });
     // Use the newly created ID in the embed
     await announcementMessage.edit({
@@ -224,6 +228,7 @@ export default class EclassManager {
     professor,
     classChannel,
     classId,
+    isRecorded,
   }: EclassEmbedOptions): MessageEmbed {
     const fullName = classChannel.name.split('-');
     const baseEmoji = fullName.shift();
@@ -239,6 +244,7 @@ export default class EclassManager {
       .addField(texts.date, formattedDate, true)
       .addField(texts.duration, dayjs.duration(duration).humanize(), true)
       .addField(texts.professor, professor, true)
+      .addField(texts.recorded, texts.recordedValues[Number(isRecorded)], true)
       .setFooter(pupa(texts.footer, { classId }));
   }
 
