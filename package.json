@@ -36,6 +36,7 @@
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
     "lodash.difference": "^4.5.0",
+    "lodash.groupby": "^4.6.0",
     "module-alias": "^2.2.2",
     "mongoose": "^5.12.11",
     "node-cron": "^3.0.0",
@@ -49,6 +50,7 @@
   "devDependencies": {
     "@types/common-tags": "^1.8.0",
     "@types/lodash.difference": "^4.5.6",
+    "@types/lodash.groupby": "^4.6.6",
     "@types/node": "^15.6.1",
     "@types/node-cron": "^2.0.3",
     "@types/node-emoji": "^1.8.1",

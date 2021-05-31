@@ -13,6 +13,7 @@ export enum ConfigEntries {
   ClassAnnoucementL2 = 'class-announcement-l2',
   ClassAnnoucementL3 = 'class-announcement-l3',
   ClassAnnoucementGeneral = 'class-announcement-general',
+  WeekUpcomingClasses = 'week-upcoming-classes',
 }
 
 /** Interface for the "Configuration"'s mongoose schema */

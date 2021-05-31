@@ -4,6 +4,11 @@ export default {
   global: {
     oops: ":warning: Oups... Quelque chose s'est mal passé en réalisant cette action. Il se peut qu'elle ne se soit pas complètement terminée, voire pas commencée. Désolé !",
   },
+  upcomingClasses: {
+    header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
+    noClasses: 'Aucune séance de prévue !',
+    classLine: '• {beginHour}h-{endHour}h: {eclass.topic} <#{eclass.classChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
+  },
   antiSwear: {
     swearModAlert: stripIndent`
       {message.member} à dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte. Si ce message est inapproprié, réagissez avec :white_check_mark: à ce message pour le flagger.

@@ -60,6 +60,13 @@ export default class SetupCommand extends MonkaCommand {
         await this.context.client.configManager.set(ConfigEntries.ClassAnnoucementGeneral, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
+      case 'week-class':
+      case 'week-classes':
+      case 'week-upcoming-class':
+      case 'week-upcoming-classes':
+        await this.context.client.configManager.set(ConfigEntries.WeekUpcomingClasses, channel);
+        await message.channel.send(config.messages.successfullyDefined);
+        break;
       default:
         await message.channel.send(config.messages.unknown);
     }
