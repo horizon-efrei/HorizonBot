@@ -10,6 +10,9 @@ export default class HourArgument extends Argument<Date> {
 
     const groups = DATE_REGEX.exec(arg)?.groups;
     const date = new Date();
+    // Start by settings the day to 1, so when we set the month we don't have any problem with months
+    // that are not 31 days long. (this took me hours of debugging)
+    date.setDate(1);
     const month = Number.parseInt(groups?.month, 10) - 1;
     const day = Number.parseInt(groups?.day, 10);
     const year = Number.parseInt(groups?.year, 10);
