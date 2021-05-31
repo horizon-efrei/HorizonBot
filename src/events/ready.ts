@@ -13,6 +13,9 @@ export default class ReadyEvent extends Event {
   public async run(): Promise<void> {
     this.context.client.checkValidity();
 
+    this.context.logger.info('[ConfigurationManager] Caching configured channels...');
+    await this.context.client.configManager.loadAll();
+
     this.context.logger.info('[Reaction Roles] Caching reactions-roles menus...');
     const reactionRoles = await ReactionRole.find();
     for (const rr of reactionRoles) {

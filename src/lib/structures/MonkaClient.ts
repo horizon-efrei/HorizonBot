@@ -48,7 +48,6 @@ export default class MonkaClient extends SapphireClient {
     this.intersectionRoles = new Set();
 
     this.configManager = new ConfigurationManager(this);
-    void this.configManager.loadAll();
 
     void this._loadCompilerApiCredits();
     void this._loadReactionRoles();

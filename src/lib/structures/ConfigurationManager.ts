@@ -44,6 +44,7 @@ export default class ConfigurationManager {
       this.channels.set(
         channel.guild,
         {
+          ...this.channels.get(channel.guild),
           [channel.name]: this.client.channels.resolve(channel.value),
         } as Record<ConfigEntries, GuildTextBasedChannel>,
       );
