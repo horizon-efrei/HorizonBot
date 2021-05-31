@@ -6,7 +6,7 @@ import Task from '@/structures/Task';
 import type { TaskOptions } from '@/structures/Task';
 import { EclassStatus } from '@/types/database';
 
-@ApplyOptions<TaskOptions>({ delay: 2 * 60 * 1000 /* Every 2 minutes */ })
+@ApplyOptions<TaskOptions>({ interval: 2 * 60 * 1000 /* Every 2 minutes */ })
 export default class ManageEclassTask extends Task {
   public async run(): Promise<void> {
     const eclasses = await Eclass.find({

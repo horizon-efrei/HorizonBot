@@ -1,6 +1,7 @@
 import { Events } from '@sapphire/framework';
 import type { PieceContext, PieceOptions } from '@sapphire/pieces';
 import { Piece } from '@sapphire/pieces';
+import cron from 'node-cron';
 
 /**
  * The base task class. This class is abstract and is to be extended by subclasses, which should implement the methods.
@@ -13,7 +14,10 @@ import { Piece } from '@sapphire/pieces';
  * import type { TaskOptions } from '@/structures/Task';
  *
  * // Define a class extending `Task`, then export it.
- * @ApplyOptions<TaskOptions>({ delay: 10_000 })
+ * // You can use a interval in milliseconds
+ * @ApplyOptions<TaskOptions>({ interval: 10_000 })
+ * // or a cron
+ * @ApplyOptions<TaskOptions>({ cron: '* * * * *' })
  * export default class MyTask extends Task {
  *   public run(): void {
  *     this.context.logger.info('Task ran!');
@@ -22,31 +26,40 @@ import { Piece } from '@sapphire/pieces';
  * ```
  */
 export default abstract class Task extends Piece {
-  public readonly delay: number;
+  public readonly interval?: number;
+  public readonly cron?: string;
 
-  private _schedule: NodeJS.Timeout;
+  private _scheduleInterval: NodeJS.Timeout;
+  private _scheduleCron: cron.ScheduledTask;
   private readonly _callback: (() => Promise<void>) | null;
 
-  constructor(context: PieceContext, options: TaskOptions = {}) {
+  constructor(context: PieceContext, options: TaskOptions) {
     super(context, options);
 
-    this.delay = options.delay ?? 10_000;
+    this.interval = options.interval;
+    this.cron = options.cron;
     this._callback = this._run.bind(this);
   }
 
   public onLoad(): void {
-    this._schedule = setInterval(this._callback, this.delay);
+    if (this.interval)
+      this._scheduleInterval = setInterval(this._callback, this.interval);
+    else if (this.cron)
+      this._scheduleCron = cron.schedule(this.cron, this._callback);
   }
 
   public onUnload(): void {
-    if (this._schedule)
-      clearInterval(this._schedule);
+    if (this._scheduleInterval)
+      clearInterval(this._scheduleInterval);
+    if (this._scheduleCron)
+      this._scheduleCron.stop().destroy();
   }
 
   public toJSON(): Record<PropertyKey, unknown> {
     return {
       ...super.toJSON(),
-      delay: this.delay,
+      interval: this.interval,
+      cron: this.cron,
     };
   }
 
@@ -61,6 +74,6 @@ export default abstract class Task extends Piece {
   public abstract run(): unknown;
 }
 
-export interface TaskOptions extends PieceOptions {
-  readonly delay?: number;
-}
+export type TaskOptions =
+  | PieceOptions & { cron: string } & { interval?: never }
+  | PieceOptions & { cron?: never } & { interval: number };

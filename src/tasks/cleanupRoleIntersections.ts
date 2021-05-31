@@ -3,7 +3,7 @@ import RoleIntersections from '@/models/roleIntersections';
 import Task from '@/structures/Task';
 import type { TaskOptions } from '@/structures/Task';
 
-@ApplyOptions<TaskOptions>({ delay: 60 * 60 * 1000 /* Every hour */ })
+@ApplyOptions<TaskOptions>({ cron: '0 * * * *' })
 export default class CleanupRoleIntersectionsTask extends Task {
   public async run(): Promise<void> {
     const roles = (await RoleIntersections.find({ expiration: { $lte: Date.now() } }))
