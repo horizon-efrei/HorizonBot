@@ -1,5 +1,6 @@
 import { Event } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
+import pupa from 'pupa';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
@@ -42,15 +43,8 @@ export default class MessageReactionAddEvent extends Event {
       await this._handleModeratorFlag(reaction, member, message);
 
     // If we want to flag a question to call a professor
-    if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagNeededAnswer) {
-      const eProfRoleId = new Profs().findProf(message.channel.id);
-      if (!eProfRoleId)
-        return;
-      const eProf: GuildMember = message.guild.roles.cache.get(eProfRoleId).members.random();
-
-      await message.channel.send(`${eProf} nous avons besoin de toi !`);
-      await eProf.send(`${member} a besoin de toi là-bas : ${message.channel}`).catch(noop);
-    }
+    if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagNeededAnswer)
+      await this._handleEprofFlag(reaction, member, message);
   }
 
   private async _flagMessage(
@@ -123,5 +117,23 @@ export default class MessageReactionAddEvent extends Event {
       this.context.logger.error(error);
       flagMessage.alertMessage.channel.send(messages.global.oops).catch(noop);
     }
+  }
+
+  private async _handleEprofFlag(
+    _reaction: MessageReaction,
+    member: GuildMember,
+    message: GuildMessage,
+  ): Promise<void> {
+    const eProfRoleId = Profs.findProf(message.channel.id);
+    if (!eProfRoleId)
+      return;
+    const eProf = message.guild.roles.cache
+      .get(eProfRoleId)
+      .members
+      .filter(mbr => mbr.presence.status !== 'online')
+      .random();
+
+    await message.channel.send(pupa(messages.miscellaneous.eprofMentionPublic, { eProf }));
+    await eProf.send(pupa(messages.miscellaneous.eprofMentionPrivate, { member, message })).catch(noop);
   }
 }
