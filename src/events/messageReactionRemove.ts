@@ -15,7 +15,7 @@ export default class MessageReactionRemoveEvent extends Event {
     const message = reaction.message as GuildMessage;
     const member = message.guild.members.cache.get(user.id);
     if (!member) {
-      this.context.logger.warn('[Message Reaction Remove] Abort even due to unresolved member.');
+      this.context.logger.warn('[Message Reaction Remove] Abort event due to unresolved member.');
       return;
     }
 
@@ -51,12 +51,13 @@ export default class MessageReactionRemoveEvent extends Event {
 
     const givenRole = message.guild.roles.cache.get(givenRoleId);
     if (!givenRole) {
-      this.context.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exists !`);
+      this.context.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exist.`);
       return;
     }
 
     if (member.roles.cache.get(givenRole.id))
       member.roles.remove(givenRole).catch(noop);
+    this.context.logger.debug(`[Reaction Roles] Removed role ${givenRole.id} (${givenRole.name}) from member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
   }
 
   private async _handleEclassRole(

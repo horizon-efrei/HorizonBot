@@ -18,7 +18,7 @@ export default class MessageReactionAddEvent extends Event {
     const message = reaction.message as GuildMessage;
     const member = message.guild.members.cache.get(user.id);
     if (!member) {
-      this.context.logger.warn('[Message Reaction Add] Abort even due to unresolved member.');
+      this.context.logger.warn('[Message Reaction Add] Abort event due to unresolved member.');
       return;
     }
 
@@ -83,12 +83,13 @@ export default class MessageReactionAddEvent extends Event {
 
     const givenRole = message.guild.roles.cache.get(givenRoleId);
     if (!givenRole) {
-      this.context.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exists !`);
+      this.context.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exist.`);
       return;
     }
 
     if (!member.roles.cache.get(givenRole.id))
       member.roles.add(givenRole).catch(noop);
+    this.context.logger.debug(`[Reaction Roles] Added role ${givenRole.id} (${givenRole.name}) to member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
   }
 
   private async _handleEclassRole(
@@ -118,7 +119,7 @@ export default class MessageReactionAddEvent extends Event {
     try {
       await flagMessage.approve(member);
     } catch (error: unknown) {
-      this.context.logger.error('[Anti Swear] An error occured while trying to confirm a flagged message...');
+      this.context.logger.error('[Anti Swear] An error occured while trying to confirm a flagged message.');
       this.context.logger.error(error);
       flagMessage.alertMessage.channel.send(messages.global.oops).catch(noop);
     }

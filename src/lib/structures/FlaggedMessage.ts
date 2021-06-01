@@ -68,6 +68,7 @@ export default class FlaggedMessage {
       await this._confirmModerators();
       await this._addToDatabase();
     }
+    this.context.logger.debug(`[Anti Swear] New flagged message added ${this.message.id} (${this.message.url}).`);
   }
 
   public async remove(): Promise<void> {
@@ -92,6 +93,8 @@ export default class FlaggedMessage {
     );
 
     await this.alertUser();
+
+    this.context.logger.debug(`[Anti Swear] Message ${this.message.id} (${this.message.url}) was just approved by moderator ${moderator.id} (${moderator.displayName}#${moderator.user.discriminator}).`);
   }
 
   public async alertUser(): Promise<void> {

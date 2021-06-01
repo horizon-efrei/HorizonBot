@@ -38,6 +38,7 @@ export default class UpdateUpcomingClassesTask extends Task {
         await message.edit(content);
       else
         await channel.send(content);
+      this.context.logger.debug('[Upcoming Classes] Updated classes.');
     }
   }
 
