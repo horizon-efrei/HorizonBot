@@ -1,9 +1,7 @@
 ---
-name: Feature request
+name: 🎉 Idée
 about: Proposez une idée pour MonkaBot !
-title: Feature Request:
-labels: feature
-assignees: noftaly
+labels: ['type: feature', 'status: waiting']
 
 ---
 
