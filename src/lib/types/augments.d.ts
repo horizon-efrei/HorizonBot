@@ -27,6 +27,9 @@ declare module '@sapphire/framework' {
     eclassRolesIds: Set<string>;
     waitingFlaggedMessages: FlaggedMessage[];
     intersectionRoles: Set<string>;
+
+    loadReactionRoles(): Promise<void>;
+    loadEclassRoles(): Promise<void>;
   }
 
   interface ArgType {

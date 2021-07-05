@@ -42,16 +42,13 @@ export default class MonkaClient extends SapphireClient {
 
     this.stores.register(new TaskStore());
 
-    this.reactionRolesIds = new Set();
-    this.eclassRolesIds = new Set();
     this.waitingFlaggedMessages = [];
     this.intersectionRoles = new Set();
+    void this._loadCompilerApiCredits();
+    void this.loadReactionRoles();
+    void this.loadEclassRoles();
 
     this.configManager = new ConfigurationManager(this);
-
-    void this._loadCompilerApiCredits();
-    void this._loadReactionRoles();
-    void this._loadEclassRoles();
 
     this.logger.info('[Main] Client initialization finished!');
   }
@@ -100,6 +97,26 @@ export default class MonkaClient extends SapphireClient {
     }
   }
 
+  public async loadReactionRoles(): Promise<void> {
+    this.reactionRolesIds = new Set();
+    const reactionRoles = await ReactionRole.find().catch(nullop);
+    if (reactionRoles) {
+      this.reactionRolesIds.addAll(...reactionRoles
+        .map(document => document?.messageId)
+        .filter(Boolean));
+    }
+  }
+
+  public async loadEclassRoles(): Promise<void> {
+    this.eclassRolesIds = new Set();
+    const eclassRoles = await Eclass.find().catch(nullop);
+    if (eclassRoles) {
+      this.eclassRolesIds.addAll(...eclassRoles
+        .map(document => document?.announcementMessage)
+        .filter(Boolean));
+    }
+  }
+
   private async _loadCompilerApiCredits(): Promise<void> {
     const response = await axios.post(settings.apis.compilerCredits, {
       clientId: process.env.COMPILERAPI_ID,
@@ -113,23 +130,5 @@ export default class MonkaClient extends SapphireClient {
 
     this.remainingCompilerApiCredits = 200 - response.data.used;
     this.logger.info(`[Compiler API] ${200 - this.remainingCompilerApiCredits}/200 credits used (${this.remainingCompilerApiCredits} remaining).`);
-  }
-
-  private async _loadReactionRoles(): Promise<void> {
-    const reactionRoles = await ReactionRole.find().catch(nullop);
-    if (reactionRoles) {
-      this.reactionRolesIds.addAll(...reactionRoles
-        .map(document => document?.messageId)
-        .filter(Boolean));
-    }
-  }
-
-  private async _loadEclassRoles(): Promise<void> {
-    const eclassRoles = await Eclass.find().catch(nullop);
-    if (eclassRoles) {
-      this.eclassRolesIds.addAll(...eclassRoles
-        .map(document => document?.announcementMessage)
-        .filter(Boolean));
-    }
   }
 }
