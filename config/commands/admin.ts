@@ -102,3 +102,64 @@ export const reactionRole = {
     ],
   },
 };
+
+export const tags = {
+  options: {
+    aliases: ['tags', 'tag'],
+    description: 'Permet de créer des tags (= messages dynamiques, entièrement configurable directement via discord).',
+    enabled: true,
+    usage: 'tags <create | list | remove | edit | rename | alias | help>',
+    examples: ['tags create test Ceci est le contenu !', 'tags list', 'tags remove test', 'tags help'],
+  },
+  messages: {
+    // Global
+    invalidTag: "Ce nom de tag n'est pas valide.",
+    invalidAliases: "Un de ces aliases n'est pas valide ou est déjà utilisé.",
+    stoppedPrompting: 'Tu as bien abandonné la création du menu !',
+
+    // Create a tag
+    createdTag: 'Ce tag a bien été créé !',
+
+    // List the tags
+    noTags: "Je n'ai trouvé aucun tags dans la base de données !",
+    listEmbedTitle: 'Liste des tags de la guilde "{message.guild.name}" ({total})',
+    listEmbedItem: '• `{name}` ({aliases})',
+
+    // Remove a tag
+    removedTag: 'Ce tag a bien été supprimé !',
+
+    // Edit a tag
+    editedTag: 'Ce tag a bien été modifié !',
+
+    // Help page
+    helpEmbedTitle: 'Aide des menus de Tags',
+    helpEmbedDescription: [
+      { name: 'Créer un tag', value: '`tags create <nom> <aliases> <contenu>`' },
+      { name: 'Lister les tags', value: '`tags list`' },
+      { name: 'Supprimer un tag', value: '`tags remove <nom>`' },
+      { name: 'Modifier un tag', value: '`tags edit <nom> <contenu>`' },
+      { name: 'Renommer un tag', value: '`tags rename <nom> <nouveau nom>`' },
+      { name: 'Définir les aliases un tag', value: '`tags aliases <nom> <aliases1, aliases2, ... | clear>`' },
+      { name: "Page d'aide", value: '`tags help`' },
+    ],
+
+    prompts: {
+      name: {
+        base: 'Entrez le nom du tag :',
+        invalid: 'Ce nom de tag est déjà utilisé ou est invalide.',
+      },
+      newName: {
+        base: 'Entrez le nouveau nom du tag :',
+        invalid: 'Ce nom de tag est déjà utilisé ou est invalide.',
+      },
+      aliases: {
+        base: 'Entrez les aliases du tag :',
+        invalid: 'Ces aliases de tags sont déjà utilisés ou sont invalides.',
+      },
+      content: {
+        base: 'Entrez le contenu du tag :',
+        invalid: 'Ce contenu est invalide.',
+      },
+    },
+  },
+};

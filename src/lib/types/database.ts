@@ -143,3 +143,23 @@ export interface FlaggedMessageDocument extends FlaggedMessageBase, Document {}
 /** Interface for the "FlaggedMessage"'s mongoose model */
 export type FlaggedMessageModel = Model<FlaggedMessageDocument>;
 // #endregion
+
+/* ******************** */
+/*  Tag Database Types  */
+/* ******************** */
+
+// #region Tag Database Types
+/** Interface for the "Tag"'s mongoose schema */
+export interface TagBase {
+  name: string;
+  aliases: string[];
+  content: string;
+  guildId: string;
+}
+
+/** Interface for the "Tag"'s mongoose document */
+export interface TagDocument extends TagBase, Document {}
+
+/** Interface for the "Tag"'s mongoose model */
+export type TagModel = Model<TagDocument>;
+// #endregion

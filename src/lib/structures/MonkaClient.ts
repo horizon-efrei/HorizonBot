@@ -6,9 +6,11 @@ import { Intents } from 'discord.js';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
+import Tags from '@/models/tags';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import TaskStore from '@/structures/TaskStore';
+import type { TagDocument } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class MonkaClient extends SapphireClient {
@@ -18,6 +20,7 @@ export default class MonkaClient extends SapphireClient {
   eclassRolesIds: Set<string>;
   waitingFlaggedMessages: FlaggedMessage[];
   intersectionRoles: Set<string>;
+  tags: Set<TagDocument>;
 
   constructor() {
     super({
@@ -47,6 +50,7 @@ export default class MonkaClient extends SapphireClient {
     void this._loadCompilerApiCredits();
     void this.loadReactionRoles();
     void this.loadEclassRoles();
+    void this.loadTags();
 
     this.configManager = new ConfigurationManager(this);
 
@@ -115,6 +119,13 @@ export default class MonkaClient extends SapphireClient {
         .map(document => document?.announcementMessage)
         .filter(Boolean));
     }
+  }
+
+  public async loadTags(): Promise<void> {
+    this.tags = new Set();
+    const tags = await Tags.find().catch(nullop);
+    if (tags)
+      this.tags.addAll(...tags);
   }
 
   private async _loadCompilerApiCredits(): Promise<void> {
