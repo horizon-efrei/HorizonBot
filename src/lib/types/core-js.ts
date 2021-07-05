@@ -18,5 +18,6 @@ declare global {
     filter(predicate: (value: T, value2: T, set: Set<T>) => unknown, thisArg?: any): Set<T>;
     filter<S extends T>(predicate: (value: T, value2: T, set: Set<T>) => value is S, thisArg?: any): Set<S>;
     map<U>(callbackfn: (value: T, value2: T, set: Set<T>) => U, thisArg?: any): Set<U>;
+    join(separator?: string): string;
   }
 }
