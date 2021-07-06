@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "github",
-    "url": "https://github.com/noftaly/MonkaBot"
+    "url": "https://github.com/EFREI-Horizon/MonkaBot"
   },
   "dependencies": {
     "@sapphire/decorators": "^2.1.5",

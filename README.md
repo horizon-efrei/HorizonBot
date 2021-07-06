@@ -1,6 +1,6 @@
 <h1 align="center">MonkaBot</h1>
 <p align="center">
-    🦉 Le bot du discord EFREI Révisions Entraide (ERE)
+    🦉 Le bot du discord Ef'Réussite !
 </p>
 
 ## Rapport de bug et suggestions
@@ -53,12 +53,12 @@ MonkaBot est sous license [MIT](./LICENSE).
 
 <!-- Link Dump -->
 
-[menu des issues]: https://github.com/noftaly/MonkaBot/issues
-[Discussion GitHub]: https://github.com/noftaly/MonkaBot/discussions
+[menu des issues]: https://github.com/EFREI-Horizon/MonkaBot/issues
+[Discussion GitHub]: https://github.com/EFREI-Horizon/MonkaBot/discussions
 [guide de contributions]: ./CONTRIBUTING.md
 [discord.js]: https://npmjs.com/package/discord.js
 [Sapphire]: https://www.npmjs.com/package/@sapphire/framework
-[License]: https://github.com/noftaly/MonkaBot/blob/master/LICENSE
+[License]: https://github.com/EFREI-Horizon/MonkaBot/blob/master/LICENSE
 [noftaly]: https://github.com/noftaly
 [petit coup de main]: #-développement-et-contributions
 [MIT]: ./LICENSE
