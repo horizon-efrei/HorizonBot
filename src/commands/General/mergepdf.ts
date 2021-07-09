@@ -1,12 +1,11 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions, UserError } from '@sapphire/framework';
+import type { MessageManager } from 'discord.js';
 import pdf_merger_js from 'pdf-merger-js';
 import pupa from 'pupa';
 import { ping as config } from '@/config/commands/general';
 import MonkaCommand from '@/structures/MonkaCommand';
 import type { GuildMessage } from '@/types';
-import * as fs from 'fs';
-import { MessageManager } from 'discord.js';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class PdfMergeCommand extends MonkaCommand {
@@ -28,18 +27,18 @@ export default class PdfMergeCommand extends MonkaCommand {
     const merger = new pdf_merger_js();
     const msgManager: MessageManager = message.channel.messages;
 
-    (async () => {
-        for(let o of msgIds) {
-            const msg = msgManager.cache.get(o);
-            merger.add(msg.attachments.first().name)
-        }
-    });
+
+    for (const o of msgIds) {
+        const msg = msgManager.cache.get(o);
+        merger.add(msg.attachments.first().name);
+    }
+
 
     await message.channel.send({
         files: [{
             attachment: await merger.save('merged.pdf'),
-            name: 'merged.pdf'
-        }]
+            name: 'merged.pdf',
+        }],
     });
   }
 }
