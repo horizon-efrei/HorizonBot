@@ -1,7 +1,8 @@
+import fs from 'fs';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions, UserError } from '@sapphire/framework';
 import type { MessageManager } from 'discord.js';
-import pdf_merger_js from 'pdf-merger-js';
+import * as PdfMerger from 'pdf-merger-js';
 import pupa from 'pupa';
 import { ping as config } from '@/config/commands/general';
 import MonkaCommand from '@/structures/MonkaCommand';
@@ -24,21 +25,29 @@ export default class PdfMergeCommand extends MonkaCommand {
         }
     }
 
-    const merger = new pdf_merger_js();
+    const merger = new PdfMerger();
     const msgManager: MessageManager = message.channel.messages;
+    var dir = '@/app/tmp';
 
+    if (!fs.existsSync(dir)){
+        fs.mkdirSync(dir);
+    }
 
     for (const o of msgIds) {
         const msg = msgManager.cache.get(o);
         merger.add(msg.attachments.first().name);
     }
 
+    await merger.save('@/app/tmp/merged.pdf')
 
     await message.channel.send({
         files: [{
-            attachment: await merger.save('merged.pdf'),
+            attachment: '@/app/tmp/merged.pdf',
             name: 'merged.pdf',
         }],
     });
+
+    fs.rmdirSync(dir, { recursive: true });
+
   }
 }
