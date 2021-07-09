@@ -4,7 +4,7 @@ import {
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions, UserError } from '@sapphire/framework';
 import type { MessageManager } from 'discord.js';
-import * as PdfMerger from 'pdf-merger-js';
+import PdfMerger from 'pdf-merger-js';
 import pupa from 'pupa';
 import { ping as config } from '@/config/commands/general';
 import MonkaCommand from '@/structures/MonkaCommand';
