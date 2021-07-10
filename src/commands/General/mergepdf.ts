@@ -6,7 +6,7 @@ import type { Args, CommandOptions, UserError } from '@sapphire/framework';
 import type { MessageManager } from 'discord.js';
 import PdfMerger from 'pdf-merger-js';
 import pupa from 'pupa';
-import { ping as config } from '@/config/commands/general';
+import { mergePDF as config } from '@/config/commands/general';
 import MonkaCommand from '@/structures/MonkaCommand';
 import type { GuildMessage } from '@/types';
 
@@ -21,35 +21,30 @@ export default class PdfMergeCommand extends MonkaCommand {
         if (msgId.success) {
             msgIds.push(msgId.value);
         } else {
-            const { parameter } = (msgId.error as UserError & { parameter: string });
-            await message.channel.send(pupa('Le pdf situé au message {id} est introuvable !', { id: parameter }));
+            const { parameter } = (config.messages.no_PDF_Found as UserError & { parameter: string });
+            await message.channel.send(pupa('{pdf_error}', { pdf_error: parameter }));
             return;
         }
     }
 
     const merger = new PdfMerger();
-    const msgManager: MessageManager = message.channel.messages;
-    const dir = '@/app/tmp';
-
-    await promises.access(dir, constants.F_OK)
-        .catch(() => {
-            void promises.mkdir(dir, { recursive: true });
-        });
 
     for (const o of msgIds) {
-        const msg = msgManager.cache.get(o);
-        merger.add(msg.attachments.first().name);
+        const msg = message.channel.messages.cache.get(o);
+        for (let a of msg.attachments.values())
+        {
+            merger.add(a.proxyURL);
+        }
     }
 
-    await merger.save('@/app/tmp/merged.pdf');
+    const pdfBuffer = await merger.saveAsBuffer();
 
     await message.channel.send({
         files: [{
-            attachment: '@/app/tmp/merged.pdf',
+            attachment: pdfBuffer,
             name: 'merged.pdf',
         }],
     });
 
-    void promises.rmdir(dir, { recursive: true });
   }
 }

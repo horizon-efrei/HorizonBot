@@ -162,3 +162,13 @@ export const vocalCount = {
     count: 'Il y a {count} personne{plural} connectée{plural} dans ce salon vocal !',
   },
 };
+
+export const mergePDF = {
+  options: {
+    aliases: ['mergepdf', 'mergePDF', 'pdf'],
+    description: 'Permet de combiner plusieurs fichiers PDF à partir de liens des messages'
+  },
+  messages: {
+    no_PDF_Found: "Aucun fichier PDF trouvé"
+  }
+}
