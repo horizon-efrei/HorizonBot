@@ -166,9 +166,9 @@ export const vocalCount = {
 export const mergePDF = {
   options: {
     aliases: ['mergepdf', 'mergePDF', 'pdf'],
-    description: 'Permet de combiner plusieurs fichiers PDF à partir de liens des messages'
+    description: 'Permet de combiner plusieurs fichiers PDF à partir de liens des messages',
   },
   messages: {
-    no_PDF_Found: "Aucun fichier PDF trouvé"
-  }
-}
+    noPdfFound: 'Aucun fichier PDF trouvé',
+  },
+};

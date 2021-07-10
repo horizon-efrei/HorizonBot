@@ -1,9 +1,5 @@
-import {
- constants, promises,
-} from 'fs';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions, UserError } from '@sapphire/framework';
-import type { MessageManager } from 'discord.js';
 import PdfMerger from 'pdf-merger-js';
 import pupa from 'pupa';
 import { mergePDF as config } from '@/config/commands/general';
@@ -21,8 +17,8 @@ export default class PdfMergeCommand extends MonkaCommand {
         if (msgId.success) {
             msgIds.push(msgId.value);
         } else {
-            const { parameter } = (config.messages.no_PDF_Found as UserError & { parameter: string });
-            await message.channel.send(pupa('{pdf_error}', { pdf_error: parameter }));
+            const { parameter } = (config.messages.noPdfFound as UserError & { parameter: string });
+            await message.channel.send(pupa('{pdf_Error}', { pdfError: parameter }));
             return;
         }
     }
@@ -31,9 +27,9 @@ export default class PdfMergeCommand extends MonkaCommand {
 
     for (const o of msgIds) {
         const msg = message.channel.messages.cache.get(o);
-        for (let a of msg.attachments.values())
-        {
-            merger.add(a.proxyURL);
+        for (const a of msg.attachments.values()) {
+            if (a.name.includes('.pdf'))
+                merger.add(a.proxyURL);
         }
     }
 
@@ -45,6 +41,5 @@ export default class PdfMergeCommand extends MonkaCommand {
             name: 'merged.pdf',
         }],
     });
-
   }
 }
