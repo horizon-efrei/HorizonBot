@@ -41,6 +41,7 @@
     "lodash.intersection": "^4.4.0",
     "module-alias": "^2.2.2",
     "mongoose": "^5.13.0",
+    "nanoid": "^3.1.23",
     "node-cron": "^3.0.0",
     "node-emoji": "^1.10.0",
     "pupa": "^2.1.1",

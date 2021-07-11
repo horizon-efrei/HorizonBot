@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import { model, Schema } from 'mongoose';
+import { nanoid } from 'nanoid';
 import slug from 'slug';
 import { eclass as eclassConfig } from '@/config/commands/professors';
 import settings from '@/config/settings';
@@ -83,11 +84,15 @@ const pad = (n: number): string => n.toString().padStart(2, '0');
 
 EclassSchema.statics.generateId = function (topic: string, professor: GuildMember, date: Date): string {
   return slug([
-    slug(topic, ''),
     slug(professor.displayName),
-    `${pad(date.getHours())}${pad(date.getMinutes())}`,
-    `${pad(date.getDate())}${pad(date.getMonth() + 1)}`,
-    date.getFullYear(),
+    [
+      pad(date.getHours()),
+      pad(date.getMinutes()),
+      pad(date.getDate()),
+      pad(date.getMonth() + 1),
+      date.getFullYear(),
+    ].join(''),
+    nanoid(4),
   ].join('_'), '_');
 };
 
