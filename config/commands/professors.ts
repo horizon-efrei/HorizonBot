@@ -121,6 +121,7 @@ export const eclass = {
     valueFinished: '[Terminé]',
 
     // Cancel subcommand
+    confirmCancel: 'Es-tu sûr de vouloir annuler ce cours ? Cette action est irrévocable.',
     successfullyCanceled: 'Le cours a bien été annulé !',
     cancelUnauthorized: "Tu n'es pas autorisé à annuler ce cours !",
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
