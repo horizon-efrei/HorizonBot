@@ -78,7 +78,8 @@
     "@/root": "./dist/",
     "@/structures": "./dist/src/lib/structures",
     "@/types": "./dist/src/lib/types",
-    "@/utils": "./dist/src/lib/utils"
+    "@/utils": "./dist/src/lib/utils",
+    "@/decorators": "./dist/src/lib/decorators"
   },
   "engines": {
     "node": ">=14.0.0"

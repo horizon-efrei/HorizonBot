@@ -7,7 +7,7 @@ import intersection from 'lodash.intersection';
 import pupa from 'pupa';
 import { tags as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
-import ResolveTagArgument from '@/lib/utils/ResolveTagArgument';
+import { ResolveTagArgument } from '@/decorators';
 import Tags from '@/models/tags';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import MonkaSubCommand from '@/structures/MonkaSubCommand';

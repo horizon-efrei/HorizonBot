@@ -29,6 +29,7 @@
 			"@/types": ["./src/lib/types"],
 			"@/types/*": ["./src/lib/types/*"],
 			"@/utils": ["src/lib/utils"],
+			"@/decorators": ["src/lib/decorators"],
 		},
     "pretty": false,
     "removeComments": true,

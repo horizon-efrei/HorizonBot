@@ -10,6 +10,7 @@ import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
+import { ValidateEclassArgument } from '@/decorators';
 import Eclass from '@/models/eclass';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import EclassManager from '@/structures/EclassManager';
@@ -17,7 +18,7 @@ import MonkaSubCommand from '@/structures/MonkaSubCommand';
 import { GuildMessage } from '@/types';
 import type { GuildTextBasedChannel, HourMinutes } from '@/types';
 import { EclassDocument, EclassStatus } from '@/types/database';
-import { generateSubcommands, nullop, ValidateEclassArgument } from '@/utils';
+import { generateSubcommands, nullop } from '@/utils';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
