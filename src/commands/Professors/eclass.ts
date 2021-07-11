@@ -2,6 +2,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import { chunk } from '@sapphire/utilities';
 import dayjs from 'dayjs';
 import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
@@ -15,6 +16,7 @@ import Eclass from '@/models/eclass';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import EclassManager from '@/structures/EclassManager';
 import MonkaSubCommand from '@/structures/MonkaSubCommand';
+import UserPaginatedMessage from '@/structures/UserPaginatedMessage';
 import { GuildMessage } from '@/types';
 import type { GuildTextBasedChannel, HourMinutes } from '@/types';
 import { EclassDocument, EclassStatus } from '@/types/database';
@@ -33,6 +35,7 @@ import { generateSubcommands, nullop } from '@/utils';
     edit: { aliases: ['modify'] },
     cancel: { aliases: ['archive'] },
     finish: { aliases: ['end', 'stop'] },
+    list: { aliases: ['liste', 'ls'] },
     help: { aliases: ['aide'], default: true },
   }),
   preconditions: [{
@@ -156,6 +159,36 @@ export default class EclassCommand extends MonkaSubCommand {
       targetRole,
       isRecorded,
     });
+  }
+
+  public async list(message: GuildMessage): Promise<void> {
+    const eclasses = await Eclass.find({ guild: message.guild.id });
+
+    const display = new UserPaginatedMessage({
+      template: new MessageEmbed()
+        .setTitle(config.messages.listTitle)
+        .setColor(settings.colors.default),
+    });
+    for (const eclassChunk of chunk(eclasses, 3)) {
+      display.addPageEmbed((embed: MessageEmbed) => {
+        for (const eclass of eclassChunk) {
+          const eclassInfos = {
+            ...eclass.toJSON(),
+            status: config.messages.statusesRaw[eclass.status],
+            date: eclass.date / 1000,
+            duration: dayjs.duration(eclass.duration).humanize(),
+            end: eclass.end / 1000,
+          };
+          embed.addField(
+            pupa(config.messages.listFieldTitle, eclassInfos),
+            pupa(config.messages.listFieldDescription, eclassInfos),
+          );
+        }
+        return embed;
+      });
+    }
+
+    await display.start(message);
   }
 
   public async help(message: GuildMessage, _args: Args): Promise<void> {

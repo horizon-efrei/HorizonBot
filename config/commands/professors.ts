@@ -7,10 +7,11 @@ export const eclass = {
     description: stripIndent`
       Commande permettant de créer un cours. Vous pouvez utiliser \`!cours create\` ou \`!cours add\` suivit de tous les arguments nécessaires (\`!cours help\`), ou vous laisser guider par \`!cours setup\`.
       Quand le cours sera créé, des messages seront envoyés dans les bons salons pour prévenir les membres, et un rôle spécial sera créé pour que les personnes voulant assister au cours puissent être notifiées.
-      Vous pourrez ensuite lancer le cours manuellement avec \`!cours start @role-spécial\`. Le cours s'arrêtera au bout de la durée spécifiée. S'il se finit avant, vous pouvez l'arrêter manuellement avec \`cours finish @role-spécial\`
+      Vous pourrez ensuite lancer le cours manuellement avec \`!cours start @role-spécial\`. Le cours s'arrêtera au bout de la durée spécifiée. S'il se finit avant, vous pouvez l'arrêter manuellement avec \`cours finish @role-spécial\`.
+      Pour plus d'informations sur comment utiliser cette commande, faites \`!cours help\`.
     `,
     enabled: true,
-    usage: 'cours <add|setup|help|start>',
+    usage: 'cours <add|setup|start|finish|edit|cancel|list|help>',
     examples: ['!cours setup', '!cours add #⚡-electricité-générale "Low and High pass filters" 24/04 20h30 2h15 @professeur @L1', '!cours start'],
   },
   messages: {
@@ -29,6 +30,7 @@ export const eclass = {
       finished: 'est terminé',
       canceled: 'est annulé',
     },
+    statusesRaw: ['pas encore commencé', 'en cours', 'terminé', 'annulé'],
 
     // Help subcommand
     helpEmbedTitle: 'Aide de la commande de cours',
@@ -39,8 +41,18 @@ export const eclass = {
       { name: 'Terminer un cours manuellement', value: '`!cours finish ID-cours`' },
       { name: 'Modifier un cours', value: '`!cours edit ID-cours <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
       { name: 'Annuler un cours', value: '`!cours cancel ID-cours`' },
+      { name: 'Liste des cours', value: '`!cours list`' },
       { name: "Page d'aide", value: '`!cours help`' },
     ],
+
+    listTitle: 'Liste des cours',
+    listFieldTitle: '{topic} ({subject})',
+    listFieldDescription: stripIndent`
+      Salon : <#{classChannel}>
+      Statut : {status}
+      Date : <t:{date}:F> (<t:{date}:R>), dure {duration}, se termine à <t:{end}:t>
+      ID : \`{classId}\`
+    `,
 
     // Create subcommand
     successfullyCreated: 'Le cours a bien été créé ! Son ID est {eclass.classId}',
