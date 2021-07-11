@@ -211,6 +211,24 @@ export default class EclassManager {
     Store.injectedContext.logger.debug(`[e-class] Just canceled class with id ${eclass.classId}.`);
   }
 
+  public static async setRecordLink(eclass: EclassDocument, link: string): Promise<void> {
+    // Fetch the annoucement message
+    const announcementChannel = await Store.injectedContext.client.configManager
+      .get(eclass.guild, eclass.announcementChannel);
+    const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+    // Update its embed
+    const announcementEmbed = announcementMessage.embeds[0];
+    announcementEmbed.fields
+      .find(field => field.name === config.messages.newClassEmbed.recorded)
+      .value += pupa(config.messages.newClassEmbed.recordedLink, { link });
+    await announcementMessage.edit(announcementEmbed);
+
+    // Mark the class as finished
+    await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
+
+    Store.injectedContext.logger.debug(`[e-class] Just added record link to class with id ${eclass.classId}.`);
+  }
+
   public static async remindClass(eclass: EclassDocument): Promise<void> {
     // Resolve the associated channel
     const guild = Store.injectedContext.client.guilds.resolve(eclass.guild);

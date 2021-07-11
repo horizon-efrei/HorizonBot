@@ -42,6 +42,7 @@ export const eclass = {
       { name: 'Modifier un cours', value: '`!cours edit ID-cours <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
       { name: 'Annuler un cours', value: '`!cours cancel ID-cours`' },
       { name: 'Liste des cours', value: '`!cours list`' },
+      { name: "Définir/voir l'enregistrement d'un cours", value: '`!cours record ID-cours [lien]`' },
       { name: "Page d'aide", value: '`!cours help`' },
     ],
 
@@ -55,7 +56,7 @@ export const eclass = {
     `,
 
     // Create subcommand
-    successfullyCreated: 'Le cours a bien été créé ! Son ID est {eclass.classId}',
+    successfullyCreated: 'Le cours a bien été créé ! Son ID est `{eclass.classId}`',
     alreadyExists: 'Ce cours (même matière, sujet, heure, jour) a déjà été prévu !',
     newClassNotification: ':bell: {targetRole}, un nouveau cours a été plannifié ! :arrow_heading_down:',
 
@@ -70,6 +71,7 @@ export const eclass = {
       professor: 'Professeur',
       recorded: 'Enregistré',
       recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
+      recordedLink: '\n[Lien]({link})',
       footer: 'ID : {eclass.classId}',
     },
 
@@ -119,9 +121,14 @@ export const eclass = {
     valueFinished: '[Terminé]',
 
     // Cancel subcommand
-    successfullyCanceled: 'Le cours a bien été archivé !',
-    cancelUnauthorized: "Tu n'es pas autorisé à archiver ce cours !",
+    successfullyCanceled: 'Le cours a bien été annulé !',
+    cancelUnauthorized: "Tu n'es pas autorisé à annuler ce cours !",
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
+
+    // Record subcommand
+    recordLink: "Le lien d'enregistrement de ce cours est <{link}>.",
+    noRecordLink: "Il n'y a pas de lien d'enregistrement disponible pour ce cours !",
+    successfullyAddedLink: 'Le lien a bien été ajouté au cours !',
 
     // Subscribing
     subscribed: "Tu t'es bien inscrit au cours de \"{topic}\" ({subject}) ! Je te le rappellerai un peu avant :)",

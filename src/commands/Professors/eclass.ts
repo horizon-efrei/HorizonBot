@@ -35,6 +35,7 @@ import { generateSubcommands, nullop } from '@/utils';
     edit: { aliases: ['modify'] },
     cancel: { aliases: ['archive'] },
     finish: { aliases: ['end', 'stop'] },
+    record: { aliases: ['enregistrement', 'link', 'lien', 'replay', 'recording'] },
     list: { aliases: ['liste', 'ls'] },
     help: { aliases: ['aide'], default: true },
   }),
@@ -429,5 +430,24 @@ export default class EclassCommand extends MonkaSubCommand {
     // Finish the class & confirm.
     await EclassManager.finishClass(eclass);
     await message.channel.send(config.messages.successfullyFinished);
+  }
+
+  @ValidateEclassArgument()
+  public async record(message: GuildMessage, args: Args, eclass: EclassDocument): Promise<void> {
+    const link = await args.pickResult('url');
+    if (link.error) {
+      await message.channel.send(eclass.recordLink
+        ? pupa(config.messages.recordLink, { link: eclass.recordLink })
+        : config.messages.noRecordLink);
+      return;
+    }
+
+    if (eclass.status !== EclassStatus.Finished) {
+      await message.channel.send(pupa(config.messages.statusIncompatible, { status: eclass.getStatus() }));
+      return;
+    }
+
+    await EclassManager.setRecordLink(eclass, link.value.toString());
+    await message.channel.send(config.messages.successfullyAddedLink);
   }
 }

@@ -62,6 +62,7 @@ export interface EclassBase {
   classId: string;
   subscribers: string[];
   isRecorded: boolean;
+  recordLink: string | null;
 }
 
 export type PrettyEclass = Omit<EclassBase, 'date' | 'duration' | 'end'> & { date: string; duration: string; end: string };

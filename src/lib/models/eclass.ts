@@ -78,6 +78,10 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     type: Boolean,
     default: false,
   },
+  recordLink: {
+    type: String,
+    default: null,
+  },
 }, { timestamps: true });
 
 const pad = (n: number): string => n.toString().padStart(2, '0');
