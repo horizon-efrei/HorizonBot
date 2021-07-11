@@ -9,7 +9,7 @@ import Task from '@/structures/Task';
 import type { TaskOptions } from '@/structures/Task';
 import type { EclassDocument } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
-import { capitalize, nullop } from '@/utils';
+import { capitalize, nullop, splitText } from '@/utils';
 
 @ApplyOptions<TaskOptions>({ cron: '0 0 * * *' })
 export default class UpdateUpcomingClassesTask extends Task {
@@ -29,15 +29,26 @@ export default class UpdateUpcomingClassesTask extends Task {
           { guild: guildId },
         ],
       });
-      // FIXME: Handle contents with more than 2000 characters (Discord's character limit for messages)
-      const content = this._generateUpcomingClassesMessage(upcomingClasses);
 
-      const message = await channel.messages.fetch(channel.lastMessageID).catch(nullop);
-      // eslint-disable-next-line unicorn/prefer-ternary
-      if (message?.editable)
-        await message.edit(content);
-      else
-        await channel.send(content);
+      const content = this._generateUpcomingClassesMessage(upcomingClasses);
+      const chunks = splitText(content);
+
+      const allMessages = await channel.messages.fetch().catch(nullop);
+      const allBotMessages = allMessages.filter(msg => msg.author.id === this.context.client.id).array().reverse();
+
+      let i = 0;
+      for (const chunk of chunks) {
+        // eslint-disable-next-line unicorn/prefer-ternary
+        if (allBotMessages[i]?.editable)
+          await allBotMessages[i].edit(chunk);
+        else
+          await channel.send(chunk);
+        i++;
+      }
+
+      if (i < allBotMessages.length)
+        allBotMessages.slice(i).map(async msg => await msg.delete());
+
       this.context.logger.debug('[Upcoming Classes] Updated classes.');
     }
   }
