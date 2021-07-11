@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions, UserError } from '@sapphire/framework';
+import type { Args, CommandOptions } from '@sapphire/framework';
 import { BucketType } from '@sapphire/framework';
 import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
