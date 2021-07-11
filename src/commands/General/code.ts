@@ -43,13 +43,11 @@ export default class CodeCommand extends MonkaCommand {
 
     const lang = await args.pickResult('codeLanguage');
     if (lang.error) {
-      // TODO: This is trash (both typings and handling).
-      const { parameter } = (lang.error as UserError & { parameter: string });
-      if (['info', 'infos', 'information', 'informations'].includes(parameter)) {
+      if (['info', 'infos', 'information', 'informations'].includes(lang.error.parameter)) {
         await this._showInfos(message);
         return;
       }
-      await message.channel.send(pupa(config.messages.unknownLanguage, { parameter }));
+      await message.channel.send(pupa(config.messages.unknownLanguage, { parameter: lang.error.parameter }));
       return;
     }
 

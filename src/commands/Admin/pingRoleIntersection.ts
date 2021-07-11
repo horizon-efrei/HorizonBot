@@ -22,8 +22,7 @@ export default class PingRoleIntersectionCommand extends MonkaCommand {
       if (role.success) {
         allRoles.push(role.value);
       } else {
-        const { parameter } = (role.error as UserError & { parameter: string });
-        await message.channel.send(pupa(config.messages.roleDoesntExist, { role: parameter }));
+        await message.channel.send(pupa(config.messages.roleDoesntExist, { role: role.error.parameter }));
         return;
       }
     }

@@ -1,3 +1,11 @@
+import type {
+  ArgOptions,
+  ArgumentError,
+  ArgumentResult,
+  IArgument,
+  RepeatArgOptions,
+  Result,
+} from '@sapphire/framework';
 import type ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import type MonkaCommand from '@/structures/MonkaCommand';
@@ -19,6 +27,27 @@ declare module '@sapphire/framework' {
 
   interface StoreRegistryEntries {
     tasks: TaskStore;
+  }
+
+  interface Args {
+    pickResult<T>(type: IArgument<T>, options?: ArgOptions): Promise<Result<T, ArgumentError>>;
+    pickResult<K extends keyof ArgType>(type: K, options?: ArgOptions): Promise<Result<ArgType[K], ArgumentError>>;
+
+    restResult<T>(type: IArgument<T>, options?: ArgOptions): Promise<Result<T, ArgumentError>>;
+    restResult<K extends keyof ArgType>(type: K, options?: ArgOptions): Promise<Result<ArgType[K], ArgumentError>>;
+
+    repeatResult<T>(type: IArgument<T>, options?: RepeatArgOptions): Promise<Result<T[], ArgumentError>>;
+    repeatResult<K extends keyof ArgType>(
+      type: K,
+      options?: RepeatArgOptions,
+    ): Promise<Result<Array<ArgType[K]>, ArgumentError>>;
+
+    peekResult<T>(type: () => ArgumentResult<T>): Promise<Result<T, ArgumentError>>;
+    peekResult<T>(type: IArgument<T>, options?: ArgOptions): Promise<Result<T, ArgumentError>>;
+    peekResult<K extends keyof ArgType>(
+      type: K | (() => ArgumentResult<ArgType[K]>),
+      options?: ArgOptions
+    ): Promise<Result<ArgType[K], ArgumentError>>;
   }
 
   interface SapphireClient {
