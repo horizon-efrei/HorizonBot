@@ -7,6 +7,7 @@ export default {
   miscellaneous: {
     eprofMentionPublic: '{eProf} nous avons besoin de toi !',
     eprofMentionPrivate: '{member} a besoin de toi là-bas : {message.channel}',
+    paginatedMessagePrompt: 'À quelle page souhaites-tu aller ?',
   },
   upcomingClasses: {
     header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
