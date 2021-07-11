@@ -11,7 +11,7 @@ import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
-import { ValidateEclassArgument } from '@/decorators';
+import { IsEprofOrStaff, ValidateEclassArgument } from '@/decorators';
 import Eclass from '@/models/eclass';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import EclassManager from '@/structures/EclassManager';
@@ -39,12 +39,9 @@ import { generateSubcommands, nullop } from '@/utils';
     list: { aliases: ['liste', 'ls'] },
     help: { aliases: ['aide'], default: true },
   }),
-  preconditions: [{
-    name: 'customRole',
-    context: { role: settings.roles.eprof, message: config.messages.onlyProfessor },
-  }],
 })
 export default class EclassCommand extends MonkaSubCommand {
+  @IsEprofOrStaff()
   public async create(message: GuildMessage, args: Args): Promise<void> {
     const classChannel = await args.pickResult('guildTextBasedChannel');
     if (classChannel.error) {
@@ -112,6 +109,7 @@ export default class EclassCommand extends MonkaSubCommand {
     });
   }
 
+  @IsEprofOrStaff()
   public async setup(message: GuildMessage): Promise<void> {
     let classChannel: GuildTextBasedChannel;
     let topic: string;
@@ -202,6 +200,7 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
+  @IsEprofOrStaff({ isOriginalEprof: true })
   public async start(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
     // Fetch the member
     const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
@@ -216,6 +215,7 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
+  @IsEprofOrStaff({ isOriginalEprof: true })
   // eslint-disable-next-line complexity
   public async edit(message: GuildMessage, args: Args, eclass: EclassDocument): Promise<void> {
     // Resolve the given arguments & validate them
@@ -412,6 +412,7 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned, EclassStatus.InProgress] })
+  @IsEprofOrStaff({ isOriginalEprof: true })
   public async cancel(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
     // Cancel the class & confirm.
     await EclassManager.cancelClass(eclass);
@@ -419,6 +420,7 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.InProgress] })
+  @IsEprofOrStaff({ isOriginalEprof: true })
   public async finish(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
     // Fetch the member
     const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
@@ -433,20 +435,25 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   @ValidateEclassArgument()
+  @IsEprofOrStaff({ isOriginalEprof: true })
   public async record(message: GuildMessage, args: Args, eclass: EclassDocument): Promise<void> {
+    // Parse the URL
     const link = await args.pickResult('url');
     if (link.error) {
+      // Show the current URL if any
       await message.channel.send(eclass.recordLink
         ? pupa(config.messages.recordLink, { link: eclass.recordLink })
         : config.messages.noRecordLink);
       return;
     }
 
+    // Check the status before setting a URL
     if (eclass.status !== EclassStatus.Finished) {
       await message.channel.send(pupa(config.messages.statusIncompatible, { status: eclass.getStatus() }));
       return;
     }
 
+    // Change the URL & confirm
     await EclassManager.setRecordLink(eclass, link.value.toString());
     await message.channel.send(config.messages.successfullyAddedLink);
   }
