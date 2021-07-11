@@ -7,24 +7,14 @@ import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import type { GuildMessage } from '@/types';
-import type { EclassDocument } from '@/types/database';
-import { EclassStatus } from '@/types/database';
+import type { EclassStatus } from '@/types/database';
 
 interface ValidationOptions {
-  statusIn: EclassStatus[];
-}
-
-function toStatus(eclass: EclassDocument): string {
-  switch (eclass.status) {
-    case EclassStatus.Planned: return config.messages.statuses.planned;
-    case EclassStatus.InProgress: return config.messages.statuses.inProgress;
-    case EclassStatus.Finished: return config.messages.statuses.finished;
-    case EclassStatus.Canceled: return config.messages.statuses.canceled;
-  }
+  statusIn?: EclassStatus[];
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
-export default function ValidateEclassArgument(options: ValidationOptions) {
+export default function ValidateEclassArgument(options?: ValidationOptions) {
   return (_target: Object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
 
@@ -49,9 +39,9 @@ export default function ValidateEclassArgument(options: ValidationOptions) {
         return;
       }
 
-      if (!options.statusIn.includes(eclass.status)) {
+      if (options?.statusIn.length > 0 && !options.statusIn.includes(eclass.status)) {
         await message.channel.send(
-          pupa(config.messages.statusIncompatible, { status: toStatus(eclass) }),
+          pupa(config.messages.statusIncompatible, { status: eclass.getStatus() }),
         );
         return;
       }

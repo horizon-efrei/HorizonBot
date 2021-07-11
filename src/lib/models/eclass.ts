@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import { model, Schema } from 'mongoose';
 import slug from 'slug';
+import { eclass as eclassConfig } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import type { EclassDocument, EclassModel, PrettyEclass } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
@@ -100,6 +101,15 @@ EclassSchema.methods.toData = function (): PrettyEclass {
     end: dayjs(doc.end).format(settings.configuration.dateFormat),
     duration: dayjs.duration(doc.duration).humanize(),
   };
+};
+
+EclassSchema.methods.getStatus = function (): string {
+  switch (this.status) {
+    case EclassStatus.Planned: return eclassConfig.messages.statuses.planned;
+    case EclassStatus.InProgress: return eclassConfig.messages.statuses.inProgress;
+    case EclassStatus.Finished: return eclassConfig.messages.statuses.finished;
+    case EclassStatus.Canceled: return eclassConfig.messages.statuses.canceled;
+  }
 };
 
 export default model<EclassDocument, EclassModel>('Eclass', EclassSchema);

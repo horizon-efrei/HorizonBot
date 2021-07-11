@@ -69,6 +69,7 @@ export type PrettyEclass = Omit<EclassBase, 'date' | 'duration' | 'end'> & { dat
 /** Interface for the "Eclass"'s mongoose document */
 export interface EclassDocument extends EclassBase, Document {
   toData(): PrettyEclass;
+  getStatus(): string;
 }
 
 /** Interface for the "Eclass"'s mongoose model */
