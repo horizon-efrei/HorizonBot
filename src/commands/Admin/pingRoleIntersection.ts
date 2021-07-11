@@ -1,6 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions, UserError } from '@sapphire/framework';
-import type { Role } from 'discord.js';
+import type { Args, CommandOptions } from '@sapphire/framework';
 import pupa from 'pupa';
 import { pingRoleIntersection as config } from '@/config/commands/admin';
 import MonkaCommand from '@/structures/MonkaCommand';
@@ -16,34 +15,29 @@ export default class PingRoleIntersectionCommand extends MonkaCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     const isPersistent = args.getFlags('keep');
 
-    const allRoles: Role[] = [];
-    while (!args.finished) {
-      const role = await args.pickResult('role');
-      if (role.success) {
-        allRoles.push(role.value);
-      } else {
-        await message.channel.send(pupa(config.messages.roleDoesntExist, { role: role.error.parameter }));
-        return;
-      }
+    const allRoles = await args.repeatResult('role');
+    if (allRoles.error) {
+      await message.channel.send(pupa(config.messages.roleDoesntExist, { role: allRoles.error.parameter }));
+      return;
     }
 
-    if (allRoles.length < 2) {
+    if (allRoles.value.length < 2) {
       await message.channel.send(config.messages.notEnoughRoles);
       return;
     }
 
     await message.guild.members.fetch();
     const targetedMembers = message.guild.members.cache
-      .filter(member => allRoles.every(role => member.roles.cache.has(role.id)));
+      .filter(member => allRoles.value.every(role => member.roles.cache.has(role.id)));
 
     if (targetedMembers.size === 0) {
-      await message.channel.send(pupa(config.messages.noTargetedUsers, { num: allRoles.length }));
+      await message.channel.send(pupa(config.messages.noTargetedUsers, { num: allRoles.value.length }));
       return;
     }
 
     const newRole = await message.guild.roles.create({
       data: {
-        name: `${allRoles.map(r => r.name).join(' + ')}`,
+        name: `${allRoles.value.map(r => r.name).join(' + ')}`,
         hoist: false,
         mentionable: true,
       },
