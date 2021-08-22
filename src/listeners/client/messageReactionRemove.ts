@@ -1,9 +1,9 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
 import settings from '@/config/settings';
+import EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
-import EclassManager from '@/structures/EclassManager';
 import type { GuildMessage } from '@/types';
 import { noop } from '@/utils';
 

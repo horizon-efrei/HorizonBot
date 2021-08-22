@@ -1,13 +1,19 @@
 import { container } from '@sapphire/pieces';
 import dayjs from 'dayjs';
-import type { GuildMember, Role } from 'discord.js';
+import type { GuildMember } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import twemoji from 'twemoji';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
-import type { GuildMessage, GuildTextBasedChannel, SchoolYear } from '@/types';
+import type {
+  AnnouncementSchoolYear,
+  EclassCreationOptions,
+  EclassEmbedOptions,
+  GuildMessage,
+  GuildTextBasedChannel,
+} from '@/types';
 import type { EclassDocument } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
 import { capitalize, massSend, noop } from '@/utils';
@@ -20,28 +26,6 @@ const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntries> = {
   l3: ConfigEntries.ClassAnnouncementL3,
   general: ConfigEntries.ClassAnnouncementGeneral,
 };
-
-type AnnouncementSchoolYear = SchoolYear | 'general';
-interface EclassCreationOptions {
-  date: Date;
-  classChannel: GuildTextBasedChannel;
-  topic: string;
-  duration: number;
-  professor: GuildMember;
-  targetRole: Role;
-  isRecorded: boolean;
-}
-
-interface EclassEmbedOptions {
-  subject: string;
-  topic: string;
-  formattedDate: string;
-  duration: number;
-  professor: GuildMember;
-  classChannel: GuildTextBasedChannel;
-  classId: string;
-  isRecorded: boolean;
-}
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export default class EclassManager {
