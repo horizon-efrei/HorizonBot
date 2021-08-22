@@ -22,10 +22,17 @@ import type { GuildTextBasedChannel, HourMinutes } from '@/types';
 import { EclassDocument, EclassStatus } from '@/types/database';
 import { capitalize, generateSubcommands, nullop } from '@/utils';
 
+const listFlags = {
+  [EclassStatus.Planned]: ['planned', 'plan', 'p', 'prévu', 'prevu'],
+  [EclassStatus.InProgress]: ['inprogress', 'progress', 'r', 'encours', 'e'],
+  [EclassStatus.Finished]: ['finished', 'f', 'terminé', 'terminer', 'termine', 't'],
+  [EclassStatus.Canceled]: ['canceled', 'c', 'annulé', 'annuler', 'annule', 'a'],
+};
+
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  flags: ['ping'],
+  flags: ['ping', ...Object.values(listFlags).flat()],
   subCommands: generateSubcommands({
     create: { aliases: ['add'] },
     setup: { aliases: ['build', 'make'] },
@@ -158,18 +165,31 @@ export default class EclassCommand extends MonkaSubCommand {
     });
   }
 
-  public async list(message: GuildMessage): Promise<void> {
+  public async list(message: GuildMessage, args: Args): Promise<void> {
+    // TODO: Add more filters (by prof, by date (before/after), by subject, by classRole)
+    // TODO: Add ability to combine filters (even status filters)
     const eclasses = await Eclass.find({ guild: message.guild.id });
+    const statusFilter = args.getFlags(...listFlags[EclassStatus.Planned]) ? EclassStatus.Planned
+      : args.getFlags(...listFlags[EclassStatus.InProgress]) ? EclassStatus.InProgress
+      : args.getFlags(...listFlags[EclassStatus.Finished]) ? EclassStatus.Finished
+      : args.getFlags(...listFlags[EclassStatus.Canceled]) ? EclassStatus.Canceled
+      : null;
+    const filteredClasses = eclasses
+      .filter(eclass => (Number.isInteger(statusFilter) ? eclass.status === statusFilter : true));
 
     const baseEmbed = new MessageEmbed()
       .setTitle(config.messages.listTitle)
       .setColor(settings.colors.default);
 
+    if (filteredClasses.length === 0) {
+      await message.channel.send({ embeds: [baseEmbed.setDescription(config.messages.noClassesFound)] });
+      return;
+    }
 
     await new PaginatedMessageEmbedFields()
-      .setTemplate(baseEmbed)
+      .setTemplate(baseEmbed.setDescription(config.messages.nClassesFound(filteredClasses.length)))
       .setItems(
-        eclasses.map((eclass) => {
+        filteredClasses.map((eclass) => {
           const eclassInfos = {
             ...eclass.toJSON(),
             status: capitalize(config.messages.statusesRaw[eclass.status]),

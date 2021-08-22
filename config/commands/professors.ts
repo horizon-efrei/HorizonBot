@@ -46,13 +46,16 @@ export const eclass = {
       { name: "Page d'aide", value: '`!cours help`' },
     ],
 
+    // List subcommand
     listTitle: 'Liste des cours',
+    noClassesFound: "Aucune classe n'a été trouvée...",
+    nClassesFound: (amount: number): string => `${amount} classe${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
     listFieldTitle: '{topic} ({subject})',
     listFieldDescription: stripIndent`
-      Salon : <#{classChannel}>
-      Statut : {status}
-      Date : <t:{date}:F> (<t:{date}:R>), dure {duration}, se termine à <t:{end}:t>
-      ID : \`{classId}\`
+      :speech_left: <#{classChannel}>
+      :bulb: {status}
+      :calendar: Prévue <t:{date}:R>, dure {duration}, se termine à <t:{end}:t>
+      :hash: \`{classId}\`
     `,
 
     // Create subcommand
