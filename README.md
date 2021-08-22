@@ -21,21 +21,24 @@ Nos Pull Request (PR) sont ouvertes à toutes contributions ! Vous pouvez regard
 MonkaBot est un bot Discord développé en TypeScript (un dérivé de JavaScript avec un typage plus fort). Il utilise la librairie [discord.js] pour les appels à l'API Discord.
 Il utilise également le framework [Sapphire], par-dessus discord.js. Ce framework sert notamment à gérer les évènements, les commandes et les arguments...
 
-Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter la [License] (MIT).
+Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter la [License] ([MIT]).
 
 ## Organisation du projet
 
-- **`dist`** *(pas sur GitHub)* **:** Dossier où se trouve le code transpilé de MonkaBot, après avoir lancé `npm run build` (ou `npm start`).
 - **`config` :** Dossier où se trouvent tous les fichiers de configuration de MonkaBot.
+- **`dist`** *(pas sur GitHub)* **:** Dossier où se trouve le code transpilé de MonkaBot, après avoir lancé `npm run build` (ou `npm start`).
 - **`src` :**
   - **`arguments` :** Dossier où se trouvent tous les arguments customs.
   - **`commands` :** Dossier où se trouvent toutes les commandes, rangées dans des sous-dossiers correspondant à leurs catégories.
-  - **`listeners` :** Dossier où se trouvent tous les gestionnaires d'évènement.
   - **`lib` :** Dossier contenant plusieurs fichiers utiles dans le code.
+    - **`decorators` :** Dossier contenant différents decorators utilisés à travers le code.
     - **`models` :** Fichiers des schemas mongoose.
     - **`structures` :** Différentes classes utilisées à travers MonkaBot.
     - **`types` :** Fichiers contenant les typings TypeScript nécessaires pour MonkaBot.
     - **`utils` :** Dossier contenant différentes fonctions utilitaires.
+  - **`listeners` :** Dossier où se trouvent tous les gestionnaires d'évènement, rangés par émetteurs.
+  - **`tasks` :** Dossier où se trouvent toutes les tâches.
+- **`typings` :** Typings TypeScript pour les librairies externes.
 
 ## Crédits
 
