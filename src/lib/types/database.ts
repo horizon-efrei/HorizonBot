@@ -79,6 +79,38 @@ export interface EclassModel extends Model<EclassDocument> {
 }
 // #endregion
 
+/* ****************************** */
+/*  Subject Database Types  */
+/* ****************************** */
+
+// #region Subject Database Types
+
+/** Interface for the "Subject"'s mongoose schema */
+export interface SubjectBase {
+  name: string;
+  nameEnglish: string;
+  emoji: string;
+  classCode: string;
+  moodleLink: string;
+  teachingUnit: string;
+  schoolYear: string;
+  textChannel: string;
+  textDocsChannel?: string;
+  voiceChannel?: string;
+  examDates?: {
+    ce?: string;
+    de?: string;
+  };
+}
+
+/** Interface for the "Subject"'s mongoose document */
+export interface SubjectDocument extends SubjectBase, Document {}
+
+
+/** Interface for the "Subject"'s mongoose model */
+export type SubjectModel = Model<SubjectDocument>;
+// #endregion
+
 /* ***************************** */
 /*  ReactionRole Database Types  */
 /* ***************************** */
