@@ -1,15 +1,15 @@
-import type { IMessagePrompterExplicitMessageReturn } from '@sapphire/discord.js-utilities';
 import { isGuildBasedChannel, MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
 import type { GuildMember, Role } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import ArgumentResolver from '@/structures/ArgumentResolver';
-import type { GuildMessage, GuildTextBasedChannel, HourMinutes } from '@/types';
-
-// Overwrite 'appliedMessage' and 'response' in 'IMessagePrompterExplicitMessageReturn' for them
-// to be GuildMessages rather than Messages
-type PrompterMessageResult = Omit<IMessagePrompterExplicitMessageReturn, 'appliedMessage' | 'response'> & { response: GuildMessage; appliedMessage: GuildMessage };
-type PrompterText = Record<'base' | 'invalid', string>;
+import type {
+  GuildMessage,
+  GuildTextBasedChannel,
+  HourMinutes,
+  PrompterMessageResult,
+  PrompterText,
+} from '@/types';
 
 export default class ArgumentPrompter {
   constructor(

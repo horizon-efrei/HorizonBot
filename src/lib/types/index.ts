@@ -1,3 +1,4 @@
+import type { IMessagePrompterExplicitMessageReturn } from '@sapphire/discord.js-utilities';
 import type { CommandOptions } from '@sapphire/framework';
 import type {
   DMChannel,
@@ -19,10 +20,37 @@ export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 /*  Custom Types used all across the codebase  */
 /* ******************************************* */
 
+// Overwrite 'appliedMessage' and 'response' in 'IMessagePrompterExplicitMessageReturn' for them
+// to be GuildMessages rather than Messages
+export type PrompterMessageResult = Omit<IMessagePrompterExplicitMessageReturn, 'appliedMessage' | 'response'> & { response: GuildMessage; appliedMessage: GuildMessage };
+export type PrompterText = Record<'base' | 'invalid', string>;
+
 export enum SchoolYear {
   L1 = 'l1',
   L2 = 'l2',
   L3 = 'l3',
+}
+
+export type AnnouncementSchoolYear = SchoolYear | 'general';
+export interface EclassCreationOptions {
+  date: Date;
+  classChannel: GuildTextBasedChannel;
+  topic: string;
+  duration: number;
+  professor: GuildMember;
+  targetRole: Role;
+  isRecorded: boolean;
+}
+
+export interface EclassEmbedOptions {
+  subject: string;
+  topic: string;
+  formattedDate: string;
+  duration: number;
+  professor: GuildMember;
+  classChannel: GuildTextBasedChannel;
+  classId: string;
+  isRecorded: boolean;
 }
 
 export type MonkaCommandOptions = CommandOptions & {
