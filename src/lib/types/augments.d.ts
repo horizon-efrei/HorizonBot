@@ -8,8 +8,8 @@ import type {
 } from '@sapphire/framework';
 import type ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
-import type MonkaCommand from '@/structures/MonkaCommand';
 import type TaskStore from '@/structures/TaskStore';
+import type MonkaCommand from '@/structures/commands/MonkaCommand';
 import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
 import type { TagDocument } from '@/types/database';
 

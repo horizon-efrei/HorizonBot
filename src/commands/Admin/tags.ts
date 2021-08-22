@@ -10,7 +10,7 @@ import settings from '@/config/settings';
 import { ResolveTagArgument } from '@/decorators';
 import Tags from '@/models/tags';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import MonkaSubCommand from '@/structures/MonkaSubCommand';
+import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
 import { GuildMessage } from '@/types';
 import { TagDocument } from '@/types/database';
 import { generateSubcommands } from '@/utils';

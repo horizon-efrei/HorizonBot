@@ -10,7 +10,7 @@ import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import ArgumentResolver from '@/structures/ArgumentResolver';
-import MonkaSubCommand from '@/structures/MonkaSubCommand';
+import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
 import type {
   GuildMessage,
   GuildTextBasedChannel,

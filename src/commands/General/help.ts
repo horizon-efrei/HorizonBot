@@ -5,8 +5,8 @@ import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { help as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import MonkaCommand from '@/structures/MonkaCommand';
-import type MonkaCommandStore from '@/structures/MonkaCommandStore';
+import MonkaCommand from '@/structures/commands/MonkaCommand';
+import type MonkaCommandStore from '@/structures/commands/MonkaCommandStore';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)

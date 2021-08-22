@@ -6,7 +6,7 @@ import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { code as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import MonkaCommand from '@/structures/MonkaCommand';
+import MonkaCommand from '@/structures/commands/MonkaCommand';
 import type { GuildMessage } from '@/types';
 import { convertSize } from '@/utils';
 

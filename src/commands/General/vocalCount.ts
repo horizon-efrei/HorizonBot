@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import pupa from 'pupa';
 import { vocalCount as config } from '@/config/commands/general';
-import MonkaCommand from '@/structures/MonkaCommand';
+import MonkaCommand from '@/structures/commands/MonkaCommand';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({ ...config.options, generateDashLessAliases: true })

@@ -6,7 +6,7 @@ import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import pkg from '@/root/package.json';
-import MonkaCommand from '@/structures/MonkaCommand';
+import MonkaCommand from '@/structures/commands/MonkaCommand';
 import type { GuildMessage } from '@/types';
 import { getGitRev } from '@/utils';
 

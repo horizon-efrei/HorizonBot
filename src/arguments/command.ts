@@ -1,7 +1,7 @@
 import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
-import type MonkaCommand from '@/structures/MonkaCommand';
-import type MonkaCommandStore from '@/structures/MonkaCommandStore';
+import type MonkaCommand from '@/structures/commands/MonkaCommand';
+import type MonkaCommandStore from '@/structures/commands/MonkaCommandStore';
 
 export default class CommandArgument extends Argument<MonkaCommand> {
   public run(arg: string, context: ArgumentContext<MonkaCommand>): ArgumentResult<MonkaCommand> {
