@@ -9,10 +9,10 @@ import type { Document, Model, Types } from 'mongoose';
 /** Enum for the "Configuration"'s mongoose schema */
 export enum ConfigEntries {
   ModeratorFeedback = 'moderator-feedback-channel',
-  ClassAnnoucementL1 = 'class-announcement-l1',
-  ClassAnnoucementL2 = 'class-announcement-l2',
-  ClassAnnoucementL3 = 'class-announcement-l3',
-  ClassAnnoucementGeneral = 'class-announcement-general',
+  ClassAnnouncementL1 = 'class-announcement-l1',
+  ClassAnnouncementL2 = 'class-announcement-l2',
+  ClassAnnouncementL3 = 'class-announcement-l3',
+  ClassAnnouncementGeneral = 'class-announcement-general',
   WeekUpcomingClasses = 'week-upcoming-classes',
 }
 

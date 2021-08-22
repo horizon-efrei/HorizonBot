@@ -14,11 +14,11 @@ import { capitalize, massSend, noop } from '@/utils';
 
 const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
 
-const classAnnoucement: Record<AnnouncementSchoolYear, ConfigEntries> = {
-  l1: ConfigEntries.ClassAnnoucementL1,
-  l2: ConfigEntries.ClassAnnoucementL2,
-  l3: ConfigEntries.ClassAnnoucementL3,
-  general: ConfigEntries.ClassAnnoucementGeneral,
+const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntries> = {
+  l1: ConfigEntries.ClassAnnouncementL1,
+  l2: ConfigEntries.ClassAnnouncementL2,
+  l3: ConfigEntries.ClassAnnouncementL3,
+  general: ConfigEntries.ClassAnnouncementGeneral,
 };
 
 type AnnouncementSchoolYear = SchoolYear | 'general';
@@ -67,21 +67,20 @@ export default class EclassManager {
 
     // Extract the school year from the category channel (L1, L2, L3...)
     const schoolYear = classChannel.parent.name.slice(-2).toLowerCase();
-    const target: AnnouncementSchoolYear = Object.keys(classAnnoucement).includes(schoolYear)
+    const target: AnnouncementSchoolYear = Object.keys(classAnnouncement).includes(schoolYear)
       ? schoolYear as AnnouncementSchoolYear
       : 'general';
 
-    // Get the corresponding annoucement channel
-    const channel = await Store.injectedContext.client.configManager.get(message.guild.id, classAnnoucement[target]);
+    // Get the corresponding announcement channel
 
     if (!channel) {
-      Store.injectedContext.logger.warn(`[e-class] A new e-class was planned but no annoucement channel was found, unable to create. Setup an annoucement channel with "${settings.prefix}setup class"`);
+      Store.injectedContext.logger.warn(`[e-class] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
       await message.channel.send(config.messages.unconfiguredChannel);
       return;
     }
 
     // Create & send the announcement embed
-    const embed = EclassManager.createAnnoucementEmbed({
+    const embed = EclassManager.createAnnouncementEmbed({
       subject,
       topic,
       formattedDate,
@@ -115,7 +114,7 @@ export default class EclassManager {
       classRole: role.id,
       targetRole: targetRole.id,
       announcementMessage: announcementMessage.id,
-      announcementChannel: classAnnoucement[target],
+      announcementChannel: classAnnouncement[target],
       classId,
       isRecorded,
     });
@@ -132,8 +131,7 @@ export default class EclassManager {
   }
 
   public static async startClass(eclass: EclassDocument): Promise<void> {
-    // Fetch the annoucement message
-    const announcementChannel = await Store.injectedContext.client.configManager
+    // Fetch the announcement message
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -164,8 +162,7 @@ export default class EclassManager {
   }
 
   public static async finishClass(eclass: EclassDocument): Promise<void> {
-    // Fetch the annoucement message
-    const announcementChannel = await Store.injectedContext.client.configManager
+    // Fetch the announcement message
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -187,8 +184,7 @@ export default class EclassManager {
   }
 
   public static async cancelClass(eclass: EclassDocument): Promise<void> {
-    // Fetch the annoucement message
-    const announcementChannel = await Store.injectedContext.client.configManager
+    // Fetch the announcement message
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -214,8 +210,7 @@ export default class EclassManager {
   }
 
   public static async setRecordLink(eclass: EclassDocument, link: string): Promise<void> {
-    // Fetch the annoucement message
-    const announcementChannel = await Store.injectedContext.client.configManager
+    // Fetch the announcement message
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -251,7 +246,7 @@ export default class EclassManager {
     Store.injectedContext.logger.debug(`[e-class] Just reminded class with id ${eclass.classId}.`);
   }
 
-  public static createAnnoucementEmbed({
+  public static createAnnouncementEmbed({
     subject,
     topic,
     formattedDate,

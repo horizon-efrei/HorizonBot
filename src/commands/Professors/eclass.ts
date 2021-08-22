@@ -374,8 +374,7 @@ export default class EclassCommand extends MonkaSubCommand {
         return;
     }
 
-    // Fetch the annoucement message
-    const originalChannel = await this.context.client.configManager.get(message.guild.id, eclass.announcementChannel);
+    // Fetch the announcement message
     const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessage);
 
     // Edit the announcement embed
@@ -383,7 +382,7 @@ export default class EclassCommand extends MonkaSubCommand {
     const classChannel = message.guild.channels.resolve(eclass.classChannel) as GuildTextBasedChannel;
     await originalMessage.edit({
       content: originalMessage.content,
-      embeds: [EclassManager.createAnnoucementEmbed({
+      embeds: [EclassManager.createAnnouncementEmbed({
         subject: eclass.subject,
         topic: eclass.topic,
         formattedDate,
