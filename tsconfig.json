@@ -31,7 +31,7 @@
 			"@/utils": ["src/lib/utils"],
 			"@/decorators": ["src/lib/decorators"],
 		},
-    "pretty": false,
+    "pretty": true,
     "removeComments": true,
     "resolveJsonModule": true,
     "sourceMap": true,
