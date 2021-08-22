@@ -5,8 +5,8 @@ import pupa from 'pupa';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
-import Task from '@/structures/Task';
-import type { TaskOptions } from '@/structures/Task';
+import Task from '@/structures/tasks/Task';
+import type { TaskOptions } from '@/structures/tasks/Task';
 import type { EclassDocument } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
 import { capitalize, nullop, splitText } from '@/utils';
@@ -14,10 +14,10 @@ import { capitalize, nullop, splitText } from '@/utils';
 @ApplyOptions<TaskOptions>({ cron: '0 0 * * *' })
 export default class UpdateUpcomingClassesTask extends Task {
   public async run(): Promise<void> {
-    for (const guildId of this.context.client.guilds.cache.keys()) {
-      const channel = await this.context.client.configManager.get(guildId, ConfigEntries.WeekUpcomingClasses);
+    for (const guildId of this.container.client.guilds.cache.keys()) {
+      const channel = await this.container.client.configManager.get(guildId, ConfigEntries.WeekUpcomingClasses);
       if (!channel) {
-        this.context.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "${settings.prefix}setup week-class"`);
+        this.container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "${settings.prefix}setup week-class"`);
         continue;
       }
 
@@ -36,7 +36,7 @@ export default class UpdateUpcomingClassesTask extends Task {
       const allMessages = await channel.messages.fetch().catch(nullop);
       const allBotMessages = [
         ...allMessages
-          .filter(msg => msg.author.id === this.context.client.id)
+          .filter(msg => msg.author.id === this.container.client.id)
           .values(),
       ].reverse();
 
@@ -53,7 +53,7 @@ export default class UpdateUpcomingClassesTask extends Task {
       if (i < allBotMessages.length)
         allBotMessages.slice(i).map(async msg => await msg.delete());
 
-      this.context.logger.debug('[Upcoming Classes] Updated classes.');
+      this.container.logger.debug('[Upcoming Classes] Updated classes.');
     }
   }
 

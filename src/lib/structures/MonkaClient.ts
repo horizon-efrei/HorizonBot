@@ -9,7 +9,7 @@ import ReactionRole from '@/models/reactionRole';
 import Tags from '@/models/tags';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
-import TaskStore from '@/structures/TaskStore';
+import TaskStore from '@/structures/tasks/TaskStore';
 import type { TagDocument } from '@/types/database';
 import { nullop } from '@/utils';
 
@@ -30,7 +30,7 @@ export default class MonkaClient extends SapphireClient {
       logger: {
         level: LogLevel.Trace,
       },
-      loadDefaultErrorEvents: true,
+      loadDefaultErrorListeners: true,
       presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${settings.prefix}help` }] },
       intents: [
         Intents.FLAGS.GUILDS, // Get access to channels, create some, pin messages etc.

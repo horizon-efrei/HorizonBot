@@ -2,8 +2,8 @@ import { ApplyOptions } from '@sapphire/decorators';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import EclassManager from '@/structures/EclassManager';
-import Task from '@/structures/Task';
-import type { TaskOptions } from '@/structures/Task';
+import Task from '@/structures/tasks/Task';
+import type { TaskOptions } from '@/structures/tasks/Task';
 import { EclassStatus } from '@/types/database';
 
 @ApplyOptions<TaskOptions>({ interval: 2 * 60 * 1000 /* Every 2 minutes */ })
