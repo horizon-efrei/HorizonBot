@@ -99,7 +99,7 @@ export default class SetupCommand extends MonkaSubCommand {
       reactionRolePairs: roles.map(({ reaction, role }) => ({ reaction, role: role.id })),
     };
 
-    this.context.client.reactionRolesIds.add(document.messageId);
+    this.container.client.reactionRolesIds.add(document.messageId);
     await ReactionRole.create(document);
   }
 
@@ -137,13 +137,13 @@ export default class SetupCommand extends MonkaSubCommand {
       givenMessage = await argumentPrompter.autoPromptMessage();
     }
 
-    const isRrMenu = this.context.client.reactionRolesIds.has(givenMessage.id);
+    const isRrMenu = this.container.client.reactionRolesIds.has(givenMessage.id);
     if (!isRrMenu) {
       await message.channel.send(config.messages.notAMenu);
       return;
     }
 
-    // We delete it, and the "messageDelete" event will take care of the rest.
+    // We delete it, and the "messageDelete" listener will take care of the rest.
     await givenMessage.delete();
     await message.channel.send(config.messages.removedMenu);
   }
@@ -307,14 +307,14 @@ export default class SetupCommand extends MonkaSubCommand {
       // Resolve the emoji, either from a standard emoji, or from a custom guild emoji.
       const emoji = ArgumentResolver.resolveEmoji(emojiQuery, result.guild);
       if (!emoji) {
-        this.context.logger.warn(`[Reaction Roles] Emoji ${emojiQuery} not found (resolve to base emoji/guild emote's cache) (guild: ${message.guild.id}).`);
+        this.container.logger.warn(`[Reaction Roles] Emoji ${emojiQuery} not found (resolve to base emoji/guild emote's cache) (guild: ${message.guild.id}).`);
         continue;
       }
 
       const role = ArgumentResolver.resolveRoleByID(roleQuery, result.guild)
         ?? ArgumentResolver.resolveRoleByQuery(roleQuery, result.guild);
       if (!role) {
-        this.context.logger.warn(`[Reaction Roles] Role ${roleQuery} not found in guild's cache (guild: ${message.guild.id}).`);
+        this.container.logger.warn(`[Reaction Roles] Role ${roleQuery} not found in guild's cache (guild: ${message.guild.id}).`);
         continue;
       }
 

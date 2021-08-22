@@ -21,7 +21,7 @@ export default class SetupCommand extends MonkaCommand {
       case 'modos':
       case 'mod':
       case 'mods':
-        await this.context.client.configManager.set(ConfigEntries.ModeratorFeedback, channel);
+        await this.container.client.configManager.set(ConfigEntries.ModeratorFeedback, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
       case 'class-l1':
@@ -30,7 +30,7 @@ export default class SetupCommand extends MonkaCommand {
       case 'eclasse-l1':
       case 'cours-l1':
       case 'ecours-l1':
-        await this.context.client.configManager.set(ConfigEntries.ClassAnnouncementL1, channel);
+        await this.container.client.configManager.set(ConfigEntries.ClassAnnouncementL1, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
       case 'class-l2':
@@ -39,7 +39,7 @@ export default class SetupCommand extends MonkaCommand {
       case 'eclasse-l2':
       case 'cours-l2':
       case 'ecours-l2':
-        await this.context.client.configManager.set(ConfigEntries.ClassAnnouncementL2, channel);
+        await this.container.client.configManager.set(ConfigEntries.ClassAnnouncementL2, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
       case 'class-l3':
@@ -48,7 +48,7 @@ export default class SetupCommand extends MonkaCommand {
       case 'eclasse-l3':
       case 'cours-l3':
       case 'ecours-l3':
-        await this.context.client.configManager.set(ConfigEntries.ClassAnnouncementL3, channel);
+        await this.container.client.configManager.set(ConfigEntries.ClassAnnouncementL3, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
       case 'class-general':
@@ -57,14 +57,14 @@ export default class SetupCommand extends MonkaCommand {
       case 'eclasse-general':
       case 'cours-general':
       case 'ecours-general':
-        await this.context.client.configManager.set(ConfigEntries.ClassAnnouncementGeneral, channel);
+        await this.container.client.configManager.set(ConfigEntries.ClassAnnouncementGeneral, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
       case 'week-class':
       case 'week-classes':
       case 'week-upcoming-class':
       case 'week-upcoming-classes':
-        await this.context.client.configManager.set(ConfigEntries.WeekUpcomingClasses, channel);
+        await this.container.client.configManager.set(ConfigEntries.WeekUpcomingClasses, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
       default:

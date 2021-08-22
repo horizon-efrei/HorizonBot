@@ -1,4 +1,4 @@
-import { Store } from '@sapphire/pieces';
+import { container } from '@sapphire/pieces';
 import { model, Schema } from 'mongoose';
 import type { TagDocument, TagModel } from '@/types/database';
 
@@ -24,10 +24,10 @@ const TagSchema = new Schema<TagDocument, TagModel>({
 });
 
 TagSchema.post('save', async () => {
-  await Store.injectedContext.client.loadTags();
+  await container.client.loadTags();
 });
 TagSchema.post('remove', async () => {
-  await Store.injectedContext.client.loadTags();
+  await container.client.loadTags();
 });
 
 export default model<TagDocument, TagModel>('Tags', TagSchema);

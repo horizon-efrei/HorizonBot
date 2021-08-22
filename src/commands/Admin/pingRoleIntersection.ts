@@ -7,9 +7,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({
   ...config.options,
-  strategyOptions: {
-    flags: ['keep'],
-  },
+  flags: ['keep'],
 })
 export default class PingRoleIntersectionCommand extends MonkaCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
@@ -52,6 +50,6 @@ export default class PingRoleIntersectionCommand extends MonkaCommand {
     );
 
     if (!isPersistent)
-      this.context.client.intersectionRoles.add(newRole.id);
+      this.container.client.intersectionRoles.add(newRole.id);
   }
 }

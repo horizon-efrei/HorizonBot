@@ -62,7 +62,7 @@ export default class TagsCommand extends MonkaSubCommand {
   }
 
   public async list(message: GuildMessage, _args: Args): Promise<void> {
-    const tags = this.context.client.tags.filter(tag => tag.guildId === message.guild.id);
+    const tags = this.container.client.tags.filter(tag => tag.guildId === message.guild.id);
     if (!tags || tags.size === 0) {
       await message.channel.send(config.messages.noTags);
       return;
@@ -136,7 +136,7 @@ export default class TagsCommand extends MonkaSubCommand {
 
   private _isValid(names: string[], guildId: string): boolean {
     const lowerNames = names.map(name => name.toLowerCase());
-    const tags = this.context.client.tags.filter(tag => tag.guildId === guildId);
+    const tags = this.container.client.tags.filter(tag => tag.guildId === guildId);
 
     for (const tag of tags) {
       if (lowerNames.includes(tag.name.toLowerCase()))

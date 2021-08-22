@@ -1,4 +1,4 @@
-import { Store } from '@sapphire/pieces';
+import { container } from '@sapphire/pieces';
 import dayjs from 'dayjs';
 import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
@@ -72,9 +72,10 @@ export default class EclassManager {
       : 'general';
 
     // Get the corresponding announcement channel
+    const channel = await container.client.configManager.get(message.guild.id, classAnnouncement[target]);
 
     if (!channel) {
-      Store.injectedContext.logger.warn(`[e-class] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
+      container.logger.warn(`[e-class] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
       await message.channel.send(config.messages.unconfiguredChannel);
       return;
     }
@@ -96,7 +97,7 @@ export default class EclassManager {
     });
     // Add the reaction & cache the message
     await announcementMessage.react(settings.emojis.yes);
-    Store.injectedContext.client.eclassRolesIds.add(announcementMessage.id);
+    container.client.eclassRolesIds.add(announcementMessage.id);
 
     // Create the role
     const role = await message.guild.roles.create({ name, color: settings.colors.white, mentionable: true });
@@ -127,11 +128,12 @@ export default class EclassManager {
     // Send confirmation message
     await message.channel.send(pupa(config.messages.successfullyCreated, { eclass }));
 
-    Store.injectedContext.logger.debug(`[e-class] Just created class with id ${classId}.`);
+    container.logger.debug(`[e-class] Just created class with id ${classId}.`);
   }
 
   public static async startClass(eclass: EclassDocument): Promise<void> {
     // Fetch the announcement message
+    const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -141,7 +143,7 @@ export default class EclassManager {
     await announcementMessage.edit({ embeds: [announcementEmbed] });
 
     // Send an embed in the corresponding text channel
-    const classChannel = Store.injectedContext.client
+    const classChannel = container.client
       .guilds.resolve(eclass.guild)
       .channels.resolve(eclass.classChannel) as GuildTextBasedChannel;
     const embed = new MessageEmbed()
@@ -158,11 +160,12 @@ export default class EclassManager {
     // Mark the class as In Progress
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.InProgress });
 
-    Store.injectedContext.logger.debug(`[e-class] Just started class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class] Just started class with id ${eclass.classId}.`);
   }
 
   public static async finishClass(eclass: EclassDocument): Promise<void> {
     // Fetch the announcement message
+    const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -172,7 +175,7 @@ export default class EclassManager {
     await announcementMessage.edit({ embeds: [announcementEmbed] });
 
     // Remove the associated role
-    await Store.injectedContext.client
+    await container.client
       .guilds.cache.get(eclass.guild)
       .roles.cache.get(eclass.classRole)
       .delete('Class finished');
@@ -180,11 +183,12 @@ export default class EclassManager {
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
 
-    Store.injectedContext.logger.debug(`[e-class] Just ended class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class] Just ended class with id ${eclass.classId}.`);
   }
 
   public static async cancelClass(eclass: EclassDocument): Promise<void> {
     // Fetch the announcement message
+    const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -195,10 +199,10 @@ export default class EclassManager {
     await announcementMessage.edit({ embeds: [announcementEmbed] });
     await announcementMessage.reactions.removeAll();
     // Remove from cache
-    Store.injectedContext.client.eclassRolesIds.delete(announcementMessage.id);
+    container.client.eclassRolesIds.delete(announcementMessage.id);
 
     // Remove the associated role
-    await Store.injectedContext.client
+    await container.client
       .guilds.cache.get(eclass.guild)
       .roles.cache.get(eclass.classRole)
       .delete('Class canceled');
@@ -206,11 +210,12 @@ export default class EclassManager {
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Canceled });
 
-    Store.injectedContext.logger.debug(`[e-class] Just canceled class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class] Just canceled class with id ${eclass.classId}.`);
   }
 
   public static async setRecordLink(eclass: EclassDocument, link: string): Promise<void> {
     // Fetch the announcement message
+    const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
@@ -223,12 +228,12 @@ export default class EclassManager {
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
 
-    Store.injectedContext.logger.debug(`[e-class] Just added record link to class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class] Just added record link to class with id ${eclass.classId}.`);
   }
 
   public static async remindClass(eclass: EclassDocument): Promise<void> {
     // Resolve the associated channel
-    const guild = Store.injectedContext.client.guilds.resolve(eclass.guild);
+    const guild = container.client.guilds.resolve(eclass.guild);
     const classChannel = guild.channels.resolve(eclass.classChannel) as GuildTextBasedChannel;
     // Send the notification
     await classChannel.send(
@@ -243,7 +248,7 @@ export default class EclassManager {
     // Mark the reminder as sent
     await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
 
-    Store.injectedContext.logger.debug(`[e-class] Just reminded class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class] Just reminded class with id ${eclass.classId}.`);
   }
 
   public static createAnnouncementEmbed({
@@ -277,7 +282,7 @@ export default class EclassManager {
   public static async subscribeMember(member: GuildMember, eclass: EclassDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
-      Store.injectedContext.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exists !`);
+      container.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exists !`);
       return;
     }
 
@@ -287,13 +292,13 @@ export default class EclassManager {
 
     member.send(pupa(config.messages.subscribed, { subject: eclass.subject, topic: eclass.topic })).catch(noop);
 
-    Store.injectedContext.logger.debug(`[e-class] Just subscribed membed ${member.id} (${member.displayName}#${member.user.discriminator}) class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class] Just subscribed membed ${member.id} (${member.displayName}#${member.user.discriminator}) class with id ${eclass.classId}.`);
   }
 
   public static async unsubscribeMember(member: GuildMember, eclass: EclassDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
-      Store.injectedContext.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exist.`);
+      container.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exist.`);
       return;
     }
 
@@ -303,6 +308,6 @@ export default class EclassManager {
 
     member.send(pupa(config.messages.unsubscribed, { subject: eclass.subject, topic: eclass.topic })).catch(noop);
 
-    Store.injectedContext.logger.debug(`[e-class] Just unsubscribed membed ${member.id} (${member.displayName}#${member.user.discriminator}) class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class] Just unsubscribed membed ${member.id} (${member.displayName}#${member.user.discriminator}) class with id ${eclass.classId}.`);
   }
 }

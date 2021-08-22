@@ -5,7 +5,7 @@ import type MonkaCommandStore from '@/structures/commands/MonkaCommandStore';
 
 export default class CommandArgument extends Argument<MonkaCommand> {
   public run(arg: string, context: ArgumentContext<MonkaCommand>): ArgumentResult<MonkaCommand> {
-    const command = (context.command.context.stores
+    const command = (context.command.container.stores
       .get('commands') as MonkaCommandStore)
       .find(cmd => cmd.aliases.includes(arg));
 

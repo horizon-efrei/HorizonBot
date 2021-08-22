@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
-import { BucketType } from '@sapphire/framework';
+import { BucketScope } from '@sapphire/framework';
 import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
@@ -20,15 +20,13 @@ const wraps = new Map([
 @ApplyOptions<CommandOptions>({
   ...config.options,
   quotes: [],
-  strategyOptions: {
-    flags: ['wrap'],
-    options: ['input'],
-  },
+  flags: ['wrap'],
+  options: ['input'],
   preconditions: [{
     name: 'Cooldown',
     context: {
       // TODO?: Make it Guild?
-      bucketType: BucketType.User,
+      bucketType: BucketScope.User,
       delay: 60_000,
       limit: 3,
     },
@@ -36,7 +34,7 @@ const wraps = new Map([
 })
 export default class CodeCommand extends MonkaCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
-    if (this.context.client.remainingCompilerApiCredits <= 0) {
+    if (this.container.client.remainingCompilerApiCredits <= 0) {
       await message.channel.send(config.messages.noMoreCredits);
       return;
     }
@@ -67,7 +65,7 @@ export default class CodeCommand extends MonkaCommand {
 
     let response = { data: { cpuTime: 0, memory: 0, output: code } };
     if (settings.configuration.enableCompilerApi) {
-      this.context.client.remainingCompilerApiCredits--;
+      this.container.client.remainingCompilerApiCredits--;
       response = await axios.post(settings.apis.compiler, {
         script: code,
         stdin: input,

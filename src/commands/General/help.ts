@@ -31,12 +31,12 @@ export default class HelpCommand extends MonkaCommand {
         embed.addField(information.examples, `\`${command.examples.join('`\n`')}\``);
     } else {
       const information = config.messages.commandsList;
-      const amount = this.context.stores.get('commands').size;
+      const amount = this.container.stores.get('commands').size;
 
       embed.setTitle(pupa(information.title, { amount }))
         .setDescription(pupa(information.description, { helpCommand: `${settings.prefix}help <commande>` }));
 
-      const categories = (this.context.stores
+      const categories = (this.container.stores
         .get('commands') as MonkaCommandStore)
         // eslint-disable-next-line unicorn/prefer-object-from-entries
         .reduce<Record<string, Command[]>>((acc, val: Command) => {

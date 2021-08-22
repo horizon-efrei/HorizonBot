@@ -12,7 +12,7 @@ export default class PingCommand extends MonkaCommand {
 
     await msg.edit(
       pupa(config.messages.secondMessage, {
-        botPing: Math.round(this.context.client.ws.ping),
+        botPing: Math.round(this.container.client.ws.ping),
         apiPing: msg.createdTimestamp - message.createdTimestamp,
       }),
     );

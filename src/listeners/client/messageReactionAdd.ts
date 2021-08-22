@@ -1,4 +1,4 @@
-import { Event } from '@sapphire/framework';
+import { Listener } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
 import pupa from 'pupa';
 import messages from '@/config/messages';
@@ -11,7 +11,7 @@ import Profs from '@/structures/profs';
 import type { GuildMessage } from '@/types';
 import { noop } from '@/utils';
 
-export default class MessageReactionAddEvent extends Event {
+export default class MessageReactionAddListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
     if (user.bot || !('guild' in reaction.message.channel))
       return;
@@ -19,7 +19,7 @@ export default class MessageReactionAddEvent extends Event {
     const message = reaction.message as GuildMessage;
     const member = message.guild.members.cache.get(user.id);
     if (!member) {
-      this.context.logger.warn('[Message Reaction Add] Abort event due to unresolved member.');
+      this.container.logger.warn('[Message Reaction Add] Abort event due to unresolved member.');
       return;
     }
 
@@ -29,16 +29,16 @@ export default class MessageReactionAddEvent extends Event {
       await this._flagMessage(reaction, member, message);
 
     // If we are reacting to a reaction role
-    if (this.context.client.reactionRolesIds.has(reaction.message.id))
+    if (this.container.client.reactionRolesIds.has(reaction.message.id))
       await this._handleReactionRole(reaction, member, message);
 
     // If we are reacting to an eclass role
-    if (this.context.client.eclassRolesIds.has(reaction.message.id)
+    if (this.container.client.eclassRolesIds.has(reaction.message.id)
       && reaction.emoji.name === settings.emojis.yes)
       await this._handleEclassRole(reaction, member, message);
 
     // If we are reacting to a flag message alert
-    if (this.context.client.waitingFlaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
+    if (this.container.client.waitingFlaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
       && reaction.emoji.name === settings.emojis.yes)
       await this._handleModeratorFlag(reaction, member, message);
 
@@ -62,7 +62,7 @@ export default class MessageReactionAddEvent extends Event {
   ): Promise<void> {
     const document = await ReactionRole.findOne({ messageId: message.id });
     if (!document) {
-      this.context.client.reactionRolesIds.delete(message.id);
+      this.container.client.reactionRolesIds.delete(message.id);
       return;
     }
     if (!document.reactionRolePairs.some(pair => pair.reaction === reaction.emoji.toString()))
@@ -77,13 +77,13 @@ export default class MessageReactionAddEvent extends Event {
 
     const givenRole = message.guild.roles.cache.get(givenRoleId);
     if (!givenRole) {
-      this.context.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exist.`);
+      this.container.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exist.`);
       return;
     }
 
     if (!member.roles.cache.get(givenRole.id))
       member.roles.add(givenRole).catch(noop);
-    this.context.logger.debug(`[Reaction Roles] Added role ${givenRole.id} (${givenRole.name}) to member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
+    this.container.logger.debug(`[Reaction Roles] Added role ${givenRole.id} (${givenRole.name}) to member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
   }
 
   private async _handleEclassRole(
@@ -93,7 +93,7 @@ export default class MessageReactionAddEvent extends Event {
   ): Promise<void> {
     const document = await Eclass.findOne({ announcementMessage: message.id });
     if (!document) {
-      this.context.client.eclassRolesIds.delete(message.id);
+      this.container.client.eclassRolesIds.delete(message.id);
       return;
     }
 
@@ -109,12 +109,12 @@ export default class MessageReactionAddEvent extends Event {
     if (reaction.emoji.name !== settings.emojis.yes)
       return;
 
-    const flagMessage = this.context.client.waitingFlaggedMessages.find(msg => msg.alertMessage.id === message.id);
+    const flagMessage = this.container.client.waitingFlaggedMessages.find(msg => msg.alertMessage.id === message.id);
     try {
       await flagMessage.approve(member);
     } catch (error: unknown) {
-      this.context.logger.error('[Anti Swear] An error occured while trying to confirm a flagged message.');
-      this.context.logger.error(error);
+      this.container.logger.error('[Anti Swear] An error occured while trying to confirm a flagged message.');
+      this.container.logger.error(error);
       flagMessage.alertMessage.channel.send(messages.global.oops).catch(noop);
     }
   }

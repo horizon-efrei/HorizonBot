@@ -25,9 +25,7 @@ import { generateSubcommands, nullop } from '@/utils';
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  strategyOptions: {
-    flags: ['ping'],
-  },
+  flags: ['ping'],
   subCommands: generateSubcommands({
     create: { aliases: ['add'] },
     setup: { aliases: ['build', 'make'] },
@@ -375,6 +373,7 @@ export default class EclassCommand extends MonkaSubCommand {
     }
 
     // Fetch the announcement message
+    const originalChannel = await this.container.client.configManager.get(message.guild.id, eclass.announcementChannel);
     const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessage);
 
     // Edit the announcement embed

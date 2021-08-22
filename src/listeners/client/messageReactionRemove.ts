@@ -1,4 +1,4 @@
-import { Event } from '@sapphire/framework';
+import { Listener } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
@@ -7,7 +7,7 @@ import EclassManager from '@/structures/EclassManager';
 import type { GuildMessage } from '@/types';
 import { noop } from '@/utils';
 
-export default class MessageReactionRemoveEvent extends Event {
+export default class MessageReactionRemoveListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
     if (user.bot || !('guild' in reaction.message.channel))
       return;
@@ -15,16 +15,16 @@ export default class MessageReactionRemoveEvent extends Event {
     const message = reaction.message as GuildMessage;
     const member = message.guild.members.cache.get(user.id);
     if (!member) {
-      this.context.logger.warn('[Message Reaction Remove] Abort event due to unresolved member.');
+      this.container.logger.warn('[Message Reaction Remove] Abort event due to unresolved member.');
       return;
     }
 
     // If we are reacting to a reaction role
-    if (this.context.client.reactionRolesIds.has(reaction.message.id))
+    if (this.container.client.reactionRolesIds.has(reaction.message.id))
       await this._handleReactionRole(reaction, member, message);
 
     // If we are reacting to an eclass role
-    if (this.context.client.eclassRolesIds.has(reaction.message.id) && reaction.emoji.name === settings.emojis.yes)
+    if (this.container.client.eclassRolesIds.has(reaction.message.id) && reaction.emoji.name === settings.emojis.yes)
       await this._handleEclassRole(reaction, member, message);
   }
 
@@ -35,7 +35,7 @@ export default class MessageReactionRemoveEvent extends Event {
   ): Promise<void> {
     const document = await ReactionRole.findOne({ messageId: message.id });
     if (!document) {
-      this.context.client.reactionRolesIds.delete(message.id);
+      this.container.client.reactionRolesIds.delete(message.id);
       return;
     }
     if (!document.reactionRolePairs.some(pair => pair.reaction === reaction.emoji.toString()))
@@ -51,13 +51,13 @@ export default class MessageReactionRemoveEvent extends Event {
 
     const givenRole = message.guild.roles.cache.get(givenRoleId);
     if (!givenRole) {
-      this.context.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exist.`);
+      this.container.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exist.`);
       return;
     }
 
     if (member.roles.cache.get(givenRole.id))
       member.roles.remove(givenRole).catch(noop);
-    this.context.logger.debug(`[Reaction Roles] Removed role ${givenRole.id} (${givenRole.name}) from member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
+    this.container.logger.debug(`[Reaction Roles] Removed role ${givenRole.id} (${givenRole.name}) from member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
   }
 
   private async _handleEclassRole(
@@ -67,7 +67,7 @@ export default class MessageReactionRemoveEvent extends Event {
   ): Promise<void> {
     const document = await Eclass.findOne({ announcementMessage: message.id });
     if (!document) {
-      this.context.client.reactionRolesIds.delete(message.id);
+      this.container.client.reactionRolesIds.delete(message.id);
       return;
     }
 

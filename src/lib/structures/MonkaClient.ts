@@ -28,7 +28,7 @@ export default class MonkaClient extends SapphireClient {
       caseInsensitivePrefixes: true,
       defaultPrefix: settings.prefix,
       logger: {
-        level: LogLevel.Trace,
+        level: LogLevel.Debug,
       },
       loadDefaultErrorListeners: true,
       presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${settings.prefix}help` }] },

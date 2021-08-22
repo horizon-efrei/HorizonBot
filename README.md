@@ -30,7 +30,7 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
 - **`src` :**
   - **`arguments` :** Dossier où se trouvent tous les arguments customs.
   - **`commands` :** Dossier où se trouvent toutes les commandes, rangées dans des sous-dossiers correspondant à leurs catégories.
-  - **`events` :** Dossier où se trouvent tous les gestionnaires d'évènement.
+  - **`listeners` :** Dossier où se trouvent tous les gestionnaires d'évènement.
   - **`lib` :** Dossier contenant plusieurs fichiers utiles dans le code.
     - **`models` :** Fichiers des schemas mongoose.
     - **`structures` :** Différentes classes utilisées à travers MonkaBot.

@@ -8,7 +8,7 @@ import type { GuildMessage } from '@/types';
 @ApplyOptions<CommandOptions>({ ...config.options, generateDashLessAliases: true })
 export default class VocalCountCommand extends MonkaCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
-    const channel = (await args.pickResult('voiceChannel'))?.value ?? message.member.voice.channel;
+    const channel = (await args.pickResult('guildVoiceChannel'))?.value ?? message.member.voice.channel;
     if (!channel) {
       await message.channel.send(config.messages.invalidUse);
       return;

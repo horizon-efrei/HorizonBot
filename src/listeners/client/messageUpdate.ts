@@ -1,14 +1,14 @@
-import { Event } from '@sapphire/framework';
+import { Listener } from '@sapphire/framework';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
 
-export default class MessageUpdateEvent extends Event {
+export default class MessageUpdateListener extends Listener {
   public async run(_oldMessage: GuildMessage, newMessage: GuildMessage): Promise<void> {
     if (newMessage.author.bot || newMessage.system)
       return;
 
     // Swearing check
-    const flaggedMessage = this.context.client.waitingFlaggedMessages.find(msg => msg.message.id === newMessage.id);
+    const flaggedMessage = this.container.client.waitingFlaggedMessages.find(msg => msg.message.id === newMessage.id);
     const swear = FlaggedMessage.getSwear(newMessage);
 
     if (flaggedMessage && !swear)
