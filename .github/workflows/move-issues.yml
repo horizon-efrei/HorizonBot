@@ -1,11 +1,12 @@
 name: Move priority card
+
 on:
   issues:
-    types:
-      - labeled
+    types: [labeled]
+
 jobs:
-  move-priority-card:
-    if: ${{ github.event.label.name == "priority: high" && contains(github.event.issue.labels.*.name, "status: approved") }}
+  move-card:
+    if: ${{ github.event.label.name == format("priority{0} high", ":") && contains(github.event.issue.labels.*.name, format("status{0} approved", ":")) }}
     runs-on: ubuntu-latest
     steps:
       - uses: alex-page/github-project-automation-plus@v0.8.1
