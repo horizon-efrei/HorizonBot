@@ -76,7 +76,7 @@ export default class TagsCommand extends MonkaSubCommand {
           aliases: tag.aliases.length > 0 ? `\`${tag.aliases.join('`, `')}\`` : '/',
         })).join('\n'),
       );
-    await message.channel.send(embed);
+    await message.channel.send({ embeds: [embed] });
   }
 
   @ResolveTagArgument()
@@ -131,7 +131,7 @@ export default class TagsCommand extends MonkaSubCommand {
       .addFields(config.messages.helpEmbedDescription)
       .setColor(settings.colors.default);
 
-    await message.channel.send(embed);
+    await message.channel.send({ embeds: [embed] });
   }
 
   private _isValid(names: string[], guildId: string): boolean {

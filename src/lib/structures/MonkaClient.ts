@@ -31,16 +31,14 @@ export default class MonkaClient extends SapphireClient {
         level: LogLevel.Trace,
       },
       loadDefaultErrorEvents: true,
-      presence: { status: 'online', activity: { type: 'LISTENING', name: `${settings.prefix}help` } },
-      ws: {
-        intents: [
-          Intents.FLAGS.GUILDS, // Get access to channels, create some, pin messages etc.
-          Intents.FLAGS.GUILD_MEMBERS, // Access to GuildMemberAdd/GuildMemberRemove events.
-          Intents.FLAGS.GUILD_MESSAGES, // Access to Message, MessageDelete and MessageUpdate events.
-          Intents.FLAGS.GUILD_MESSAGE_REACTIONS, // Access to MessageReactionAdd events.
-          Intents.FLAGS.GUILD_VOICE_STATES, // Access to VoiceStateUpdate events.
-        ],
-      },
+      presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${settings.prefix}help` }] },
+      intents: [
+        Intents.FLAGS.GUILDS, // Get access to channels, create some, pin messages etc.
+        Intents.FLAGS.GUILD_MEMBERS, // Access to GuildMemberAdd/GuildMemberRemove events.
+        Intents.FLAGS.GUILD_MESSAGES, // Access to Message, MessageDelete and MessageUpdate events.
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS, // Access to MessageReactionAdd events.
+        Intents.FLAGS.GUILD_VOICE_STATES, // Access to VoiceStateUpdate events.
+      ],
     });
 
     this.stores.register(new TaskStore());
@@ -72,9 +70,9 @@ export default class MonkaClient extends SapphireClient {
       'READ_MESSAGE_HISTORY',
     ];
     // Traverse each guild we are in
-    for (const guild of this.guilds.cache.array()) {
+    for (const guild of this.guilds.cache.values()) {
       // Check guild-level permissions
-      if (!guild.me?.hasPermission(permissions)) {
+      if (!guild.me?.permissions.has(permissions)) {
         this.logger.warn(oneLine`
           [Main]
           MonkaBot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does
@@ -83,9 +81,11 @@ export default class MonkaClient extends SapphireClient {
       }
 
       // Grab all channels
-      const guildChannels = guild.channels.cache
-        .filter((chan: GuildChannel): chan is TextChannel => chan.isText())
-        .array();
+      const guildChannels = [
+        ...guild.channels.cache
+          .filter((chan: GuildChannel): chan is TextChannel => chan.isText())
+          .values(),
+      ];
 
       for (const channel of guildChannels) {
         // Check channel-level permissions

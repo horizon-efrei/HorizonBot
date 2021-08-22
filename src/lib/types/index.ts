@@ -1,11 +1,11 @@
 import type { CommandOptions } from '@sapphire/framework';
 import type {
- Guild,
- GuildMember,
- Message,
- NewsChannel,
- Role,
- TextChannel,
+  DMChannel,
+  Guild,
+  GuildMember,
+  Message,
+  PartialDMChannel,
+  Role,
 } from 'discord.js';
 import type MonkaClient from '@/structures/MonkaClient';
 
@@ -13,11 +13,17 @@ import type MonkaClient from '@/structures/MonkaClient';
 /*  Util types  */
 /* ************ */
 
-export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 
 /* ******************************************* */
 /*  Custom Types used all across the codebase  */
 /* ******************************************* */
+
+export enum SchoolYear {
+  L1 = 'l1',
+  L2 = 'l2',
+  L3 = 'l3',
+}
 
 export type MonkaCommandOptions = CommandOptions & {
   usage: string;
@@ -25,7 +31,7 @@ export type MonkaCommandOptions = CommandOptions & {
   runnableBy: string;
 };
 
-export type GuildTextBasedChannel = NewsChannel | TextChannel;
+export type GuildTextBasedChannel = Exclude<Message['channel'], DMChannel | PartialDMChannel>;
 
 export interface GuildMessage extends Message {
   channel: GuildTextBasedChannel;

@@ -63,7 +63,7 @@ export default class CodeCommand extends MonkaCommand {
     if (shouldWrap)
       code = pupa(wraps.get(lang.value.language), { code });
 
-    void message.channel.startTyping();
+    void message.channel.sendTyping();
 
     let response = { data: { cpuTime: 0, memory: 0, output: code } };
     if (settings.configuration.enableCompilerApi) {
@@ -87,8 +87,6 @@ export default class CodeCommand extends MonkaCommand {
     }));
     // Ph (placeholder) prevents Discord from taking the first line as a language identifier for markdown and remove it
     await message.channel.send(`\`\`\`ph\n${response.data.output}\`\`\``);
-
-    message.channel.stopTyping();
   }
 
   private async _showInfos(message: GuildMessage): Promise<void> {
@@ -101,6 +99,6 @@ export default class CodeCommand extends MonkaCommand {
           inline: true,
         })),
       );
-    await message.channel.send(embed);
+    await message.channel.send({ embeds: [embed] });
   }
 }

@@ -1,6 +1,7 @@
 import { Store } from '@sapphire/pieces';
 import type { GuildMember } from 'discord.js';
 import pupa from 'pupa';
+import type { Object } from 'ts-toolbelt';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import FlaggedMessageDB from '@/models/flaggedMessage';
@@ -9,9 +10,7 @@ import type { FlaggedMessageDocument } from '@/types/database';
 import { ConfigEntries } from '@/types/database';
 import { nullop } from '@/utils';
 
-type FlaggedMessageData =
-  | { manualModerator: GuildMember } & { swear?: never }
-  | { manualModerator?: never } & { swear: string };
+type FlaggedMessageData = Object.Either<{ manualModerator: GuildMember; swear: string }, 'manualModerator' | 'swear'>;
 
 export default class FlaggedMessage {
   logChannel: GuildTextBasedChannel;

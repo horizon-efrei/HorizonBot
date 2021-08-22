@@ -1,3 +1,4 @@
+import { isGuildBasedChannel, isTextBasedChannel } from '@sapphire/discord.js-utilities';
 import type { ArgumentResult, ExtendedArgumentContext, PieceContext } from '@sapphire/framework';
 import { ExtendedArgument } from '@sapphire/framework';
 import type { GuildChannel } from 'discord.js';
@@ -12,11 +13,11 @@ export default class GuildTextBasedChannelArgument extends ExtendedArgument<'gui
   }
 
   public handle(channel: GuildChannel, context: ExtendedArgumentContext): ArgumentResult<GuildTextBasedChannel> {
-    return channel.type === 'text' || channel.type === 'news'
+    return isTextBasedChannel(channel) && isGuildBasedChannel(channel)
       ? this.ok(channel as GuildTextBasedChannel)
       : this.error({
           parameter: context.parameter,
-          message: 'The argument did not resolve to a text or news channel.',
+          message: 'The argument did not resolve to a guild text-based channel.',
           context: { ...context, channel },
         });
   }

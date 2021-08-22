@@ -11,7 +11,7 @@ import type FlaggedMessage from '@/structures/FlaggedMessage';
 import type MonkaCommand from '@/structures/MonkaCommand';
 import type TaskStore from '@/structures/TaskStore';
 import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
-import type { TagDocument } from './database';
+import type { TagDocument } from '@/types/database';
 
 
 declare module 'discord.js' {

@@ -32,6 +32,6 @@ export default class StatisticsCommand extends MonkaCommand {
       .addField(embedMessages.commands, totalCommands.toString(), true)
       .setTimestamp();
 
-    await message.channel.send(embed);
+    await message.channel.send({ embeds: [embed] });
   }
 }

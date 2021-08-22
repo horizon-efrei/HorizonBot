@@ -19,9 +19,8 @@ export default class ReadyEvent extends Event {
     this.context.logger.info('[Reaction Roles] Caching reactions-roles menus...');
     const reactionRoles = await ReactionRole.find();
     for (const rr of reactionRoles) {
-      const channel = this.context.client.channels.cache.get(rr.channelId);
-      const textChannel = channel as TextChannel;
-      textChannel.messages.fetch(rr.messageId)
+      const channel = this.context.client.channels.cache.get(rr.channelId) as TextChannel;
+      channel.messages.fetch(rr.messageId)
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await ReactionRole.findByIdAndDelete(rr._id);

@@ -27,7 +27,7 @@ export default class ConfigurationManager {
     const result = await Configuration.findOne({ guild: guildID, name: channel }).catch(nullop);
     if (result?.value) {
       const resolvedChannel = this.client.channels.resolve(result.value);
-      if (resolvedChannel.isText() && resolvedChannel.type !== 'dm') {
+      if (resolvedChannel.isText() && resolvedChannel.type !== 'DM') {
         this.channels.set(guildID, { [channel]: resolvedChannel } as Record<ConfigEntries, GuildTextBasedChannel>);
         return resolvedChannel;
       }

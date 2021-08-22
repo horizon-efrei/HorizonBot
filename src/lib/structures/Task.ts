@@ -2,6 +2,7 @@ import { Events } from '@sapphire/framework';
 import type { PieceContext, PieceOptions } from '@sapphire/pieces';
 import { Piece } from '@sapphire/pieces';
 import cron from 'node-cron';
+import type { Object } from 'ts-toolbelt';
 
 /**
  * The base task class. This class is abstract and is to be extended by subclasses, which should implement the methods.
@@ -74,6 +75,4 @@ export default abstract class Task extends Piece {
   public abstract run(): unknown;
 }
 
-export type TaskOptions =
-  | PieceOptions & { cron: string } & { interval?: never }
-  | PieceOptions & { cron?: never } & { interval: number };
+export type TaskOptions = Object.Either<PieceOptions & { cron: string; interval: number }, 'cron' | 'interval'>;

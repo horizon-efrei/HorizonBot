@@ -71,7 +71,7 @@ export default class SetupCommand extends MonkaSubCommand {
           description: description || config.messages.noDescription,
         }),
       );
-    const handler = new MessagePrompter(confirmationEmbed, MessagePrompterStrategies.Confirm, {
+    const handler = new MessagePrompter({ embeds: [confirmationEmbed] }, MessagePrompterStrategies.Confirm, {
       confirmEmoji: settings.emojis.yes,
       cancelEmoji: settings.emojis.no,
       timeout: 60 * 1000,
@@ -87,7 +87,7 @@ export default class SetupCommand extends MonkaSubCommand {
     const embed = new MessageEmbed()
       .setTitle(title)
       .setDescription(description);
-    const reactionRoleMessage = await channel.send(embed);
+    const reactionRoleMessage = await channel.send({ embeds: [embed] });
 
     for (const rr of roles)
       await reactionRoleMessage.react(rr.reaction);
@@ -127,7 +127,7 @@ export default class SetupCommand extends MonkaSubCommand {
     const embed = new MessageEmbed()
       .setTitle(pupa(config.messages.listEmbedTitle, { message, total: reactionRoles.length }))
       .setDescription(description);
-    await message.channel.send(embed);
+    await message.channel.send({ embeds: [embed] });
   }
 
   public async remove(message: GuildMessage, args: Args): Promise<void> {
@@ -160,7 +160,7 @@ export default class SetupCommand extends MonkaSubCommand {
     const embed = givenMessage.embeds[0];
     embed.setTitle(title);
     embed.setDescription(description);
-    await givenMessage.edit(embed);
+    await givenMessage.edit({ embeds: [embed] });
 
     await message.channel.send(config.messages.editedMenu);
   }
@@ -243,7 +243,7 @@ export default class SetupCommand extends MonkaSubCommand {
       .addFields(config.messages.helpEmbedDescription)
       .setColor(settings.colors.default);
 
-    await message.channel.send(embed);
+    await message.channel.send({ embeds: [embed] });
   }
 
   private async _promptTitle(message: GuildMessage): Promise<[title: string, description: string]> {

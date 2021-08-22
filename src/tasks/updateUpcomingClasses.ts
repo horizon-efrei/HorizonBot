@@ -34,7 +34,11 @@ export default class UpdateUpcomingClassesTask extends Task {
       const chunks = splitText(content);
 
       const allMessages = await channel.messages.fetch().catch(nullop);
-      const allBotMessages = allMessages.filter(msg => msg.author.id === this.context.client.id).array().reverse();
+      const allBotMessages = [
+        ...allMessages
+          .filter(msg => msg.author.id === this.context.client.id)
+          .values(),
+      ].reverse();
 
       let i = 0;
       for (const chunk of chunks) {

@@ -1,15 +1,16 @@
+import type { ColorResolvable } from 'discord.js';
 import type { CodeLanguageResult } from '@/types';
 
 export default {
   prefix: '!',
   colors: {
-    primary: '#5bb78f',
-    default: '#439bf2',
-    white: '#ffffff',
-    green: '#32a852',
-    yellow: '#e0c748',
-    orange: '#f27938',
-    red: '#eb2d1c',
+    primary: '#5bb78f' as ColorResolvable,
+    default: '#439bf2' as ColorResolvable,
+    white: '#ffffff' as ColorResolvable,
+    green: '#32a852' as ColorResolvable,
+    yellow: '#e0c748' as ColorResolvable,
+    orange: '#f27938' as ColorResolvable,
+    red: '#eb2d1c' as ColorResolvable,
   },
   configuration: {
     swears: ['fleur', 'arbre', 'tulipe'], // ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],

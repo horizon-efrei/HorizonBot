@@ -36,11 +36,9 @@ export default class PingRoleIntersectionCommand extends MonkaCommand {
     }
 
     const newRole = await message.guild.roles.create({
-      data: {
-        name: `${allRoles.value.map(r => r.name).join(' + ')}`,
-        hoist: false,
-        mentionable: true,
-      },
+      name: `${allRoles.value.map(r => r.name).join(' + ')}`,
+      hoist: false,
+      mentionable: true,
       reason: `${message.author.username} a éxecuté la commande PingRoleIntersection`,
     });
 

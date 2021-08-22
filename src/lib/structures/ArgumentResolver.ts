@@ -33,7 +33,7 @@ export default {
 
   resolveChannelByQuery(query: string, guild: Guild): GuildTextBasedChannel {
     const queryLower = query.toLowerCase();
-    return guild.channels.cache.array().find(
+    return guild.channels.cache.find(
       (channel): channel is GuildTextBasedChannel => channel.isText() && channel.name.toLowerCase() === queryLower,
     );
   },
@@ -77,8 +77,8 @@ export default {
 
     const channel = guild.channels.cache.get(channelID);
     if (!channel
-      || !channel.viewable
       || !(isNewsChannel(channel) || isTextChannel(channel))
+      || !channel.viewable
       || !channel.permissionsFor(user)?.has(Permissions.FLAGS.VIEW_CHANNEL))
       return null;
 

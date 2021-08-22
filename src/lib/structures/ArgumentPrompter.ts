@@ -1,5 +1,5 @@
 import type { IMessagePrompterExplicitMessageReturn } from '@sapphire/discord.js-utilities';
-import { MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
+import { isGuildBasedChannel, MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
 import type { GuildMember, Role } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
@@ -87,8 +87,9 @@ export default class ArgumentPrompter {
         : prompts?.base || messages.prompts.channel.base,
     );
 
-    if (response.mentions.channels.size > 0 && response.mentions.channels.first().isText())
-      return response.mentions.channels.first();
+    const firstMention = response.mentions.channels.first();
+    if (response.mentions.channels.size > 0 && firstMention.isText() && isGuildBasedChannel(firstMention))
+      return firstMention;
 
     const query = response.content.split(' ').join('-');
     return ArgumentResolver.resolveChannelByID(query, response.guild)

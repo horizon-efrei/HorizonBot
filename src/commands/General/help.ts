@@ -38,6 +38,7 @@ export default class HelpCommand extends MonkaCommand {
 
       const categories = (this.context.stores
         .get('commands') as MonkaCommandStore)
+        // eslint-disable-next-line unicorn/prefer-object-from-entries
         .reduce<Record<string, Command[]>>((acc, val: Command) => {
           const category = this._resolveCategory(val);
           if (acc[category])
@@ -55,7 +56,7 @@ export default class HelpCommand extends MonkaCommand {
       }
     }
 
-    await message.channel.send(embed);
+    await message.channel.send({ embeds: [embed] });
   }
 
   private _resolveCategory(command: Command): string {

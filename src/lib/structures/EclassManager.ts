@@ -7,21 +7,21 @@ import twemoji from 'twemoji';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
-import type { GuildMessage, GuildTextBasedChannel } from '@/types';
+import type { GuildMessage, GuildTextBasedChannel, SchoolYear } from '@/types';
 import type { EclassDocument } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
 import { capitalize, massSend, noop } from '@/utils';
 
 const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
 
-const classAnnoucement: Record<SchoolYear, ConfigEntries> = {
+const classAnnoucement: Record<AnnouncementSchoolYear, ConfigEntries> = {
   l1: ConfigEntries.ClassAnnoucementL1,
   l2: ConfigEntries.ClassAnnoucementL2,
   l3: ConfigEntries.ClassAnnoucementL3,
   general: ConfigEntries.ClassAnnoucementGeneral,
 };
 
-type SchoolYear = 'general' | 'l1' | 'l2' | 'l3';
+type AnnouncementSchoolYear = SchoolYear | 'general';
 interface EclassCreationOptions {
   date: Date;
   classChannel: GuildTextBasedChannel;
@@ -67,7 +67,9 @@ export default class EclassManager {
 
     // Extract the school year from the category channel (L1, L2, L3...)
     const schoolYear = classChannel.parent.name.slice(-2).toLowerCase();
-    const target: SchoolYear = Object.keys(classAnnoucement).includes(schoolYear) ? schoolYear as SchoolYear : 'general';
+    const target: AnnouncementSchoolYear = Object.keys(classAnnoucement).includes(schoolYear)
+      ? schoolYear as AnnouncementSchoolYear
+      : 'general';
 
     // Get the corresponding annoucement channel
     const channel = await Store.injectedContext.client.configManager.get(message.guild.id, classAnnoucement[target]);
@@ -91,14 +93,14 @@ export default class EclassManager {
     });
     const announcementMessage = await channel.send({
       content: pupa(config.messages.newClassNotification, { targetRole }),
-      embed,
+      embeds: [embed],
     });
     // Add the reaction & cache the message
     await announcementMessage.react(settings.emojis.yes);
     Store.injectedContext.client.eclassRolesIds.add(announcementMessage.id);
 
     // Create the role
-    const role = await message.guild.roles.create({ data: { name, color: settings.colors.white, mentionable: true } });
+    const role = await message.guild.roles.create({ name, color: settings.colors.white, mentionable: true });
 
     // Add the class to the database
     const classId = Eclass.generateId(topic, professor, date);
@@ -120,7 +122,7 @@ export default class EclassManager {
     // Use the newly created ID in the embed
     await announcementMessage.edit({
       content: announcementMessage.content,
-      embed: embed.setFooter(pupa(config.messages.newClassEmbed.footer, { eclass })),
+      embeds: [embed.setFooter(pupa(config.messages.newClassEmbed.footer, { eclass }))],
     });
 
     // Send confirmation message
@@ -138,7 +140,7 @@ export default class EclassManager {
     const announcementEmbed = announcementMessage.embeds[0];
     announcementEmbed.setColor(settings.colors.orange);
     announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date).value += ` ${config.messages.valueInProgress}`;
-    await announcementMessage.edit(announcementEmbed);
+    await announcementMessage.edit({ embeds: [announcementEmbed] });
 
     // Send an embed in the corresponding text channel
     const classChannel = Store.injectedContext.client
@@ -152,7 +154,7 @@ export default class EclassManager {
       .setFooter(pupa(config.messages.startClassEmbed.footer, { eclass }));
     await classChannel.send({
       content: pupa(config.messages.startClassNotification, { classRole: eclass.classRole }),
-      embed,
+      embeds: [embed],
     });
 
     // Mark the class as In Progress
@@ -170,7 +172,7 @@ export default class EclassManager {
     const announcementEmbed = announcementMessage.embeds[0];
     const statusField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
     statusField.value = statusField.value.replace(config.messages.valueInProgress, config.messages.valueFinished);
-    await announcementMessage.edit(announcementEmbed);
+    await announcementMessage.edit({ embeds: [announcementEmbed] });
 
     // Remove the associated role
     await Store.injectedContext.client
@@ -194,7 +196,7 @@ export default class EclassManager {
     announcementEmbed.setColor(settings.colors.red);
     announcementEmbed.setDescription(config.messages.valueCanceled);
     announcementEmbed.spliceFields(0, 25);
-    await announcementMessage.edit(announcementEmbed);
+    await announcementMessage.edit({ embeds: [announcementEmbed] });
     await announcementMessage.reactions.removeAll();
     // Remove from cache
     Store.injectedContext.client.eclassRolesIds.delete(announcementMessage.id);
@@ -221,7 +223,7 @@ export default class EclassManager {
     announcementEmbed.fields
       .find(field => field.name === config.messages.newClassEmbed.recorded)
       .value += pupa(config.messages.newClassEmbed.recordedLink, { link });
-    await announcementMessage.edit(announcementEmbed);
+    await announcementMessage.edit({ embeds: [announcementEmbed] });
 
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
@@ -272,7 +274,7 @@ export default class EclassManager {
       .setAuthor(texts.author, classChannel.guild.iconURL())
       .addField(texts.date, formattedDate, true)
       .addField(texts.duration, dayjs.duration(duration).humanize(), true)
-      .addField(texts.professor, professor, true)
+      .addField(texts.professor, professor.toString(), true)
       .addField(texts.recorded, texts.recordedValues[Number(isRecorded)], true)
       .setFooter(pupa(texts.footer, { classId }));
   }
