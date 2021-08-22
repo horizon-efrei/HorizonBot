@@ -20,7 +20,7 @@ import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
 import { GuildMessage } from '@/types';
 import type { GuildTextBasedChannel, HourMinutes } from '@/types';
 import { EclassDocument, EclassStatus } from '@/types/database';
-import { generateSubcommands, nullop } from '@/utils';
+import { capitalize, generateSubcommands, nullop } from '@/utils';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
