@@ -20,64 +20,67 @@ export default class ArgumentPrompter {
     },
   ) {}
 
-  public async autoPromptTextChannel(prompts?: PrompterText): Promise<GuildTextBasedChannel> {
-    let response = await this.promptTextChannel(prompts);
+  public async autoPromptTextChannel(
+    prompts?: PrompterText,
+    previousIsFailure = false,
+  ): Promise<GuildTextBasedChannel> {
+    let response = await this.promptTextChannel(prompts, previousIsFailure);
     while (!response)
       response = await this.promptTextChannel(prompts, true);
     return response;
   }
 
-  public async autoPromptMessage(prompts?: PrompterText): Promise<GuildMessage> {
-    let response = await this.promptMessage(prompts);
+  public async autoPromptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
+    let response = await this.promptMessage(prompts, previousIsFailure);
     while (!response)
       response = await this.promptMessage(prompts, true);
     return response;
   }
 
-  public async autoPromptText(prompts?: PrompterText): Promise<string> {
-    let response = await this.promptText(prompts);
+  public async autoPromptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {
+    let response = await this.promptText(prompts, previousIsFailure);
     while (!response)
       response = await this.promptText(prompts, true);
     return response;
   }
 
-  public async autoPromptDate(prompts?: PrompterText): Promise<Date> {
-    let response = await this.promptDate(prompts);
+  public async autoPromptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
+    let response = await this.promptDate(prompts, previousIsFailure);
     while (!response)
       response = await this.promptDate(prompts, true);
     return response;
   }
 
-  public async autoPromptHour(prompts?: PrompterText): Promise<HourMinutes> {
-    let response = await this.promptHour(prompts);
+  public async autoPromptHour(prompts?: PrompterText, previousIsFailure = false): Promise<HourMinutes> {
+    let response = await this.promptHour(prompts, previousIsFailure);
     while (!response)
       response = await this.promptHour(prompts, true);
     return response;
   }
 
-  public async autoPromptDuration(prompts?: PrompterText): Promise<number> {
-    let response = await this.promptDuration(prompts);
+  public async autoPromptDuration(prompts?: PrompterText, previousIsFailure = false): Promise<number> {
+    let response = await this.promptDuration(prompts, previousIsFailure);
     while (!response)
       response = await this.promptDuration(prompts, true);
     return response;
   }
 
-  public async autoPromptMember(prompts?: PrompterText): Promise<GuildMember> {
-    let response = await this.promptMember(prompts);
+  public async autoPromptMember(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMember> {
+    let response = await this.promptMember(prompts, previousIsFailure);
     while (!response)
       response = await this.promptMember(prompts, true);
     return response;
   }
 
-  public async autoPromptRole(prompts?: PrompterText): Promise<Role> {
-    let response = await this.promptRole(prompts);
+  public async autoPromptRole(prompts?: PrompterText, previousIsFailure = false): Promise<Role> {
+    let response = await this.promptRole(prompts, previousIsFailure);
     while (!response)
       response = await this.promptRole(prompts, true);
     return response;
   }
 
-  public async autoPromptBoolean(prompts?: PrompterText): Promise<boolean> {
-    let response = await this.promptBoolean(prompts);
+  public async autoPromptBoolean(prompts?: PrompterText, previousIsFailure = false): Promise<boolean> {
+    let response = await this.promptBoolean(prompts, previousIsFailure);
     while (!response)
       response = await this.promptBoolean(prompts, true);
     return response;
