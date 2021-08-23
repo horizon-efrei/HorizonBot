@@ -126,8 +126,8 @@ export default class EclassCommand extends MonkaSubCommand {
     let isRecorded: boolean;
 
     try {
-      const allMessages: GuildMessage[] = [];
-      const prompter = new ArgumentPrompter(message, allMessages);
+      const allMessages = new Set<GuildMessage>();
+      const prompter = new ArgumentPrompter(message, { messageArray: allMessages });
 
       classChannel = await prompter.autoPromptTextChannel(config.messages.prompts.classChannel);
       topic = await prompter.autoPromptText(config.messages.prompts.topic);

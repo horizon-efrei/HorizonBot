@@ -14,7 +14,10 @@ import type {
 export default class ArgumentPrompter {
   constructor(
     private readonly _message: GuildMessage,
-    private readonly _messageArray?: GuildMessage[],
+    private readonly _options?: {
+      messageArray?: Set<GuildMessage>;
+      baseMessage?: GuildMessage;
+    },
   ) {}
 
   public async autoPromptTextChannel(prompts?: PrompterText): Promise<GuildTextBasedChannel> {
@@ -188,12 +191,12 @@ export default class ArgumentPrompter {
     const handler = new MessagePrompter(
       text,
       'message',
-      { timeout: 60 * 1000, explicitReturn: true },
+      { timeout: 60 * 1000, explicitReturn: true, editMessage: this._options.baseMessage },
     );
     const { response, appliedMessage } = await handler
       .run(this._message.channel, this._message.author) as PrompterMessageResult;
-    if (this._messageArray)
-      this._messageArray.push(response, appliedMessage);
+    if (this._options.messageArray)
+      this._options.messageArray.addAll(response, appliedMessage);
 
     if (settings.configuration.stop.has(response.content))
       throw new Error('STOP');
