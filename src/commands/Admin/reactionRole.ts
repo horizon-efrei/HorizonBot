@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
+import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import type { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { MessageEmbed } from 'discord.js';
@@ -71,7 +71,7 @@ export default class SetupCommand extends MonkaSubCommand {
           description: description || config.messages.noDescription,
         }),
       );
-    const handler = new MessagePrompter({ embeds: [confirmationEmbed] }, MessagePrompterStrategies.Confirm, {
+    const handler = new MessagePrompter({ embeds: [confirmationEmbed] }, 'confirm', {
       confirmEmoji: settings.emojis.yes,
       cancelEmoji: settings.emojis.no,
       timeout: 60 * 1000,
@@ -249,7 +249,7 @@ export default class SetupCommand extends MonkaSubCommand {
   private async _promptTitle(message: GuildMessage): Promise<[title: string, description: string]> {
     const handler = new MessagePrompter(
       config.messages.titlePrompt,
-      MessagePrompterStrategies.Message,
+      'message',
       { timeout: 60 * 1000 },
     );
     const result = await handler.run(message.channel, message.author) as GuildMessage;
@@ -290,7 +290,7 @@ export default class SetupCommand extends MonkaSubCommand {
   private async _promptReactionRoles(message: GuildMessage): Promise<ReactionRoleReturnPayload> {
     const handler = new MessagePrompter(
       config.messages.rolesPrompt,
-      MessagePrompterStrategies.Message,
+      'message',
       { timeout: 60 * 1000 },
     );
     const result = await handler.run(message.channel, message.author) as GuildMessage;

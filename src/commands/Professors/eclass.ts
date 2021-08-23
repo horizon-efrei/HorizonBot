@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { ApplyOptions } from '@sapphire/decorators';
-import { MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
+import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import dayjs from 'dayjs';
@@ -431,8 +431,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned, EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async cancel(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
-    const handler = new MessagePrompter(config.messages.confirmCancel, MessagePrompterStrategies.Confirm, {
+    const handler = new MessagePrompter(config.messages.confirmCancel, 'confirm', {
       confirmEmoji: settings.emojis.yes,
       cancelEmoji: settings.emojis.no,
       timeout: 60 * 1000,

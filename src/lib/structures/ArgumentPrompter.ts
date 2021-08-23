@@ -1,4 +1,4 @@
-import { isGuildBasedChannel, MessagePrompter, MessagePrompterStrategies } from '@sapphire/discord.js-utilities';
+import { isGuildBasedChannel, MessagePrompter } from '@sapphire/discord.js-utilities';
 import type { GuildMember, Role } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
@@ -187,7 +187,7 @@ export default class ArgumentPrompter {
   private async _prompt(text: string): Promise<GuildMessage> {
     const handler = new MessagePrompter(
       text,
-      MessagePrompterStrategies.Message,
+      'message',
       { timeout: 60 * 1000, explicitReturn: true },
     );
     const { response, appliedMessage } = await handler
