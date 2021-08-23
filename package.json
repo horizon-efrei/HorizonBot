@@ -78,14 +78,15 @@
   "_moduleAliases": {
     "@/app": "./dist/src",
     "@/config": "./dist/config",
+    "@/decorators": "./dist/src/lib/decorators",
+    "@/eclasses": "./dist/src/lib/eclasses",
     "@/lib": "./dist/src/lib",
     "@/models": "./dist/src/lib/models",
+    "@/resolvers": "./dist/src/lib/resolvers",
     "@/root": "./dist/",
     "@/structures": "./dist/src/lib/structures",
-    "@/eclasses": "./dist/src/lib/eclasses",
     "@/types": "./dist/src/lib/types",
-    "@/utils": "./dist/src/lib/utils",
-    "@/decorators": "./dist/src/lib/decorators"
+    "@/utils": "./dist/src/lib/utils"
   },
   "engines": {
     "node": ">=16.6.0"

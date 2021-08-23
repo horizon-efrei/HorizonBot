@@ -1,24 +1,19 @@
-import { isGuildBasedChannel, isTextBasedChannel } from '@sapphire/discord.js-utilities';
-import type { ArgumentResult, ExtendedArgumentContext, PieceContext } from '@sapphire/framework';
-import { ExtendedArgument } from '@sapphire/framework';
-import type { GuildChannel } from 'discord.js';
+import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
+import { Argument } from '@sapphire/framework';
+import CustomResolvers from '@/resolvers';
 import type { GuildTextBasedChannel } from '@/types';
 
-export default class GuildTextBasedChannelArgument extends ExtendedArgument<'guildChannel', GuildTextBasedChannel> {
-  constructor(context: PieceContext) {
-    super(context, {
-      name: 'guildTextBasedChannel',
-      baseArgument: 'guildChannel',
-    });
-  }
+export default class GuildTextBasedChannelArgument extends Argument<GuildTextBasedChannel> {
+  public run(parameter: string, context: ArgumentContext): ArgumentResult<GuildTextBasedChannel> {
+    const resolved = CustomResolvers.resolveGuildTextBasedChannel(parameter, context.message);
 
-  public handle(channel: GuildChannel, context: ExtendedArgumentContext): ArgumentResult<GuildTextBasedChannel> {
-    return isTextBasedChannel(channel) && isGuildBasedChannel(channel)
-      ? this.ok(channel as GuildTextBasedChannel)
-      : this.error({
-          parameter: context.parameter,
-          message: 'The argument did not resolve to a guild text-based channel.',
-          context: { ...context, channel },
-        });
+    if (resolved.success)
+      return this.ok(resolved.value);
+    return this.error({
+      parameter,
+      identifier: resolved.error,
+      message: 'The argument did not resolve to a guild text-based channel.',
+      context,
+    });
   }
 }

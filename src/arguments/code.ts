@@ -1,13 +1,18 @@
 import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
-
-const MARKDOWN_FENCED_BLOCK_REGEX = /^```(?:[\S]+)?\n(?<code>[^`]*)```$/imu;
+import CustomResolvers from '@/resolvers';
 
 export default class CodeArgument extends Argument<string> {
-  public run(arg: string, _context: ArgumentContext<string>): ArgumentResult<string> {
-    const code = MARKDOWN_FENCED_BLOCK_REGEX.test(arg)
-      ? MARKDOWN_FENCED_BLOCK_REGEX.exec(arg).groups.code
-      : arg;
-    return this.ok(code);
+  public run(parameter: string, context: ArgumentContext<string>): ArgumentResult<string> {
+    const resolved = CustomResolvers.resolveCode(parameter);
+
+    if (resolved.success)
+      return this.ok(resolved.value);
+    return this.error({
+      parameter,
+      identifier: resolved.error,
+      message: 'The argument did not resolve to a code block.',
+      context,
+    });
   }
 }

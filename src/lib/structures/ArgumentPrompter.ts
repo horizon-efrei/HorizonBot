@@ -1,8 +1,9 @@
 import { isGuildBasedChannel, MessagePrompter } from '@sapphire/discord.js-utilities';
+import { Resolvers } from '@sapphire/framework';
 import type { GuildMember, Role } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
-import ArgumentResolver from '@/structures/ArgumentResolver';
+import CustomResolvers from '@/resolvers';
 import type {
   GuildMessage,
   GuildTextBasedChannel,
@@ -98,8 +99,7 @@ export default class ArgumentPrompter {
       return firstMention;
 
     const query = response.content.split(' ').join('-');
-    return ArgumentResolver.resolveChannelByID(query, response.guild)
-      ?? ArgumentResolver.resolveChannelByQuery(query, response.guild);
+    return CustomResolvers.resolveGuildTextBasedChannel(query, response).value;
   }
 
   public async promptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
@@ -109,8 +109,7 @@ export default class ArgumentPrompter {
         : prompts?.base || messages.prompts.message.base,
     );
 
-    return await ArgumentResolver.resolveMessageByID(response.content, response.channel)
-      ?? await ArgumentResolver.resolveMessageByLink(response.content, response.guild, response.author);
+    return (await Resolvers.resolveMessage(response.content, { message: response })).value as GuildMessage;
   }
 
   public async promptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {
@@ -120,7 +119,7 @@ export default class ArgumentPrompter {
         : prompts?.base || messages.prompts.text.base,
     );
 
-    return response.content;
+    return Resolvers.resolveString(response.content).value;
   }
 
   public async promptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
@@ -130,7 +129,7 @@ export default class ArgumentPrompter {
         : prompts?.base || messages.prompts.date.base,
     );
 
-    return ArgumentResolver.resolveDate(response.content);
+    return CustomResolvers.resolveDay(response.content).value;
   }
 
   public async promptHour(prompts?: PrompterText, previousIsFailure = false): Promise<HourMinutes> {
@@ -140,7 +139,7 @@ export default class ArgumentPrompter {
         : prompts?.base || messages.prompts.hour.base,
     );
 
-    return ArgumentResolver.resolveHour(response.content);
+    return CustomResolvers.resolveHour(response.content).value;
   }
 
   public async promptDuration(prompts?: PrompterText, previousIsFailure = false): Promise<number> {
@@ -150,7 +149,7 @@ export default class ArgumentPrompter {
         : prompts?.base || messages.prompts.duration.base,
     );
 
-    return ArgumentResolver.resolveDuration(response.content);
+    return CustomResolvers.resolveDuration(response.content).value;
   }
 
   public async promptMember(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMember> {
@@ -163,8 +162,7 @@ export default class ArgumentPrompter {
     if (response.mentions.members.size > 0)
       return response.mentions.members.first();
 
-    return ArgumentResolver.resolveMemberByQuery(response.content, response.guild)
-      ?? await ArgumentResolver.resolveMemberByID(response.content, response.guild);
+    return (await Resolvers.resolveMember(response.content, response.guild)).value;
   }
 
   public async promptRole(prompts?: PrompterText, previousIsFailure = false): Promise<Role> {
@@ -177,8 +175,7 @@ export default class ArgumentPrompter {
     if (response.mentions.roles.size > 0)
       return response.mentions.roles.first();
 
-    return ArgumentResolver.resolveRoleByID(response.content, response.guild)
-      ?? ArgumentResolver.resolveRoleByQuery(response.content, response.guild);
+    return (await Resolvers.resolveRole(response.content, response.guild)).value;
   }
 
   public async promptBoolean(prompts?: PrompterText, previousIsFailure = false): Promise<boolean> {
@@ -187,7 +184,11 @@ export default class ArgumentPrompter {
         ? `${prompts?.invalid || messages.prompts.role.invalid} ${prompts?.base || messages.prompts.role.base}`
         : prompts?.base || messages.prompts.role.base,
     );
-    return ArgumentResolver.resolveBoolean(response.content);
+
+    return Resolvers.resolveBoolean(response.content, {
+      truths: settings.configuration.booleanTruths,
+      falses: settings.configuration.booleanFalses,
+    }).value;
   }
 
   private async _prompt(text: string): Promise<GuildMessage> {

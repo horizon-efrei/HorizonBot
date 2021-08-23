@@ -1,20 +1,19 @@
 import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
+import CustomResolvers from '@/resolvers';
 import type { HourMinutes } from '@/types';
 
-const HOUR_REGEX = /^(?<hour>\d{1,2})[h:]?(?<minutes>\d{2})?$/imu;
-
 export default class HourArgument extends Argument<HourMinutes> {
-  public run(arg: string, _context: ArgumentContext<HourMinutes>): ArgumentResult<HourMinutes> {
-    const hour = Number.parseInt(HOUR_REGEX.exec(arg)?.groups?.hour, 10);
-    const minutes = Number.parseInt(HOUR_REGEX.exec(arg)?.groups?.minutes, 10) || 0;
+  public run(parameter: string, context: ArgumentContext<HourMinutes>): ArgumentResult<HourMinutes> {
+    const resolved = CustomResolvers.resolveHour(parameter);
 
-    if (!hour)
-      return this.error({ parameter: arg });
-    return this.ok({
-      hour,
-      minutes,
-      formatted: `${hour}h${minutes.toString().padStart(2, '0')}`,
+    if (resolved.success)
+      return this.ok(resolved.value);
+    return this.error({
+      parameter,
+      identifier: resolved.error,
+      message: 'The argument did not resolve to an hour.',
+      context,
     });
   }
 }
