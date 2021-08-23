@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { SchoolYear } from '../types';
+import { SchoolYear } from '@/types';
 import type { SubjectDocument, SubjectModel } from '@/types/database';
 
 const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({

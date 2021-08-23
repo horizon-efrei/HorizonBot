@@ -1,6 +1,6 @@
 import { Store } from '@sapphire/pieces';
 import type { Constructor } from '@sapphire/utilities';
-import Task from './Task';
+import Task from '@/structures/tasks/Task';
 
 export default class TaskStore extends Store<Task> {
   constructor() {
