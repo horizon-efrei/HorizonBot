@@ -17,7 +17,7 @@ export default class BooleanArgument extends Argument<boolean> {
     const possibles = [...truths, ...falses];
     return this.error({
       parameter,
-      identifier: Identifiers.ArgumentBoolean,
+      identifier: Identifiers.ArgumentBooleanError,
       context: { ...context, possibles, count: possibles.length },
     });
   }
