@@ -9,7 +9,7 @@ const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({
   },
   nameEnglish: {
     type: String,
-    required: true,
+    required: false,
   },
   emoji: {
     type: String,
@@ -18,6 +18,7 @@ const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({
   classCode: {
     type: String,
     required: true,
+    index: true,
   },
   moodleLink: {
     type: String,
