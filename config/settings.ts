@@ -22,7 +22,7 @@ export default {
     flagMessageReaction: '🚩',
     flagNeededAnswer: '📝',
     dateFormat: 'DD/MM [à] HH:mm',
-    eclassRoleFormat: '{subject}: {topic} ({formattedDate})',
+    eclassRoleFormat: '{subject.name}: {topic} ({formattedDate})',
     eclassReminderTime: 15 * 60 * 1000, // 15 minutes
   },
   channels: {

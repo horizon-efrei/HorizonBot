@@ -1,5 +1,6 @@
 import type { GuildMember } from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
+import type { SchoolYear } from '@/types';
 
 /* ****************************** */
 /*  Configuration Database Types  */
@@ -45,21 +46,20 @@ export enum EclassStatus {
 
 /** Interface for the "Eclass"'s mongoose schema */
 export interface EclassBase {
-  classChannel: string;
+  classId: string;
   guild: string;
   topic: string;
-  subject: string;
+  subject: SubjectDocument | Types.ObjectId;
   date: number;
   duration: number;
   end: number;
   professor: string;
   classRole: string;
   targetRole: string;
-  announcementMessage: string;
   announcementChannel: ConfigEntries;
+  announcementMessage: string;
   status: EclassStatus;
   reminded: boolean;
-  classId: string;
   subscribers: string[];
   isRecorded: boolean;
   recordLink: string | null;
@@ -68,9 +68,19 @@ export interface EclassBase {
 export type PrettyEclass = Omit<EclassBase, 'date' | 'duration' | 'end'> & { date: string; duration: string; end: string };
 
 /** Interface for the "Eclass"'s mongoose document */
-export interface EclassDocument extends EclassBase, Document {
+interface EclassBaseDocument extends EclassBase, Document {
+  subscribers: Types.Array<string>;
   toData(): PrettyEclass;
   getStatus(): string;
+}
+
+/** Interface for the "Eclass"'s mongoose document, when the subject field is not populated */
+export interface EclassDocument extends EclassBaseDocument {
+  subject: SubjectDocument['_id'];
+}
+/** Interface for the "Eclass"'s mongoose document, when the subject field is populated */
+export interface EclassPopulatedDocument extends EclassBaseDocument {
+  subject: SubjectDocument;
 }
 
 /** Interface for the "Eclass"'s mongoose model */
@@ -89,11 +99,12 @@ export interface EclassModel extends Model<EclassDocument> {
 export interface SubjectBase {
   name: string;
   nameEnglish: string;
+  slug: string;
   emoji: string;
   classCode: string;
   moodleLink: string;
   teachingUnit: string;
-  schoolYear: string;
+  schoolYear: SchoolYear;
   textChannel: string;
   textDocsChannel?: string;
   voiceChannel?: string;

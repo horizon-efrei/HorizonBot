@@ -14,9 +14,9 @@ import type {
   GuildMessage,
   GuildTextBasedChannel,
 } from '@/types';
-import type { EclassDocument } from '@/types/database';
+import type { EclassPopulatedDocument } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
-import { capitalize, massSend, noop } from '@/utils';
+import { massSend, noop } from '@/utils';
 
 const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
 
@@ -32,37 +32,28 @@ export default class EclassManager {
   public static async createClass(
     message: GuildMessage,
     {
-      date, classChannel, topic, duration, professor, targetRole, isRecorded,
+      date, subject, topic, duration, professor, targetRole, isRecorded,
     }: EclassCreationOptions,
   ): Promise<void> {
     // Prepare the date
     const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
 
-    // All channels start with an emote followed by the subject's name
-    const fullName = classChannel.name.split('-');
-    fullName.shift();
-    const subject = fullName.map(capitalize).join(' ');
-    const name = pupa(settings.configuration.eclassRoleFormat, { subject, topic, formattedDate });
-
-    if (message.guild.roles.cache.some(r => r.name === name)) {
+    const roleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic, formattedDate });
+    if (message.guild.roles.cache.some(r => r.name === roleName)) {
       await message.channel.send(config.messages.alreadyExists);
       return;
     }
 
-    // Extract the school year from the category channel (L1, L2, L3...)
-    const schoolYear = classChannel.parent.name.slice(-2).toLowerCase();
-    const target: AnnouncementSchoolYear = Object.keys(classAnnouncement).includes(schoolYear)
-      ? schoolYear as AnnouncementSchoolYear
-      : 'general';
-
-    // Get the corresponding announcement channel
-    const channel = await container.client.configManager.get(message.guild.id, classAnnouncement[target]);
-
-    if (!channel) {
+    // Get the corresponding channels
+    const announcementChannel = await container.client.configManager
+      .get(message.guild.id, classAnnouncement[subject.schoolYear]);
+    if (!announcementChannel) {
       container.logger.warn(`[e-class] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
       await message.channel.send(config.messages.unconfiguredChannel);
       return;
     }
+
+    const classChannel = await message.guild.channels.fetch(subject.textChannel) as GuildTextBasedChannel;
 
     // Create & send the announcement embed
     const embed = EclassManager.createAnnouncementEmbed({
@@ -75,7 +66,7 @@ export default class EclassManager {
       classId: '',
       isRecorded,
     });
-    const announcementMessage = await channel.send({
+    const announcementMessage = await announcementChannel.send({
       content: pupa(config.messages.newClassNotification, { targetRole }),
       embeds: [embed],
     });
@@ -84,7 +75,7 @@ export default class EclassManager {
     container.client.eclassRolesIds.add(announcementMessage.id);
 
     // Create the role
-    const role = await message.guild.roles.create({ name, color: settings.colors.white, mentionable: true });
+    const role = await message.guild.roles.create({ name: roleName, color: settings.colors.white, mentionable: true });
 
     // Add the class to the database
     const classId = Eclass.generateId(topic, professor, date);
@@ -99,7 +90,7 @@ export default class EclassManager {
       classRole: role.id,
       targetRole: targetRole.id,
       announcementMessage: announcementMessage.id,
-      announcementChannel: classAnnouncement[target],
+      announcementChannel: classAnnouncement[subject.schoolYear],
       classId,
       isRecorded,
     });
@@ -115,7 +106,7 @@ export default class EclassManager {
     container.logger.debug(`[e-class] Just created class with id ${classId}.`);
   }
 
-  public static async startClass(eclass: EclassDocument): Promise<void> {
+  public static async startClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
@@ -129,7 +120,7 @@ export default class EclassManager {
     // Send an embed in the corresponding text channel
     const classChannel = container.client
       .guilds.resolve(eclass.guild)
-      .channels.resolve(eclass.classChannel) as GuildTextBasedChannel;
+      .channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
     const embed = new MessageEmbed()
       .setColor(settings.colors.primary)
       .setTitle(pupa(config.messages.startClassEmbed.title, { eclass }))
@@ -147,7 +138,7 @@ export default class EclassManager {
     container.logger.debug(`[e-class] Just started class with id ${eclass.classId}.`);
   }
 
-  public static async finishClass(eclass: EclassDocument): Promise<void> {
+  public static async finishClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
@@ -170,7 +161,7 @@ export default class EclassManager {
     container.logger.debug(`[e-class] Just ended class with id ${eclass.classId}.`);
   }
 
-  public static async cancelClass(eclass: EclassDocument): Promise<void> {
+  public static async cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
@@ -197,7 +188,7 @@ export default class EclassManager {
     container.logger.debug(`[e-class] Just canceled class with id ${eclass.classId}.`);
   }
 
-  public static async setRecordLink(eclass: EclassDocument, link: string): Promise<void> {
+  public static async setRecordLink(eclass: EclassPopulatedDocument, link: string): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.guild, eclass.announcementChannel);
@@ -215,10 +206,10 @@ export default class EclassManager {
     container.logger.debug(`[e-class] Just added record link to class with id ${eclass.classId}.`);
   }
 
-  public static async remindClass(eclass: EclassDocument): Promise<void> {
+  public static async remindClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Resolve the associated channel
     const guild = container.client.guilds.resolve(eclass.guild);
-    const classChannel = guild.channels.resolve(eclass.classChannel) as GuildTextBasedChannel;
+    const classChannel = guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
     // Send the notification
     await classChannel.send(
       pupa(config.messages.remindClassNotification, {
@@ -263,7 +254,7 @@ export default class EclassManager {
       .setFooter(pupa(texts.footer, { classId }));
   }
 
-  public static async subscribeMember(member: GuildMember, eclass: EclassDocument): Promise<void> {
+  public static async subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
       container.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exists !`);
@@ -279,7 +270,7 @@ export default class EclassManager {
     container.logger.debug(`[e-class] Just subscribed membed ${member.id} (${member.displayName}#${member.user.discriminator}) class with id ${eclass.classId}.`);
   }
 
-  public static async unsubscribeMember(member: GuildMember, eclass: EclassDocument): Promise<void> {
+  public static async unsubscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
       container.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exist.`);

@@ -9,6 +9,7 @@ import type {
   Role,
 } from 'discord.js';
 import type MonkaClient from '@/structures/MonkaClient';
+import type { SubjectBase } from '@/types/database';
 
 /* ************ */
 /*  Util types  */
@@ -34,7 +35,7 @@ export enum SchoolYear {
 export type AnnouncementSchoolYear = SchoolYear | 'general';
 export interface EclassCreationOptions {
   date: Date;
-  classChannel: GuildTextBasedChannel;
+  subject: SubjectBase;
   topic: string;
   duration: number;
   professor: GuildMember;
@@ -43,7 +44,7 @@ export interface EclassCreationOptions {
 }
 
 export interface EclassEmbedOptions {
-  subject: string;
+  subject: SubjectBase;
   topic: string;
   formattedDate: string;
   duration: number;

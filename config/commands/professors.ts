@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { stripIndent } from 'common-tags';
+import type { MessageSelectOptionData } from 'discord.js';
 
 export const eclass = {
   options: {
@@ -35,22 +36,21 @@ export const eclass = {
     // Help subcommand
     helpEmbedTitle: 'Aide de la commande de cours',
     helpEmbedDescription: [
-      { name: "Créer un cours à partir d'arguments donnés", value: '`!cours create <#salon | salon | ID> <sujet> <date> <heure> <durée> <@professeur | professeur | ID> <@role-audience | role audience | ID> <oui/non enregistré>`' },
-      { name: 'Créer un cours de manière intéractive', value: '`!cours setup`' },
-      { name: 'Commencer un cours', value: '`!cours start ID-cours`' },
-      { name: 'Terminer un cours manuellement', value: '`!cours finish ID-cours`' },
-      { name: 'Modifier un cours', value: '`!cours edit ID-cours <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
-      { name: 'Annuler un cours', value: '`!cours cancel ID-cours`' },
+      { name: 'Créer un cours', value: '`!cours create`' },
+      { name: 'Commencer un cours', value: '`!cours start <ID-cours>`' },
+      { name: 'Terminer un cours manuellement', value: '`!cours finish <ID-cours>`' },
+      { name: 'Modifier un cours', value: '`!cours edit <ID-cours> <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
+      { name: 'Annuler un cours', value: '`!cours cancel <ID-cours>`' },
       { name: 'Liste des cours', value: '`!cours list`' },
-      { name: "Définir/voir l'enregistrement d'un cours", value: '`!cours record ID-cours [lien]`' },
+      { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
       { name: "Page d'aide", value: '`!cours help`' },
     ],
 
     // List subcommand
     listTitle: 'Liste des cours',
     noClassesFound: "Aucune classe n'a été trouvée...",
-    nClassesFound: (amount: number): string => `${amount} classe${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
-    listFieldTitle: '{topic} ({subject})',
+    someClassesFound: (amount: number): string => `${amount} classe${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
+    listFieldTitle: '{topic} ({subject.name})',
     listFieldDescription: stripIndent`
       :speech_left: <#{classChannel}>
       :bulb: {status}
@@ -63,10 +63,8 @@ export const eclass = {
     alreadyExists: 'Ce cours (même matière, sujet, heure, jour) a déjà été prévu !',
     newClassNotification: ':bell: {targetRole}, un nouveau cours a été plannifié ! :arrow_heading_down:',
 
-    invalidDate: "Cette date/heure est invalide. Vérifie bien qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
-
     newClassEmbed: {
-      title: '{subject} - {topic}',
+      title: '{subject.name} - {topic}',
       description: "Un nouveau cours en {classChannel} a été planifié sur Ef'Réussite !\nRéagis avec :white_check_mark: pour être notifié du cours !",
       author: "Ef'Réussite - Nouveau cours !",
       date: 'Date et heure',
@@ -76,6 +74,64 @@ export const eclass = {
       recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
       recordedLink: '\n[Lien]({link})',
       footer: 'ID : {eclass.classId}',
+    },
+
+    createClassSetup: {
+      embed: {
+        title: "Création d'un cours",
+        description: "Bienvenue dans l'assistant de création de cours. Suivez les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il vous sera demandé. Vous pouvez, à tous moment, abandonner la création du cours en cliquant sur \"Abandonner\".",
+        stepPreviewTitle: 'Aperçu des étapes',
+        stepPreviewDescription: 'Aperçu des étapes',
+        currentStepTitle: 'Étape actuelle : {step}',
+        currentStepDescription: [
+          'Choisissez dans le menu déroulant ci-dessous quelle promotion votre cours vise.',
+          'Choisissez dans le menu déroulant ci-dessous sur quelle matière votre cours porte.',
+          'Envoyez un message contenant le sujet de votre cours.',
+          'Envoyez un message contenant la date à laquelle votre cours est prévu.',
+          "Envoyez un message contenant l'heure à laquelle votre cours est prévu.",
+          'Envoyez un message contenant le professeur en charge de votre cours.',
+          'Envoyez un message contenant le rôle visé par votre cours.',
+          'Choisissez dans le menu déroulant ci-dessou si oui ou non votre cours sera enregistré.',
+          'Terminé !',
+        ],
+      },
+      promptMessageDropdown: 'Choisissez une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
+      stepPreview: stripIndent`
+        **1.** __Promotion :__ {schoolYear}
+        **2.** __Matière :__ {subject}
+        **3.** __Sujet :__ {topic}
+        **4.** __Date :__ {date}
+        **5.** __Durée :__ {duration}
+        **6.** __Professeur :__ {professor}
+        **7.** __Rôle visé :__ {role}
+        **8.** __Enregistré :__ {isRecorded}
+      `,
+      schoolYearMenu: {
+        placeholder: 'Aucune année sélectionnée',
+        options: [
+          { label: 'L1 - Promo 2026', emoji: '1⃣' },
+          { label: 'L2 - Promo 2025', emoji: '2⃣' },
+          { label: 'L3 - Promo 2024', emoji: '3⃣' },
+        ] as Array<Omit<MessageSelectOptionData, 'value'>>,
+      },
+      subjectMenu: {
+        placeholder: 'Aucune matière sélectionnée',
+      },
+      isRecordedMenu: {
+        placeholder: 'Aucune valeur sélectionnée',
+        options: [{
+          label: 'Oui',
+          description: 'Le cours sera enregistré par le professeur ou un élève',
+          emoji: '✅',
+        }, {
+          label: 'Non',
+          description: 'Le cours ne sera pas enregistré',
+          emoji: '❌',
+        }] as Array<Omit<MessageSelectOptionData, 'value'>>,
+      },
+      abortMenu: {
+        label: 'Abandonner',
+      },
     },
 
     // Edit subcommand
@@ -111,22 +167,19 @@ export const eclass = {
     valueInProgress: '[En cours]',
 
     startClassEmbed: {
-      title: 'Le cours en {eclass.subject} va commencer !',
+      title: 'Le cours en {eclass.subject.name} va commencer !',
       author: "Ef'Réussite - Un cours commence !",
-      description: 'Le cours en **{eclass.subject}** sur "**{eclass.topic}**" présenté par <@{eclass.professor}> commence ! Le salon textuel associé est <#{eclass.classChannel}>',
+      description: 'Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par <@{eclass.professor}> commence ! Le salon textuel associé est <#{eclass.subject.textChannel}>, et le salon vocal est <#{eclass.subject.voiceChannel}>',
       footer: 'ID : {eclass.classId}',
     },
 
     // Finish subcommand
     successfullyFinished: 'Le cours a bien été terminé !',
-    finishUnauthorized: "Tu n'es pas autoriser à terminer ce cours !",
-    notFinishable: "Ce cours n'est pas lancé, tu ne peux donc pas le terminer !",
     valueFinished: '[Terminé]',
 
     // Cancel subcommand
     confirmCancel: 'Es-tu sûr de vouloir annuler ce cours ? Cette action est irrévocable.',
     successfullyCanceled: 'Le cours a bien été annulé !',
-    cancelUnauthorized: "Tu n'es pas autorisé à annuler ce cours !",
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
 
     // Record subcommand
@@ -135,14 +188,14 @@ export const eclass = {
     successfullyAddedLink: 'Le lien a bien été ajouté au cours !',
 
     // Subscribing
-    subscribed: "Tu t'es bien inscrit au cours de \"{topic}\" ({subject}) ! Je te le rappellerai un peu avant :)",
-    unsubscribed: "Tu t'es bien désinscrit du cours de \"{topic}\" ({subject}) !",
+    subscribed: "Tu t'es bien inscrit au cours de \"{topic}\" ({subject.name}) ! Je te le rappellerai un peu avant :)",
+    unsubscribed: "Tu t'es bien désinscrit du cours de \"{topic}\" ({subject.name}) !",
 
     // Prompts
     prompts: {
-      classChannel: {
-        base: 'Entrez le salon associé au cours que vous souhaitez donner (mentionnez-le ou entrez son nom ou son ID) :',
-        invalid: 'Ce salon de cours est invalide.',
+      subject: {
+        base: 'Entrez le code de la matière associée au cours que vous souhaitez donner (par exemple "TI403" ou "SM204") :',
+        invalid: 'Ce code de matière est invalide.',
       },
       topic: {
         base: 'Entrez le sujet du cours que vous souhaitez donner (nom du chapitre, thème du cours...) :',
@@ -150,14 +203,14 @@ export const eclass = {
       },
       date: {
         base: 'Entrez la date du cours que vous souhaitez donner (au format "jj/MM") :',
-        invalid: 'Cette date est invalide.',
+        invalid: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
       },
       hour: {
         base: "Entrez l'heure de début du cours que vous souhaitez donner (au format \"HH:mm\") :",
-        invalid: 'Cette heure est invalide.',
+        invalid: "Cette heure est invalide. Vérifie bien que la date ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
       },
       duration: {
-        base: 'Entrez une durée pour votre cours (en anglais ou en francais).\nVous pouvez par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Vous pouvez également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
+        base: 'Entrez une durée pour votre cours (en anglais ou en français).\nVous pouvez par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Vous pouvez également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
         invalid: 'Cette durée est invalide.',
       },
       professor: {

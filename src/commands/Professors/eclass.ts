@@ -4,7 +4,6 @@ import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import dayjs from 'dayjs';
-import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 
@@ -12,14 +11,14 @@ import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import { IsEprofOrStaff, ValidateEclassArgument } from '@/decorators';
+import EclassInteractiveBuilder from '@/eclasses/EclassInteractiveBuilder';
 import EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
-import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
 import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
 import { GuildMessage } from '@/types';
-import type { GuildTextBasedChannel, HourMinutes } from '@/types';
-import { EclassDocument, EclassStatus } from '@/types/database';
+import type { GuildTextBasedChannel } from '@/types';
+import { EclassPopulatedDocument, EclassStatus } from '@/types/database';
 import { capitalize, generateSubcommands, nullop } from '@/utils';
 
 const listFlags = {
@@ -34,8 +33,7 @@ const listFlags = {
   generateDashLessAliases: true,
   flags: ['ping', ...Object.values(listFlags).flat()],
   subCommands: generateSubcommands({
-    create: { aliases: ['add'] },
-    setup: { aliases: ['build', 'make'] },
+    create: { aliases: ['add', 'make', 'new'] },
     start: { aliases: ['begin'] },
     edit: { aliases: ['modify'] },
     cancel: { aliases: ['archive'] },
@@ -47,128 +45,17 @@ const listFlags = {
 })
 export default class EclassCommand extends MonkaSubCommand {
   @IsEprofOrStaff()
-  public async create(message: GuildMessage, args: Args): Promise<void> {
-    const classChannel = await args.pickResult('guildTextBasedChannel');
-    if (classChannel.error) {
-      await message.channel.send(config.messages.prompts.classChannel.invalid);
+  public async create(message: GuildMessage): Promise<void> {
+    const responses = await new EclassInteractiveBuilder(message).start();
+    if (!responses)
       return;
-    }
-
-    const topic = await args.pickResult('string');
-    if (topic.error) {
-      await message.channel.send(config.messages.prompts.topic.invalid);
-      return;
-    }
-
-    const date = await args.pickResult('day');
-    if (date.error) {
-      await message.channel.send(config.messages.prompts.date.invalid);
-      return;
-    }
-
-    const hour = await args.pickResult('hour');
-    if (hour.error) {
-      await message.channel.send(config.messages.prompts.hour.invalid);
-      return;
-    }
-
-    date.value.setHours(hour.value.hour);
-    date.value.setMinutes(hour.value.minutes);
-    if (!dayjs(date.value).isBetween(dayjs(), dayjs().add(2, 'month'))) {
-      await message.channel.send(config.messages.invalidDate);
-      return;
-    }
-
-    const duration = await args.pickResult('duration');
-    if (duration.error) {
-      await message.channel.send(config.messages.prompts.duration.invalid);
-      return;
-    }
-
-    const professor = await args.pickResult('member');
-    if (professor.error) {
-      await message.channel.send(config.messages.prompts.professor.invalid);
-      return;
-    }
-
-    const targetRole = await args.pickResult('role');
-    if (targetRole.error) {
-      await message.channel.send(config.messages.prompts.targetRole.invalid);
-      return;
-    }
-
-    const isRecorded = await args.pickResult('boolean');
-    if (isRecorded.error) {
-      await message.channel.send(config.messages.prompts.recorded.invalid);
-      return;
-    }
-
-    await EclassManager.createClass(message, {
-      date: date.value,
-      classChannel: classChannel.value,
-      topic: topic.value,
-      duration: duration.value,
-      professor: professor.value,
-      targetRole: targetRole.value,
-      isRecorded: isRecorded.value,
-    });
-  }
-
-  @IsEprofOrStaff()
-  public async setup(message: GuildMessage): Promise<void> {
-    let classChannel: GuildTextBasedChannel;
-    let topic: string;
-    let date: Date;
-    let hour: HourMinutes;
-    let duration: number;
-    let professor: GuildMember;
-    let targetRole: Role;
-    let isRecorded: boolean;
-
-    try {
-      const allMessages = new Set<GuildMessage>();
-      const prompter = new ArgumentPrompter(message, { messageArray: allMessages });
-
-      classChannel = await prompter.autoPromptTextChannel(config.messages.prompts.classChannel);
-      topic = await prompter.autoPromptText(config.messages.prompts.topic);
-      date = await prompter.autoPromptDate(config.messages.prompts.date);
-      hour = await prompter.autoPromptHour(config.messages.prompts.hour);
-      date.setHours(hour.hour);
-      date.setMinutes(hour.minutes);
-      while (!dayjs(date).isBetween(dayjs(), dayjs().add(2, 'month'))) {
-        await message.channel.send(config.messages.invalidDate);
-        date = await prompter.autoPromptDate(config.messages.prompts.date);
-        hour = await prompter.autoPromptHour(config.messages.prompts.hour);
-        date.setHours(hour.hour);
-        date.setMinutes(hour.minutes);
-      }
-      duration = await prompter.autoPromptDuration(config.messages.prompts.duration);
-      professor = await prompter.autoPromptMember(config.messages.prompts.professor);
-      targetRole = await prompter.autoPromptRole(config.messages.prompts.targetRole);
-      isRecorded = await prompter.autoPromptBoolean(config.messages.prompts.recorded);
-    } catch (error: unknown) {
-      if ((error as Error).message === 'STOP') {
-        await message.channel.send(messages.prompts.stoppedPrompting);
-        return;
-      }
-      throw error;
-    }
-
-    await EclassManager.createClass(message, {
-      date,
-      classChannel,
-      topic,
-      duration,
-      professor,
-      targetRole,
-      isRecorded,
-    });
+    await EclassManager.createClass(message, responses);
   }
 
   public async list(message: GuildMessage, args: Args): Promise<void> {
     // TODO: Add more filters (by prof, by date (before/after), by subject, by classRole)
     // TODO: Add ability to combine filters (even status filters)
-    const eclasses = await Eclass.find({ guild: message.guild.id });
+    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: message.guild.id });
     const statusFilter = args.getFlags(...listFlags[EclassStatus.Planned]) ? EclassStatus.Planned
       : args.getFlags(...listFlags[EclassStatus.InProgress]) ? EclassStatus.InProgress
       : args.getFlags(...listFlags[EclassStatus.Finished]) ? EclassStatus.Finished
@@ -187,7 +74,7 @@ export default class EclassCommand extends MonkaSubCommand {
     }
 
     await new PaginatedMessageEmbedFields()
-      .setTemplate(baseEmbed.setDescription(config.messages.nClassesFound(filteredClasses.length)))
+      .setTemplate(baseEmbed.setDescription(config.messages.someClassesFound(filteredClasses.length)))
       .setItems(
         filteredClasses.map((eclass) => {
           const eclassInfos = {
@@ -219,7 +106,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async start(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
+  public async start(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the member
     const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
     if (!professor) {
@@ -235,7 +122,7 @@ export default class EclassCommand extends MonkaSubCommand {
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
   @IsEprofOrStaff({ isOriginalEprof: true })
   // eslint-disable-next-line complexity
-  public async edit(message: GuildMessage, args: Args, eclass: EclassDocument): Promise<void> {
+  public async edit(message: GuildMessage, args: Args, eclass: EclassPopulatedDocument): Promise<void> {
     // Resolve the given arguments & validate them
     const shouldPing = args.getFlags('ping');
     const property = await args.pickResult('string');
@@ -398,7 +285,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
     // Edit the announcement embed
     const formattedDate = dayjs(eclass.date).format(settings.configuration.dateFormat);
-    const classChannel = message.guild.channels.resolve(eclass.classChannel) as GuildTextBasedChannel;
+    const classChannel = message.guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
     await originalMessage.edit({
       content: originalMessage.content,
       embeds: [EclassManager.createAnnouncementEmbed({
@@ -431,6 +318,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned, EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
+  public async cancel(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
     const handler = new MessagePrompter(config.messages.confirmCancel, 'confirm', {
       confirmEmoji: settings.emojis.yes,
       cancelEmoji: settings.emojis.no,
@@ -449,7 +337,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async finish(message: GuildMessage, _args: Args, eclass: EclassDocument): Promise<void> {
+  public async finish(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the member
     const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
     if (!professor) {
@@ -464,7 +352,7 @@ export default class EclassCommand extends MonkaSubCommand {
 
   @ValidateEclassArgument()
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async record(message: GuildMessage, args: Args, eclass: EclassDocument): Promise<void> {
+  public async record(message: GuildMessage, args: Args, eclass: EclassPopulatedDocument): Promise<void> {
     // Parse the URL
     const link = await args.pickResult('url');
     if (link.error) {

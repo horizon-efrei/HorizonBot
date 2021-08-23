@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import { model, Schema } from 'mongoose';
+import autopopulate from 'mongoose-autopopulate';
 import { nanoid } from 'nanoid';
 import slug from 'slug';
 import { eclass as eclassConfig } from '@/config/commands/professors';
@@ -14,10 +15,6 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     required: true,
     index: true,
   },
-  classChannel: {
-    type: String,
-    required: true,
-  },
   guild: {
     type: String,
     required: true,
@@ -27,8 +24,10 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     required: true,
   },
   subject: {
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'Subject',
     required: true,
+    autopopulate: true,
   },
   date: {
     type: Number,
@@ -120,5 +119,8 @@ EclassSchema.methods.getStatus = function (): string {
     case EclassStatus.Canceled: return eclassConfig.messages.statuses.canceled;
   }
 };
+
+// @ts-expect-error: ts(2345) TODO: Fix this
+EclassSchema.plugin(autopopulate);
 
 export default model<EclassDocument, EclassModel>('Eclass', EclassSchema);
