@@ -71,7 +71,9 @@
 - name: 'scope: tags'
   description: Issues and PRs related to tags.
   color: C2E0C6
-
+- name: 'scope: community'
+  description: Issues and PRs related to the community and the member's engagement.
+  color: C2E0C6
 - name: 'scope: admin features'
   description: Issues and PRs related to admin features (usually /src/commands/Admin).
   color: C2E0C6
