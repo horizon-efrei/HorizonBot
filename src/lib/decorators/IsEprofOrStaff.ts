@@ -34,7 +34,7 @@ export default function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDec
       }
 
       // Check if the professor is the right one
-      if (options.isOriginalEprof && message.member.id !== eclass.professor) {
+      if (options?.isOriginalEprof && message.member.id !== eclass.professor) {
         await message.channel.send(config.messages.editUnauthorized);
         return;
       }
