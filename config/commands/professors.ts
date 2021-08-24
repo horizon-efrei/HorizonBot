@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { stripIndent } from 'common-tags';
 import type { MessageSelectOptionData } from 'discord.js';
+import { EclassStatus } from '@/types/database';
 
 export const eclass = {
   options: {
@@ -26,12 +27,17 @@ export const eclass = {
 
     // Statuses
     statuses: {
-      planned: "n'est pas encore commencé",
-      inProgress: 'est en cours',
-      finished: 'est terminé',
-      canceled: 'est annulé',
+      [EclassStatus.Planned]: "n'est pas encore commencé",
+      [EclassStatus.InProgress]: 'est en cours',
+      [EclassStatus.Finished]: 'est terminé',
+      [EclassStatus.Canceled]: 'est annulé',
     },
-    statusesRaw: ['pas encore commencé', 'en cours', 'terminé', 'annulé'],
+    rawStatuses: {
+      [EclassStatus.Planned]: 'pas encore commencé',
+      [EclassStatus.InProgress]: 'en cours',
+      [EclassStatus.Finished]: 'terminé',
+      [EclassStatus.Canceled]: 'annulé',
+    },
 
     // Help subcommand
     helpEmbedTitle: 'Aide de la commande de cours',

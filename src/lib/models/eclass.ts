@@ -112,12 +112,7 @@ EclassSchema.methods.toData = function (): PrettyEclass {
 };
 
 EclassSchema.methods.getStatus = function (): string {
-  switch (this.status) {
-    case EclassStatus.Planned: return eclassConfig.messages.statuses.planned;
-    case EclassStatus.InProgress: return eclassConfig.messages.statuses.inProgress;
-    case EclassStatus.Finished: return eclassConfig.messages.statuses.finished;
-    case EclassStatus.Canceled: return eclassConfig.messages.statuses.canceled;
-  }
+  return eclassConfig.messages.statuses[this.status];
 };
 
 // @ts-expect-error: ts(2345) TODO: Fix this

@@ -75,7 +75,7 @@ export default class EclassCommand extends MonkaSubCommand {
     const statusQuery = args.getOption(...listOptions.status);
     if (statusQuery) {
       statusValue = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
-      filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.statusesRaw[statusValue] }));
+      filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.rawStatuses[statusValue] }));
     }
 
     const professorQuery = args.getOption(...listOptions.professor);
@@ -128,7 +128,7 @@ export default class EclassCommand extends MonkaSubCommand {
         filteredClasses.map((eclass) => {
           const eclassInfos = {
             ...eclass.toJSON(),
-            status: capitalize(config.messages.statusesRaw[eclass.status]),
+            status: capitalize(config.messages.rawStatuses[eclass.status]),
             date: Math.floor(eclass.date / 1000),
             duration: dayjs.duration(eclass.duration).humanize(),
             end: Math.floor(eclass.end / 1000),
