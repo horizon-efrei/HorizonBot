@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessagePrompter } from '@sapphire/discord.js-utilities';
-import { Args } from '@sapphire/framework';
+import { Args, Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import { isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
+import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 
@@ -21,17 +23,24 @@ import type { GuildTextBasedChannel } from '@/types';
 import { EclassPopulatedDocument, EclassStatus } from '@/types/database';
 import { capitalize, generateSubcommands, nullop } from '@/utils';
 
-const listFlags = {
-  [EclassStatus.Planned]: ['planned', 'plan', 'p', 'prévu', 'prevu'],
-  [EclassStatus.InProgress]: ['inprogress', 'progress', 'r', 'encours', 'e'],
-  [EclassStatus.Finished]: ['finished', 'f', 'terminé', 'terminer', 'termine', 't'],
-  [EclassStatus.Canceled]: ['canceled', 'c', 'annulé', 'annuler', 'annule', 'a'],
+const listOptions = {
+  status: ['status', 'statut', 's'],
+  professor: ['professor', 'professeur', 'prof', 'p'],
+  subject: ['subject', 'matière', 'matiere', 'm'],
+  role: ['role', 'rôle', 'r'],
 };
+const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]> = [
+  [['planned', 'plan', 'p', 'prévu', 'prevu'], EclassStatus.Planned],
+  [['inprogress', 'progress', 'r', 'encours', 'e'], EclassStatus.InProgress],
+  [['finished', 'f', 'terminé', 'terminer', 'termine', 't'], EclassStatus.Finished],
+  [['canceled', 'c', 'annulé', 'annuler', 'annule', 'a'], EclassStatus.Canceled],
+];
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  flags: ['ping', ...Object.values(listFlags).flat()],
+  flags: ['ping'],
+  options: Object.values(listOptions).flat(),
   subCommands: generateSubcommands({
     create: { aliases: ['add', 'make', 'new'] },
     start: { aliases: ['begin'] },
@@ -53,28 +62,68 @@ export default class EclassCommand extends MonkaSubCommand {
   }
 
   public async list(message: GuildMessage, args: Args): Promise<void> {
-    // TODO: Add more filters (by prof, by date (before/after), by subject, by classRole)
-    // TODO: Add ability to combine filters (even status filters)
+    // TODO: Add filter by date (before/after)
+    // TODO: Add ability to combine same filters with each-other
     const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: message.guild.id });
-    const statusFilter = args.getFlags(...listFlags[EclassStatus.Planned]) ? EclassStatus.Planned
-      : args.getFlags(...listFlags[EclassStatus.InProgress]) ? EclassStatus.InProgress
-      : args.getFlags(...listFlags[EclassStatus.Finished]) ? EclassStatus.Finished
-      : args.getFlags(...listFlags[EclassStatus.Canceled]) ? EclassStatus.Canceled
-      : null;
-    const filteredClasses = eclasses
-      .filter(eclass => (Number.isInteger(statusFilter) ? eclass.status === statusFilter : true));
+
+    const filterDescriptions: string[] = [];
+    let statusValue: EclassStatus;
+    let professorValue: GuildMember;
+    let roleValue: Role;
+    let subjectValue: string;
+
+    const statusQuery = args.getOption(...listOptions.status);
+    if (statusQuery) {
+      statusValue = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
+      filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.statusesRaw[statusValue] }));
+    }
+
+    const professorQuery = args.getOption(...listOptions.professor);
+    if (professorQuery) {
+      professorValue = (await Resolvers.resolveMember(professorQuery, message.guild))?.value;
+      filterDescriptions.push(pupa(config.messages.professorFilter, { value: professorValue }));
+    }
+
+    const roleQuery = args.getOption(...listOptions.role);
+    if (roleQuery) {
+      roleValue = (await Resolvers.resolveRole(roleQuery, message.guild))?.value;
+      filterDescriptions.push(pupa(config.messages.roleFilter, { value: roleValue }));
+    }
+
+    const subjectQuery = args.getOption(...listOptions.subject);
+    if (subjectQuery) {
+      subjectValue = subjectQuery;
+      filterDescriptions.push(pupa(config.messages.subjectFilter, { value: subjectValue }));
+    }
+
+    const filterDescription = filterDescriptions.length > 0
+      ? pupa(config.messages.filterTitle, { filters: filterDescriptions.join('\n') })
+      : config.messages.noFilter;
+
+    const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [
+      (eclass): boolean => (isNullish(statusValue) ? true : eclass.status === statusValue),
+      (eclass): boolean => (isNullish(professorValue) ? true : eclass.professor === professorValue.id),
+      (eclass): boolean => (isNullish(roleValue) ? true : eclass.targetRole === roleValue.id),
+      (eclass): boolean => (isNullish(subjectValue)
+        ? true
+        : (eclass.subject.classCode === subjectValue || eclass.subject.name === subjectValue)),
+    ];
+    // Change the ".every" to ".some" to have a "OR" between the filters, rather than "AND".
+    const filteredClasses = eclasses.filter(eclass => filters.every(filt => filt(eclass)));
 
     const baseEmbed = new MessageEmbed()
       .setTitle(config.messages.listTitle)
       .setColor(settings.colors.default);
 
     if (filteredClasses.length === 0) {
-      await message.channel.send({ embeds: [baseEmbed.setDescription(config.messages.noClassesFound)] });
+      await message.channel.send({ embeds: [baseEmbed.setDescription(`${filterDescription}${config.messages.noClassesFound}`)] });
       return;
     }
 
     await new PaginatedMessageEmbedFields()
-      .setTemplate(baseEmbed.setDescription(config.messages.someClassesFound(filteredClasses.length)))
+      .setTemplate(
+        baseEmbed.setDescription(`${filterDescription}${config.messages.someClassesFound(filteredClasses.length)}`),
+      )
       .setItems(
         filteredClasses.map((eclass) => {
           const eclassInfos = {

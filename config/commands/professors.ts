@@ -41,7 +41,7 @@ export const eclass = {
       { name: 'Terminer un cours manuellement', value: '`!cours finish <ID-cours>`' },
       { name: 'Modifier un cours', value: '`!cours edit <ID-cours> <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
       { name: 'Annuler un cours', value: '`!cours cancel <ID-cours>`' },
-      { name: 'Liste des cours', value: '`!cours list`' },
+      { name: 'Liste des cours', value: '`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]`' },
       { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
       { name: "Page d'aide", value: '`!cours help`' },
     ],
@@ -50,6 +50,12 @@ export const eclass = {
     listTitle: 'Liste des cours',
     noClassesFound: "Aucune classe n'a été trouvée...",
     someClassesFound: (amount: number): string => `${amount} classe${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
+    filterTitle: 'Filtre(s) de recherche appliqué(s) :\n{filters}\n\n',
+    noFilter: 'Aucun filtre de recherche appliqué',
+    statusFilter: '• Statut : {value}',
+    professorFilter: '• Professeur : {value}',
+    roleFilter: '• Rôle : {value}',
+    subjectFilter: '• Matière : {value}',
     listFieldTitle: '{topic} ({subject.name})',
     listFieldDescription: stripIndent`
       :speech_left: <#{subject.textChannel}>
