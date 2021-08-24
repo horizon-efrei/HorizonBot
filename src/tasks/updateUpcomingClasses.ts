@@ -14,6 +14,14 @@ import { capitalize, nullop, splitText } from '@/utils';
 @ApplyOptions<TaskOptions>({ cron: '0 0 * * *' })
 export default class UpdateUpcomingClassesTask extends Task {
   public async run(): Promise<void> {
+    const allUpcomingClasses = await Eclass.find({
+      $and: [
+        { date: { $lte: dayjs().add(1, 'week').unix() * 1000 } },
+        { date: { $gte: Date.now() } },
+        { status: EclassStatus.Planned },
+      ],
+    });
+
     for (const guildId of this.container.client.guilds.cache.keys()) {
       const channel = await this.container.client.configManager.get(guildId, ConfigEntries.WeekUpcomingClasses);
       if (!channel) {
@@ -21,23 +29,14 @@ export default class UpdateUpcomingClassesTask extends Task {
         continue;
       }
 
-      const upcomingClasses = await Eclass.find({
-        $and: [
-          { date: { $lte: dayjs().add(1, 'week').unix() * 1000 } },
-          { date: { $gte: Date.now() } },
-          { status: EclassStatus.Planned },
-          { guild: guildId },
-        ],
-      });
+      const upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId);
 
       const content = this._generateUpcomingClassesMessage(upcomingClasses);
       const chunks = splitText(content);
 
       const allMessages = await channel.messages.fetch().catch(nullop);
       const allBotMessages = [
-        ...allMessages
-          .filter(msg => msg.author.id === this.container.client.id)
-          .values(),
+        ...(allMessages?.filter(msg => msg.author.id === this.container.client.id).values() ?? []),
       ].reverse();
 
       let i = 0;
@@ -46,14 +45,14 @@ export default class UpdateUpcomingClassesTask extends Task {
         if (allBotMessages[i]?.editable)
           await allBotMessages[i].edit(chunk);
         else
-          await channel.send(chunk);
+          await channel.send(chunk).then(async msg => await msg.crosspost());
         i++;
       }
 
       if (i < allBotMessages.length)
         allBotMessages.slice(i).map(async msg => await msg.delete());
 
-      this.container.logger.debug('[Upcoming Classes] Updated classes.');
+      this.container.logger.debug(`[Upcoming Classes] Updated classes in guild ${guildId}.`);
     }
   }
 
@@ -74,8 +73,8 @@ export default class UpdateUpcomingClassesTask extends Task {
         builder += `**${capitalize(begin.format('dddd DD/MM'))}**\n`;
 
         for (const eclass of classGroup) {
-          const beginHour = dayjs(eclass.date).hour().toString().padStart(2, '0');
-          const endHour = dayjs(eclass.end).hour().toString().padStart(2, '0');
+          const beginHour = dayjs(eclass.date).format('HH[h]mm');
+          const endHour = dayjs(eclass.end).format('HH[h]mm');
           builder += pupa(messages.upcomingClasses.classLine, { beginHour, endHour, eclass });
         }
         builder += '\n';
