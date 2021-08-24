@@ -1,4 +1,6 @@
+import type { Guild } from 'discord.js';
 import { Collection } from 'discord.js';
+import omit from 'lodash.omit';
 import Configuration from '@/models/configuration';
 import type MonkaClient from '@/structures/MonkaClient';
 import type { GuildTextBasedChannel } from '@/types';
@@ -18,6 +20,12 @@ export default class ConfigurationManager {
       { upsert: true },
     );
     this.channels.set(value.guild.id, { [channel]: value } as Record<ConfigEntries, GuildTextBasedChannel>);
+  }
+
+  public async remove(channel: ConfigEntries, guild: Guild): Promise<void> {
+    await Configuration.findOneAndDelete({ guild: guild.id, name: channel });
+    const channelsToKeep = omit(this.channels.get(guild.id), channel);
+    this.channels.set(guild.id, channelsToKeep as Record<ConfigEntries, GuildTextBasedChannel>);
   }
 
   public async get(guildID: string, channel: ConfigEntries): Promise<GuildTextBasedChannel> {
