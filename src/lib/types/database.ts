@@ -101,6 +101,7 @@ export interface SubjectBase {
   nameEnglish: string;
   slug: string;
   emoji: string;
+  emojiImage: string;
   classCode: string;
   moodleLink: string;
   teachingUnit: string;
@@ -108,10 +109,7 @@ export interface SubjectBase {
   textChannel: string;
   textDocsChannel?: string;
   voiceChannel?: string;
-  examDates?: {
-    ce?: string;
-    de?: string;
-  };
+  exams: Array<{ name: string; date: number }>;
 }
 
 /** Interface for the "Subject"'s mongoose document */

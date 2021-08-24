@@ -15,6 +15,10 @@ const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({
     type: String,
     required: true,
   },
+  emojiImage: {
+    type: String,
+    required: false,
+  },
   classCode: {
     type: String,
     required: true,
@@ -47,10 +51,10 @@ const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({
   voiceChannel: {
     type: String,
   },
-  examDates: {
-    ce: { type: String },
-    de: { type: String },
-  },
+  exams: [{
+    name: String,
+    date: Number,
+  }],
 }, { timestamps: true });
 
 export default model<SubjectDocument, SubjectModel>('Subject', SubjectSchema);
