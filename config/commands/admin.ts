@@ -27,7 +27,23 @@ export const setup = {
   },
   messages: {
     successfullyDefined: 'Salon définit avec succès !',
+    successfullyUndefined: 'Salon déréférencé avec succès !',
     unknown: 'Salon inconnu.',
+    associatedKeys: 'Les clés associées à ce salon sont : `{keys}`.',
+    noAssociatedKey: "Ce salon-là n'a pas de clé associé.",
+    associatedValue: 'Le salon associé est : <#{value}>.',
+    noAssociatedValue: "Cette clé n'a aucun salon associé",
+    listTitle: 'Liste des salons',
+    lineWithValue: '**{name}** : <#{value}>',
+    lineWithoutValue: '**{name}** : Aucune valeur associée',
+    helpEmbedTitle: 'Aide de la commande de setup',
+    helpEmbedDescription: [
+      { name: 'Définir un salon', value: '`!setup set <keyword> [salon=salon actuel]`' },
+      { name: 'Déréférencer un salon', value: '`!setup remove <keyword>`' },
+      { name: 'Informations sur un salon', value: '`!setup info [(keyword | salon)=salon actuel]`' },
+      { name: 'Liste des salons', value: '`!setup list`' },
+      { name: "Page d'aide", value: '`!setup help`' },
+    ],
   },
 };
 
