@@ -27,9 +27,9 @@ export type PrompterMessageResult = Omit<IMessagePrompterExplicitMessageReturn, 
 export type PrompterText = Record<'base' | 'invalid', string>;
 
 export enum SchoolYear {
-  L1 = 'l1',
-  L2 = 'l2',
-  L3 = 'l3',
+  L1 = 'L1',
+  L2 = 'L2',
+  L3 = 'L3',
 }
 
 export type AnnouncementSchoolYear = SchoolYear | 'general';

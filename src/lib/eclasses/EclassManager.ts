@@ -14,6 +14,7 @@ import type {
   GuildMessage,
   GuildTextBasedChannel,
 } from '@/types';
+import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
 import { massSend, noop } from '@/utils';
@@ -21,9 +22,9 @@ import { massSend, noop } from '@/utils';
 const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
 
 const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntries> = {
-  l1: ConfigEntries.ClassAnnouncementL1,
-  l2: ConfigEntries.ClassAnnouncementL2,
-  l3: ConfigEntries.ClassAnnouncementL3,
+  [SchoolYear.L1]: ConfigEntries.ClassAnnouncementL1,
+  [SchoolYear.L2]: ConfigEntries.ClassAnnouncementL2,
+  [SchoolYear.L3]: ConfigEntries.ClassAnnouncementL3,
   general: ConfigEntries.ClassAnnouncementGeneral,
 };
 

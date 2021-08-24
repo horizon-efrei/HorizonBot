@@ -269,15 +269,9 @@ export default class EclassInteractiveBuilder {
 
   private _buildStepsPreview(): string {
     return pupa(config.messages.createClassSetup.stepPreview, {
-        schoolYear: this.responses.subject
-          ? this.responses.subject.schoolYear.toUpperCase()
-          : this._emoteForStep(0),
-        subject: this.responses.subject
-          ? this.responses.subject.name
-          : this._emoteForStep(1),
-        topic: this.responses.topic
-          ? this.responses.topic
-          : this._emoteForStep(2),
+        schoolYear: this.responses.subject?.schoolYear ?? this._emoteForStep(0),
+        subject: this.responses.subject?.name ?? this._emoteForStep(1),
+        topic: this.responses.topic ?? this._emoteForStep(2),
         date: this.responses.date && this.step === 3
           ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDate)
           : this.responses.date
@@ -286,12 +280,8 @@ export default class EclassInteractiveBuilder {
         duration: this.responses.duration
           ? dayjs.duration(this.responses.duration * 1000).humanize()
           : this._emoteForStep(4),
-        professor: this.responses.professor
-          ? this.responses.professor
-          : this._emoteForStep(5),
-        role: this.responses.targetRole
-          ? this.responses.targetRole
-          : this._emoteForStep(6),
+          professor: this.responses.professor ?? this._emoteForStep(5),
+          role: this.responses.targetRole ?? this._emoteForStep(6),
         isRecorded: isNullish(this.responses.isRecorded)
           ? this._emoteForStep(7)
           : this.responses.isRecorded
