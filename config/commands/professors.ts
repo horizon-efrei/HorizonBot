@@ -52,7 +52,7 @@ export const eclass = {
     someClassesFound: (amount: number): string => `${amount} classe${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
     listFieldTitle: '{topic} ({subject.name})',
     listFieldDescription: stripIndent`
-      :speech_left: <#{classChannel}>
+      :speech_left: <#{subject.textChannel}>
       :bulb: {status}
       :calendar: Prévue <t:{date}:R>, dure {duration}, se termine à <t:{end}:t>
       :hash: \`{classId}\`
