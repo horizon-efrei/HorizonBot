@@ -1,7 +1,7 @@
 import { EmojiRegex } from '@sapphire/discord.js-utilities';
 import type { Result } from '@sapphire/framework';
 import { err, ok } from '@sapphire/framework';
-import { isNullish } from '@sapphire/pieces/node_modules/@sapphire/utilities';
+import { isNullish } from '@sapphire/utilities';
 import type { Guild } from 'discord.js';
 import nodeEmoji from 'node-emoji';
 
