@@ -76,13 +76,14 @@ export default class CodeCommand extends MonkaCommand {
       });
     }
 
-    // TODO(discord.js>=13.0.0): Replace with a reply.
-    await message.channel.send(pupa(config.messages.result, {
-      message,
-      lang,
-      cpuTime: response.data.cpuTime ?? 0,
-      memory: convertSize(response.data.memory),
-    }));
+    await message.reply(
+      pupa(config.messages.result, {
+        message,
+        lang,
+        cpuTime: response.data.cpuTime ?? 0,
+        memory: convertSize(response.data.memory),
+      }),
+    );
     // Ph (placeholder) prevents Discord from taking the first line as a language identifier for markdown and remove it
     await message.channel.send(`\`\`\`ph\n${response.data.output}\`\`\``);
   }
