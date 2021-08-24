@@ -14,6 +14,14 @@ export default {
     noClasses: 'Aucune séance de prévue !',
     classLine: '• {beginHour}h-{endHour}h: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
   },
+  classesCalendar: {
+    textChannel: 'Salon textuel : <#{textChannel}>',
+    textDocsChannel: ' • Documents : <#{textDocsChannel}>',
+    title: '{name}',
+    pretitle: '{teachingUnit} ({classCode}) - {schoolYear}',
+    classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic}',
+    body: '{baseInformations}\n{exams}\n\n**Cours à venir :**\n{classes}',
+  },
   antiSwear: {
     swearModAlert: stripIndent`
       {message.member} à dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte. Si ce message est inapproprié, réagissez avec :white_check_mark: à ce message pour le flagger.

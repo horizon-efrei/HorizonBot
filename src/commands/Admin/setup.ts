@@ -24,6 +24,7 @@ export default class SetupCommand extends MonkaCommand {
         await this.container.client.configManager.set(ConfigEntries.ModeratorFeedback, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
+
       case 'class-l1':
       case 'eclass-l1':
       case 'classe-l1':
@@ -67,6 +68,26 @@ export default class SetupCommand extends MonkaCommand {
         await this.container.client.configManager.set(ConfigEntries.WeekUpcomingClasses, channel);
         await message.channel.send(config.messages.successfullyDefined);
         break;
+
+      case 'calendrier-l1':
+      case 'calendar-l1':
+      case 'cal-l1':
+        await this.container.client.configManager.set(ConfigEntries.ClassCalendarL1, channel);
+        await message.channel.send(config.messages.successfullyDefined);
+        break;
+      case 'calendrier-l2':
+      case 'calendar-l2':
+      case 'cal-l2':
+        await this.container.client.configManager.set(ConfigEntries.ClassCalendarL2, channel);
+        await message.channel.send(config.messages.successfullyDefined);
+        break;
+      case 'calendrier-l3':
+      case 'calendar-l3':
+      case 'cal-l3':
+        await this.container.client.configManager.set(ConfigEntries.ClassCalendarL3, channel);
+        await message.channel.send(config.messages.successfullyDefined);
+        break;
+
       default:
         await message.channel.send(config.messages.unknown);
     }
