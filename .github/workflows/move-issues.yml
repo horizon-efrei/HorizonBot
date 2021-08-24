@@ -6,7 +6,7 @@ on:
 
 jobs:
   move-card:
-    if: ${{ github.event.label.name == format("priority{0} high", ":") && contains(github.event.issue.labels.*.name, format("status{0} approved", ":")) }}
+    if: ${{ startsWith(github.event.label.name, "priority") && endsWith(github.event.label.name, "high") && startsWith(github.event.issue.labels.*.name, "approved") }}
     runs-on: ubuntu-latest
     steps:
       - uses: alex-page/github-project-automation-plus@v0.8.1
