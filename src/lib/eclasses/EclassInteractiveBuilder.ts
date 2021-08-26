@@ -122,7 +122,7 @@ export default class EclassInteractiveBuilder {
     const collector = this.mainBotMessage.createMessageComponentCollector<ButtonInteraction>({ componentType: 'BUTTON' })
       .on('collect', async (interaction) => {
         if (interaction.customId === 'abort') {
-          await interaction.update({ embeds: [this._embed.setColor(settings.colors.orange)] });
+          await interaction.update({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
           await this.botMessagePrompt.edit(config.messages.prompts.stoppedPrompting);
           this.stopped = true;
         }
