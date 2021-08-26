@@ -239,6 +239,7 @@ export const eclass = {
       },
 
       stoppedPrompting: "Tu as bien abandonné la commande ! Aucun cours n'a été créé.",
+      promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucun cours n'a été créé.",
     },
   },
 };
@@ -367,6 +368,7 @@ export const subject = {
       },
 
       stoppedPrompting: "Tu as bien abandonné la commande ! Aucune matière n'a été créé.",
+      promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucune matière n'a été créée.",
     },
   },
 };

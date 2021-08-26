@@ -147,6 +147,8 @@ export default class SubjectInteractiveBuilder {
   private async _askPrompts(): Promise<void> {
     // 1. Ask for the targeted schoolyear
     const schoolYearInteraction = await this._makeSelectMenuStep(schoolYearMenu);
+    if (this.stopped)
+      return;
     this.responses.schoolYear = schoolYearInteraction.values.shift() as SchoolYear;
     this.step++;
     await this._updateStep(schoolYearInteraction);
@@ -156,6 +158,8 @@ export default class SubjectInteractiveBuilder {
 
     // 2. Ask for the teaching unit
     const teachingUnitInteraction = await this._makeSelectMenuStep(teachingUnitMenu);
+    if (this.stopped)
+      return;
     this.responses.teachingUnit = teachingUnitInteraction.values.shift() as TeachingUnit;
     this.step++;
     await this._updateStep(teachingUnitInteraction);
@@ -215,6 +219,11 @@ export default class SubjectInteractiveBuilder {
       componentType: component.type,
       time: 2 * 60 * 1000,
       filter: i => i.user.id === this.message.author.id && i.customId === component.customId && !this.stopped,
+    }).catch(async () => {
+      this.stopped = true;
+      await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
+      await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
+      return null;
     });
     this._actionRows.splice(1);
     return interaction;

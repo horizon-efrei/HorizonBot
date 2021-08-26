@@ -122,9 +122,9 @@ export default class EclassInteractiveBuilder {
     const collector = this.mainBotMessage.createMessageComponentCollector<ButtonInteraction>({ componentType: 'BUTTON' })
       .on('collect', async (interaction) => {
         if (interaction.customId === 'abort') {
+          this.stopped = true;
           await interaction.update({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
           await this.botMessagePrompt.edit(config.messages.prompts.stoppedPrompting);
-          this.stopped = true;
         }
       });
 
@@ -145,6 +145,9 @@ export default class EclassInteractiveBuilder {
   private async _askPrompts(): Promise<void> {
     // 1. Ask for the targeted schoolyear
     const schoolYearInteraction = await this._makeSelectMenuStep(schoolYearMenu);
+    if (this.stopped)
+      return;
+
     const schoolYear = schoolYearInteraction.values.shift() as SchoolYear;
     this.step++;
     await this._updateStep(schoolYearInteraction);
@@ -155,8 +158,10 @@ export default class EclassInteractiveBuilder {
     // 2. Ask for the subject
     const subjects = await Subject.find({ schoolYear });
     const subjectInteraction = await this._makeSelectMenuStep(getSubjectMenu(subjects));
-    const selectedSubjectCode = subjectInteraction.values.shift();
+    if (this.stopped)
+      return;
 
+    const selectedSubjectCode = subjectInteraction.values.shift();
     this.responses.subject = subjects.find(subject => subject.classCode === selectedSubjectCode);
     this.step++;
     await this._updateStep(subjectInteraction);
@@ -214,6 +219,8 @@ export default class EclassInteractiveBuilder {
     // 8. Ask whether the class will be recorded
     await this.botMessagePrompt.edit(config.messages.createClassSetup.promptMessageDropdown);
     const isRecordedInteraction = await this._makeSelectMenuStep(isRecordedMenu);
+    if (this.stopped)
+      return;
     this.responses.isRecorded = isRecordedInteraction.values.shift() === 'yes';
   }
 
@@ -225,6 +232,11 @@ export default class EclassInteractiveBuilder {
       componentType: component.type,
       time: 2 * 60 * 1000,
       filter: i => i.user.id === this.message.author.id && i.customId === component.customId && !this.stopped,
+    }).catch(async () => {
+      this.stopped = true;
+      await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
+      await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
+      return null;
     });
     this._actionRows.splice(1);
     return interaction;
