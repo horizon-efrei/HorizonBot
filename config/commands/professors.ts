@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { stripIndent } from 'common-tags';
 import type { MessageSelectOptionData } from 'discord.js';
 import { EclassStatus } from '@/types/database';
@@ -240,6 +239,134 @@ export const eclass = {
       },
 
       stoppedPrompting: "Tu as bien abandonné la commande ! Aucun cours n'a été créé.",
+    },
+  },
+};
+
+export const subject = {
+  options: {
+    aliases: ['subject', 'matière', 'matiere'],
+    description: stripIndent`
+      Commande permettant de créer une matière. Vous pouvez utiliser \`!subject create\` et vous laisser guider par le menu interactif qui apparaitra.
+      Pour plus d'informations sur comment utiliser cette commande, faites \`!subject help\`.
+    `,
+    enabled: true,
+    usage: 'subject <create|remove|list|help>',
+    examples: ['!cours subject', '!subject create', '!subject list'],
+  },
+  messages: {
+    // Global
+    invalidCode: "Le code cours entré n'est pas valide !",
+    unknownSubject: 'Impossible de trouver une matière correspondant à ce code cours',
+
+    // Help subcommand
+    helpEmbedTitle: 'Aide de la commande de matières',
+    helpEmbedDescription: [
+      { name: 'Créer une matière', value: '`!subject create`' },
+      { name: 'Supprimer une matière', value: '`!subject remove <code cours>`' },
+      { name: 'Liste des matières', value: '`!subject list`' },
+      { name: "Page d'aide", value: '`!subject help`' },
+    ],
+
+    // List subcommand
+    listTitle: 'Liste des matières',
+    noSubjectFound: "Aucune matière n'a été trouvée...",
+    someSubjectsFound: (amount: number): string => `${amount} matière${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
+    listFieldTitle: '{emoji} {name} ({schoolYear})',
+    listFieldDescription: stripIndent`
+      {classCode} - {teachingUnit}
+      [Moodle]({moodleLink})
+      Salons : {channels}
+    `,
+
+    // Create subcommand
+    successfullyCreated: 'La matière a bien été créée !',
+    alreadyExists: 'Une matière avec le même code-cours existe déjà !',
+
+    createSubjectSetup: {
+      embed: {
+        title: "Création d'une matière",
+        description: "Bienvenue dans l'assistant de création de matières. Suivez les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il vous sera demandé. Vous pouvez, à tous moment, abandonner la création de la matière en cliquant sur \"Abandonner\".",
+        stepPreviewTitle: 'Aperçu des étapes',
+        stepPreviewDescription: 'Aperçu des étapes',
+        currentStepTitle: 'Étape actuelle : {step}',
+        currentStepDescription: [
+          'Choisissez dans le menu déroulant ci-dessous quelle promotion votre matière vise.',
+          "Choisissez dans le menu déroulant ci-dessous dans quelle UE votre matière s'inscrit.",
+          'Envoyez un message contenant le nom de votre matière.',
+          'Envoyez un message contenant le nom en anglais (pour les INTs) de votre matière.',
+          'Envoyez un message contenant le code cours de votre matière (par exemple "TI403" ou "SM204").',
+          'Envoyez un message contenant le lien moodle de votre matière.',
+          'Envoyez un message contenant le salon textuel associé à votre matière.',
+          'Envoyez un message contenant un émoji représentant votre matière.',
+          'Terminé !',
+        ],
+      },
+      promptMessageDropdown: 'Choisissez une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
+      stepPreview: stripIndent`
+        **1.** __Promotion :__ {schoolYear}
+        **2.** __UE :__ {teachingUnit}
+        **3.** __Nom :__ {name}
+        **4.** __Nom anglais :__ {nameEnglish}
+        **5.** __Code cours :__ {classCode}
+        **6.** __Moodle :__ {moodleLink}
+        **7.** __Salon :__ {textChannel}
+        **8.** __Emoji :__ {emoji}
+      `,
+      schoolYearMenu: {
+        placeholder: 'Aucune année sélectionnée',
+        options: [
+          { label: 'L1 - Promo 2026', emoji: '1⃣' },
+          { label: 'L2 - Promo 2025', emoji: '2⃣' },
+          { label: 'L3 - Promo 2024', emoji: '3⃣' },
+        ] as Array<Omit<MessageSelectOptionData, 'value'>>,
+      },
+      teachingUnitMenu: {
+        placeholder: 'Aucune UE sélectionnée',
+        options: [
+          { label: 'Formation Générale', emoji: '🧑‍🎓' },
+          { label: 'Informatique', emoji: '💻' },
+          { label: 'Mathématiques', emoji: '🔢' },
+          { label: 'Physique & Électronique', emoji: '🔋' },
+        ] as Array<Omit<MessageSelectOptionData, 'value'>>,
+      },
+      abortMenu: {
+        label: 'Abandonner',
+      },
+    },
+
+    // Remove subcommand
+    successfullyRemoved: 'La matière a bien été supprimée !',
+    removalFailed: "La matière n'a **pas** pu être supprimée, car elle est utilisée par {amount} cours. Si la supprimer est une nécessité, contactez un administrateur pour faire cette action manuellement.",
+
+    // Prompts
+    prompts: {
+      name: {
+        base: 'Entrez le nom de la matière que vous souhaitez ajouter :',
+        invalid: 'Ce nom de matière est invalide.',
+      },
+      englishName: {
+        base: 'Entrez le nom de la matière que vous souhaitez ajouter, en anglais (pour les classes INTs) :',
+        invalid: 'Ce nom de matière est invalide.',
+      },
+      classCode: {
+        base: 'Entrez le code cours de la matière que vous souhaitez ajouter (par exemple "TI403" ou "SM204") :',
+        invalid: 'Cette code cours est invalide.',
+      },
+      moodleLink: {
+        base: 'Entrez le lien moodle de la matière que vous souhaitez ajouter. Sélectionner le lien moodle de la matière pour les classes classique (pas INT, ni renforcé, ni bordeaux...) :',
+        invalid: 'Ce lien est invalide.',
+      },
+      textChannel: {
+        base: 'Entrez le salon textuel associé à votre matière (mentionnez le, ou entrez son nom ou son ID) :',
+        invalid: 'Ce salon textuel est invalide.',
+      },
+      emoji: {
+        base: "Entrez l'émoji qui correspond au mieux à la matière que vous ajoutez :",
+        invalid: 'Cet émoji est invalide.',
+      },
+
+      stoppedPrompting: "Tu as bien abandonné la commande ! Aucune matière n'a été créé.",
     },
   },
 };
