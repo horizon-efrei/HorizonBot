@@ -1,6 +1,6 @@
 import type { GuildMember } from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
-import type { SchoolYear } from '@/types';
+import type { SchoolYear, TeachingUnit } from '@/types';
 
 /* ****************************** */
 /*  Configuration Database Types  */
@@ -107,7 +107,7 @@ export interface SubjectBase {
   emojiImage: string;
   classCode: string;
   moodleLink: string;
-  teachingUnit: string;
+  teachingUnit: TeachingUnit;
   schoolYear: SchoolYear;
   textChannel: string;
   textDocsChannel?: string;

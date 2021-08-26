@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { SchoolYear } from '@/types';
+import { SchoolYear, TeachingUnit } from '@/types';
 import type { SubjectDocument, SubjectModel } from '@/types/database';
 
 const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({
@@ -34,6 +34,7 @@ const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({
   },
   teachingUnit: {
     type: String,
+    enum: TeachingUnit,
     required: true,
   },
   schoolYear: {

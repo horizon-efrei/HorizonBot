@@ -32,6 +32,13 @@ export enum SchoolYear {
   L3 = 'L3',
 }
 
+export enum TeachingUnit {
+  GeneralFormation = 'Formation Générale',
+  ComputerScience = 'Informatique',
+  Mathematics = 'Mathématiques',
+  PhyisicsElectronics = 'Physique & Électronique',
+}
+
 export type AnnouncementSchoolYear = SchoolYear | 'general';
 export interface EclassCreationOptions {
   date: Date;
