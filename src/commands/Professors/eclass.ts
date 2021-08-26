@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/member-ordering */
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Args, Resolvers } from '@sapphire/framework';
@@ -59,98 +58,6 @@ export default class EclassCommand extends MonkaSubCommand {
     if (!responses)
       return;
     await EclassManager.createClass(message, responses);
-  }
-
-  public async list(message: GuildMessage, args: Args): Promise<void> {
-    // TODO: Add filter by date (before/after)
-    // TODO: Add ability to combine same filters with each-other
-    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: message.guild.id });
-
-    const filterDescriptions: string[] = [];
-    let statusValue: EclassStatus;
-    let professorValue: GuildMember;
-    let roleValue: Role;
-    let subjectValue: string;
-
-    const statusQuery = args.getOption(...listOptions.status);
-    if (statusQuery) {
-      statusValue = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
-      filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.rawStatuses[statusValue] }));
-    }
-
-    const professorQuery = args.getOption(...listOptions.professor);
-    if (professorQuery) {
-      professorValue = (await Resolvers.resolveMember(professorQuery, message.guild))?.value;
-      filterDescriptions.push(pupa(config.messages.professorFilter, { value: professorValue }));
-    }
-
-    const roleQuery = args.getOption(...listOptions.role);
-    if (roleQuery) {
-      roleValue = (await Resolvers.resolveRole(roleQuery, message.guild))?.value;
-      filterDescriptions.push(pupa(config.messages.roleFilter, { value: roleValue }));
-    }
-
-    const subjectQuery = args.getOption(...listOptions.subject);
-    if (subjectQuery) {
-      subjectValue = subjectQuery;
-      filterDescriptions.push(pupa(config.messages.subjectFilter, { value: subjectValue }));
-    }
-
-    const filterDescription = filterDescriptions.length > 0
-      ? pupa(config.messages.filterTitle, { filters: filterDescriptions.join('\n') })
-      : config.messages.noFilter;
-
-    const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [
-      (eclass): boolean => (isNullish(statusValue) ? true : eclass.status === statusValue),
-      (eclass): boolean => (isNullish(professorValue) ? true : eclass.professor === professorValue.id),
-      (eclass): boolean => (isNullish(roleValue) ? true : eclass.targetRole === roleValue.id),
-      (eclass): boolean => (isNullish(subjectValue)
-        ? true
-        : (eclass.subject.classCode === subjectValue || eclass.subject.name === subjectValue)),
-    ];
-    // Change the ".every" to ".some" to have a "OR" between the filters, rather than "AND".
-    const filteredClasses = eclasses.filter(eclass => filters.every(filt => filt(eclass)));
-
-    const baseEmbed = new MessageEmbed()
-      .setTitle(config.messages.listTitle)
-      .setColor(settings.colors.default);
-
-    if (filteredClasses.length === 0) {
-      await message.channel.send({ embeds: [baseEmbed.setDescription(`${filterDescription}${config.messages.noClassesFound}`)] });
-      return;
-    }
-
-    await new PaginatedMessageEmbedFields()
-      .setTemplate(
-        baseEmbed.setDescription(`${filterDescription}${config.messages.someClassesFound(filteredClasses.length)}`),
-      )
-      .setItems(
-        filteredClasses.map((eclass) => {
-          const eclassInfos = {
-            ...eclass.toJSON(),
-            status: capitalize(config.messages.rawStatuses[eclass.status]),
-            date: Math.floor(eclass.date / 1000),
-            duration: dayjs.duration(eclass.duration).humanize(),
-            end: Math.floor(eclass.end / 1000),
-          };
-          return {
-            name: pupa(config.messages.listFieldTitle, eclassInfos),
-            value: pupa(config.messages.listFieldDescription, eclassInfos),
-          };
-        }),
-      )
-      .setItemsPerPage(3)
-      .make()
-      .run(message, message.author);
-  }
-
-  public async help(message: GuildMessage, _args: Args): Promise<void> {
-    const embed = new MessageEmbed()
-      .setTitle(config.messages.helpEmbedTitle)
-      .addFields(config.messages.helpEmbedDescription)
-      .setColor(settings.colors.default);
-
-    await message.channel.send({ embeds: [embed] });
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
@@ -421,5 +328,97 @@ export default class EclassCommand extends MonkaSubCommand {
     // Change the URL & confirm
     await EclassManager.setRecordLink(eclass, link.value.toString());
     await message.channel.send(config.messages.successfullyAddedLink);
+  }
+
+  public async list(message: GuildMessage, args: Args): Promise<void> {
+    // TODO: Add filter by date (before/after)
+    // TODO: Add ability to combine same filters with each-other
+    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: message.guild.id });
+
+    const filterDescriptions: string[] = [];
+    let statusValue: EclassStatus;
+    let professorValue: GuildMember;
+    let roleValue: Role;
+    let subjectValue: string;
+
+    const statusQuery = args.getOption(...listOptions.status);
+    if (statusQuery) {
+      statusValue = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
+      filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.rawStatuses[statusValue] }));
+    }
+
+    const professorQuery = args.getOption(...listOptions.professor);
+    if (professorQuery) {
+      professorValue = (await Resolvers.resolveMember(professorQuery, message.guild))?.value;
+      filterDescriptions.push(pupa(config.messages.professorFilter, { value: professorValue }));
+    }
+
+    const roleQuery = args.getOption(...listOptions.role);
+    if (roleQuery) {
+      roleValue = (await Resolvers.resolveRole(roleQuery, message.guild))?.value;
+      filterDescriptions.push(pupa(config.messages.roleFilter, { value: roleValue }));
+    }
+
+    const subjectQuery = args.getOption(...listOptions.subject);
+    if (subjectQuery) {
+      subjectValue = subjectQuery;
+      filterDescriptions.push(pupa(config.messages.subjectFilter, { value: subjectValue }));
+    }
+
+    const filterDescription = filterDescriptions.length > 0
+      ? pupa(config.messages.filterTitle, { filters: filterDescriptions.join('\n') })
+      : config.messages.noFilter;
+
+    const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [
+      (eclass): boolean => (isNullish(statusValue) ? true : eclass.status === statusValue),
+      (eclass): boolean => (isNullish(professorValue) ? true : eclass.professor === professorValue.id),
+      (eclass): boolean => (isNullish(roleValue) ? true : eclass.targetRole === roleValue.id),
+      (eclass): boolean => (isNullish(subjectValue)
+        ? true
+        : (eclass.subject.classCode === subjectValue || eclass.subject.name === subjectValue)),
+    ];
+    // Change the ".every" to ".some" to have a "OR" between the filters, rather than "AND".
+    const filteredClasses = eclasses.filter(eclass => filters.every(filt => filt(eclass)));
+
+    const baseEmbed = new MessageEmbed()
+      .setTitle(config.messages.listTitle)
+      .setColor(settings.colors.default);
+
+    if (filteredClasses.length === 0) {
+      await message.channel.send({ embeds: [baseEmbed.setDescription(`${filterDescription}${config.messages.noClassesFound}`)] });
+      return;
+    }
+
+    await new PaginatedMessageEmbedFields()
+      .setTemplate(
+        baseEmbed.setDescription(`${filterDescription}${config.messages.someClassesFound(filteredClasses.length)}`),
+      )
+      .setItems(
+        filteredClasses.map((eclass) => {
+          const eclassInfos = {
+            ...eclass.toJSON(),
+            status: capitalize(config.messages.rawStatuses[eclass.status]),
+            date: Math.floor(eclass.date / 1000),
+            duration: dayjs.duration(eclass.duration).humanize(),
+            end: Math.floor(eclass.end / 1000),
+          };
+          return {
+            name: pupa(config.messages.listFieldTitle, eclassInfos),
+            value: pupa(config.messages.listFieldDescription, eclassInfos),
+          };
+        }),
+      )
+      .setItemsPerPage(3)
+      .make()
+      .run(message, message.author);
+  }
+
+  public async help(message: GuildMessage, _args: Args): Promise<void> {
+    const embed = new MessageEmbed()
+      .setTitle(config.messages.helpEmbedTitle)
+      .addFields(config.messages.helpEmbedDescription)
+      .setColor(settings.colors.default);
+
+    await message.channel.send({ embeds: [embed] });
   }
 }
