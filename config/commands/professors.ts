@@ -7,14 +7,15 @@ export const eclass = {
   options: {
     aliases: ['cours', 'class', 'ecours', 'eclass', 'e-cours', 'e-class'],
     description: stripIndent`
-      Commande permettant de créer un cours. Vous pouvez utiliser \`!cours create\` ou \`!cours add\` suivit de tous les arguments nécessaires (\`!cours help\`), ou vous laisser guider par \`!cours setup\`.
+      Commande permettant de créer un cours. Vous pouvez utiliser \`!cours create\` et vous laisser guider par le menu interactif qui apparaitra.
       Quand le cours sera créé, des messages seront envoyés dans les bons salons pour prévenir les membres, et un rôle spécial sera créé pour que les personnes voulant assister au cours puissent être notifiées.
-      Vous pourrez ensuite lancer le cours manuellement avec \`!cours start @role-spécial\`. Le cours s'arrêtera au bout de la durée spécifiée. S'il se finit avant, vous pouvez l'arrêter manuellement avec \`cours finish @role-spécial\`.
+      Le cours se lancera tout seul à l'heure indiquée (ou jusqu'à 2 minutes après). Sinon, vous pouvez le lancer manuellement avec \`!cours start <ID cours>\`.
+      Le cours s'arrêtera au bout de la durée spécifiée. S'il se finit avant, vous pouvez l'arrêter manuellement avec \`!cours finish <ID cours>\`.
       Pour plus d'informations sur comment utiliser cette commande, faites \`!cours help\`.
     `,
     enabled: true,
-    usage: 'cours <add|setup|start|finish|edit|cancel|list|help>',
-    examples: ['!cours setup', '!cours add #⚡-electricité-générale "Low and High pass filters" 24/04 20h30 2h15 @professeur @L1', '!cours start'],
+    usage: 'cours <create|start|finish|edit|cancel|list|help>',
+    examples: ['!cours setup', '!cours list', '!cours start pierre_232623082021_jneh'],
   },
   messages: {
     // Global
