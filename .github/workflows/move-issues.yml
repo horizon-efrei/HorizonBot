@@ -6,11 +6,11 @@ on:
 
 jobs:
   move-card:
-    if: ${{ startsWith(github.event.label.name, "priority") && endsWith(github.event.label.name, "high") && startsWith(github.event.issue.labels.*.name, "approved") }}
     runs-on: ubuntu-latest
     steps:
-      - uses: alex-page/github-project-automation-plus@v0.8.1
+      - uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
         with:
-          project: MonkaBot
-          column: Priority
-          repo-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          project-url: "https://github.com/orgs/github/projects/1"
+          column-name: "Priority"
+          label-name: "priority: high"
+          action-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
