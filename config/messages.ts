@@ -1,8 +1,15 @@
+import { Identifiers } from '@sapphire/framework';
 import { oneLine, stripIndent } from 'common-tags';
 
 export default {
   global: {
     oops: ":warning: Oups... Quelque chose s'est mal passé en réalisant cette action. Il se peut qu'elle ne se soit pas complètement terminée, voire pas commencée. Désolé !",
+  },
+  errors: {
+    precondition: {
+      [Identifiers.PreconditionStaffOnly]: ":x: Aïe, tu n'as pas la permission de faire cela :confused:",
+      unknownError: "Une pré-condition de commande inconnue vous empêche d'effectuer cette action.",
+    },
   },
   miscellaneous: {
     eprofMentionPublic: '{eProf} nous avons besoin de toi !',

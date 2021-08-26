@@ -25,6 +25,15 @@ declare module '@sapphire/framework' {
     tasks: TaskStore;
   }
 
+  const enum Identifiers {
+    PreconditionStaffOnly = 'preconditionStaffOnly',
+  }
+
+  interface Preconditions {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    StaffOnly: never;
+  }
+
   interface Args {
     pickResult<T>(type: IArgument<T>, options?: ArgOptions): Promise<Result<T, ArgumentError>>;
     pickResult<K extends keyof ArgType>(type: K, options?: ArgOptions): Promise<Result<ArgType[K], ArgumentError>>;
