@@ -7,6 +7,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({
   ...config.options,
+  preconditions: ['StaffOnly'],
   flags: ['keep'],
 })
 export default class PingRoleIntersectionCommand extends MonkaCommand {

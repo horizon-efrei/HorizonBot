@@ -18,6 +18,7 @@ import { generateSubcommands } from '@/utils';
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
+  preconditions: ['StaffOnly'],
   subCommands: generateSubcommands({
     add: { aliases: ['create'] },
     list: { aliases: ['liste', 'show'] },

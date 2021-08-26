@@ -28,6 +28,7 @@ import {
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
+  preconditions: ['StaffOnly'],
   subCommands: generateSubcommands({
     start: { aliases: ['make', 'setup', 'create', 'add'] },
     list: { aliases: ['liste', 'show'] },

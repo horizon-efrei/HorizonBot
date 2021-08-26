@@ -29,6 +29,7 @@ const wraps = new Map([
       bucketType: BucketScope.User,
       delay: 60_000,
       limit: 3,
+      silent: true,
     },
   }],
 })

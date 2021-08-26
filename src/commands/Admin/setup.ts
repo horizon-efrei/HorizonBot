@@ -45,6 +45,7 @@ const argNames = [{
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
+  preconditions: ['StaffOnly'],
   subCommands: generateSubcommands({
     define: { aliases: ['set', 'create', 'add'] },
     see: { aliases: ['get', 'info'] },
