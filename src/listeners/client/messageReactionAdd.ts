@@ -6,8 +6,8 @@ import settings from '@/config/settings';
 import EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
+import Subject from '@/models/subject';
 import FlaggedMessage from '@/structures/FlaggedMessage';
-import Profs from '@/structures/profs';
 import type { GuildMessage } from '@/types';
 import { noop } from '@/utils';
 
@@ -124,13 +124,19 @@ export default class MessageReactionAddListener extends Listener {
     member: GuildMember,
     message: GuildMessage,
   ): Promise<void> {
-    const eProfRoleId = Profs.findProf(message.channel.id);
+    const subject = await Subject.findOne({
+      $or: [
+        { textChannel: message.channel.id },
+        { textDocsChannel: message.channel.id },
+      ],
+    });
+    const eProfRoleId = settings.roles.eprofs[subject.teachingUnit];
     if (!eProfRoleId)
       return;
     const eProf = message.guild.roles.cache
       .get(eProfRoleId)
       .members
-      .filter(mbr => mbr.presence.status !== 'online')
+      .filter(mbr => mbr.presence.status === 'online')
       .random();
 
     await message.channel.send(pupa(messages.miscellaneous.eprofMentionPublic, { eProf }));

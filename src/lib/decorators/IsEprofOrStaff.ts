@@ -28,7 +28,7 @@ export default function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDec
       }
 
       // Check if the user is not an eprof
-      if (!message.member.roles.cache.has(settings.roles.eprof)) {
+      if (!message.member.roles.cache.has(settings.roles.eprofs.global)) {
         await message.channel.send(config.messages.onlyProfessor);
         return;
       }

@@ -1,5 +1,6 @@
 import type { ColorResolvable } from 'discord.js';
 import type { CodeLanguageResult } from '@/types';
+import { TeachingUnit } from '@/types';
 
 export default {
   prefix: '!',
@@ -25,22 +26,16 @@ export default {
     eclassRoleFormat: '{subject.name}: {topic} ({formattedDate})',
     eclassReminderTime: 15 * 60 * 1000, // 15 minutes
   },
-  channels: {
-    eProfsId: {
-      info: '',
-      maths: '',
-      physique: '',
-    },
-    matieresId: {
-      info: ['799660807881359380', '799660606525407232', '694637242496450582', '836219855833268227', '799660540011216896'],
-      maths: ['694637521254219839', '808432914287165471', '808432941301760062'],
-      physique: ['808432662732996628', '808432809697345606', '808432842249076808'],
-    },
-  },
+  // TODO: Move that to per-guild configuration (managed by ConfigurationManager)
   roles: {
-    // TODO: Move that to per-guild configuration (managed by ConfigurationManager)
-    staff: '822900204742770749',
-    eprof: '838842486498656307',
+    staff: '879311863970684962',
+    eprofs: {
+      global: '879311863958089731',
+      [TeachingUnit.ComputerScience]: '879311863937105948',
+      [TeachingUnit.GeneralFormation]: '879311863937105947',
+      [TeachingUnit.Mathematics]: '879311863937105950',
+      [TeachingUnit.PhyisicsElectronics]: '879311863937105949',
+    },
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',
