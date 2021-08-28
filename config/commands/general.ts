@@ -20,6 +20,7 @@ export const code = {
     unknownLanguage: 'Le langage que tu as spécifié (`{parameter}`) est invalide. Il se peut que je ne le supporte pas ou que tu ais oublié de le spécifier.',
     noCode: "Tu as oublié d'ajouter du code à exécuter !",
     result: "Résultat de l'éxecution du code de {message.member} en {lang.value.display}. (Temps CPU : {cpuTime} / Memoire : {memory})",
+    creditStatus: "Crédits restant pour aujourd'hui : {remaining}",
     informationBlock: stripIndent`
       Abbréviations : {formattedSlugs}
       Version : {lang.version}

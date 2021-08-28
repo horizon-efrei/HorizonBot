@@ -1,14 +1,15 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions } from '@sapphire/framework';
+import type { Args } from '@sapphire/framework';
 import { BucketScope } from '@sapphire/framework';
+import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
+import MonkaSubCommand from '@/app/lib/structures/commands/MonkaSubCommand';
 import { code as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import MonkaCommand from '@/structures/commands/MonkaCommand';
 import type { GuildMessage } from '@/types';
-import { convertSize } from '@/utils';
+import { convertSize, generateSubcommands } from '@/utils';
 
 const wraps = new Map([
   ['c', '#include <stdio.h>\n#include <stdlib.h>\nint main() { {code} }'],
@@ -17,7 +18,7 @@ const wraps = new Map([
   ['javascript', ';(async () => { {code} } )();'],
 ]);
 
-@ApplyOptions<CommandOptions>({
+@ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   quotes: [],
   flags: ['wrap'],
@@ -32,9 +33,13 @@ const wraps = new Map([
       silent: true,
     },
   }],
+  subCommands: generateSubcommands({
+    information: { aliases: ['info', 'infos', 'informations', 'list', 'liste', 'ls'] },
+    main: { aliases: [], default: true },
+  }),
 })
-export default class CodeCommand extends MonkaCommand {
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+export default class CodeCommand extends MonkaSubCommand {
+  public async main(message: GuildMessage, args: Args): Promise<void> {
     if (this.container.client.remainingCompilerApiCredits <= 0) {
       await message.channel.send(config.messages.noMoreCredits);
       return;
@@ -42,10 +47,6 @@ export default class CodeCommand extends MonkaCommand {
 
     const lang = await args.pickResult('codeLanguage');
     if (lang.error) {
-      if (['info', 'infos', 'information', 'informations'].includes(lang.error.parameter)) {
-        await this._showInfos(message);
-        return;
-      }
       await message.channel.send(pupa(config.messages.unknownLanguage, { parameter: lang.error.parameter }));
       return;
     }
@@ -89,9 +90,11 @@ export default class CodeCommand extends MonkaCommand {
     await message.channel.send(`\`\`\`ph\n${response.data.output}\`\`\``);
   }
 
-  private async _showInfos(message: GuildMessage): Promise<void> {
+  public async information(message: GuildMessage, _args: Args): Promise<void> {
+    const remaining = this.container.client.remainingCompilerApiCredits;
     const embed = new MessageEmbed()
       .setColor(settings.colors.default)
+      .setDescription(pupa(config.messages.creditStatus, { remaining }))
       .addFields(
         settings.languages.map(lang => ({
           name: lang.display,
