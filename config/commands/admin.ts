@@ -1,5 +1,18 @@
 import { stripIndents } from 'common-tags';
 
+export const limits = {
+  options: {
+    aliases: ['limit', 'limits', 'limite', 'limites'],
+    description: 'Permet de consulter le nombre de salons et de rôles actuel, par rapport aux limites imposées par Discord ; à savoir 500 salons maximum et 250 rôles maximum.',
+    enabled: true,
+    usage: 'limits',
+    examples: ['limits'],
+  },
+  messages: {
+    limits: 'Salons : {channels}/500 (reste {channelsLeft})\nRôles : {roles}/250 (reste {rolesLeft})',
+  },
+};
+
 export const pingRoleIntersection = {
   options: {
     aliases: ['intersects', 'intersect', 'inter'],
@@ -14,36 +27,6 @@ export const pingRoleIntersection = {
     noTargetedUsers: "Personne n'a ces {num} rôles à la fois dans ce serveur, il n'a donc pas été créé.",
     successTemporary: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s). Il sera supprimé juste après sa première utilisation.',
     successPersistent: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s).',
-  },
-};
-
-export const setup = {
-  options: {
-    aliases: ['setup', 'config', 'configure', 'define'],
-    description: 'Permet de définir les salons particuliers que MonkaBot peut utiliser pour envoyer des messages.',
-    enabled: true,
-    usage: 'setup [salon]',
-    examples: ['setup mod'],
-  },
-  messages: {
-    successfullyDefined: 'Salon définit avec succès !',
-    successfullyUndefined: 'Salon déréférencé avec succès !',
-    unknown: 'Salon inconnu.',
-    associatedKeys: 'Les clés associées à ce salon sont : `{keys}`.',
-    noAssociatedKey: "Ce salon-là n'a pas de clé associé.",
-    associatedValue: 'Le salon associé est : <#{value}>.',
-    noAssociatedValue: "Cette clé n'a aucun salon associé",
-    listTitle: 'Liste des salons',
-    lineWithValue: '**{name}** : <#{value}>',
-    lineWithoutValue: '**{name}** : Aucune valeur associée',
-    helpEmbedTitle: 'Aide de la commande de setup',
-    helpEmbedDescription: [
-      { name: 'Définir un salon', value: '`!setup set <keyword> [salon=salon actuel]`' },
-      { name: 'Déréférencer un salon', value: '`!setup remove <keyword>`' },
-      { name: 'Informations sur un salon', value: '`!setup info [(keyword | salon)=salon actuel]`' },
-      { name: 'Liste des salons', value: '`!setup list`' },
-      { name: "Page d'aide", value: '`!setup help`' },
-    ],
   },
 };
 
@@ -115,6 +98,36 @@ export const reactionRole = {
       { name: 'Ajouter une paire à un menu', value: '`rr addpair <identifiant du message> <emoji> <role>`' },
       { name: "Enlever une paire d'un menu", value: '`rr removepair <identifiant du message> <role>`' },
       { name: "Page d'aide", value: '`rr help`' },
+    ],
+  },
+};
+
+export const setup = {
+  options: {
+    aliases: ['setup', 'config', 'configure', 'define'],
+    description: 'Permet de définir les salons particuliers que MonkaBot peut utiliser pour envoyer des messages.',
+    enabled: true,
+    usage: 'setup [salon]',
+    examples: ['setup mod'],
+  },
+  messages: {
+    successfullyDefined: 'Salon définit avec succès !',
+    successfullyUndefined: 'Salon déréférencé avec succès !',
+    unknown: 'Salon inconnu.',
+    associatedKeys: 'Les clés associées à ce salon sont : `{keys}`.',
+    noAssociatedKey: "Ce salon-là n'a pas de clé associé.",
+    associatedValue: 'Le salon associé est : <#{value}>.',
+    noAssociatedValue: "Cette clé n'a aucun salon associé",
+    listTitle: 'Liste des salons',
+    lineWithValue: '**{name}** : <#{value}>',
+    lineWithoutValue: '**{name}** : Aucune valeur associée',
+    helpEmbedTitle: 'Aide de la commande de setup',
+    helpEmbedDescription: [
+      { name: 'Définir un salon', value: '`!setup set <keyword> [salon=salon actuel]`' },
+      { name: 'Déréférencer un salon', value: '`!setup remove <keyword>`' },
+      { name: 'Informations sur un salon', value: '`!setup info [(keyword | salon)=salon actuel]`' },
+      { name: 'Liste des salons', value: '`!setup list`' },
+      { name: "Page d'aide", value: '`!setup help`' },
     ],
   },
 };
