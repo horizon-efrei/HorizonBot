@@ -88,7 +88,7 @@ export interface EclassPopulatedDocument extends EclassBaseDocument {
 
 /** Interface for the "Eclass"'s mongoose model */
 export interface EclassModel extends Model<EclassDocument> {
-  generateId(topic: string, professor: GuildMember, date: Date): string;
+  generateId(professor: GuildMember, date: Date): string;
 }
 // #endregion
 

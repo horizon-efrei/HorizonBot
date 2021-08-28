@@ -79,7 +79,7 @@ export default class EclassManager {
     const role = await message.guild.roles.create({ name: roleName, color: settings.colors.white, mentionable: true });
 
     // Add the class to the database
-    const classId = Eclass.generateId(topic, professor, date);
+    const classId = Eclass.generateId(professor, date);
     const eclass = await Eclass.create({
       classChannel: classChannel.id,
       guild: classChannel.guild.id,

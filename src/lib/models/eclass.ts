@@ -83,18 +83,11 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
   },
 }, { timestamps: true });
 
-const pad = (n: number): string => n.toString().padStart(2, '0');
 
-EclassSchema.statics.generateId = function (topic: string, professor: GuildMember, date: Date): string {
+EclassSchema.statics.generateId = function (professor: GuildMember, date: Date): string {
   return slug([
     slug(professor.displayName),
-    [
-      pad(date.getHours()),
-      pad(date.getMinutes()),
-      pad(date.getDate()),
-      pad(date.getMonth() + 1),
-      date.getFullYear(),
-    ].join(''),
+    dayjs(date).format('hhmmDDMMYYYY'),
     nanoid(4),
   ].join('_'), '_');
 };
