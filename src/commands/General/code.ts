@@ -5,9 +5,9 @@ import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommand
 import axios from 'axios';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
-import MonkaSubCommand from '@/app/lib/structures/commands/MonkaSubCommand';
 import { code as config } from '@/config/commands/general';
 import settings from '@/config/settings';
+import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
 import type { GuildMessage } from '@/types';
 import { convertSize, generateSubcommands } from '@/utils';
 
