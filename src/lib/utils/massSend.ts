@@ -9,8 +9,7 @@ export default async function massSend(guild: Guild, memberIds: string[], text: 
     if (shouldThrottle && i % 10 === 0 && i !== 0)
       await sleep(2000);
 
-    const member = guild.members.resolve(memberId)
-      ?? await guild.members.fetch({ user: memberId, cache: false }).catch(nullop);
+    const member = await guild.members.fetch({ user: memberId, cache: false }).catch(nullop);
     if (member)
       await member.send(text).catch(noop);
   }
