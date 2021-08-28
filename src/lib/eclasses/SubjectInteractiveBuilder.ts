@@ -47,7 +47,7 @@ const teachingUnitMenu = new MessageSelectMenu()
       value: TeachingUnit.ComputerScience,
     }, {
       ...config.messages.createSubjectSetup.teachingUnitMenu.options[3],
-      value: TeachingUnit.PhyisicsElectronics,
+      value: TeachingUnit.PhysicsElectronics,
   }]);
 
 interface SubjectCreationOptions {

@@ -9,7 +9,16 @@ import ReactionRole from '@/models/reactionRole';
 import Subject from '@/models/subject';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
+import { TeachingUnit } from '@/types';
+import { ConfigEntriesRoles } from '@/types/database';
 import { noop } from '@/utils';
+
+const teachingUnitEprofMapping = new Map([
+  [TeachingUnit.ComputerScience, ConfigEntriesRoles.EprofComputerScience],
+  [TeachingUnit.GeneralFormation, ConfigEntriesRoles.EprofGeneralFormation],
+  [TeachingUnit.Mathematics, ConfigEntriesRoles.EprofMathematics],
+  [TeachingUnit.PhysicsElectronics, ConfigEntriesRoles.EprofPhysicsElectronics],
+]);
 
 export default class MessageReactionAddListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
@@ -24,8 +33,9 @@ export default class MessageReactionAddListener extends Listener {
     }
 
     // If a moderator is flagging a message
+    const staffRole = await this.container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
     if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagMessageReaction
-      && member.roles.cache.has(settings.roles.staff))
+      && member.roles.cache.has(staffRole.id))
       await this._flagMessage(reaction, member, message);
 
     // If we are reacting to a reaction role
@@ -130,11 +140,12 @@ export default class MessageReactionAddListener extends Listener {
         { textDocsChannel: message.channel.id },
       ],
     });
-    const eProfRoleId = settings.roles.eprofs[subject.teachingUnit];
-    if (!eProfRoleId)
+    const eprofRoleIdEntry = teachingUnitEprofMapping.get(subject.teachingUnit);
+    const eprofRole = await this.container.client.configManager.get(eprofRoleIdEntry, message.guild.id);
+    if (!eprofRole)
       return;
     const eProf = message.guild.roles.cache
-      .get(eProfRoleId)
+      .get(eprofRole.id)
       .members
       .filter(mbr => mbr.presence.status === 'online')
       .random();

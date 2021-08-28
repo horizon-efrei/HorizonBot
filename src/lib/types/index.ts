@@ -36,7 +36,7 @@ export enum TeachingUnit {
   GeneralFormation = 'Formation Générale',
   ComputerScience = 'Informatique',
   Mathematics = 'Mathématiques',
-  PhyisicsElectronics = 'Physique & Électronique',
+  PhysicsElectronics = 'Physique & Électronique',
 }
 
 export type AnnouncementSchoolYear = SchoolYear | 'general';

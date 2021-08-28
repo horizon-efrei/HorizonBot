@@ -1,10 +1,11 @@
 import type { Args } from '@sapphire/framework';
+import { container } from '@sapphire/framework';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
-import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import type { GuildMessage } from '@/types';
 import type { EclassStatus } from '@/types/database';
+import { ConfigEntriesRoles } from '@/types/database';
 
 interface ValidationOptions {
   statusIn?: EclassStatus[];
@@ -30,7 +31,8 @@ export default function ValidateEclassArgument(options?: ValidationOptions): Met
       }
 
       // Check if the professor is the right one
-      if (message.member.id !== eclass.professor && !message.member.roles.cache.has(settings.roles.staff)) {
+      const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
+      if (message.member.id !== eclass.professor && !message.member.roles.cache.has(staffRole.id)) {
         await message.channel.send(config.messages.editUnauthorized);
         return;
       }

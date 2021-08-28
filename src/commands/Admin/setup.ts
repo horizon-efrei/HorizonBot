@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import type { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
-import { MessageEmbed } from 'discord.js';
+import { Formatters, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { setup as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
@@ -10,36 +10,69 @@ import Configuration from '@/models/configuration';
 import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
 import type { GuildMessage } from '@/types';
 import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
-import { ConfigEntriesChannels } from '@/types/database';
+import { ConfigEntriesChannels, ConfigEntriesRoles } from '@/types/database';
 import { generateSubcommands } from '@/utils';
 
-const argNames = [{
-  possibilities: ['moderator', 'moderators', 'moderateur', 'moderateurs', 'modo', 'modos', 'mod', 'mods'],
+const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry: ConfigEntries }> = [{
+  possibilities: ['moderator', 'moderateur', 'mod'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ModeratorFeedback,
 }, {
-  possibilities: ['class-l1', 'eclass-l1', 'classe-l1', 'eclasse-l1', 'cours-l1', 'ecours-l1'],
+  possibilities: ['class-l1', 'classe-l1', 'cours-l1'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ClassAnnouncementL1,
 }, {
-  possibilities: ['class-l2', 'eclass-l2', 'classe-l2', 'eclasse-l2', 'cours-l2', 'ecours-l2'],
+  possibilities: ['class-l2', 'classe-l2', 'cours-l2'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ClassAnnouncementL2,
 }, {
-  possibilities: ['class-l3', 'eclass-l3', 'classe-l3', 'eclasse-l3', 'cours-l3', 'ecours-l3'],
+  possibilities: ['class-l3', 'classe-l3', 'cours-l3'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ClassAnnouncementL3,
 }, {
-  possibilities: ['class-general', 'eclass-general', 'classe-general', 'eclasse-general', 'cours-general', 'ecours-general'],
+  possibilities: ['class-general', 'classe-general', 'cours-general'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ClassAnnouncementGeneral,
 }, {
-  possibilities: ['week-class', 'week-classes', 'week-upcoming-class', 'week-upcoming-classes'],
+  possibilities: ['week-class', 'week-upcoming-class', 'cours-semaine'],
+  type: 'channel',
   entry: ConfigEntriesChannels.WeekUpcomingClasses,
 }, {
   possibilities: ['calendrier-l1', 'calendar-l1', 'cal-l1'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ClassCalendarL1,
 }, {
   possibilities: ['calendrier-l2', 'calendar-l2', 'cal-l2'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ClassCalendarL2,
 }, {
   possibilities: ['calendrier-l3', 'calendar-l3', 'cal-l3'],
+  type: 'channel',
   entry: ConfigEntriesChannels.ClassCalendarL3,
+}, {
+  possibilities: ['role-staff', 'staff'],
+  type: 'role',
+  entry: ConfigEntriesRoles.Staff,
+}, {
+  possibilities: ['prof-info', 'eprof-info', 'prof-informatique', 'eprof-informatique'],
+  type: 'role',
+  entry: ConfigEntriesRoles.EprofComputerScience,
+}, {
+  possibilities: ['prof-maths', 'eprof-maths', 'prof-mathématiques', 'eprof-mathématiques'],
+  type: 'role',
+  entry: ConfigEntriesRoles.EprofMathematics,
+}, {
+  possibilities: ['prof-fg', 'eprof-fg', 'prof-formation-générale', 'eprof-formation-générale'],
+  type: 'role',
+  entry: ConfigEntriesRoles.EprofGeneralFormation,
+}, {
+  possibilities: ['prof-phy', 'eprof-phy', 'prof-physique-éléctronique', 'eprof-physique-éléctronique'],
+  type: 'role',
+  entry: ConfigEntriesRoles.EprofPhysicsElectronics,
+}, {
+  possibilities: ['prof', 'eprof', 'prof-general', 'eprof-general'],
+  type: 'role',
+  entry: ConfigEntriesRoles.Eprof,
 }];
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
@@ -58,14 +91,24 @@ export default class SetupCommand extends MonkaSubCommand {
   public async define(message: GuildMessage, args: Args): Promise<void> {
     const query = await args.pickResult('string');
     const matchArg = argNames.find(argName => argName.possibilities.includes(query.value));
+    if (!matchArg) {
+      await message.channel.send(config.messages.unknown);
+      return;
+    }
 
-    if (matchArg) {
+    if (matchArg.type === 'channel') {
       const channel = (await args.pickResult('guildTextBasedChannel'))?.value || message.channel;
       await this.container.client.configManager.set(matchArg.entry, channel);
-      await message.channel.send(config.messages.successfullyDefined);
-    } else {
-      await message.channel.send(config.messages.unknown);
+    } else if (matchArg.type === 'role') {
+      const role = (await args.pickResult('role'))?.value;
+      if (!role) {
+        await message.channel.send(config.messages.invalidRole);
+        return;
+      }
+      await this.container.client.configManager.set(matchArg.entry, role);
     }
+
+    await message.channel.send(config.messages.successfullyDefined);
   }
 
   public async remove(message: GuildMessage, args: Args): Promise<void> {
@@ -81,13 +124,13 @@ export default class SetupCommand extends MonkaSubCommand {
   }
 
   public async see(message: GuildMessage, args: Args): Promise<void> {
-    const queryChannel = await args.pickResult('guildTextBasedChannel');
+    const queryResolved = await args.pickResult('guildTextBasedChannel').catch(async () => args.pickResult('role'));
     const queryString = await args.pickResult('string');
 
-    if (queryChannel.success || queryString.error) {
-      const targetChannel = queryChannel.value ?? message.channel;
+    if (queryResolved.success || queryString.error) {
+      const targetValue = queryResolved.value ?? message.channel;
       // TODO: Improve configurationManager so we don't need to bypass it here
-      const entry = await Configuration.find({ guild: targetChannel.guild.id, value: targetChannel.id });
+      const entry = await Configuration.find({ guild: message.guild.id, value: targetValue.id });
       await message.channel.send(entry
         ? pupa(config.messages.associatedKeys, { keys: entry.map(e => e.name).join(' `, `') })
         : config.messages.noAssociatedKey);
@@ -99,7 +142,16 @@ export default class SetupCommand extends MonkaSubCommand {
       }
       const entry = await Configuration.findOne({ guild: message.guild.id, name: matchArg.entry });
       await message.channel.send(entry
-        ? pupa(config.messages.associatedValue, entry)
+        ? {
+            embeds: [
+              new MessageEmbed()
+                .setDescription(pupa(config.messages.associatedValue, {
+                  ...entry,
+                  // FIXME: Hackiest code in the west
+                  value: this._getMention(entry),
+                })),
+            ],
+          }
         : config.messages.noAssociatedValue);
     }
   }
@@ -114,7 +166,10 @@ export default class SetupCommand extends MonkaSubCommand {
       .setTitleField(config.messages.listTitle)
       .setTemplate(new MessageEmbed().setColor(settings.colors.default))
       .setItems(allEntriesFilled.map(([key, entry]) => ({ name: key, value: entry?.value })))
-      .formatItems(item => pupa(item.value ? config.messages.lineWithValue : config.messages.lineWithoutValue, item))
+      .formatItems(item => pupa(
+        item.value ? config.messages.lineWithValue : config.messages.lineWithoutValue,
+        { ...item, value: this._getMention(item) },
+      ))
       .setItemsPerPage(10)
       .make()
       .run(message);
@@ -127,5 +182,9 @@ export default class SetupCommand extends MonkaSubCommand {
       .setColor(settings.colors.default);
 
     await message.channel.send({ embeds: [embed] });
+  }
+
+  private _getMention(entry: { name: ConfigEntries; value: string }): string {
+    return entry.name.startsWith('channel') ? Formatters.channelMention(entry.value) : Formatters.roleMention(entry.value);
   }
 }

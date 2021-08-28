@@ -24,7 +24,8 @@ export enum ConfigEntriesRoles {
   EprofComputerScience = 'role-eprof-computer-science',
   EprofGeneralFormation = 'role-eprof-general-formation',
   EprofMathematics = 'role-eprof-mathematics',
-  EprofPhysicsElectronics = 'role-eprof-phyisics-electronics',
+  EprofPhysicsElectronics = 'role-eprof-physics-electronics',
+  Eprof = 'role-eprof',
   Staff = 'role-staff',
 }
 

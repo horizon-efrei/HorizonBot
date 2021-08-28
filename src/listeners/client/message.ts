@@ -3,6 +3,7 @@ import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
+import { ConfigEntriesRoles } from '@/types/database';
 
 export default class MessageListener extends Listener {
   public async run(message: GuildMessage): Promise<void> {
@@ -26,7 +27,8 @@ export default class MessageListener extends Listener {
 
     // Swearing check
     const swear = settings.configuration.swears.find(swr => message.cleanContent.split(' ').includes(swr));
-    if (swear && !message.member.roles.cache.has(settings.roles.staff))
+    const staffRole = await this.container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
+    if (swear && !message.member.roles.cache.has(staffRole.id))
       await new FlaggedMessage(message, { swear }).start();
   }
 }

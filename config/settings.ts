@@ -1,6 +1,5 @@
 import type { ColorResolvable } from 'discord.js';
 import type { CodeLanguageResult } from '@/types';
-import { TeachingUnit } from '@/types';
 
 export default {
   prefix: '!',
@@ -25,17 +24,6 @@ export default {
     dateFormat: 'DD/MM [à] HH:mm',
     eclassRoleFormat: '{subject.name}: {topic} ({formattedDate})',
     eclassReminderTime: 15 * 60 * 1000, // 15 minutes
-  },
-  // TODO: Move that to per-guild configuration (managed by ConfigurationManager)
-  roles: {
-    staff: '879311863970684962',
-    eprofs: {
-      global: '879311863958089731',
-      [TeachingUnit.ComputerScience]: '879311863937105948',
-      [TeachingUnit.GeneralFormation]: '879311863937105947',
-      [TeachingUnit.Mathematics]: '879311863937105950',
-      [TeachingUnit.PhyisicsElectronics]: '879311863937105949',
-    },
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',
