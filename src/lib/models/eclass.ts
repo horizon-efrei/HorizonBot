@@ -7,7 +7,7 @@ import slug from 'slug';
 import { eclass as eclassConfig } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import type { EclassDocument, EclassModel, PrettyEclass } from '@/types/database';
-import { ConfigEntries, EclassStatus } from '@/types/database';
+import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 
 const EclassSchema = new Schema<EclassDocument, EclassModel>({
   classId: {
@@ -57,7 +57,7 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
   announcementChannel: {
     type: String,
     required: true,
-    enum: ConfigEntries,
+    enum: ConfigEntriesChannels,
   },
   announcementMessage: {
     type: String,

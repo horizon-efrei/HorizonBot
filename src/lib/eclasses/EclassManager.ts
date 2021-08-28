@@ -16,16 +16,16 @@ import type {
 } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
-import { ConfigEntries, EclassStatus } from '@/types/database';
+import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import { massSend, noop, nullop } from '@/utils';
 
 const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
 
-const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntries> = {
-  [SchoolYear.L1]: ConfigEntries.ClassAnnouncementL1,
-  [SchoolYear.L2]: ConfigEntries.ClassAnnouncementL2,
-  [SchoolYear.L3]: ConfigEntries.ClassAnnouncementL3,
-  general: ConfigEntries.ClassAnnouncementGeneral,
+const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntriesChannels> = {
+  [SchoolYear.L1]: ConfigEntriesChannels.ClassAnnouncementL1,
+  [SchoolYear.L2]: ConfigEntriesChannels.ClassAnnouncementL2,
+  [SchoolYear.L3]: ConfigEntriesChannels.ClassAnnouncementL3,
+  general: ConfigEntriesChannels.ClassAnnouncementGeneral,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -47,7 +47,7 @@ export default class EclassManager {
 
     // Get the corresponding channels
     const announcementChannel = await container.client.configManager
-      .get(message.guild.id, classAnnouncement[subject.schoolYear]);
+      .get(classAnnouncement[subject.schoolYear], message.guild.id);
     if (!announcementChannel) {
       container.logger.warn(`[e-class:not-created] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
       await message.channel.send(config.messages.unconfiguredChannel);
@@ -110,7 +110,7 @@ export default class EclassManager {
   public static async startClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
-      .get(eclass.guild, eclass.announcementChannel);
+      .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];
@@ -151,7 +151,7 @@ export default class EclassManager {
   public static async finishClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
-      .get(eclass.guild, eclass.announcementChannel);
+      .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];
@@ -174,7 +174,7 @@ export default class EclassManager {
   public static async cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
-      .get(eclass.guild, eclass.announcementChannel);
+      .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];
@@ -201,7 +201,7 @@ export default class EclassManager {
   public static async setRecordLink(eclass: EclassPopulatedDocument, link: string): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
-      .get(eclass.guild, eclass.announcementChannel);
+      .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];

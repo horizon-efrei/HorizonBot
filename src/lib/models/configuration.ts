@@ -1,13 +1,12 @@
 import { model, Schema } from 'mongoose';
 import type { ConfigurationDocument, ConfigurationModel } from '@/types/database';
-import { ConfigEntries } from '@/types/database';
+import { ConfigEntriesChannels, ConfigEntriesRoles } from '@/types/database';
 
 const ConfigurationSchema = new Schema<ConfigurationDocument, ConfigurationModel>({
   name: {
     type: String,
     required: true,
-    enum: ConfigEntries,
-    default: ConfigEntries.ModeratorFeedback,
+    enum: [Object.values(ConfigEntriesChannels), Object.values(ConfigEntriesRoles)].flat(),
   },
   guild: {
     type: String,

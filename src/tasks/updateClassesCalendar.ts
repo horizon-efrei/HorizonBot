@@ -11,13 +11,13 @@ import Task from '@/structures/tasks/Task';
 import type { TaskOptions } from '@/structures/tasks/Task';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
-import { ConfigEntries, EclassStatus } from '@/types/database';
+import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import { nullop } from '@/utils';
 
 const calendarMapping = new Map([
-  [SchoolYear.L1, ConfigEntries.ClassCalendarL1],
-  [SchoolYear.L2, ConfigEntries.ClassCalendarL2],
-  [SchoolYear.L3, ConfigEntries.ClassCalendarL3],
+  [SchoolYear.L1, ConfigEntriesChannels.ClassCalendarL1],
+  [SchoolYear.L2, ConfigEntriesChannels.ClassCalendarL2],
+  [SchoolYear.L3, ConfigEntriesChannels.ClassCalendarL3],
 ]);
 
 @ApplyOptions<TaskOptions>({ cron: '0 0 * * *' })
@@ -32,7 +32,7 @@ export default class UpdateClassesCalendarTask extends Task {
 
     for (const guildId of this.container.client.guilds.cache.keys()) {
       for (const schoolYear of Object.values(SchoolYear)) {
-        const channel = await this.container.client.configManager.get(guildId, calendarMapping.get(schoolYear));
+        const channel = await this.container.client.configManager.get(calendarMapping.get(schoolYear), guildId);
         if (!channel) {
           this.container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Setup an calendar channel with "${settings.prefix}setup calendar-${schoolYear}"`);
           continue;

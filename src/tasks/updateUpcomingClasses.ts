@@ -8,7 +8,7 @@ import Eclass from '@/models/eclass';
 import Task from '@/structures/tasks/Task';
 import type { TaskOptions } from '@/structures/tasks/Task';
 import type { EclassDocument } from '@/types/database';
-import { ConfigEntries, EclassStatus } from '@/types/database';
+import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import { capitalize, nullop, splitText } from '@/utils';
 
 @ApplyOptions<TaskOptions>({ cron: '0 0 * * *' })
@@ -23,7 +23,7 @@ export default class UpdateUpcomingClassesTask extends Task {
     });
 
     for (const guildId of this.container.client.guilds.cache.keys()) {
-      const channel = await this.container.client.configManager.get(guildId, ConfigEntries.WeekUpcomingClasses);
+      const channel = await this.container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
       if (!channel) {
         this.container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "${settings.prefix}setup week-class"`);
         continue;

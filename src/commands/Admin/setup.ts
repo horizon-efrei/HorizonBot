@@ -9,37 +9,37 @@ import settings from '@/config/settings';
 import Configuration from '@/models/configuration';
 import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
 import type { GuildMessage } from '@/types';
-import type { ConfigurationDocument } from '@/types/database';
-import { ConfigEntries } from '@/types/database';
+import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
+import { ConfigEntriesChannels } from '@/types/database';
 import { generateSubcommands } from '@/utils';
 
 const argNames = [{
   possibilities: ['moderator', 'moderators', 'moderateur', 'moderateurs', 'modo', 'modos', 'mod', 'mods'],
-  entry: ConfigEntries.ModeratorFeedback,
+  entry: ConfigEntriesChannels.ModeratorFeedback,
 }, {
   possibilities: ['class-l1', 'eclass-l1', 'classe-l1', 'eclasse-l1', 'cours-l1', 'ecours-l1'],
-  entry: ConfigEntries.ClassAnnouncementL1,
+  entry: ConfigEntriesChannels.ClassAnnouncementL1,
 }, {
   possibilities: ['class-l2', 'eclass-l2', 'classe-l2', 'eclasse-l2', 'cours-l2', 'ecours-l2'],
-  entry: ConfigEntries.ClassAnnouncementL2,
+  entry: ConfigEntriesChannels.ClassAnnouncementL2,
 }, {
   possibilities: ['class-l3', 'eclass-l3', 'classe-l3', 'eclasse-l3', 'cours-l3', 'ecours-l3'],
-  entry: ConfigEntries.ClassAnnouncementL3,
+  entry: ConfigEntriesChannels.ClassAnnouncementL3,
 }, {
   possibilities: ['class-general', 'eclass-general', 'classe-general', 'eclasse-general', 'cours-general', 'ecours-general'],
-  entry: ConfigEntries.ClassAnnouncementGeneral,
+  entry: ConfigEntriesChannels.ClassAnnouncementGeneral,
 }, {
   possibilities: ['week-class', 'week-classes', 'week-upcoming-class', 'week-upcoming-classes'],
-  entry: ConfigEntries.WeekUpcomingClasses,
+  entry: ConfigEntriesChannels.WeekUpcomingClasses,
 }, {
   possibilities: ['calendrier-l1', 'calendar-l1', 'cal-l1'],
-  entry: ConfigEntries.ClassCalendarL1,
+  entry: ConfigEntriesChannels.ClassCalendarL1,
 }, {
   possibilities: ['calendrier-l2', 'calendar-l2', 'cal-l2'],
-  entry: ConfigEntries.ClassCalendarL2,
+  entry: ConfigEntriesChannels.ClassCalendarL2,
 }, {
   possibilities: ['calendrier-l3', 'calendar-l3', 'cal-l3'],
-  entry: ConfigEntries.ClassCalendarL3,
+  entry: ConfigEntriesChannels.ClassCalendarL3,
 }];
 
 @ApplyOptions<SubCommandPluginCommandOptions>({

@@ -1,6 +1,6 @@
-import type { GuildMember } from 'discord.js';
+import type { GuildMember, Role } from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
-import type { SchoolYear, TeachingUnit } from '@/types';
+import type { GuildTextBasedChannel, SchoolYear, TeachingUnit } from '@/types';
 
 /* ****************************** */
 /*  Configuration Database Types  */
@@ -8,17 +8,29 @@ import type { SchoolYear, TeachingUnit } from '@/types';
 
 // #region Configuration Database Types
 /** Enum for the "Configuration"'s mongoose schema */
-export enum ConfigEntries {
-  ModeratorFeedback = 'moderator-feedback-channel',
-  ClassAnnouncementL1 = 'class-announcement-l1',
-  ClassAnnouncementL2 = 'class-announcement-l2',
-  ClassAnnouncementL3 = 'class-announcement-l3',
-  ClassAnnouncementGeneral = 'class-announcement-general',
-  WeekUpcomingClasses = 'week-upcoming-classes',
-  ClassCalendarL1 = 'class-calendar-l1',
-  ClassCalendarL2 = 'class-calendar-l2',
-  ClassCalendarL3 = 'class-calendar-l3',
+export enum ConfigEntriesChannels {
+  ClassAnnouncementGeneral = 'channel-class-announcement-general',
+  ClassAnnouncementL1 = 'channel-class-announcement-l1',
+  ClassAnnouncementL2 = 'channel-class-announcement-l2',
+  ClassAnnouncementL3 = 'channel-class-announcement-l3',
+  ClassCalendarL1 = 'channel-class-calendar-l1',
+  ClassCalendarL2 = 'channel-class-calendar-l2',
+  ClassCalendarL3 = 'channel-class-calendar-l3',
+  ModeratorFeedback = 'channel-moderator-feedback',
+  WeekUpcomingClasses = 'channel-week-upcoming-classes',
 }
+
+export enum ConfigEntriesRoles {
+  EprofComputerScience = 'role-eprof-computer-science',
+  EprofGeneralFormation = 'role-eprof-general-formation',
+  EprofMathematics = 'role-eprof-mathematics',
+  EprofPhysicsElectronics = 'role-eprof-phyisics-electronics',
+  Staff = 'role-staff',
+}
+
+export type ConfigEntries = ConfigEntriesChannels | ConfigEntriesRoles;
+
+export type ConfigEntryHolds = GuildTextBasedChannel | Role;
 
 /** Interface for the "Configuration"'s mongoose schema */
 export interface ConfigurationBase {
@@ -59,7 +71,7 @@ export interface EclassBase {
   professor: string;
   classRole: string;
   targetRole: string;
-  announcementChannel: ConfigEntries;
+  announcementChannel: ConfigEntriesChannels;
   announcementMessage: string;
   status: EclassStatus;
   reminded: boolean;

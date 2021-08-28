@@ -6,7 +6,7 @@ import Eclass from '@/models/eclass';
 import FlaggedMessageDB from '@/models/flaggedMessage';
 import ReactionRole from '@/models/reactionRole';
 import FlaggedMessage from '@/structures/FlaggedMessage';
-import { ConfigEntries, EclassStatus } from '@/types/database';
+import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 
 @ApplyOptions<ListenerOptions>({ once: true })
 export default class ReadyListener extends Listener {
@@ -31,7 +31,7 @@ export default class ReadyListener extends Listener {
     this.container.logger.info('[Reaction Roles] Caching eclass announcement...');
     const eclasses = await Eclass.find({ status: EclassStatus.Planned });
     for (const eclass of eclasses) {
-      const channel = await this.container.client.configManager.get(eclass.guild, eclass.announcementChannel);
+      const channel = await this.container.client.configManager.get(eclass.announcementChannel, eclass.guild);
 
       channel.messages.fetch(eclass.announcementMessage)
         .catch(async () => {
@@ -45,8 +45,8 @@ export default class ReadyListener extends Listener {
     let flaggedMessages = await FlaggedMessageDB.find({ approved: false });
     for (const flaggedMessage of flaggedMessages) {
       const logChannel = await this.container.client.configManager.get(
+        ConfigEntriesChannels.ModeratorFeedback,
         flaggedMessage.guildId,
-        ConfigEntries.ModeratorFeedback,
       );
       logChannel.messages.fetch(flaggedMessage.alertMessageId)
         .catch(async () => {

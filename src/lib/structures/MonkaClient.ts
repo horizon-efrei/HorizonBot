@@ -48,7 +48,7 @@ export default class MonkaClient extends SapphireClient {
     void this.loadEclassRoles();
     void this.loadTags();
 
-    this.configManager = new ConfigurationManager(this);
+    this.configManager = new ConfigurationManager();
 
     this.logger.info('[Main] Client initialization finished!');
   }

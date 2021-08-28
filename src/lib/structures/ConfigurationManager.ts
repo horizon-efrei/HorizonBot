@@ -1,61 +1,87 @@
+import { container } from '@sapphire/pieces';
 import type { Guild } from 'discord.js';
-import { Collection } from 'discord.js';
-import omit from 'lodash.omit';
+import { Collection, GuildChannel, Role } from 'discord.js';
 import Configuration from '@/models/configuration';
-import type MonkaClient from '@/structures/MonkaClient';
 import type { GuildTextBasedChannel } from '@/types';
-import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
+import type {
+ ConfigEntries,
+ ConfigEntriesChannels,
+ ConfigEntryHolds,
+ ConfigurationDocument,
+} from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class ConfigurationManager {
-  // TODO: Make this linear, not nested.
-  channels: Collection<string, Record<ConfigEntries, GuildTextBasedChannel>>;
+  private readonly _entries = new Collection<
+    string,
+    { guild: string; name: ConfigEntries; value: ConfigEntryHolds }
+  >();
 
-  constructor(public readonly client: MonkaClient) {}
-
-  public async set(channel: ConfigEntries, value: GuildTextBasedChannel): Promise<void> {
+  public async set(name: ConfigEntries, value: ConfigEntryHolds): Promise<void> {
+    const guild = value.guild.id;
     await Configuration.findOneAndUpdate(
-      { guild: value.guild.id, name: channel },
-      { guild: value.guild.id, value: value.id },
+      { guild, name },
+      { guild, value: value.id },
       { upsert: true },
     );
-    this.channels.set(value.guild.id, { [channel]: value } as Record<ConfigEntries, GuildTextBasedChannel>);
+
+    this._entries.set(this._getKey(name, value.guild.id), { guild, name, value });
   }
 
-  public async remove(channel: ConfigEntries, guild: Guild): Promise<void> {
-    await Configuration.findOneAndDelete({ guild: guild.id, name: channel });
-    const channelsToKeep = omit(this.channels.get(guild.id), channel);
-    this.channels.set(guild.id, channelsToKeep as Record<ConfigEntries, GuildTextBasedChannel>);
+  public async remove(name: ConfigEntries, guild: Guild): Promise<void> {
+    await Configuration.findOneAndDelete({ guild: guild.id, name });
+    this._entries.delete(this._getKey(name, guild.id));
   }
 
-  public async get(guildID: string, channel: ConfigEntries): Promise<GuildTextBasedChannel> {
-    if (this.channels.get(guildID)?.[channel])
-      return this.channels.get(guildID)[channel];
+  // TODO: Better typings for return value
+  public async get<
+    T extends ConfigEntries,
+    Return = T extends ConfigEntriesChannels ? GuildTextBasedChannel : Role,
+  >(
+    name: T,
+    guildId: string,
+  ): Promise<Return> {
+    const key = this._getKey(name, guildId);
+    if (this._entries.get(key))
+      return this._entries.get(key).value as unknown as Return;
 
-    const result = await Configuration.findOne({ guild: guildID, name: channel }).catch(nullop);
+    const result = await Configuration.findOne({ guild: guildId, name }).catch(nullop);
     if (result?.value) {
-      const resolvedChannel = this.client.channels.resolve(result.value);
-      if (resolvedChannel.isText() && resolvedChannel.type !== 'DM') {
-        this.channels.set(guildID, { [channel]: resolvedChannel } as Record<ConfigEntries, GuildTextBasedChannel>);
-        return resolvedChannel;
+      const resolved = this._resolve(result.value, guildId);
+      if (resolved) {
+        this._entries.set(key, { guild: guildId, name, value: resolved });
+        return resolved as unknown as Return;
       }
     }
   }
 
   public async loadAll(): Promise<void> {
-    this.channels = new Collection();
-    const configuredChannels: ConfigurationDocument[] = await Configuration.find().catch(nullop);
-    if (!configuredChannels)
+    const documents: ConfigurationDocument[] = await Configuration.find().catch(nullop);
+    if (!documents)
       return;
 
-    for (const channel of configuredChannels) {
-      this.channels.set(
-        channel.guild,
+    for (const document of documents) {
+      this._entries.set(
+        this._getKey(document.name, document.guild),
         {
-          ...this.channels.get(channel.guild),
-          [channel.name]: this.client.channels.resolve(channel.value),
-        } as Record<ConfigEntries, GuildTextBasedChannel>,
+          guild: document.guild,
+          name: document.name,
+          value: this._resolve(document.value, document.guild),
+        },
       );
     }
+  }
+
+  private _getKey(name: ConfigEntries, guildId: string): `${string}` {
+    return `${guildId}-${name}`;
+  }
+
+  private _resolve(value: string, guildId: string): ConfigEntryHolds {
+    const guild = container.client.guilds.cache.get(guildId);
+
+    const resolved = guild.channels.resolve(value) ?? guild.roles.resolve(value);
+    if (resolved instanceof Role || (resolved instanceof GuildChannel && resolved.isText()))
+      return resolved;
+    return null;
   }
 }

@@ -7,7 +7,7 @@ import settings from '@/config/settings';
 import FlaggedMessageDB from '@/models/flaggedMessage';
 import type { GuildMessage, GuildTextBasedChannel } from '@/types';
 import type { FlaggedMessageDocument } from '@/types/database';
-import { ConfigEntries } from '@/types/database';
+import { ConfigEntriesChannels } from '@/types/database';
 import { nullop } from '@/utils';
 
 type FlaggedMessageData = Object.Either<{ manualModerator: GuildMember; swear: string }, 'manualModerator' | 'swear'>;
@@ -43,8 +43,8 @@ export default class FlaggedMessage {
     // Create the flag message and assign its properties
     const flaggedMessage = new FlaggedMessage(message, { swear: document.swear });
     flaggedMessage.logChannel = await container.client.configManager.get(
+      ConfigEntriesChannels.ModeratorFeedback,
       flaggedMessage.message.guild.id,
-      ConfigEntries.ModeratorFeedback,
     );
     flaggedMessage.alertMessage = await flaggedMessage.logChannel.messages
       .fetch(document.alertMessageId) as GuildMessage;
@@ -136,8 +136,8 @@ export default class FlaggedMessage {
     // Cache the log channel if not already
     if (!this.logChannel) {
       this.logChannel = await container.client.configManager.get(
+        ConfigEntriesChannels.ModeratorFeedback,
         this.message.guild.id,
-        ConfigEntries.ModeratorFeedback,
       );
     }
 
@@ -154,8 +154,8 @@ export default class FlaggedMessage {
     // Cache the log channel if not already
     if (!this.logChannel) {
       this.logChannel = await container.client.configManager.get(
+        ConfigEntriesChannels.ModeratorFeedback,
         this.message.guild.id,
-        ConfigEntries.ModeratorFeedback,
       );
     }
 

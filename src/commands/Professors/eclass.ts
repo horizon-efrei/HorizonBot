@@ -236,7 +236,7 @@ export default class EclassCommand extends MonkaSubCommand {
     }
 
     // Fetch the announcement message
-    const originalChannel = await this.container.client.configManager.get(message.guild.id, eclass.announcementChannel);
+    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannel, message.guild.id);
     const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessage);
 
     // Edit the announcement embed
