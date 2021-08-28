@@ -17,7 +17,7 @@ import type {
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import { ConfigEntries, EclassStatus } from '@/types/database';
-import { massSend, noop } from '@/utils';
+import { massSend, noop, nullop } from '@/utils';
 
 const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
 
@@ -122,12 +122,21 @@ export default class EclassManager {
     const classChannel = container.client
       .guilds.resolve(eclass.guild)
       .channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
+
+    const texts = config.messages.startClassEmbed;
     const embed = new MessageEmbed()
       .setColor(settings.colors.primary)
-      .setTitle(pupa(config.messages.startClassEmbed.title, { eclass }))
-      .setAuthor(config.messages.startClassEmbed.author, announcementChannel.guild.iconURL())
-      .setDescription(pupa(config.messages.startClassEmbed.description, { eclass }))
-      .setFooter(pupa(config.messages.startClassEmbed.footer, { eclass }));
+      .setTitle(pupa(texts.title, { eclass }))
+      .setAuthor(texts.author, announcementChannel.guild.iconURL())
+      .setDescription(pupa(texts.baseDescription, {
+        eclass,
+        isRecorded: eclass.isRecorded ? texts.descriptionIsRecorded : texts.descriptionIsNotRecorded,
+        textChannels: pupa(
+          eclass.subject.voiceChannel ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
+        ),
+      }))
+      .setFooter(pupa(texts.footer, { eclass }));
+
     await classChannel.send({
       content: pupa(config.messages.startClassNotification, { classRole: eclass.classRole }),
       embeds: [embed],
@@ -219,7 +228,31 @@ export default class EclassManager {
       }),
     );
     // Send the private message
-    await massSend(guild, eclass.subscribers, pupa(config.messages.remindClassPrivateNotification, { eclass }));
+    await massSend(guild, eclass.subscribers, pupa(config.messages.remindClassPrivateNotification, eclass));
+
+    // Alert the professor
+    const professor = await guild.members.fetch({ user: eclass.professor, cache: false }).catch(nullop);
+    const beforeChecklist = [
+      eclass.isRecorded ? config.messages.alertProfessorComplements.startRecord : null,
+      pupa(eclass.subject.voiceChannel
+        ? config.messages.alertProfessorComplements.connectVoiceChannel
+        : config.messages.alertProfessorComplements.announceVoiceChannel, eclass),
+    ].filter(Boolean).join('\n');
+
+    await professor?.send(
+      pupa(config.messages.alertProfessor, {
+        ...eclass.toJSON(),
+        date: Math.floor(eclass.date / 1000),
+        beforeChecklist,
+        afterChecklist: eclass.isRecorded
+          ? pupa(config.messages.alertProfessorComplements.registerRecording, eclass)
+          : '',
+        isIsNot: eclass.isRecorded
+          ? config.messages.alertProfessorComplements.isRecorded
+          : config.messages.alertProfessorComplements.isNotRecorded,
+        notIsRecorded: (!eclass.isRecorded).toString(),
+      }),
+    ).catch(nullop);
 
     // Mark the reminder as sent
     await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });

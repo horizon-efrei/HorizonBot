@@ -47,7 +47,16 @@ export const eclass = {
       { name: 'Terminer un cours manuellement', value: '`!cours finish <ID-cours>`' },
       { name: 'Modifier un cours', value: '`!cours edit <ID-cours> <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
       { name: 'Annuler un cours', value: '`!cours cancel <ID-cours>`' },
-      { name: 'Liste des cours', value: '`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]`' },
+      {
+        name: 'Liste des cours',
+        value: stripIndent`
+          \`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]\`
+          • \`--statut\` (ou \`-s\`) : Filtrer par le statut du cours (\`planned\`/\`prévu\`/\`p\`, \`progress\`/\`r\`/\`encours\`/\`e\`, \`finished\`/\`f\`/\`terminé\`/\`t\`, \`canceled\`/\`c\`/\`annulé\`/\`a\`).
+          • \`--matière\` (ou \`-m\`) : Filtrer par la matière du cours (code-cours ou nom de la matière en toutes lettres).
+          • \`--professeur\` (ou \`-p\`) : Filtrer par le professeur organisant le cours (utilisez une mention, son pseudo ou son ID).
+          • \`--role\` (ou \`-r\`) : Filtrer par le rôle visé par le cours (utilisez une mention, son nom ou son ID).
+        `,
+      },
       { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
       { name: "Page d'aide", value: '`!cours help`' },
     ],
@@ -175,13 +184,46 @@ export const eclass = {
     successfullyStarted: 'Le cours a bien été lancé !',
     startClassNotification: ':bell: <@&{classRole}>, le cours commence !',
     remindClassNotification: ':bell: <@&{classRole}> rappel : le cours commence dans {duration}',
-    remindClassPrivateNotification: ":bell: Tu t'es inscrit au cours \"{eclass.topic}\". Il va commencer dans environ 15 minutes ! Tien-toi prêt :\\)",
+    remindClassPrivateNotification: ":bell: Tu t'es inscrit au cours \"{topic}\". Il va commencer dans environ 15 minutes ! Tiens-toi prêt :\\)",
     valueInProgress: '[En cours]',
+    alertProfessor: stripIndent`
+      Bonjour, ton cours "{topic}" (en {subject.teachingUnit}) va commencer dans environ 15 minutes.
+      Voici quelques conseils et rappels pour le bon déroulement du cours :
+
+      **AVANT**
+      - Prépare les documents et logiciels dont tu vas te servir pour animer le cours ;
+      {beforeChecklist}
+
+      **PENDANT**
+      - Je lancerai le cours automatiquement autour de l'heure définie (<t:{date}:F>) (ou jusqu'à 2 minutes après), et je mentionnerai toutes les personnes directement intéressées par le cours ;
+      - Anime ton cours comme tu le souhaites, en essayant d'être le plus clair possible dans tes propos ;
+      - N'hésite-pas a demander à des fauteurs de trouble de partir, ou prévient un membre du staff si besoin ;
+
+      **APRÈS**
+      - J'arrêterai le cours automatiquement au bout de la durée prévue. Ce n'est pas grave s'il dure plus ou moins longtemps. Tu peux l'arrêter manuellement avec \`!ecours finish {classId}\`
+      {afterChecklist}
+
+      :warning: Rappel : Il a été prévu que le cours {isIsNot} enregistré ! Tu peux changer cela avec \`!ecours edit {classId} record {notIsRecorded}\`.
+
+      Bon courage !
+    `,
+    alertProfessorComplements: {
+      startRecord: "- Lançe ton logiciel d'enregistrement pour filmer le cours ;",
+      connectVoiceChannel: '- Connecte-toi au salon vocal définit, en cliquant ici : <#{subject.voiceChannel}> ;',
+      announceVoiceChannel: "- Annonce le salon vocal que tu vas utiliser dans <#{subject.textChannel}>, car aucun salon vocal n'a été trouvé pour la matière \"{subject.name}\" ;",
+      registerRecording: "- Télécharge ton enregistrement sur ce lien <https://drive.google.com/drive/u/2/folders/1rKNNU1NYFf-aE4kKTe_eC-GiUIgqdsZg>. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle \"Respo eProf\"). Ensuite, lance la commande `!ecours record {classId} <ton lien>` ;",
+      isRecorded: 'soit',
+      isNotRecorded: 'ne soit pas',
+    },
 
     startClassEmbed: {
       title: 'Le cours en {eclass.subject.name} va commencer !',
       author: "Ef'Réussite - Un cours commence !",
-      description: 'Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par <@{eclass.professor}> commence ! Le salon textuel associé est <#{eclass.subject.textChannel}>, et le salon vocal est <#{eclass.subject.voiceChannel}>',
+      baseDescription: 'Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par <@{eclass.professor}> commence ! {textChannels}\n{isRecorded}',
+      descriptionAllChannels: 'Le salon textuel associé est <#{eclass.subject.textChannel}>, et le salon vocal est <#{eclass.subject.voiceChannel}>.',
+      descriptionTextChannel: 'Le salon textuel associé est <#{eclass.subject.textChannel}>.',
+      descriptionIsRecorded: ':red_circle: Le cours est enregistré !',
+      descriptionIsNotRecorded: ":warning: Le cours n'est pas enregistré !",
       footer: 'ID : {eclass.classId}',
     },
 
@@ -253,7 +295,7 @@ export const subject = {
     `,
     enabled: true,
     usage: 'subject <create|remove|list|help>',
-    examples: ['!cours subject', '!subject create', '!subject list'],
+    examples: ['!subject help', '!subject create', '!subject list'],
   },
   messages: {
     // Global
