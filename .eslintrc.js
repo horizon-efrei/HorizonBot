@@ -37,4 +37,29 @@ module.exports = {
       },
     },
   },
+  overrides: [
+    {
+      files: './src/lib/decorators/**.ts',
+      rules: {
+        '@typescript-eslint/no-unsafe-argument': 'off',
+        '@typescript-eslint/naming-convention': [
+          ...require('eslint-config-noftalint/rules/typescript').rules['@typescript-eslint/naming-convention'],
+          {
+            selector: 'function',
+            modifiers: ['exported'],
+            format: ['PascalCase'],
+            leadingUnderscore: 'forbid',
+            trailingUnderscore: 'forbid',
+          },
+          {
+            selector: 'function',
+            modifiers: ['global'],
+            format: ['camelCase'],
+            leadingUnderscore: 'forbid',
+            trailingUnderscore: 'forbid',
+          },
+        ],
+      },
+    },
+  ],
 };

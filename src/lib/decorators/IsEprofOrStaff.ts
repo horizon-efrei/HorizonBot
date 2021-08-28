@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import type { Args } from '@sapphire/framework';
 import { eclass as config } from '@/config/commands/professors';
@@ -10,7 +9,6 @@ interface EprofOrStaffOptions {
   isOriginalEprof?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDecorator {
   return (_target, _key, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 import type { Args } from '@sapphire/framework';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
@@ -12,7 +10,6 @@ interface ValidationOptions {
   statusIn?: EclassStatus[];
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function ValidateEclassArgument(options?: ValidationOptions): MethodDecorator {
   return (_target, _key, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;

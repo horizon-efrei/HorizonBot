@@ -1,12 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-
 import type { Args } from '@sapphire/framework';
 import { tags as config } from '@/config/commands/admin';
 import Tags from '@/models/tags';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { GuildMessage } from '@/types';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export default function ResolveTagArgument(): MethodDecorator {
   return (_target, _key, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
