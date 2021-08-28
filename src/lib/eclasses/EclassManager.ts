@@ -49,7 +49,7 @@ export default class EclassManager {
     const announcementChannel = await container.client.configManager
       .get(message.guild.id, classAnnouncement[subject.schoolYear]);
     if (!announcementChannel) {
-      container.logger.warn(`[e-class] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
+      container.logger.warn(`[e-class:not-created] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
       await message.channel.send(config.messages.unconfiguredChannel);
       return;
     }
@@ -104,7 +104,7 @@ export default class EclassManager {
     // Send confirmation message
     await message.channel.send(pupa(config.messages.successfullyCreated, { eclass }));
 
-    container.logger.debug(`[e-class] Just created class with id ${classId}.`);
+    container.logger.debug(`[e-class:${classId}] Created eclass.`);
   }
 
   public static async startClass(eclass: EclassPopulatedDocument): Promise<void> {
@@ -145,7 +145,7 @@ export default class EclassManager {
     // Mark the class as In Progress
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.InProgress });
 
-    container.logger.debug(`[e-class] Just started class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class:${eclass.classId}] Started class.`);
   }
 
   public static async finishClass(eclass: EclassPopulatedDocument): Promise<void> {
@@ -168,7 +168,7 @@ export default class EclassManager {
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
 
-    container.logger.debug(`[e-class] Just ended class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
   }
 
   public static async cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
@@ -195,7 +195,7 @@ export default class EclassManager {
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Canceled });
 
-    container.logger.debug(`[e-class] Just canceled class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class:${eclass.classId}] Canceled class.`);
   }
 
   public static async setRecordLink(eclass: EclassPopulatedDocument, link: string): Promise<void> {
@@ -213,7 +213,7 @@ export default class EclassManager {
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
 
-    container.logger.debug(`[e-class] Just added record link to class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class:${eclass.classId}] Added record link.`);
   }
 
   public static async remindClass(eclass: EclassPopulatedDocument): Promise<void> {
@@ -257,7 +257,7 @@ export default class EclassManager {
     // Mark the reminder as sent
     await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
 
-    container.logger.debug(`[e-class] Just reminded class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class:${eclass.classId}] Sent reminders.`);
   }
 
   public static createAnnouncementEmbed({
@@ -291,7 +291,7 @@ export default class EclassManager {
   public static async subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
-      container.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exists !`);
+      container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
       return;
     }
 
@@ -299,15 +299,15 @@ export default class EclassManager {
     if (!member.roles.cache.get(givenRole.id))
       await member.roles.add(givenRole);
 
-    member.send(pupa(config.messages.subscribed, { subject: eclass.subject, topic: eclass.topic })).catch(noop);
+    member.send(pupa(config.messages.subscribed, eclass)).catch(noop);
 
-    container.logger.debug(`[e-class] Just subscribed membed ${member.id} (${member.displayName}#${member.user.discriminator}) class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class:${eclass.classId}] Subscribed member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
   }
 
   public static async unsubscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
-      container.logger.warn(`[e-class] The role with id ${eclass.classRole} does not exist.`);
+      container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
       return;
     }
 
@@ -315,8 +315,8 @@ export default class EclassManager {
     if (member.roles.cache.get(givenRole.id))
       await member.roles.remove(givenRole);
 
-    member.send(pupa(config.messages.unsubscribed, { subject: eclass.subject, topic: eclass.topic })).catch(noop);
+    member.send(pupa(config.messages.unsubscribed, eclass)).catch(noop);
 
-    container.logger.debug(`[e-class] Just unsubscribed membed ${member.id} (${member.displayName}#${member.user.discriminator}) class with id ${eclass.classId}.`);
+    container.logger.debug(`[e-class:${eclass.classId}] Unsubscribed member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
   }
 }

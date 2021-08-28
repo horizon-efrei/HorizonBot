@@ -64,5 +64,7 @@ export default class ReadyListener extends Listener {
       const parsedFlaggedMessage = await FlaggedMessage.fromDocument(flaggedMessage);
       this.container.client.waitingFlaggedMessages.push(parsedFlaggedMessage);
     }
+
+    this.container.logger.info('All caching done!');
   }
 }

@@ -1,8 +1,6 @@
 import { LogLevel, SapphireClient } from '@sapphire/framework';
 import axios from 'axios';
-import { oneLine } from 'common-tags';
-import type { GuildChannel, PermissionString, TextChannel } from 'discord.js';
-import { Intents } from 'discord.js';
+import { Intents, Permissions } from 'discord.js';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
@@ -61,42 +59,32 @@ export default class MonkaClient extends SapphireClient {
       this.logger.warn('[Main] Disabling Sentry as the DSN was not set in the environment variables (SENTRY_TOKEN).');
 
     // Check permissions
-    const permissions: PermissionString[] = [
+    const requiredChannelPermissions = new Permissions([
       'ADD_REACTIONS',
-      'VIEW_CHANNEL',
-      'SEND_MESSAGES',
-      'MANAGE_MESSAGES',
       'ATTACH_FILES',
+      'MANAGE_MESSAGES',
       'READ_MESSAGE_HISTORY',
-    ];
+      'SEND_MESSAGES',
+      'USE_PUBLIC_THREADS',
+      'VIEW_CHANNEL',
+    ]);
+    const requiredGuildPermissions = new Permissions([
+      ...requiredChannelPermissions,
+      'MANAGE_ROLES',
+    ]);
+
     // Traverse each guild we are in
     for (const guild of this.guilds.cache.values()) {
       // Check guild-level permissions
-      if (!guild.me?.permissions.has(permissions)) {
-        this.logger.warn(oneLine`
-          [Main]
-          MonkaBot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does
-          not contain one of the following: ${permissions.join(', ')}.
-        `);
-      }
+      const guildMissingPerms = guild.me?.permissions.missing(requiredGuildPermissions);
+      if (guildMissingPerms.length > 0)
+        this.logger.warn(`[Main] MonkaBot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does not contain: ${guildMissingPerms.join(', ')}.`);
 
-      // Grab all channels
-      const guildChannels = [
-        ...guild.channels.cache
-          .filter((chan: GuildChannel): chan is TextChannel => chan.isText())
-          .values(),
-      ];
-
-      for (const channel of guildChannels) {
-        // Check channel-level permissions
-        const channelPermissions = channel.permissionsFor(guild.me)?.toArray();
-        if (channelPermissions && !permissions.every(perm => channelPermissions.includes(perm))) {
-          this.logger.warn(oneLine`
-            [Main]
-            MonkaBot is missing permission(s) ${permissions.filter(perm => !channelPermissions.includes(perm)).join(', ')}
-            in channel "#${channel.name}" in guild "${guild.name}"
-          `);
-          }
+      // Check channel-level permissions
+      for (const channel of guild.channels.cache.values()) {
+        const channelMissingPerms = channel.permissionsFor(guild.me).missing(requiredChannelPermissions);
+        if (channelMissingPerms.length > 0)
+          this.logger.warn(`[Main] MonkaBot is missing permission(s) ${channelMissingPerms.join(', ')} in channel "#${channel.name}" in guild "${guild.name}".`);
       }
     }
   }
