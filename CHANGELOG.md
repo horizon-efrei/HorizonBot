@@ -7,10 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
 - Created base client
-- Created "ping" command
-- Created "statistics" command
-- Created "help" command
-- Created "setup" command
+- Created "Limits" command
+- Created "PingRoleIntersection" command
+- Created "ReactionRole" command
+- Created "Setup" command
+- Created "Tags" command
+- Created "Code" command
+- Created "Help" command
+- Created "Latext" command
+- Created "Ping" command
+- Created "Statistics" command
+- Created "VocalCount" command
+- Created "Subject" command
+- Created Eclass command and system
 - Created an anti-swear system
-- Created "code" command
+- Created an eprof-request system
