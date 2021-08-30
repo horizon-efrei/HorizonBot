@@ -6,24 +6,25 @@ export const eclass = {
   options: {
     aliases: ['cours', 'class', 'ecours', 'eclass', 'e-cours', 'e-class'],
     description: stripIndent`
-      Commande permettant de créer un cours. Vous pouvez utiliser \`!cours create\` et vous laisser guider par le menu interactif qui apparaitra.
+      Commande permettant de gérer les cours organisés sur ce Discord.
+      Pour créer un cours, vous pouvez utiliser \`!cours create\` et vous laisser guider par le menu interactif qui apparaîtra.
       Quand le cours sera créé, des messages seront envoyés dans les bons salons pour prévenir les membres, et un rôle spécial sera créé pour que les personnes voulant assister au cours puissent être notifiées.
       Le cours se lancera tout seul à l'heure indiquée (ou jusqu'à 2 minutes après). Sinon, vous pouvez le lancer manuellement avec \`!cours start <ID cours>\`.
-      Le cours s'arrêtera au bout de la durée spécifiée. S'il se finit avant, vous pouvez l'arrêter manuellement avec \`!cours finish <ID cours>\`.
+      Le cours s'arrêtera au bout de la durée spécifiée. S'il se fini avant, vous pouvez l'arrêter manuellement avec \`!cours finish <ID cours>\`.
       Pour plus d'informations sur comment utiliser cette commande, faites \`!cours help\`.
     `,
     enabled: true,
-    usage: 'cours <create|start|finish|edit|cancel|list|help>',
+    usage: 'cours <create | start | finish | edit | cancel | list | help>',
     examples: ['!cours setup', '!cours list', '!cours start pierre_232623082021_jneh'],
   },
   messages: {
     // Global
-    invalidClassId: "Désolé, mais cet identifiant n'est pas valide. L'identifiant de la classe a été envoyé quand elle a été crée, et il est toujours disponible dans l'embed d'annonce du cours.",
+    invalidClassId: "Cet identifiant n'est pas valide. L'identifiant de la classe a été envoyé quand elle a été créée, et il est toujours disponible dans l'embed d'annonce du cours. Sinon, tu peux le retrouver en faisant `!cours list`.",
     onlyProfessor: 'Seul les professeurs peuvent effectuer cette action !',
     unresolvedProfessor: ':x: Impossible de retrouver le professeur pour ce cours !',
-    unconfiguredChannel: "Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configurez-en un en tapant la commande `setup class` dans le bon salon.",
-    editUnauthorized: "Tu ne peux pas modifier un cours qui n'est pas a toi !",
-    statusIncompatible: 'Tu ne peux pas faire cette action alors que le cours {status}',
+    unconfiguredChannel: "Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configures-en un en tapant la commande `setup set class-<promo> #salon`.",
+    editUnauthorized: "Tu ne peux pas modifier un cours qui n'est pas à toi !",
+    statusIncompatible: 'Tu ne peux pas faire cette action alors que le cours {status}.',
 
     // Statuses
     statuses: {
@@ -73,14 +74,14 @@ export const eclass = {
     subjectFilter: '• Matière : {value}',
     listFieldTitle: '{topic} ({subject.name})',
     listFieldDescription: stripIndent`
-      :speech_left: <#{subject.textChannel}>
-      :bulb: {status}
-      :calendar: Prévue <t:{date}:R>, dure {duration}, se termine à <t:{end}:t>
-      :hash: \`{classId}\`
+      Prévu <t:{date}:R>, dure {duration}, se termine à <t:{end}:t>
+      **Salon :** <#{subject.textChannel}>
+      **Statut :** {status}
+      **Identifiant :** \`{classId}\`
     `,
 
     // Create subcommand
-    successfullyCreated: 'Le cours a bien été créé ! Son ID est `{eclass.classId}`',
+    successfullyCreated: 'Le cours a bien été créé ! Son ID est `{eclass.classId}`.',
     alreadyExists: 'Ce cours (même matière, sujet, heure, jour) a déjà été prévu !',
     newClassNotification: ':bell: {targetRole}, un nouveau cours a été plannifié ! :arrow_heading_down:',
 
@@ -100,23 +101,22 @@ export const eclass = {
     createClassSetup: {
       embed: {
         title: "Création d'un cours",
-        description: "Bienvenue dans l'assistant de création de cours. Suivez les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il vous sera demandé. Vous pouvez, à tous moment, abandonner la création du cours en cliquant sur \"Abandonner\".",
+        description: "Bienvenue dans l'assistant de création de cours ! Suis les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il te sera demandé. Tu peux, à tout moment, abandonner la création du cours en cliquant sur \"Abandonner\".",
         stepPreviewTitle: 'Aperçu des étapes',
-        stepPreviewDescription: 'Aperçu des étapes',
         currentStepTitle: 'Étape actuelle : {step}',
         currentStepDescription: [
-          'Choisissez dans le menu déroulant ci-dessous quelle promotion votre cours vise.',
-          'Choisissez dans le menu déroulant ci-dessous sur quelle matière votre cours porte.',
-          'Envoyez un message contenant le sujet de votre cours.',
-          'Envoyez un message contenant la date à laquelle votre cours est prévu.',
-          "Envoyez un message contenant l'heure à laquelle votre cours est prévu.",
-          'Envoyez un message contenant le professeur en charge de votre cours.',
-          'Envoyez un message contenant le rôle visé par votre cours.',
-          'Choisissez dans le menu déroulant ci-dessou si oui ou non votre cours sera enregistré.',
+          'Choisis dans le menu déroulant ci-dessous quelle promotion ton cours vise.',
+          'Choisis dans le menu déroulant ci-dessous sur quelle matière ton cours porte.',
+          'Envoie un message contenant le sujet de ton cours.',
+          'Envoie un message contenant la date à laquelle ton cours est prévu.',
+          "Envoie un message contenant l'heure à laquelle ton cours est prévu.",
+          'Envoie un message contenant le professeur en charge de ton cours.',
+          'Envoie un message contenant le rôle visé par ton cours.',
+          'Choisis dans le menu déroulant ci-dessous si oui ou non ton cours sera enregistré. Cette option peut être changée plus tard.',
           'Terminé !',
         ],
       },
-      promptMessageDropdown: 'Choisissez une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
+      promptMessageDropdown: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
       stepPreview: stripIndent`
         **1.** __Promotion :__ {schoolYear}
         **2.** __Matière :__ {subject}
@@ -156,27 +156,27 @@ export const eclass = {
     },
 
     // Edit subcommand
-    invalidEditProperty: 'Cette propriété est invalide. Choisissez parmi "sujet", "date", "heure", "durée", "professeur", "rôle".',
+    invalidEditProperty: 'Cette propriété est invalide. Choisis parmi "sujet", "date", "heure", "durée", "professeur" et "rôle".',
 
-    editedTopic: 'Vous avez bien modifié le thème du cours en "{eclass.topic}".',
+    editedTopic: 'Tu as bien modifié le thème du cours en "{eclass.topic}".',
     pingEditedTopic: '{role}, le cours a été modifié : le thème a été changé en "{eclass.topic}".',
 
-    editedDate: 'Vous avez bien modifié la date du cours pour le {eclass.date}.',
+    editedDate: 'Tu as bien modifié la date du cours pour le {eclass.date}.',
     pingEditedDate: '{role}, le cours a été modifié : la date a été changée pour le {eclass.date}.',
 
-    editedHour: "Vous avez bien modifié l'heure du cours pour le {eclass.date}.",
+    editedHour: "Tu as bien modifié l'heure du cours pour le {eclass.date}.",
     pingEditedHour: "{role}, le cours a été modifié : l'heure a été changée pour le {eclass.date}.",
 
-    editedDuration: 'Vous avez bien modifié la durée du cours en {eclass.duration}.',
+    editedDuration: 'Tu as bien modifié la durée du cours en {eclass.duration}.',
     pingEditedDuration: '{role}, le cours a été modifié : la durée a été changée en {eclass.duration}.',
 
-    editedProfessor: 'Vous avez bien modifié le professeur du cours qui est maintenant <@{eclass.professor}>.',
+    editedProfessor: 'Tu as bien modifié le professeur du cours qui est maintenant <@{eclass.professor}>.',
     pingEditedProfessor: '{role}, le cours a été modifié : le professeur est maintenant <@{eclass.professor}>.',
 
-    editedRole: 'Vous avez bien modifié le rôle visé en "{eclass.role}".',
+    editedRole: 'Tu as bien modifié le rôle visé en "{eclass.role}".',
     pingEditedRole: '{role}, le cours a été modifié : le rôle visé est maintenant "{eclass.role}".',
 
-    editedRecorded: "Vous avez bien modifié le statut d'enregistrement du cours en `{eclass.isRecorded}`.",
+    editedRecorded: "Tu as bien modifié le statut d'enregistrement du cours en `{eclass.isRecorded}`.",
     pingEditedRecorded: '{role}, le cours a été modifié : ',
     pingEditedRecordedValues: ['il ne sera plus enregistré.', 'il sera maintenant enregistré.'],
 
@@ -197,7 +197,7 @@ export const eclass = {
       **PENDANT**
       - Je lancerai le cours automatiquement autour de l'heure définie (<t:{date}:F>) (ou jusqu'à 2 minutes après), et je mentionnerai toutes les personnes directement intéressées par le cours ;
       - Anime ton cours comme tu le souhaites, en essayant d'être le plus clair possible dans tes propos ;
-      - N'hésite-pas a demander à des fauteurs de trouble de partir, ou prévient un membre du staff si besoin ;
+      - N'hésite-pas à demander à des fauteurs de trouble de partir, ou prévient un membre du staff si besoin ;
 
       **APRÈS**
       - J'arrêterai le cours automatiquement au bout de la durée prévue. Ce n'est pas grave s'il dure plus ou moins longtemps. Tu peux l'arrêter manuellement avec \`!ecours finish {classId}\`
@@ -208,8 +208,8 @@ export const eclass = {
       Bon courage !
     `,
     alertProfessorComplements: {
-      startRecord: "- Lançe ton logiciel d'enregistrement pour filmer le cours ;",
-      connectVoiceChannel: '- Connecte-toi au salon vocal définit, en cliquant ici : <#{subject.voiceChannel}> ;',
+      startRecord: "- Lance ton logiciel d'enregistrement pour filmer le cours ;",
+      connectVoiceChannel: '- Connecte-toi au salon vocal défini, en cliquant ici : <#{subject.voiceChannel}> ;',
       announceVoiceChannel: "- Annonce le salon vocal que tu vas utiliser dans <#{subject.textChannel}>, car aucun salon vocal n'a été trouvé pour la matière \"{subject.name}\" ;",
       registerRecording: "- Télécharge ton enregistrement sur ce lien <https://drive.google.com/drive/u/2/folders/1rKNNU1NYFf-aE4kKTe_eC-GiUIgqdsZg>. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle \"Respo eProf\"). Ensuite, lance la commande `!ecours record {classId} <ton lien>` ;",
       isRecorded: 'soit',
@@ -247,36 +247,31 @@ export const eclass = {
 
     // Prompts
     prompts: {
-      subject: {
-        base: 'Entrez le code de la matière associée au cours que vous souhaitez donner (par exemple "TI403" ou "SM204") :',
-        invalid: 'Ce code de matière est invalide.',
-      },
       topic: {
-        base: 'Entrez le sujet du cours que vous souhaitez donner (nom du chapitre, thème du cours...) :',
+        base: 'Entre le sujet du cours que tu souhaites donner (nom du chapitre, thème du cours...) :',
         invalid: 'Ce sujet est invalide.',
       },
       date: {
-        base: 'Entrez la date du cours que vous souhaitez donner (au format "jj/MM") :',
+        base: 'Entre la date du cours que tu souhaites donner (au format "jj/MM") :',
         invalid: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
       },
       hour: {
-        base: "Entrez l'heure de début du cours que vous souhaitez donner (au format \"HH:mm\") :",
+        base: "Entre l'heure de début du cours que tu souhaites donner (au format \"HH:mm\") :",
         invalid: "Cette heure est invalide. Vérifie bien que la date ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
       },
       duration: {
-        base: 'Entrez une durée pour votre cours (en anglais ou en français).\nVous pouvez par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Vous pouvez également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
+        base: 'Entre une durée pour ton cours (en anglais ou en français).\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
         invalid: 'Cette durée est invalide.',
       },
       professor: {
-        base: 'Entrez le professeur qui va donner le cours (mentionnez-le ou entrez son pseudo ou son ID) :',
+        base: 'Entre le professeur qui va donner le cours (mentionne-le ou entre son pseudo ou son ID) :',
         invalid: 'Ce membre est invalide.',
       },
       targetRole: {
-        base: 'Entrez le rôle visé (L1, L2...) (mentionnez-le ou entrez son nom ou son ID) :',
+        base: 'Entre le rôle visé (L1, L2...) (mentionne-le ou entre son nom ou son ID) :',
         invalid: 'Ce rôle est invalide.',
       },
       recorded: {
-        base: 'Entrez si oui ou non le cours sera enregistré (oui/o/yes/y | non/no/n) :',
         invalid: 'Cette valeur est invalide.',
       },
 
@@ -290,11 +285,12 @@ export const subject = {
   options: {
     aliases: ['subject', 'matière', 'matiere'],
     description: stripIndent`
-      Commande permettant de créer une matière. Vous pouvez utiliser \`!subject create\` et vous laisser guider par le menu interactif qui apparaitra.
+      Commande permettant de créer une matière.
+      Pour créer une nouvelle matière, vous pouvez utiliser \`!subject create\` et vous laisser guider par le menu interactif qui apparaîtra.
       Pour plus d'informations sur comment utiliser cette commande, faites \`!subject help\`.
     `,
     enabled: true,
-    usage: 'subject <create|remove|list|help>',
+    usage: 'subject <create | remove | list | help>',
     examples: ['!subject help', '!subject create', '!subject list'],
   },
   messages: {
@@ -324,28 +320,27 @@ export const subject = {
 
     // Create subcommand
     successfullyCreated: 'La matière a bien été créée !',
-    alreadyExists: 'Une matière avec le même code-cours existe déjà !',
+    alreadyExists: 'Une matière avec le même code cours existe déjà !',
 
     createSubjectSetup: {
       embed: {
         title: "Création d'une matière",
-        description: "Bienvenue dans l'assistant de création de matières. Suivez les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il vous sera demandé. Vous pouvez, à tous moment, abandonner la création de la matière en cliquant sur \"Abandonner\".",
+        description: "Bienvenue dans l'assistant de création de matières. Suis les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il te sera demandé. Tu peux, à tout moment, abandonner la création de la matière en cliquant sur \"Abandonner\".",
         stepPreviewTitle: 'Aperçu des étapes',
-        stepPreviewDescription: 'Aperçu des étapes',
         currentStepTitle: 'Étape actuelle : {step}',
         currentStepDescription: [
-          'Choisissez dans le menu déroulant ci-dessous quelle promotion votre matière vise.',
-          "Choisissez dans le menu déroulant ci-dessous dans quelle UE votre matière s'inscrit.",
-          'Envoyez un message contenant le nom de votre matière.',
-          'Envoyez un message contenant le nom en anglais (pour les INTs) de votre matière.',
-          'Envoyez un message contenant le code cours de votre matière (par exemple "TI403" ou "SM204").',
-          'Envoyez un message contenant le lien moodle de votre matière.',
-          'Envoyez un message contenant le salon textuel associé à votre matière.',
-          'Envoyez un message contenant un émoji représentant votre matière.',
+          'Choisis dans le menu déroulant ci-dessous quelle promotion ta matière vise.',
+          "Choisis dans le menu déroulant ci-dessous dans quelle UE ta matière s'inscrit.",
+          'Envoie un message contenant le nom de ta matière.',
+          'Envoie un message contenant le nom en anglais (pour les INTs) de ta matière.',
+          'Envoie un message contenant le code cours de ta matière (par exemple "TI403" ou "SM204").',
+          'Envoie un message contenant le lien Moodle de ta matière.',
+          'Envoie un message contenant le salon textuel associé à ta matière.',
+          'Envoie un message contenant un émoji représentant ta matière.',
           'Terminé !',
         ],
       },
-      promptMessageDropdown: 'Choisissez une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
+      promptMessageDropdown: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
       stepPreview: stripIndent`
         **1.** __Promotion :__ {schoolYear}
         **2.** __UE :__ {teachingUnit}
@@ -380,32 +375,32 @@ export const subject = {
 
     // Remove subcommand
     successfullyRemoved: 'La matière a bien été supprimée !',
-    removalFailed: "La matière n'a **pas** pu être supprimée, car elle est utilisée par {amount} cours. Si la supprimer est une nécessité, contactez un administrateur pour faire cette action manuellement.",
+    removalFailed: "La matière n'a **pas** pu être supprimée, car elle est utilisée par {amount} cours. Si la supprimer est une nécessité, contacte un administrateur pour faire cette action manuellement.",
 
     // Prompts
     prompts: {
       name: {
-        base: 'Entrez le nom de la matière que vous souhaitez ajouter :',
+        base: 'Entre le nom de la matière que tu souhaites ajouter :',
         invalid: 'Ce nom de matière est invalide.',
       },
       englishName: {
-        base: 'Entrez le nom de la matière que vous souhaitez ajouter, en anglais (pour les classes INTs) :',
+        base: 'Entre le nom de la matière que tu souhaites ajouter, en anglais (pour les classes INTs) :',
         invalid: 'Ce nom de matière est invalide.',
       },
       classCode: {
-        base: 'Entrez le code cours de la matière que vous souhaitez ajouter (par exemple "TI403" ou "SM204") :',
+        base: 'Entre le code cours de la matière que tu souhaites ajouter (par exemple "TI403" ou "SM204") :',
         invalid: 'Cette code cours est invalide.',
       },
       moodleLink: {
-        base: 'Entrez le lien moodle de la matière que vous souhaitez ajouter. Sélectionner le lien moodle de la matière pour les classes classique (pas INT, ni renforcé, ni bordeaux...) :',
+        base: 'Entre le lien Moodle de la matière que tu souhaites ajouter. Sélectionne le lien Moodle de la matière pour les classes classiques (pas INT, ni renforcé, ni bordeaux...) :',
         invalid: 'Ce lien est invalide.',
       },
       textChannel: {
-        base: 'Entrez le salon textuel associé à votre matière (mentionnez le, ou entrez son nom ou son ID) :',
+        base: 'Entre le salon textuel associé à ta matière (mentionne-le, ou entre son nom ou son ID) :',
         invalid: 'Ce salon textuel est invalide.',
       },
       emoji: {
-        base: "Entrez l'émoji qui correspond au mieux à la matière que vous ajoutez :",
+        base: "Entre l'émoji qui correspond au mieux à la matière que tu ajoutes :",
         invalid: 'Cet émoji est invalide.',
       },
 

@@ -7,19 +7,19 @@ export const code = {
       Permet d'exécuter du code directement depuis Discord.
       • Pour certains langages (Java, C, C++...), tu peux ajouter le drapeau \`--wrap\` pour automatiquement ajouter la fonction/classe \`main\` autour de ton code.
       • Tu peux écrire ton code directement après le langage, ou dans un bloc de code Markdown.
-      • Pour voir la liste des langages supportés, tape \`{prefix}code info\`.
+      • Pour voir la liste des langages supportés, tape \`code info\`.
       • Si ton programme *demande* des données à l'utilisateur, tu peux en fournir via \`--input=123\` ou \`--input="mes données"\` avec des guillements si ton texte contient plusieurs mots.
-      • Je ne peux pas faire cette commande un nombre illimité de fois : elle est cappée à 200 utilisations par jour, en tout. Merci de ne pas en abuser pour que tout le monde puisse en profiter ! :) (ne vous étonnez pas si elle ne répond plus quand vous l'executez : vous l'avez surement trop spammée.)
+      • Je ne peux faire cette commande qu'un nombre limité de fois : elle est cappée à 200 utilisations par jour, en tout. Merci de ne pas en abuser pour que tout le monde puisse en profiter ! :) (ne vous étonnez pas si elle ne répond plus quand vous l'exécutez : vous l'avez surement trop spammée.)
     `,
     enabled: true,
-    usage: 'run info|<langage> [--wrap] <code>',
-    examples: ['code info', 'run java --wrap System.out.println("Test");', 'run js console.log("test");'],
+    usage: 'run info | <langage> [--wrap] <code>',
+    examples: ['code info', 'run java --wrap System.out.println("Test");', 'run js --input=test console.log(process.argv[0]);'],
   },
   messages: {
-    noMoreCredits: 'Cette commande peut malheureusement être utilisée maximum 200 fois par jour en tout, et ce quota a été atteint... Réessaye à partir de 13h !',
+    noMoreCredits: 'Cette commande peut malheureusement être utilisée maximum 200 fois par jour, et ce quota a été atteint... Réessaye à partir de 13h !',
     unknownLanguage: 'Le langage que tu as spécifié (`{parameter}`) est invalide. Il se peut que je ne le supporte pas ou que tu ais oublié de le spécifier.',
     noCode: "Tu as oublié d'ajouter du code à exécuter !",
-    result: "Résultat de l'éxecution du code de {message.member} en {lang.value.display}. (Temps CPU : {cpuTime} / Memoire : {memory})",
+    result: "Résultat de l'éxecution de ce code en {lang.value.display}. (Temps CPU : {cpuTime} / Memoire : {memory})",
     creditStatus: "Crédits restant pour aujourd'hui : {remaining}",
     informationBlock: stripIndent`
       Abbréviations : {formattedSlugs}
@@ -107,9 +107,9 @@ export const statistics = {
 export const vocalCount = {
   options: {
     aliases: ['vocal-count', 'voc-count', 'vocount'],
-    description: 'Affiche le nombre de personnes connectées dans un salon vocal choisit, ou dans le tient.',
+    description: 'Affiche le nombre de personnes connectées dans un salon vocal choisi, ou dans le tien.',
     enabled: true,
-    usage: 'vocalcount [#mention salon | ID salon | nom salon]',
+    usage: 'vocalcount [salon]',
     examples: ['vocalcount', 'vocount Linux'],
   },
   messages: {

@@ -25,7 +25,7 @@ export const pingRoleIntersection = {
     roleDoesntExist: "Es-tu sûr que le rôle \"{role}\" existe ? Je n'ai pas pu le trouver...",
     notEnoughRoles: "Tu n'as pas entré assez de rôles ! Il en faut au moins 2.",
     noTargetedUsers: "Personne n'a ces {num} rôles à la fois dans ce serveur, il n'a donc pas été créé.",
-    successTemporary: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s). Il sera supprimé juste après sa première utilisation.',
+    successTemporary: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s). Il sera supprimé 2 jours après sa première utilisation.',
     successPersistent: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s).',
   },
 };
@@ -33,7 +33,7 @@ export const pingRoleIntersection = {
 export const reactionRole = {
   options: {
     aliases: ['reactionrole', 'rr', 'autorole', 'ar'],
-    description: "Permet de créer des menus de réaction, sur lesquels les utilisateurs peuvent utiliser des réactions pour s'ajouter des rôles.",
+    description: "Permet de créer des menus de réactions, grâce auxquels les utilisateurs peuvent utiliser les réactions pour s'ajouter des rôles.",
     enabled: true,
     usage: 'reactionrole <start | list | remove | help>',
     examples: ['reactionrole start', 'rr start #salon-annonces', 'autorole list', 'ar remove 188341077902753794', 'rr help'],
@@ -42,8 +42,8 @@ export const reactionRole = {
     // Global
     notAMessage: "Cet identifiant de message n'est pas valide. Il faut entrer le lien vers le message, ou son ID.",
     notAMenu: "Ce message n'est pas un menu de réaction.",
-    invalidReaction: "Cette réaction n'est pas valide",
-    invalidRole: "Ce rôle n'est pas valide",
+    invalidReaction: "Cette réaction n'est pas valide.",
+    invalidRole: "Ce rôle n'est pas valide.",
 
     // Create the menu
     channelPrompt: 'Dans quel salon veux-tu créer ce menu ? Tu peux entrer son nom, son ID, ou le mentionner.',
@@ -51,7 +51,7 @@ export const reactionRole = {
     rolesPrompt: "Entre les émojis et les rôles associés. Chaque paire doit être sur une ligne à part, le tout dans un seul message. Tu dois entrer l'émoji, un espace puis le rôle (son nom, son ID, ou en le mentionnant). Seuls les 20 premières entrées seront utilisées.",
 
     duplicatedEmojis: "Oups, tu as mis plusieurs fois le même émoji pour différents rôles... Ce n'est pas possible ! Recréé un menu en mettant un emoji unique pour chaque rôle. (Émojis utilisés en double : {duplicatedEmojis})",
-    duplicatedRoles: "Oups, tu as mis plusieurs fois le même rôle... Ce n'est pas possible ! Recréé un menu en mettant un chaque rôle une unique fois. (Rôles utilisés en double : {duplicatedRoles})",
+    duplicatedRoles: "Oups, tu as mis plusieurs fois le même rôle... Ce n'est pas possible ! Recréé un menu en mettant chaque rôle une unique fois. (Rôles utilisés en double : {duplicatedRoles})",
     invalidEntries: "Aucune paire réaction/rôle valide n'a été retrouvée dans ton message... :confused:",
 
     confirmationTitle: "Parfait, la mise en place est terminée ! Peux-tu confirmer que c'est correct ?",
@@ -62,18 +62,18 @@ export const reactionRole = {
       Le titre est "{title}", et la description est
       >>> {description}
     `,
-    rolesListItem: '• La réaction {reaction} donnera la rôle {role}',
+    rolesListItem: '• La réaction {reaction} donnera la rôle {role}.',
     noDescription: '*Aucune description définie.*',
     stoppedPrompting: 'Tu as bien abandonné la création du menu !',
 
     // List the menus
     noMenus: "Je n'ai trouvé aucun menu de réaction dans la base de données !",
-    listEmbedTitle: 'Liste des menus de réaction de la guilde "{message.guild.name}" ({total})',
-    listEmbedDescription: '• [{title}]({url}) ({total} roles)\n',
+    listEmbedTitle: 'Liste des menus de réaction ({total})',
+    listEmbedDescription: '• [{title}]({url}) ({total} rôles)\n',
 
     // Remove a menu
     removedMenu: 'Ce menu a bien été supprimé !',
-    removePrompt: "Entre l'identifiant (ID) du message qui contient le menu que tu souhaites supprimer.",
+    removePrompt: "Entre l'identifiant (ID) ou le lien du message qui contient le menu que tu souhaites supprimer.",
 
     // Edit a menu
     editedMenu: 'Ce menu a bien été modifié !',
@@ -81,23 +81,23 @@ export const reactionRole = {
     // Add a role to a menu
     reactionAlreadyUsed: 'Cette réaction est déjà utilisée dans ce menu !',
     roleAlreadyUsed: 'Ce rôle est déjà utilisé dans ce menu !',
-    addedPairSuccessfuly: "C'est fait ! La réaction {reaction} donnera le rôle \"{role.name}\" sur le menu {rrMessage.url}",
+    addedPairSuccessfuly: "C'est fait ! La réaction {reaction} donnera le rôle \"{role.name}\" sur le menu {rrMessage.url}.",
 
     // Remove a role from a menu
     reactionNotUsed: "Cette réaction n'est pas dans ce menu !",
     roleNotUsed: "Ce rôle n'est pas dans ce menu !",
-    removedPairSuccessfuly: "C'est fait ! Cette paire à bien été supprimée du menu {rrMessage.url}",
+    removedPairSuccessfuly: "C'est fait ! Cette paire à bien été supprimée du menu {rrMessage.url}.",
 
     // Help page
-    helpEmbedTitle: 'Aide des menus de réaction-rôle',
+    helpEmbedTitle: 'Aide des menus de réaction',
     helpEmbedDescription: [
-      { name: 'Créer un menu', value: '`rr start [identifiant du salon]` puis répondre aux questions' },
-      { name: 'Lister les menus', value: '`rr list`' },
-      { name: 'Supprimer un menu', value: '`rr remove <identifiant du message>`' },
-      { name: 'Modifier un menu', value: '`rr edit <identifiant du message>` puis répondre aux questions' },
-      { name: 'Ajouter une paire à un menu', value: '`rr addpair <identifiant du message> <emoji> <role>`' },
-      { name: "Enlever une paire d'un menu", value: '`rr removepair <identifiant du message> <role>`' },
-      { name: "Page d'aide", value: '`rr help`' },
+      { name: 'Créer un menu', value: '`!rr start [salon]` puis répondre aux questions' },
+      { name: 'Liste des menus', value: '`!rr list`' },
+      { name: 'Supprimer un menu', value: '`!rr remove <ID message>`' },
+      { name: 'Modifier un menu', value: '`!rr edit <ID message>` puis répondre aux questions' },
+      { name: 'Ajouter une paire à un menu', value: '`!rr addpair <ID message> <emoji> <role>`' },
+      { name: "Enlever une paire d'un menu", value: '`!rr removepair <ID message> <role>`' },
+      { name: "Page d'aide", value: '`!rr help`' },
     ],
   },
 };
@@ -105,9 +105,9 @@ export const reactionRole = {
 export const setup = {
   options: {
     aliases: ['setup', 'config', 'configure', 'define'],
-    description: 'Permet de définir les salons et rôle particuliers dont MonkaBot à besoin.',
+    description: 'Permet de définir les salons et rôles particuliers dont MonkaBot à besoin.',
     enabled: true,
-    usage: 'setup <set|see|list|remove|help>',
+    usage: 'setup <set | see | list | remove | help>',
     examples: ['setup set cours-semaine #cours-de-la-semaine', 'setup define role-staff 188341077902753794', 'setup remove role-staff', 'setup see @Staff'],
   },
   messages: {
@@ -152,7 +152,7 @@ export const tags = {
 
     // List the tags
     noTags: "Je n'ai trouvé aucun tags dans la base de données !",
-    listEmbedTitle: 'Liste des tags de la guilde "{message.guild.name}" ({total})',
+    listEmbedTitle: 'Liste des tags ({total})',
     listEmbedItem: '• `{name}` ({aliases})',
 
     // Remove a tag
@@ -165,29 +165,29 @@ export const tags = {
     helpEmbedTitle: 'Aide des menus de Tags',
     helpEmbedDescription: [
       { name: 'Créer un tag', value: '`tags create <nom> <aliases> <contenu>`' },
-      { name: 'Lister les tags', value: '`tags list`' },
+      { name: 'Liste des tags', value: '`tags list`' },
       { name: 'Supprimer un tag', value: '`tags remove <nom>`' },
       { name: 'Modifier un tag', value: '`tags edit <nom> <contenu>`' },
       { name: 'Renommer un tag', value: '`tags rename <nom> <nouveau nom>`' },
-      { name: 'Définir les aliases un tag', value: '`tags aliases <nom> <aliases1, aliases2, ... | clear>`' },
+      { name: "Définir les aliases d'un tag", value: '`tags aliases <nom> <aliases1, aliases2, ... | clear>`' },
       { name: "Page d'aide", value: '`tags help`' },
     ],
 
     prompts: {
       name: {
-        base: 'Entrez le nom du tag :',
+        base: 'Entre le nom du tag :',
         invalid: 'Ce nom de tag est déjà utilisé ou est invalide.',
       },
       newName: {
-        base: 'Entrez le nouveau nom du tag :',
+        base: 'Entre le nouveau nom du tag :',
         invalid: 'Ce nom de tag est déjà utilisé ou est invalide.',
       },
       aliases: {
-        base: 'Entrez les aliases du tag :',
+        base: 'Entre les aliases du tag :',
         invalid: 'Ces aliases de tags sont déjà utilisés ou sont invalides.',
       },
       content: {
-        base: 'Entrez le contenu du tag :',
+        base: 'Entre le contenu du tag :',
         invalid: 'Ce contenu est invalide.',
       },
     },

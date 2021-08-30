@@ -13,7 +13,7 @@ export default {
     red: '#eb2d1c' as ColorResolvable,
   },
   configuration: {
-    swears: ['fleur', 'arbre', 'tulipe'], // ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
+    swears: ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
     stop: new Set(['stop', 'cancel', 'retour']),
     booleanTruths: ['oui', 'o', 'yes', 'y', 'vrai', 'v', 'true', 't'],
     booleanFalses: ['non', 'no', 'n', 'faux', 'f', 'false'],
