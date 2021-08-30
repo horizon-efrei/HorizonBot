@@ -5,7 +5,7 @@
   "main": "./dist/src/main.js",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
-    "exec": "node ./dist/src/main.js",
+    "exec": "node --no-warnings ./dist/src/main.js",
     "start": "npm run build && cross-env NODE_ENV=production npm run exec",
     "dev": "npm run build && cross-env NODE_ENV=development npm run exec",
     "lint": "eslint .",

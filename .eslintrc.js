@@ -62,4 +62,7 @@ module.exports = {
       },
     },
   ],
+  globals: {
+    PromiseRejectedResult: 'readonly',
+  },
 };
