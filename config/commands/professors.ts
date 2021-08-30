@@ -158,25 +158,25 @@ export const eclass = {
     // Edit subcommand
     invalidEditProperty: 'Cette propriété est invalide. Choisis parmi "sujet", "date", "heure", "durée", "professeur" et "rôle".',
 
-    editedTopic: 'Tu as bien modifié le thème du cours en "{eclass.topic}".',
-    pingEditedTopic: '{role}, le cours a été modifié : le thème a été changé en "{eclass.topic}".',
+    editedTopic: 'Tu as bien modifié le thème du cours en "{topic}".',
+    pingEditedTopic: '{role}, le cours a été modifié : le thème a été changé en "{topic}".',
 
-    editedDate: 'Tu as bien modifié la date du cours pour le {eclass.date}.',
-    pingEditedDate: '{role}, le cours a été modifié : la date a été changée pour le {eclass.date}.',
+    editedDate: 'Tu as bien modifié la date du cours pour le {date}.',
+    pingEditedDate: '{role}, le cours a été modifié : la date a été changée pour le {date}.',
 
-    editedHour: "Tu as bien modifié l'heure du cours pour le {eclass.date}.",
-    pingEditedHour: "{role}, le cours a été modifié : l'heure a été changée pour le {eclass.date}.",
+    editedHour: "Tu as bien modifié l'heure du cours pour le {date}.",
+    pingEditedHour: "{role}, le cours a été modifié : l'heure a été changée pour le {date}.",
 
-    editedDuration: 'Tu as bien modifié la durée du cours en {eclass.duration}.',
-    pingEditedDuration: '{role}, le cours a été modifié : la durée a été changée en {eclass.duration}.',
+    editedDuration: 'Tu as bien modifié la durée du cours en {duration}.',
+    pingEditedDuration: '{role}, le cours a été modifié : la durée a été changée en {duration}.',
 
-    editedProfessor: 'Tu as bien modifié le professeur du cours qui est maintenant <@{eclass.professor}>.',
-    pingEditedProfessor: '{role}, le cours a été modifié : le professeur est maintenant <@{eclass.professor}>.',
+    editedProfessor: 'Tu as bien modifié le professeur du cours qui est maintenant <@{professor}>.',
+    pingEditedProfessor: '{role}, le cours a été modifié : le professeur est maintenant <@{professor}>.',
 
-    editedRole: 'Tu as bien modifié le rôle visé en "{eclass.role}".',
-    pingEditedRole: '{role}, le cours a été modifié : le rôle visé est maintenant "{eclass.role}".',
+    editedRole: 'Tu as bien modifié le rôle visé en "{role}".',
+    pingEditedRole: '{role}, le cours a été modifié : le rôle visé est maintenant "{role}".',
 
-    editedRecorded: "Tu as bien modifié le statut d'enregistrement du cours en `{eclass.isRecorded}`.",
+    editedRecorded: "Tu as bien modifié le statut d'enregistrement du cours en `{isRecorded}`.",
     pingEditedRecorded: '{role}, le cours a été modifié : ',
     pingEditedRecordedValues: ['il ne sera plus enregistré.', 'il sera maintenant enregistré.'],
 

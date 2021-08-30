@@ -265,7 +265,8 @@ export default class EclassCommand extends MonkaSubCommand {
 
     // Send messages
     const payload = {
-      eclass: { ...eclass.toData(), role: message.guild.roles.resolve(eclass.targetRole).name },
+      ...eclass.toData(),
+      role: message.guild.roles.resolve(eclass.targetRole).name,
     };
     await message.channel.send(pupa(updateMessage, payload));
     if (shouldPing)
