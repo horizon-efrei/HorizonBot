@@ -99,7 +99,8 @@ export const statistics = {
       `,
       uptime: '❯ Temps de fonctionnement',
       memory: '❯ Mémoire',
-      commands: '❯ Commandes',
+      maintainers: '❯ Développeurs',
+      thanks: '❯ Remerciements',
     },
   },
 };
