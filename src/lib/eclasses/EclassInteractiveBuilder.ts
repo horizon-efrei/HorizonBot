@@ -71,7 +71,7 @@ export default class EclassInteractiveBuilder {
   public mainBotMessage: Message;
   public botMessagePrompt: GuildMessage;
   public prompter: ArgumentPrompter;
-  public stopped = false;
+  public aborted = false;
   public responses = {
     date: null,
     subject: null,
@@ -118,21 +118,26 @@ export default class EclassInteractiveBuilder {
       baseMessage: this.botMessagePrompt,
     });
 
-    // TODO: Handle abort better
     const collector = this.mainBotMessage.createMessageComponentCollector<ButtonInteraction>({ componentType: 'BUTTON' })
       .on('collect', async (interaction) => {
         if (interaction.customId === 'abort') {
-          this.stopped = true;
+          this.aborted = true;
           await interaction.update({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
           await this.botMessagePrompt.edit(config.messages.prompts.stoppedPrompting);
         }
       });
 
-    await this._askPrompts();
-    collector.stop();
-
-    if (this.stopped)
+    try {
+      await this._askPrompts();
+    } catch {
+      if (this.aborted)
+        return;
+      await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
+      await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
       return;
+    } finally {
+      collector.stop();
+    }
 
     await this.mainBotMessage.edit({
       embeds: [this._embed.setColor(settings.colors.green).spliceFields(1, 1)],
@@ -145,82 +150,60 @@ export default class EclassInteractiveBuilder {
   private async _askPrompts(): Promise<void> {
     // 1. Ask for the targeted schoolyear
     const schoolYearInteraction = await this._makeSelectMenuStep(schoolYearMenu);
-    if (this.stopped)
-      return;
 
     const schoolYear = schoolYearInteraction.values.shift() as SchoolYear;
     this.step++;
     await this._updateStep(schoolYearInteraction);
-    if (this.stopped)
-      return;
 
 
     // 2. Ask for the subject
     const subjects = await Subject.find({ schoolYear });
     const subjectInteraction = await this._makeSelectMenuStep(getSubjectMenu(subjects));
-    if (this.stopped)
-      return;
 
     const selectedSubjectCode = subjectInteraction.values.shift();
     this.responses.subject = subjects.find(subject => subject.classCode === selectedSubjectCode);
     this.step++;
     await this._updateStep(subjectInteraction);
-    if (this.stopped)
-      return;
 
 
     // 3. Ask for the topic
     this.responses.topic = await this._makeMessageStep('autoPromptText', config.messages.prompts.topic);
     this.step++;
     await this._updateStep();
-    if (this.stopped)
-      return;
 
 
     // 4. Ask for the date
     this.responses.date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, dateValidator);
     await this._updateStep();
-    if (this.stopped)
-      return;
 
     const hour = await this._makeMessageStep('autoPromptHour', config.messages.prompts.hour, resolved => hourValidator(resolved, this.responses.date));
     this.responses.date.setHours(hour.hour);
     this.responses.date.setMinutes(hour.minutes);
     this.step++;
     await this._updateStep();
-    if (this.stopped)
-      return;
 
 
     // 5. Ask for the duration
     this.responses.duration = await this._makeMessageStep('autoPromptDuration', config.messages.prompts.duration);
     this.step++;
     await this._updateStep();
-    if (this.stopped)
-      return;
 
 
     // 6. Ask for the professor
     this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
     this.step++;
     await this._updateStep();
-    if (this.stopped)
-      return;
 
 
     // 7. Ask for the targeted role
     this.responses.targetRole = await this._makeMessageStep('autoPromptRole', config.messages.prompts.targetRole);
     this.step++;
     await this._updateStep();
-    if (this.stopped)
-      return;
 
 
     // 8. Ask whether the class will be recorded
     await this.botMessagePrompt.edit(config.messages.createClassSetup.promptMessageDropdown);
     const isRecordedInteraction = await this._makeSelectMenuStep(isRecordedMenu);
-    if (this.stopped)
-      return;
     this.responses.isRecorded = isRecordedInteraction.values.shift() === 'yes';
   }
 
@@ -230,13 +213,8 @@ export default class EclassInteractiveBuilder {
 
     const interaction = await this.mainBotMessage.awaitMessageComponent<SelectMenuInteraction>({
       componentType: component.type,
-      time: 2 * 60 * 1000,
-      filter: i => i.user.id === this.message.author.id && i.customId === component.customId && !this.stopped,
-    }).catch(async () => {
-      this.stopped = true;
-      await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
-      await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
-      return null;
+      time: 60 * 1000,
+      filter: i => i.user.id === this.message.author.id && i.customId === component.customId && !this.aborted,
     });
     this._actionRows.splice(1);
     return interaction;
@@ -256,7 +234,7 @@ export default class EclassInteractiveBuilder {
     let previousIsFailure = false;
     do {
       result = await this.prompter[prompter](prompts, previousIsFailure) as TResult;
-      if (this.stopped)
+      if (this.aborted)
         return;
 
       previousIsFailure = true;
