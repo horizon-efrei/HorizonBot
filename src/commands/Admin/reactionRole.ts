@@ -39,7 +39,7 @@ import {
     help: { aliases: ['aide'], default: true },
   }),
 })
-export default class SetupCommand extends MonkaSubCommand {
+export default class ReactionRoleCommand extends MonkaSubCommand {
   public async start(message: GuildMessage, args: Args): Promise<void> {
     let channel: GuildTextBasedChannel = (await args.pickResult('guildTextBasedChannel')).value;
     let title: string;
