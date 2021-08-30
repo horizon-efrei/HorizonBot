@@ -195,11 +195,11 @@ export default class ArgumentPrompter {
     const handler = new MessagePrompter(
       text,
       'message',
-      { timeout: 60 * 1000, explicitReturn: true, editMessage: this._options.baseMessage },
+      { timeout: 60 * 1000, explicitReturn: true, editMessage: this._options?.baseMessage },
     );
     const { response, appliedMessage } = await handler
       .run(this._message.channel, this._message.author) as PrompterMessageResult;
-    if (this._options.messageArray)
+    if (this._options?.messageArray)
       this._options.messageArray.addAll(response, appliedMessage);
 
     if (settings.configuration.stop.has(response.content))
