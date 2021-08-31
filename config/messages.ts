@@ -36,7 +36,7 @@ export default {
       {message.url}
     `,
     manualSwearAlert: stripIndent`
-      {message.member} à envoyé un message jugé innaproprié par {manualModerator} dans {message.channel}. Il a donc été sommé en MP.
+      {message.member} à envoyé un message jugé innaproprié par {manualModerator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.
 
       {message.url}
     `,
