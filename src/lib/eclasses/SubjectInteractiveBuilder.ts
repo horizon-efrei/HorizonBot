@@ -145,7 +145,7 @@ export default class SubjectInteractiveBuilder {
       embeds: [this._embed.setColor(settings.colors.green).spliceFields(1, 1)],
       components: [],
     });
-    await this.botMessagePrompt.edit(JSON.stringify(this.responses, null, 2));
+    await this.botMessagePrompt.delete();
     return this.responses;
   }
 
