@@ -78,13 +78,13 @@ export default class MonkaClient extends SapphireClient {
       // Check guild-level permissions
       const guildMissingPerms = guild.me?.permissions.missing(requiredGuildPermissions);
       if (guildMissingPerms.length > 0)
-        this.logger.warn(`[Main] MonkaBot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does not contain: ${guildMissingPerms.join(', ')}.`);
+        this.logger.warn(`[Main] The bot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does not contain: ${guildMissingPerms.join(', ')}.`);
 
       // Check channel-level permissions
       for (const channel of guild.channels.cache.values()) {
         const channelMissingPerms = channel.permissionsFor(guild.me).missing(requiredChannelPermissions);
         if (channelMissingPerms.length > 0)
-          this.logger.warn(`[Main] MonkaBot is missing permission(s) ${channelMissingPerms.join(', ')} in channel "#${channel.name}" in guild "${guild.name}".`);
+          this.logger.warn(`[Main] The bot is missing permission(s) ${channelMissingPerms.join(', ')} in channel "#${channel.name}" in guild "${guild.name}".`);
       }
     }
   }

@@ -31,7 +31,7 @@ export const code = {
 export const help = {
   options: {
     aliases: ['help', 'aide'],
-    description: "Permet de voir la liste des commandes de MonkaBot, ou d'avoir des informations sur une commande en particulier.",
+    description: "Permet de voir la liste des commandes du bot, ou d'avoir des informations sur une commande en particulier.",
     enabled: true,
     usage: 'help [commande]',
     examples: ['help', 'aide statistique'],
@@ -46,7 +46,7 @@ export const help = {
       examples: '❯ Exemples',
     },
     commandsList: {
-      title: 'Commandes de MonkaBot ({amount})',
+      title: 'Commandes de du bot ({amount})',
       description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande en particulier.",
       category: '❯ {categoryName}',
     },
@@ -69,7 +69,7 @@ export const latex = {
 export const ping = {
   options: {
     aliases: ['ping', 'pong', 'ms'],
-    description: "Permet de connaître la latence de MonkaBot et de l'API Discord.",
+    description: "Permet de connaître la latence du bot et de l'API Discord.",
     enabled: true,
     usage: 'ping',
     examples: ['ping'],
@@ -83,14 +83,14 @@ export const ping = {
 export const statistics = {
   options: {
     aliases: ['statistiques', 'statistique', 'statistics', 'statistic', 'stats', 'stat', 'botinfo'],
-    description: 'Affiche des statistiques et diverses informations sur MonkaBot, comme son temps de fonctionnement, sa version etc.',
+    description: 'Affiche des statistiques et diverses informations sur le bot, comme son temps de fonctionnement, sa version etc.',
     enabled: true,
     usage: 'statistiques',
     examples: ['statistiques'],
   },
   messages: {
     embed: {
-      title: 'Statistiques de MonkaBot',
+      title: 'Statistiques du bot',
       description: 'Le préfixe est `{prefix}`. Faites `{prefix}aide` pour avoir la liste des commandes.',
       version: '❯ Version',
       versionContent: stripIndent`

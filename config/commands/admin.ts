@@ -105,7 +105,7 @@ export const reactionRole = {
 export const setup = {
   options: {
     aliases: ['setup', 'config', 'configure', 'define'],
-    description: 'Permet de définir les salons et rôles particuliers dont MonkaBot à besoin.',
+    description: 'Permet de définir les salons et rôles particuliers dont le bot à besoin.',
     enabled: true,
     usage: 'setup <set | see | list | remove | help>',
     examples: ['setup set cours-semaine #cours-de-la-semaine', 'setup define role-staff 188341077902753794', 'setup remove role-staff', 'setup see @Staff'],

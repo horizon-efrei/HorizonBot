@@ -14,7 +14,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import mongoose from 'mongoose';
 import MonkaClient from '@/structures/MonkaClient';
 
-console.log('Starting MonkaBot...');
+console.log('Starting the bot...');
 
 dayjs.locale('fr');
 dayjs.extend(duration);

@@ -203,7 +203,7 @@ export const eclass = {
       - J'arrêterai le cours automatiquement au bout de la durée prévue. Ce n'est pas grave s'il dure plus ou moins longtemps. Tu peux l'arrêter manuellement avec \`!ecours finish {classId}\`
       {afterChecklist}
 
-      :warning: Rappel : Il a été prévu que le cours {isIsNot} enregistré ! Tu peux changer cela avec \`!ecours edit {classId} record {notIsRecorded}\`.
+      :warning: Rappel : il a été prévu que le cours {isIsNot} enregistré ! Tu peux changer cela avec \`!ecours edit {classId} record {notIsRecorded}\`.
 
       Bon courage !
     `,
