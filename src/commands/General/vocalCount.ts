@@ -2,11 +2,11 @@ import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import pupa from 'pupa';
 import { vocalCount as config } from '@/config/commands/general';
-import MonkaCommand from '@/structures/commands/MonkaCommand';
+import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({ ...config.options, generateDashLessAliases: true })
-export default class VocalCountCommand extends MonkaCommand {
+export default class VocalCountCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     const channel = (await args.pickResult('guildVoiceChannel'))?.value ?? message.member.voice.channel;
     if (!channel) {

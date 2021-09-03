@@ -10,7 +10,7 @@ import settings from '@/config/settings';
 import { ResolveTagArgument } from '@/decorators';
 import Tags from '@/models/tags';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
+import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import { GuildMessage } from '@/types';
 import { TagDocument } from '@/types/database';
 import { generateSubcommands } from '@/utils';
@@ -29,7 +29,7 @@ import { generateSubcommands } from '@/utils';
     help: { aliases: ['aide'], default: true },
   }),
 })
-export default class TagsCommand extends MonkaSubCommand {
+export default class TagsCommand extends HorizonSubCommand {
   public async add(message: GuildMessage, args: Args): Promise<void> {
     let name: string = (await args.pickResult('string')).value?.toLowerCase();
     let content: string = (await args.restResult('string')).value;

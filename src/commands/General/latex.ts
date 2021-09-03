@@ -2,11 +2,11 @@ import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import { latex as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import MonkaCommand from '@/structures/commands/MonkaCommand';
+import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
-export default class LatexCommand extends MonkaCommand {
+export default class LatexCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     const equation = await args.restResult('string');
     if (equation.error) {

@@ -11,7 +11,7 @@ import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
 import CustomResolvers from '@/resolvers';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
+import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type {
   GuildMessage,
   GuildTextBasedChannel,
@@ -39,7 +39,7 @@ import {
     help: { aliases: ['aide'], default: true },
   }),
 })
-export default class ReactionRoleCommand extends MonkaSubCommand {
+export default class ReactionRoleCommand extends HorizonSubCommand {
   public async start(message: GuildMessage, args: Args): Promise<void> {
     let channel: GuildTextBasedChannel = (await args.pickResult('guildTextBasedChannel')).value;
     let title: string;

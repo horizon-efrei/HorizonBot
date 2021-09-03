@@ -1,13 +1,13 @@
 import type { PieceContext } from '@sapphire/framework';
-import { Command } from '@sapphire/framework';
-import type { MonkaCommandOptions } from '@/types';
+import { SubCommandPluginCommand } from '@sapphire/plugin-subcommands';
+import type { HorizonCommandOptions } from '@/types';
 
-export default abstract class MonkaCommand extends Command {
+export default abstract class HorizonSubCommand extends SubCommandPluginCommand {
   usage: string;
   examples: string[];
   runnableBy: string;
 
-  constructor(context: PieceContext, options: MonkaCommandOptions) {
+  constructor(context: PieceContext, options: HorizonCommandOptions) {
     super(context, options);
 
     this.usage = options?.usage || '';

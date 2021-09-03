@@ -6,12 +6,12 @@ import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import pkg from '@/root/package.json';
-import MonkaCommand from '@/structures/commands/MonkaCommand';
+import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 import { getGitRev } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)
-export default class StatisticsCommand extends MonkaCommand {
+export default class StatisticsCommand extends HorizonCommand {
   public async run(message: GuildMessage): Promise<void> {
     const embedMessages = config.messages.embed;
     const commitHash = await getGitRev();

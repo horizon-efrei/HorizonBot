@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import pupa from 'pupa';
 import { pingRoleIntersection as config } from '@/config/commands/admin';
-import MonkaCommand from '@/structures/commands/MonkaCommand';
+import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({
@@ -10,7 +10,7 @@ import type { GuildMessage } from '@/types';
   preconditions: ['StaffOnly'],
   flags: ['keep'],
 })
-export default class PingRoleIntersectionCommand extends MonkaCommand {
+export default class PingRoleIntersectionCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     const isPersistent = args.getFlags('keep');
 

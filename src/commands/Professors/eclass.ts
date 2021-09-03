@@ -16,7 +16,7 @@ import EclassInteractiveBuilder from '@/eclasses/EclassInteractiveBuilder';
 import EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
-import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
+import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import { GuildMessage } from '@/types';
 import type { GuildTextBasedChannel } from '@/types';
 import { EclassPopulatedDocument, EclassStatus } from '@/types/database';
@@ -51,7 +51,7 @@ const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]>
     help: { aliases: ['aide'], default: true },
   }),
 })
-export default class EclassCommand extends MonkaSubCommand {
+export default class EclassCommand extends HorizonSubCommand {
   @IsEprofOrStaff()
   public async create(message: GuildMessage): Promise<void> {
     const responses = await new EclassInteractiveBuilder(message).start();

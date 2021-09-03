@@ -5,12 +5,12 @@ import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { help as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import MonkaCommand from '@/structures/commands/MonkaCommand';
-import type MonkaCommandStore from '@/structures/commands/MonkaCommandStore';
+import HorizonCommand from '@/structures/commands/HorizonCommand';
+import type HorizonCommandStore from '@/structures/commands/HorizonCommandStore';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
-export default class HelpCommand extends MonkaCommand {
+export default class HelpCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     const requestedCommand = await args.pickResult('command');
     const embed = new MessageEmbed().setColor(settings.colors.default);
@@ -37,7 +37,7 @@ export default class HelpCommand extends MonkaCommand {
         .setDescription(pupa(information.description, { helpCommand: `${settings.prefix}help <commande>` }));
 
       const categories = (this.container.stores
-        .get('commands') as MonkaCommandStore)
+        .get('commands') as HorizonCommandStore)
         // eslint-disable-next-line unicorn/prefer-object-from-entries
         .reduce<Record<string, Command[]>>((acc, val: Command) => {
           const category = this._resolveCategory(val);

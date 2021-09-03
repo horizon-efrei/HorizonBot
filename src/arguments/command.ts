@@ -1,10 +1,10 @@
 import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
 import CustomResolvers from '@/resolvers';
-import type MonkaCommand from '@/structures/commands/MonkaCommand';
+import type HorizonCommand from '@/structures/commands/HorizonCommand';
 
-export default class CommandArgument extends Argument<MonkaCommand> {
-  public run(parameter: string, context: ArgumentContext<MonkaCommand>): ArgumentResult<MonkaCommand> {
+export default class CommandArgument extends Argument<HorizonCommand> {
+  public run(parameter: string, context: ArgumentContext<HorizonCommand>): ArgumentResult<HorizonCommand> {
     const resolved = CustomResolvers.resolveCommand(parameter);
 
     if (resolved.success)

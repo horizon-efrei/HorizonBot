@@ -8,7 +8,7 @@ import type {
   PartialDMChannel,
   Role,
 } from 'discord.js';
-import type MonkaClient from '@/structures/MonkaClient';
+import type HorizonClient from '@/structures/HorizonClient';
 import type { SubjectBase } from '@/types/database';
 
 /* ************ */
@@ -61,7 +61,7 @@ export interface EclassEmbedOptions {
   isRecorded: boolean;
 }
 
-export type MonkaCommandOptions = CommandOptions & {
+export type HorizonCommandOptions = CommandOptions & {
   usage: string;
   examples: string[];
   runnableBy: string;
@@ -71,7 +71,7 @@ export type GuildTextBasedChannel = Exclude<Message['channel'], DMChannel | Part
 
 export interface GuildMessage extends Message {
   channel: GuildTextBasedChannel;
-  readonly client: MonkaClient;
+  readonly client: HorizonClient;
   readonly guild: Guild;
   readonly member: GuildMember;
 }

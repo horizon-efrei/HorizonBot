@@ -12,7 +12,7 @@ import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import mongoose from 'mongoose';
-import MonkaClient from '@/structures/MonkaClient';
+import HorizonClient from '@/structures/HorizonClient';
 
 console.log('Starting the bot...');
 
@@ -29,7 +29,7 @@ const main = async (): Promise<void> => {
     useFindAndModify: false,
   });
 
-  const client = new MonkaClient();
+  const client = new HorizonClient();
 
   try {
     await client.login(process.env.DISCORD_TOKEN);

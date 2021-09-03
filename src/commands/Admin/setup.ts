@@ -7,7 +7,7 @@ import pupa from 'pupa';
 import { setup as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import Configuration from '@/models/configuration';
-import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
+import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildMessage } from '@/types';
 import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
 import { ConfigEntriesChannels, ConfigEntriesRoles } from '@/types/database';
@@ -87,7 +87,7 @@ const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry
     help: { aliases: ['aide'], default: true },
   }),
 })
-export default class SetupCommand extends MonkaSubCommand {
+export default class SetupCommand extends HorizonSubCommand {
   public async define(message: GuildMessage, args: Args): Promise<void> {
     const query = await args.pickResult('string');
     const matchArg = argNames.find(argName => argName.possibilities.includes(query.value));

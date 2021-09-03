@@ -11,7 +11,7 @@ import TaskStore from '@/structures/tasks/TaskStore';
 import type { TagDocument } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class MonkaClient extends SapphireClient {
+export default class HorizonClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
   reactionRolesIds: Set<string>;

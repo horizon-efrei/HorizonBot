@@ -11,7 +11,7 @@ import SubjectInteractiveBuilder from '@/eclasses/SubjectInteractiveBuilder';
 import Eclass from '@/models/eclass';
 import Subject from '@/models/subject';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
-import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
+import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import { GuildMessage } from '@/types';
 import type { SubjectDocument } from '@/types/database';
 import { generateSubcommands } from '@/utils';
@@ -27,7 +27,7 @@ import { generateSubcommands } from '@/utils';
     help: { aliases: ['aide'], default: true },
   }),
 })
-export default class SubjectCommand extends MonkaSubCommand {
+export default class SubjectCommand extends HorizonSubCommand {
   @IsEprofOrStaff()
   public async create(message: GuildMessage, _args: Args): Promise<void> {
     const responses = await new SubjectInteractiveBuilder(message).start();

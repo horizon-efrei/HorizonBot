@@ -8,7 +8,7 @@ import type {
 } from '@sapphire/framework';
 import type ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
-import type MonkaCommand from '@/structures/commands/MonkaCommand';
+import type HorizonCommand from '@/structures/commands/HorizonCommand';
 import type TaskStore from '@/structures/tasks/TaskStore';
 import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
 import type { TagDocument } from '@/types/database';
@@ -72,7 +72,7 @@ declare module '@sapphire/framework' {
   interface ArgType {
     code: string;
     codeLanguage: CodeLanguageResult;
-    command: MonkaCommand;
+    command: HorizonCommand;
     day: Date;
     duration: number;
     guildTextBasedChannel: GuildTextBasedChannel;

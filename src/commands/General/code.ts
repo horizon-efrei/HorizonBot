@@ -7,7 +7,7 @@ import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { code as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import MonkaSubCommand from '@/structures/commands/MonkaSubCommand';
+import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildMessage } from '@/types';
 import { convertSize, generateSubcommands } from '@/utils';
 
@@ -38,7 +38,7 @@ const wraps = new Map([
     main: { aliases: [], default: true },
   }),
 })
-export default class CodeCommand extends MonkaSubCommand {
+export default class CodeCommand extends HorizonSubCommand {
   public async main(message: GuildMessage, args: Args): Promise<void> {
     if (this.container.client.remainingCompilerApiCredits <= 0) {
       await message.channel.send(config.messages.noMoreCredits);
