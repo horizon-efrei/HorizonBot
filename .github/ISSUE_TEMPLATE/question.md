@@ -1,6 +1,6 @@
 ---
 name: ❓ Question
-about: Posez une question aux développeurs et contributeurs de MonkaBot !
+about: Posez une question aux développeurs et contributeurs de HorizonBot !
 labels: ['type: question']
 
 ---

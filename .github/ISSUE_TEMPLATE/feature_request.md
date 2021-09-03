@@ -1,6 +1,6 @@
 ---
 name: 🎉 Idée
-about: Proposez une idée pour MonkaBot !
+about: Proposez une idée pour HorizonBot !
 labels: ['type: feature', 'status: awaiting approval']
 
 ---

@@ -33,16 +33,16 @@ changement (ne faites pas 3 commandes et 4 bugfixes en une seule PR).
 variables et tout autre objet compris directement dans le code.\
 Les messages visibles par les utilisateurs (envoyés par discord), votre PR, vos issues etc. doivent être en **français**.
 
-## Lancer MonkaBot localement
+## Lancer HorizonBot localement
 
-Pour lancer MonkaBot localement, il faut suivre ces étapes :
+Pour lancer HorizonBot localement, il faut suivre ces étapes :
 
 1. Installez [Node.js].
 1. Installez [MongoDB Community Edition].
 1. Renommez le fichier `.env.example` à la racine du projet, en `.env`.
 1. Remplissez ce fichier avec vos tokens et votre configuration.
 1. Installez les dependences avec `npm install`.
-1. Lancez MonkaBot en mode "développement" avec `npm run dev`.
+1. Lancez HorizonBot en mode "développement" avec `npm run dev`.
 
 D'autres commandes importantes :
 
@@ -53,19 +53,19 @@ $ npm run lint
 # Appliquer automatiquement les règles de style de code
 $ npm run lint:fix
 
-# Lancer MonkaBot en mode de développement
+# Lancer HorizonBot en mode de développement
 $ npm run dev
 
-# Lancer MonkaBot en mode de production
+# Lancer HorizonBot en mode de production
 $ npm start
 ```
 
-## Concept de MonkaBot
+## Concept de HorizonBot
 
 Il y a certaines directives à prendre en compte avant que vos changements soient acceptés. *Ce n'est pas une liste
 exhaustive, mais ca peut vous donner une idée de ce à quoi penser avant de faire vos changements.*
 
-- Les fonctionnalités de MonkaBot doivent être utiles à la majorité des utilisateurs. Mais ne laissez pas cela vous
+- Les fonctionnalités de HorizonBot doivent être utiles à la majorité des utilisateurs. Mais ne laissez pas cela vous
 arrêter : votre idée est surement très bonne aussi !
 - Pensez que vous développez une fonctionnalité pour un discord d'entraide et de révision, pas une communauté de jeu.
 Ainsi, inutile d'ajouter des commandes "fun" ou qui n'ont rien à voir avec le thème du discord.

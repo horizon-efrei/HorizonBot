@@ -31,7 +31,7 @@ export const code = {
 export const help = {
   options: {
     aliases: ['help', 'aide'],
-    description: "Permet de voir la liste des commandes du bot, ou d'avoir des informations sur une commande en particulier.",
+    description: "Permet de voir la liste des commandes de HorizonBot, ou d'avoir des informations sur une commande en particulier.",
     enabled: true,
     usage: 'help [commande]',
     examples: ['help', 'aide statistique'],
@@ -46,7 +46,7 @@ export const help = {
       examples: '❯ Exemples',
     },
     commandsList: {
-      title: 'Commandes de du bot ({amount})',
+      title: 'Commandes de de HorizonBot ({amount})',
       description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande en particulier.",
       category: '❯ {categoryName}',
     },
@@ -69,14 +69,14 @@ export const latex = {
 export const ping = {
   options: {
     aliases: ['ping', 'pong', 'ms'],
-    description: "Permet de connaître la latence du bot et de l'API Discord.",
+    description: "Permet de connaître la latence de HorizonBot et de l'API Discord.",
     enabled: true,
     usage: 'ping',
     examples: ['ping'],
   },
   messages: {
     firstMessage: 'Ping !',
-    secondMessage: "Pong ! Latence du bot : {botPing}ms. Latence de l'API : {apiPing}ms.",
+    secondMessage: "Pong ! Latence de HorizonBot : {botPing}ms. Latence de l'API : {apiPing}ms.",
   },
 };
 
@@ -90,7 +90,7 @@ export const statistics = {
   },
   messages: {
     embed: {
-      title: 'Statistiques du bot',
+      title: 'Statistiques de HorizonBot',
       description: 'Le préfixe est `{prefix}`. Faites `{prefix}aide` pour avoir la liste des commandes.',
       version: '❯ Version',
       versionContent: stripIndent`

@@ -1,7 +1,7 @@
 {
-  "name": "monka-bot",
+  "name": "horizonbot",
   "version": "0.1.0",
-  "description": "The discord bot for EFREI Révisions Entraide (ERE)",
+  "description": "The discord bot for Ef'Réussite",
   "main": "./dist/src/main.js",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "github",
-    "url": "https://github.com/EFREI-Horizon/MonkaBot"
+    "url": "https://github.com/EFREI-Horizon/HorizonBot"
   },
   "dependencies": {
     "@discordjs/builders": "^0.5.0",
