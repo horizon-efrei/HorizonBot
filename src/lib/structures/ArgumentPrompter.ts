@@ -45,10 +45,10 @@ export default class ArgumentPrompter {
     return response;
   }
 
-  public async autoPromptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
-    let response = await this.promptDate(prompts, previousIsFailure);
+  public async autoPromptDay(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
+    let response = await this.promptDay(prompts, previousIsFailure);
     while (!response)
-      response = await this.promptDate(prompts, true);
+      response = await this.promptDay(prompts, true);
     return response;
   }
 
@@ -122,11 +122,11 @@ export default class ArgumentPrompter {
     return Resolvers.resolveString(response.content).value;
   }
 
-  public async promptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
+  public async promptDay(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
     const response = await this._prompt(
       previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.date.invalid} ${prompts?.base || messages.prompts.date.base}`
-        : prompts?.base || messages.prompts.date.base,
+        ? `${prompts?.invalid || messages.prompts.day.invalid} ${prompts?.base || messages.prompts.day.base}`
+        : prompts?.base || messages.prompts.day.base,
     );
 
     return CustomResolvers.resolveDay(response.content).value;

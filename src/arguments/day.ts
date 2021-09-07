@@ -2,7 +2,7 @@ import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
 import CustomResolvers from '@/resolvers';
 
-export default class HourArgument extends Argument<Date> {
+export default class DayArgument extends Argument<Date> {
   public run(parameter: string, context: ArgumentContext<Date>): ArgumentResult<Date> {
     const resolved = CustomResolvers.resolveDay(parameter);
 

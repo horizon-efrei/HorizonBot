@@ -2,7 +2,7 @@ import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
 import CustomResolvers from '@/resolvers';
 
-export default class CodeArgument extends Argument<number> {
+export default class DurationArgument extends Argument<number> {
   public run(parameter: string, context: ArgumentContext<number>): ArgumentResult<number> {
     const resolved = CustomResolvers.resolveDuration(parameter);
 

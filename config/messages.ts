@@ -80,7 +80,7 @@ export default {
       base: 'Entre du texte :',
       invalid: 'Ce texte est invalide.',
     },
-    date: {
+    day: {
       base: 'Entre une date (au format "jj/MM")  :',
       invalid: 'Cette date est invalide.',
     },

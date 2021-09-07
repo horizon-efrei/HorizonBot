@@ -173,7 +173,7 @@ export default class EclassInteractiveBuilder {
 
 
     // 4. Ask for the date
-    this.responses.date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, dateValidator);
+    this.responses.date = await this._makeMessageStep('autoPromptDay', config.messages.prompts.date, dateValidator);
     await this._updateStep();
 
     const hour = await this._makeMessageStep('autoPromptHour', config.messages.prompts.hour, resolved => hourValidator(resolved, this.responses.date));
