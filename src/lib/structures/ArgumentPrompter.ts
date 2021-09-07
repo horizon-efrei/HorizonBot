@@ -59,6 +59,13 @@ export default class ArgumentPrompter {
     return response;
   }
 
+  public async autoPromptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
+    let response = await this.promptDate(prompts, previousIsFailure);
+    while (!response)
+      response = await this.promptDate(prompts, true);
+    return response;
+  }
+
   public async autoPromptDuration(prompts?: PrompterText, previousIsFailure = false): Promise<number> {
     let response = await this.promptDuration(prompts, previousIsFailure);
     while (!response)
@@ -140,6 +147,16 @@ export default class ArgumentPrompter {
     );
 
     return CustomResolvers.resolveHour(response.content).value;
+  }
+
+  public async promptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
+    const response = await this._prompt(
+      previousIsFailure
+        ? `${prompts?.invalid || messages.prompts.date.invalid} ${prompts?.base || messages.prompts.date.base}`
+        : prompts?.base || messages.prompts.date.base,
+    );
+
+    return CustomResolvers.resolveDate(response.content).value;
   }
 
   public async promptDuration(prompts?: PrompterText, previousIsFailure = false): Promise<number> {

@@ -88,6 +88,10 @@ export default {
       base: 'Entre une heure (au format "HH:mm") :',
       invalid: 'Cette heure est invalide.',
     },
+    date: {
+      base: 'Entre une date (au format "jj/MM HH:mm")  :',
+      invalid: 'Cette date est invalide.',
+    },
     duration: {
       base: 'Entre une durée (en anglais ou en francais).\nTu pouvez par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
       invalid: 'Cette durée est invalide.',
