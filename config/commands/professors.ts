@@ -252,7 +252,7 @@ export const eclass = {
         invalid: 'Ce sujet est invalide.',
       },
       date: {
-        base: 'Entre la date du cours que tu souhaites donner (au format "jj/MM") :',
+        base: 'Entre la date du cours que tu souhaites donner (au format "jj/MM HH:mm") :',
         invalid: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
       },
       hour: {

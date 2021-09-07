@@ -15,12 +15,7 @@ import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import Subject from '@/models/subject';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import type {
-  EclassCreationOptions,
-  GuildMessage,
-  HourMinutes,
-  PrompterText,
-} from '@/types';
+import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
 import type { SubjectDocument } from '@/types/database';
 
@@ -56,15 +51,7 @@ const getSubjectMenu = (subjects: SubjectDocument[]): MessageSelectMenu => new M
     subjects.map(subject => ({ label: subject.name, emoji: subject.emoji, value: subject.classCode })),
   );
 
-const dateValidator = (resolved: Date): boolean => dayjs(resolved).isBetween(
-  dayjs().startOf('day').subtract(1, 'ms'),
-  dayjs().add(2, 'month'),
-);
-const hourValidator = (resolved: HourMinutes, date: Date): boolean => {
-  date.setHours(resolved.hour);
-  date.setMinutes(resolved.minutes);
-  return dayjs(date).isBetween(dayjs(), dayjs().add(2, 'month'));
-};
+const dateValidator = (resolved: Date): boolean => dayjs(resolved).isBetween(dayjs(), dayjs().add(2, 'month'));
 
 export default class EclassInteractiveBuilder {
   public step = 0;
@@ -152,7 +139,6 @@ export default class EclassInteractiveBuilder {
     const schoolYearInteraction = await this._makeSelectMenuStep(schoolYearMenu);
 
     const schoolYear = schoolYearInteraction.values.shift() as SchoolYear;
-    this.step++;
     await this._updateStep(schoolYearInteraction);
 
 
@@ -162,7 +148,6 @@ export default class EclassInteractiveBuilder {
 
     const selectedSubjectCode = subjectInteraction.values.shift();
     this.responses.subject = subjects.find(subject => subject.classCode === selectedSubjectCode);
-    this.step++;
     await this._updateStep(subjectInteraction);
 
 
@@ -173,31 +158,22 @@ export default class EclassInteractiveBuilder {
 
 
     // 4. Ask for the date
-    this.responses.date = await this._makeMessageStep('autoPromptDay', config.messages.prompts.date, dateValidator);
-    await this._updateStep();
-
-    const hour = await this._makeMessageStep('autoPromptHour', config.messages.prompts.hour, resolved => hourValidator(resolved, this.responses.date));
-    this.responses.date.setHours(hour.hour);
-    this.responses.date.setMinutes(hour.minutes);
-    this.step++;
+    this.responses.date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, dateValidator);
     await this._updateStep();
 
 
     // 5. Ask for the duration
     this.responses.duration = await this._makeMessageStep('autoPromptDuration', config.messages.prompts.duration);
-    this.step++;
     await this._updateStep();
 
 
     // 6. Ask for the professor
     this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
-    this.step++;
     await this._updateStep();
 
 
     // 7. Ask for the targeted role
     this.responses.targetRole = await this._makeMessageStep('autoPromptRole', config.messages.prompts.targetRole);
-    this.step++;
     await this._updateStep();
 
 
@@ -250,6 +226,7 @@ export default class EclassInteractiveBuilder {
   }
 
   private async _updateStep(interaction?: SelectMenuInteraction): Promise<void> {
+    this.step++;
     // eslint-disable-next-line unicorn/prefer-ternary
     if (interaction)
       await interaction.update({ embeds: [this._embed], components: this._actionRows });
