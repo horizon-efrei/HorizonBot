@@ -108,7 +108,6 @@ EclassSchema.methods.getStatus = function (): string {
   return eclassConfig.messages.statuses[this.status];
 };
 
-// @ts-expect-error: ts(2345) TODO: Fix this
 EclassSchema.plugin(autopopulate);
 
 export default model<EclassDocument, EclassModel>('Eclass', EclassSchema);

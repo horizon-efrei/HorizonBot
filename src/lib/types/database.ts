@@ -120,6 +120,7 @@ export interface SubjectBase {
   emojiImage: string;
   classCode: string;
   moodleLink: string;
+  docsLink: string;
   teachingUnit: TeachingUnit;
   schoolYear: SchoolYear;
   textChannel: string;
