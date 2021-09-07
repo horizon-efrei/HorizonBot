@@ -5,7 +5,10 @@ import { limits as config } from '@/config/commands/admin';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
-@ApplyOptions<CommandOptions>(config.options)
+@ApplyOptions<CommandOptions>({
+  ...config.options,
+  preconditions: ['StaffOnly'],
+})
 export default class LimitsCommand extends HorizonCommand {
   public async run(message: GuildMessage): Promise<void> {
     await message.channel.send(pupa(config.messages.limits, {
