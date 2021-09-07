@@ -64,5 +64,7 @@ module.exports = {
   ],
   globals: {
     PromiseRejectedResult: 'readonly',
+    PromiseSettledResult: 'readonly',
+    PromiseFulfilledResult: 'readonly',
   },
 };

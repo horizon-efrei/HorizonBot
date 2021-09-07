@@ -1,7 +1,14 @@
 import path from 'path';
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, Command, CommandOptions } from '@sapphire/framework';
+import type {
+  Args,
+  CommandOptions,
+  PreconditionContainerSingle,
+  Result,
+  UserError,
+} from '@sapphire/framework';
 import { MessageEmbed } from 'discord.js';
+import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
 import { help as config } from '@/config/commands/general';
 import settings from '@/config/settings';
@@ -36,17 +43,7 @@ export default class HelpCommand extends HorizonCommand {
       embed.setTitle(pupa(information.title, { amount }))
         .setDescription(pupa(information.description, { helpCommand: `${settings.prefix}help <commande>` }));
 
-      const categories = (this.container.stores
-        .get('commands') as HorizonCommandStore)
-        // eslint-disable-next-line unicorn/prefer-object-from-entries
-        .reduce<Record<string, Command[]>>((acc, val: Command) => {
-          const category = this._resolveCategory(val);
-          if (acc[category])
-            acc[category].push(val);
-          else
-            acc[category] = [val];
-          return acc;
-        }, {});
+      const categories = await this._getCategories(message);
 
       for (const [category, commands] of Object.entries(categories)) {
         embed.addField(
@@ -59,7 +56,24 @@ export default class HelpCommand extends HorizonCommand {
     await message.channel.send({ embeds: [embed] });
   }
 
-  private _resolveCategory(command: Command): string {
+  private async _getCategories(message: GuildMessage): Promise<Record<string, HorizonCommand[]>> {
+    const originalCommands = (this.container.stores.get('commands') as HorizonCommandStore);
+    const commands = [];
+
+    for (const command of originalCommands.values()) {
+      const preconditions = command.preconditions.entries.map(
+        (precondition: PreconditionContainerSingle) => precondition.run(message, command, precondition.context),
+      ) as Array<Result<unknown, UserError>>;
+
+      const results = await Promise.allSettled(preconditions);
+      if (results.every(result => result.status === 'fulfilled' && result.value.success))
+        commands.push(command);
+    }
+
+    return groupBy(commands, command => this._resolveCategory(command));
+  }
+
+  private _resolveCategory(command: HorizonCommand): string {
     const paths = command.path.split(path.sep);
     return paths.slice(paths.indexOf('commands') + 1, -1)[0];
   }
