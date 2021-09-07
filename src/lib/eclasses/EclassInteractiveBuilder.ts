@@ -268,7 +268,7 @@ export default class EclassInteractiveBuilder {
             ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDateTime)
             : this._emoteForStep(3),
         duration: this.responses.duration
-          ? dayjs.duration(this.responses.duration * 1000).humanize()
+          ? dayjs.duration(this.responses.duration).humanize()
           : this._emoteForStep(4),
           professor: this.responses.professor ?? this._emoteForStep(5),
           role: this.responses.targetRole ?? this._emoteForStep(6),
