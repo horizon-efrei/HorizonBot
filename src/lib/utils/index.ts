@@ -5,6 +5,7 @@ export { default as firstAndRest } from './firstAndRest';
 export { default as generateSubcommands } from './generateSubcommands';
 export { default as getDuration } from './getDuration';
 export { default as getGitRev } from './getGitRev';
+export { default as getGraduationYear } from './getGraduationYear';
 export { default as massSend } from './massSend';
 export { noop, nullop } from './noop';
 export { default as sleep } from './sleep';

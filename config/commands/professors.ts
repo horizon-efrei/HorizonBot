@@ -1,6 +1,8 @@
 import { stripIndent } from 'common-tags';
 import type { MessageSelectOptionData } from 'discord.js';
+import { SchoolYear } from '@/types';
 import { EclassStatus } from '@/types/database';
+import { getGraduationYear } from '@/utils';
 
 export const eclass = {
   options: {
@@ -130,9 +132,9 @@ export const eclass = {
       schoolYearMenu: {
         placeholder: 'Aucune année sélectionnée',
         options: [
-          { label: 'L1 - Promo 2026', emoji: '1⃣' },
-          { label: 'L2 - Promo 2025', emoji: '2⃣' },
-          { label: 'L3 - Promo 2024', emoji: '3⃣' },
+          { label: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, emoji: '1⃣' },
+          { label: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, emoji: '2⃣' },
+          { label: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, emoji: '3⃣' },
         ] as Array<Omit<MessageSelectOptionData, 'value'>>,
       },
       subjectMenu: {
@@ -354,9 +356,9 @@ export const subject = {
       schoolYearMenu: {
         placeholder: 'Aucune année sélectionnée',
         options: [
-          { label: 'L1 - Promo 2026', emoji: '1⃣' },
-          { label: 'L2 - Promo 2025', emoji: '2⃣' },
-          { label: 'L3 - Promo 2024', emoji: '3⃣' },
+          { label: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, emoji: '1⃣' },
+          { label: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, emoji: '2⃣' },
+          { label: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, emoji: '3⃣' },
         ] as Array<Omit<MessageSelectOptionData, 'value'>>,
       },
       teachingUnitMenu: {
