@@ -145,13 +145,13 @@ export const tags = {
     // Global
     invalidTag: "Ce nom de tag n'est pas valide.",
     invalidAliases: "Un de ces aliases n'est pas valide ou est déjà utilisé.",
-    stoppedPrompting: 'Tu as bien abandonné la création du menu !',
+    stoppedPrompting: 'Tu as bien abandonné la création de ce tag !',
 
     // Create a tag
     createdTag: 'Ce tag a bien été créé !',
 
     // List the tags
-    noTags: "Je n'ai trouvé aucun tags dans la base de données !",
+    noTags: "Je n'ai trouvé aucun tag dans la base de données !",
     listEmbedTitle: 'Liste des tags ({total})',
     listEmbedItem: '• `{name}` ({aliases})',
 
@@ -162,7 +162,7 @@ export const tags = {
     editedTag: 'Ce tag a bien été modifié !',
 
     // Help page
-    helpEmbedTitle: 'Aide des menus de Tags',
+    helpEmbedTitle: 'Aide des Tags',
     helpEmbedDescription: [
       { name: 'Créer un tag', value: '`tags create <nom> <aliases> <contenu>`' },
       { name: 'Liste des tags', value: '`tags list`' },
