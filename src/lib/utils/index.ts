@@ -8,5 +8,6 @@ export { default as getGitRev } from './getGitRev';
 export { default as getGraduationYear } from './getGraduationYear';
 export { default as massSend } from './massSend';
 export { noop, nullop } from './noop';
+export { default as promiseTimeout } from './promiseTimeout';
 export { default as sleep } from './sleep';
 export { default as splitText } from './splitText';

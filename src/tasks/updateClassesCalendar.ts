@@ -1,5 +1,4 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { chunk as chunkify } from '@sapphire/utilities';
 import dayjs from 'dayjs';
 import { MessageEmbed } from 'discord.js';
 import groupBy from 'lodash.groupby';
@@ -12,7 +11,7 @@ import type { TaskOptions } from '@/structures/tasks/Task';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
-import { nullop } from '@/utils';
+import { nullop, promiseTimeout } from '@/utils';
 
 const calendarMapping = new Map([
   [SchoolYear.L1, ConfigEntriesChannels.ClassCalendarL1],
@@ -41,64 +40,74 @@ export default class UpdateClassesCalendarTask extends Task {
         const upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId
           && eclass.subject.schoolYear === schoolYear);
 
-        const embeds = this._generateCalendarEmbeds(upcomingClasses);
-        const chunks = chunkify(embeds, 10);
-
         const allMessages = await channel.messages.fetch().catch(nullop);
         const allBotMessages = [
           ...(allMessages?.filter(msg => msg.author.id === this.container.client.id).values() ?? []),
-          ].reverse();
+        ].reverse();
+        const firstMessage = allBotMessages.shift();
 
-        let i = 0;
-        for (const chunk of chunks) {
-          // eslint-disable-next-line unicorn/prefer-ternary
-          if (allBotMessages[i]?.editable)
-            await allBotMessages[i].edit({ embeds: chunk });
-          else
-            await channel.send({ embeds: chunk }).then(async msg => await msg.crosspost());
-          i++;
+        // TODO: Check that limits are not crossed
+        //     - max 6000 chars in all embed
+        //     - less than 25 fields
+        //     - field name max 256 chars
+        //     - field value max 1024 chars
+        const embed = this._generateCalendarEmbed(upcomingClasses);
+
+        let edited = false;
+        if (firstMessage?.editable) {
+          try {
+            await promiseTimeout(firstMessage.edit({ embeds: [embed] }), 5000);
+            edited = true;
+          } catch { /* No-op */ }
         }
 
-        if (i < allBotMessages.length)
-          allBotMessages.slice(i).map(async msg => await msg.delete());
+        if (!edited) {
+          if (firstMessage?.deletable)
+            await firstMessage.delete();
+          await channel.send({ embeds: [embed] }).then(async msg => await msg.crosspost());
+        }
+
+        for (const msg of allBotMessages)
+          await msg.delete();
 
         this.container.logger.debug(`[Calendar] Updated classes for school year ${schoolYear} in guild ${guildId}`);
       }
     }
   }
 
-  private _generateCalendarEmbeds(upcomingClasses: EclassPopulatedDocument[]): MessageEmbed[] {
-    const embeds: MessageEmbed[] = [];
+  private _generateCalendarEmbed(upcomingClasses: EclassPopulatedDocument[]): MessageEmbed {
+    const embed = new MessageEmbed()
+      .setColor(settings.colors.default)
+      .setTitle(messages.classesCalendar.title);
+
+    if (upcomingClasses.length === 0) {
+      embed.setDescription(messages.classesCalendar.noClasses);
+      return embed;
+    }
 
     const groupedClasses = groupBy(upcomingClasses, val => val.subject.classCode);
     for (const classes of Object.values(groupedClasses)) {
       const { subject } = classes[0];
-      let baseInformations = pupa(messages.classesCalendar.textChannel, subject);
-      if (subject.textDocsChannel)
-        baseInformations += pupa(messages.classesCalendar.textDocsChannel, subject);
 
-      embeds.push(
-        new MessageEmbed()
-          .setAuthor(pupa(messages.classesCalendar.pretitle, subject))
-          .setURL(subject.moodleLink)
-          .setTitle(pupa(messages.classesCalendar.title, subject))
-          .setThumbnail(subject.emojiImage)
-          .setDescription(
-            pupa(messages.classesCalendar.body, {
-              baseInformations,
-              exams: subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • '),
-              classes: classes.map(eclass =>
-                pupa(messages.classesCalendar.classLine, {
-                  ...eclass.toJSON(),
-                  date: Math.floor(eclass.date / 1000),
-                  beginHour: dayjs(eclass.date).format('HH[h]mm'),
-                  endHour: dayjs(eclass.end).format('HH[h]mm'),
-                })).join('\n'),
-            }),
-          ),
-      );
+      let content = pupa(messages.classesCalendar.textChannel, subject);
+      if (subject.textDocsChannel)
+        content += pupa(messages.classesCalendar.textDocsChannel, subject);
+
+      const exams = subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • ');
+      content += pupa(messages.classesCalendar.body, {
+        exams: exams.length > 0 ? `\n${exams}` : '',
+        classes: classes.map(eclass =>
+          pupa(messages.classesCalendar.classLine, {
+            ...eclass.toJSON(),
+            date: Math.floor(eclass.date / 1000),
+            beginHour: dayjs(eclass.date).format('HH[h]mm'),
+            endHour: dayjs(eclass.end).format('HH[h]mm'),
+          })).join('\n'),
+      });
+
+      embed.addField(pupa(messages.classesCalendar.subjectTitle, subject), content);
     }
 
-    return embeds;
+    return embed;
   }
 }

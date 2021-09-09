@@ -26,12 +26,13 @@ export default {
     classLine: '• {beginHour}h-{endHour}h: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
   },
   classesCalendar: {
+    title: "Calendrier des cours sur Ef'Réussite",
+    noClasses: 'Aucun cours prévu pour le moment.',
+    subjectTitle: '{emoji} {name}',
     textChannel: 'Salon textuel : <#{textChannel}>',
     textDocsChannel: ' • Documents : <#{textDocsChannel}>',
-    title: '{name}',
-    pretitle: '{teachingUnit} ({classCode}) - {schoolYear}',
+    body: '{exams}\n\n**Cours à venir :**\n{classes}\n**\n**',
     classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic}',
-    body: '{baseInformations}\n{exams}\n\n**Cours à venir :**\n{classes}',
   },
   antiSwear: {
     swearModAlert: stripIndent`
