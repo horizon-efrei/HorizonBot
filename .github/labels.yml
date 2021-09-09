@@ -39,6 +39,9 @@
   description: Issues and PRs that have been approved.
   color: '8CE098'
 
+- name: 'priority: critical'
+  description: Issues that must be fixed or PRs that must be finished and merged with maximum priority, letting other issues on stand-by.
+  color: 'F45B0E'
 - name: 'priority: high'
   description: Issues that must be fixed or PRs that must be finished and merged with high priority.
   color: 'F48750'
@@ -48,6 +51,9 @@
 - name: 'priority: low'
   description: Issues that must be fixed or PRs that must be finished and merged with low priority.
   color: '9CEB34'
+- name: 'priority: lowest'
+  description: Issues that must be fixed or PRs that must be finished with the lowest priority, only if there is nothing else to work on.
+  color: '41FC02'
 
 - name: 'difficulty: complex'
   description: Issues that are quite complex to finish.
