@@ -32,11 +32,14 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
   - **`commands` :** Dossier où se trouvent toutes les commandes, rangées dans des sous-dossiers correspondant à leurs catégories.
   - **`lib` :** Dossier contenant plusieurs fichiers utiles dans le code.
     - **`decorators` :** Dossier contenant différents decorators utilisés à travers le code.
+    - **`eclasses` :** Dossier contenant des classes et utilitaires relatifs aux e-classes.
     - **`models` :** Fichiers des schemas mongoose.
+    - **`resolvers` :** Fichiers des resolvers customs pour les arguments.
     - **`structures` :** Différentes classes utilisées à travers HorizonBot.
     - **`types` :** Fichiers contenant les typings TypeScript nécessaires pour HorizonBot.
     - **`utils` :** Dossier contenant différentes fonctions utilitaires.
   - **`listeners` :** Dossier où se trouvent tous les gestionnaires d'évènement, rangés par émetteurs.
+  - **`preconditions` :** Dossier où se trouvent les pré-conditions customs.
   - **`tasks` :** Dossier où se trouvent toutes les tâches.
 - **`typings` :** Typings TypeScript pour les librairies externes.
 

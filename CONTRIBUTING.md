@@ -37,7 +37,7 @@ Les messages visibles par les utilisateurs (envoyés par discord), votre PR, vos
 
 Pour lancer HorizonBot localement, il faut suivre ces étapes :
 
-1. Installez [Node.js].
+1. Installez [Node.js]. Vérifiez bien d'avoir Node.js v16.6.1 ou plus quand vous faites `node -v`.
 1. Installez [MongoDB Community Edition].
 1. Renommez le fichier `.env.example` à la racine du projet, en `.env`.
 1. Remplissez ce fichier avec vos tokens et votre configuration.
