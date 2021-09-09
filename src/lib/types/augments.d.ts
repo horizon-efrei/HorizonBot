@@ -11,7 +11,7 @@ import type FlaggedMessage from '@/structures/FlaggedMessage';
 import type HorizonCommand from '@/structures/commands/HorizonCommand';
 import type TaskStore from '@/structures/tasks/TaskStore';
 import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
-import type { TagDocument } from '@/types/database';
+import type { ReminderDocument, TagDocument } from '@/types/database';
 
 
 declare module 'discord.js' {
@@ -63,10 +63,12 @@ declare module '@sapphire/framework' {
     waitingFlaggedMessages: FlaggedMessage[];
     intersectionRoles: Set<string>;
     tags: Set<TagDocument>;
+    reminders: Set<ReminderDocument>;
 
     loadReactionRoles(): Promise<void>;
     loadEclassRoles(): Promise<void>;
     loadTags(): Promise<void>;
+    loadReminders(): Promise<void>;
   }
 
   interface ArgType {

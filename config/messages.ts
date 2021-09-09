@@ -16,6 +16,10 @@ export default {
     eprofMentionPrivate: '{member} a besoin de toi là-bas : {message.channel}',
     paginatedMessagePrompt: 'À quelle page désires-tu aller ?',
   },
+  reminders: {
+    alarm: ":alarm_clock: Il est l'heure ! Tu m'avais demandé de te rappeler ceci :\n> {description}",
+    noDescription: 'Aucune description',
+  },
   upcomingClasses: {
     header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
     noClasses: 'Aucune séance de prévue !',

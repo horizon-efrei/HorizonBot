@@ -80,6 +80,50 @@ export const ping = {
   },
 };
 
+export const reminders = {
+  options: {
+    aliases: ['reminders', 'reminder', 'rappels', 'rappel'],
+    description: 'Permet de créer/modifier et lister des rappels.',
+    enabled: true,
+    usage: 'reminders <create | list | remove | help>',
+    examples: ['reminder create 2h Aller me coucher', 'reminders list', 'tags remove 12we6f', 'reminders help'],
+  },
+  messages: {
+    // Global
+    invalidReminder: "Cet ID de rappel n'est pas valide.",
+    invalidTime: "Cette durée ou cette date n'est pas valide.",
+
+    // Create a reminder
+    createdReminder: "D'accord, je te rappelerai ça ! Ce rappel à l'ID `{reminderId}`.",
+    openDm: "\n:warning: Tes messages privés ne sont pas ouverts ou tu m'as bloqué, je ne pourrai donc pas t'envoyer le message de rappel ! Active-les ou débloque-moi pour les recevoir.",
+
+    // List the reminders
+    noReminders: "Je n'ai trouvé aucun rappel t'étant associé dans la base de données !",
+    listEmbedTitle: 'Liste de tes rappels ({total})',
+    listEmbedItem: '• `{reminderId}` (<t:{timestamp}:R>) : {description}',
+
+    // Remove a reminder
+    removedReminder: 'Ce rappel a bien été supprimé !',
+
+    // Help page
+    helpEmbedTitle: 'Aide des rappels',
+    helpEmbedDescription: [
+      { name: 'Créer un rappel', value: '`reminders create <durée | date> [description]`' },
+      { name: 'Liste de tes rappels', value: '`reminders list`' },
+      { name: 'Supprimer un rappel', value: '`reminders remove <ID>`' },
+      { name: "Page d'aide", value: '`reminders help`' },
+    ],
+
+    // Prompts
+    prompts: {
+      id: {
+        base: "Entre l'ID du rappel :",
+        invalid: 'Cet ID de rappel est invalide.',
+      },
+    },
+  },
+};
+
 export const statistics = {
   options: {
     aliases: ['statistiques', 'statistique', 'statistics', 'statistic', 'stats', 'stat', 'botinfo'],

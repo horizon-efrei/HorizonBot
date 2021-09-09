@@ -110,7 +110,6 @@ export interface EclassModel extends Model<EclassDocument> {
 /* ****************************** */
 
 // #region Subject Database Types
-
 /** Interface for the "Subject"'s mongoose schema */
 export interface SubjectBase {
   name: string;
@@ -222,4 +221,25 @@ export interface TagDocument extends TagBase, Document {}
 
 /** Interface for the "Tag"'s mongoose model */
 export type TagModel = Model<TagDocument>;
+// #endregion
+
+/* ************************* */
+/*  Reminder Database Types  */
+/* ************************* */
+
+// #region Reminder Database Types
+/** Interface for the "Reminder"'s mongoose schema */
+export interface ReminderBase {
+  reminderId: string;
+  date: number;
+  description: string;
+  userId: string;
+  guildId: string;
+}
+
+/** Interface for the "Reminder"'s mongoose document */
+export interface ReminderDocument extends ReminderBase, Document {}
+
+/** Interface for the "Reminder"'s mongoose model */
+export type ReminderModel = Model<ReminderDocument>;
 // #endregion

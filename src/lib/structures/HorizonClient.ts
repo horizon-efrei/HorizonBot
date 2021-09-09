@@ -4,11 +4,12 @@ import { Intents, Permissions } from 'discord.js';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
+import Reminders from '@/models/reminders';
 import Tags from '@/models/tags';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import TaskStore from '@/structures/tasks/TaskStore';
-import type { TagDocument } from '@/types/database';
+import type { ReminderDocument, TagDocument } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class HorizonClient extends SapphireClient {
@@ -19,6 +20,7 @@ export default class HorizonClient extends SapphireClient {
   waitingFlaggedMessages: FlaggedMessage[];
   intersectionRoles: Set<string>;
   tags: Set<TagDocument>;
+  reminders: Set<ReminderDocument>;
 
   constructor() {
     super({
@@ -47,6 +49,7 @@ export default class HorizonClient extends SapphireClient {
     void this.loadReactionRoles();
     void this.loadEclassRoles();
     void this.loadTags();
+    void this.loadReminders();
 
     this.configManager = new ConfigurationManager();
 
@@ -114,6 +117,13 @@ export default class HorizonClient extends SapphireClient {
     const tags = await Tags.find().catch(nullop);
     if (tags)
       this.tags.addAll(...tags);
+  }
+
+  public async loadReminders(): Promise<void> {
+    this.reminders = new Set();
+    const reminders = await Reminders.find().catch(nullop);
+    if (reminders)
+      this.reminders.addAll(...reminders);
   }
 
   private async _loadCompilerApiCredits(): Promise<void> {
