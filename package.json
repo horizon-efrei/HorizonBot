@@ -20,7 +20,7 @@
     "url": "https://github.com/EFREI-Horizon/MonkaBot"
   },
   "dependencies": {
-    "@sapphire/decorators": "^2.1.5",
+    "@sapphire/decorators": "^2.2.0",
     "@sapphire/discord-utilities": "^2.1.5",
     "@sapphire/discord.js-utilities": "^1.6.0",
     "@sapphire/framework": "^1.0.2",
@@ -43,7 +43,7 @@
     "mongoose": "^5.13.0",
     "node-cron": "^3.0.0",
     "node-emoji": "^1.10.0",
-    "pdf-merger-js": "^3.1.0",
+    "pdf-merger-js": "^3.2.1",
     "pupa": "^2.1.1",
     "reflect-metadata": "^0.1.13",
     "slug": "^5.1.0",

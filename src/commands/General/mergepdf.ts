@@ -1,32 +1,28 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type {
- Args, CommandOptions, Result, UserError,
+ Args, CommandOptions,
 } from '@sapphire/framework';
-import type { Message } from 'discord.js';
 import PdfMerger from 'pdf-merger-js';
 import { mergePDF as config } from '@/config/commands/general';
-import MonkaCommand from '@/structures/MonkaCommand';
+import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
-export default class PdfMergeCommand extends MonkaCommand {
+export default class PdfMergeCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     // Argument dans l'ordre croissant
-    const result: Result<Message[], UserError> = await args.repeatResult('message');
+    const result = await args.repeatResult('message');
 
-    let msgs: Message[] = [];
-
-    if (result.success)
-        msgs = result.value;
-    else
-        await message.channel.send('Erreur fichiers !');
-
+    if (!result.success) {
+        await message.channel.send(config.messages.noPdfFound);
+        return;
+    }
     const merger = new PdfMerger();
 
-    for (const o of msgs) {
-        for (const a of o.attachments.values()) {
-            if (a.name.endsWith('.pdf'))
-                merger.add(a.proxyURL);
+    for (const msg of result.value) {
+        for (const fichier of msg.attachments.values()) {
+            if (fichier.name.endsWith('.pdf'))
+                merger.add(fichier.proxyURL);
         }
     }
 
