@@ -24,7 +24,7 @@ export type Writable<T> = { -readonly [P in keyof T]: T[P] };
 // Overwrite 'appliedMessage' and 'response' in 'IMessagePrompterExplicitMessageReturn' for them
 // to be GuildMessages rather than Messages
 export type PrompterMessageResult = Omit<IMessagePrompterExplicitMessageReturn, 'appliedMessage' | 'response'> & { response: GuildMessage; appliedMessage: GuildMessage };
-export type PrompterText = Record<'base' | 'invalid', string>;
+export type PrompterText = Partial<Record<'base' | 'invalid', string>>;
 
 export enum SchoolYear {
   L1 = 'L1',

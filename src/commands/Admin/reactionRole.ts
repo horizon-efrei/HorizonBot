@@ -1,29 +1,27 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessagePrompter, PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
-import type { Args } from '@sapphire/framework';
-import { Resolvers } from '@sapphire/framework';
+import { Args, Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { MessageEmbed } from 'discord.js';
 import difference from 'lodash.difference';
 import pupa from 'pupa';
 import { reactionRole as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
+import { ResolveReactionRoleArgument } from '@/decorators';
 import ReactionRole from '@/models/reactionRole';
 import * as CustomResolvers from '@/resolvers';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
-import type {
-  GuildMessage,
-  GuildTextBasedChannel,
-  ReactionRolePair,
-  ReactionRoleReturnPayload,
-} from '@/types';
-import {
-  commaListAnd,
-  firstAndRest,
-  generateSubcommands,
-  nullop,
-} from '@/utils';
+import { GuildMessage } from '@/types';
+import type { GuildTextBasedChannel, ReactionRolePair } from '@/types';
+import type { ReactionRoleDocument } from '@/types/database';
+import { firstAndRest, generateSubcommands, nullop } from '@/utils';
+
+interface ExtraContext {
+  document?: ReactionRoleDocument;
+  rrMessage: GuildMessage;
+}
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
@@ -136,50 +134,27 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       .run(message);
   }
 
-  public async remove(message: GuildMessage, args: Args): Promise<void> {
-    let givenMessage = (await args.pickResult('message')).value;
-    if (!givenMessage)
-      givenMessage = await new ArgumentPrompter(message).autoPromptMessage();
-
-    const isRrMenu = this.container.client.reactionRolesIds.has(givenMessage.id);
-    if (!isRrMenu) {
-      await message.channel.send(config.messages.notAMenu);
-      return;
-    }
-
+  @ResolveReactionRoleArgument()
+  public async remove(message: GuildMessage, _args: Args, { rrMessage }: ExtraContext): Promise<void> {
     // We delete it, and the "messageDelete" listener will take care of the rest.
-    await givenMessage.delete();
+    await rrMessage.delete();
     await message.channel.send(config.messages.removedMenu);
   }
 
-  public async edit(message: GuildMessage, args: Args): Promise<void> {
-    let givenMessage = (await args.pickResult('message')).value;
-    if (!givenMessage)
-      givenMessage = await new ArgumentPrompter(message).autoPromptMessage();
-
+  @ResolveReactionRoleArgument()
+  public async edit(message: GuildMessage, _args: Args, { rrMessage }: ExtraContext): Promise<void> {
     const [title, description] = await this._promptTitle(message);
 
-    const embed = givenMessage.embeds[0];
+    const embed = rrMessage.embeds[0];
     embed.setTitle(title);
     embed.setDescription(description);
-    await givenMessage.edit({ embeds: [embed] });
+    await rrMessage.edit({ embeds: [embed] });
 
     await message.channel.send(config.messages.editedMenu);
   }
 
-  public async addPair(message: GuildMessage, args: Args): Promise<void> {
-    const rrMessage = (await args.pickResult('message'))?.value as GuildMessage;
-    if (!rrMessage) {
-      await message.channel.send(config.messages.notAMessage);
-      return;
-    }
-
-    const document = await ReactionRole.findOne({ messageId: rrMessage.id });
-    if (!rrMessage) {
-      await message.channel.send(config.messages.notAMenu);
-      return;
-    }
-
+  @ResolveReactionRoleArgument({ getDocument: true })
+  public async addPair(message: GuildMessage, args: Args, { document, rrMessage }: ExtraContext): Promise<void> {
     const emojiQuery = (await args.pickResult('string'))?.value;
     const reaction = CustomResolvers.resolveEmoji(emojiQuery, message.guild);
     if (reaction.error) {
@@ -210,19 +185,8 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     );
   }
 
-  public async removePair(message: GuildMessage, args: Args): Promise<void> {
-    const rrMessage = (await args.pickResult('message'))?.value as GuildMessage;
-    if (!rrMessage) {
-      await message.channel.send(config.messages.notAMessage);
-      return;
-    }
-
-    const document = await ReactionRole.findOne({ messageId: rrMessage.id });
-    if (!rrMessage) {
-      await message.channel.send(config.messages.notAMenu);
-      return;
-    }
-
+  @ResolveReactionRoleArgument({ getDocument: true })
+  public async removePair(message: GuildMessage, args: Args, { document, rrMessage }: ExtraContext): Promise<void> {
     const role = (await args.pickResult('role'))?.value;
     if (!role) {
       await message.channel.send(config.messages.invalidRole);

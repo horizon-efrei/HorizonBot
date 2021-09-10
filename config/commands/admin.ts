@@ -40,8 +40,8 @@ export const reactionRole = {
   },
   messages: {
     // Global
-    notAMessage: "Cet identifiant de message n'est pas valide. Il faut entrer le lien vers le message, ou son ID.",
     notAMenu: "Ce message n'est pas un menu de réaction.",
+    rrMessagePrompt: "Entre l'identifiant (ID) ou le lien du message qui contient le menu que souhaité.",
     invalidReaction: "Cette réaction n'est pas valide.",
     invalidRole: "Ce rôle n'est pas valide.",
 
@@ -68,12 +68,11 @@ export const reactionRole = {
 
     // List the menus
     noMenus: "Je n'ai trouvé aucun menu de réaction dans la base de données !",
-    listEmbedTitle: 'Liste des menus de réaction ({total})',
-    listEmbedDescription: '• [{title}]({url}) ({total} rôles)\n',
+    listTitle: 'Liste des menus de réaction ({total})',
+    listLine: '• **[{title}]({url})** ({total} rôles)\n',
 
     // Remove a menu
     removedMenu: 'Ce menu a bien été supprimé !',
-    removePrompt: "Entre l'identifiant (ID) ou le lien du message qui contient le menu que tu souhaites supprimer.",
 
     // Edit a menu
     editedMenu: 'Ce menu a bien été modifié !',
