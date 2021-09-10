@@ -17,6 +17,10 @@ const TagSchema = new Schema<TagDocument, TagModel>({
     type: String,
     required: true,
   },
+  uses: {
+    type: Number,
+    default: 0,
+  },
   guildId: {
     type: String,
     required: true,

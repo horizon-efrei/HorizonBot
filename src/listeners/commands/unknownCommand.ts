@@ -11,7 +11,10 @@ export default class UnknownCommandListener extends Listener<typeof Events.Unkno
     const name = commandName.toLowerCase();
     const tag = tags.find(t => t.name.toLowerCase() === name
       || t.aliases.map(alias => alias.toLowerCase()).includes(name));
-    if (tag)
+    if (tag) {
       await message.channel.send(tag.content);
+      tag.uses++;
+      await tag.save();
+    }
   }
 }

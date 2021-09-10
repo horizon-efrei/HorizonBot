@@ -71,7 +71,8 @@ export default class TagsCommand extends HorizonSubCommand {
       .setDescription(
         tags.map(tag => pupa(config.messages.listEmbedItem, {
           name: tag.name,
-          aliases: tag.aliases.length > 0 ? `\`${tag.aliases.join('`, `')}\`` : '/',
+          aliases: tag.aliases.length > 0 ? `\`${tag.aliases.join('`, `')}\`` : ':x:',
+          uses: tag.uses,
         })).join('\n'),
       );
     await message.channel.send({ embeds: [embed] });

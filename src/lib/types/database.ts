@@ -213,6 +213,7 @@ export interface TagBase {
   name: string;
   aliases: string[];
   content: string;
+  uses: number;
   guildId: string;
 }
 
