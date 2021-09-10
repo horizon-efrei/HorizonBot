@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { SchoolYear } from '../types';
+import { SchoolYear } from '@/types';
 
 const yearsLeft = {
   [SchoolYear.L1]: 5,
