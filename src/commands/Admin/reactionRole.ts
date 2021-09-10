@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { MessagePrompter } from '@sapphire/discord.js-utilities';
+import { MessagePrompter, PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import type { Args } from '@sapphire/framework';
 import { Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
@@ -112,24 +112,28 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       return;
     }
 
-    let description = '';
+    const items: Array<{ title: string; url: string; total: number }> = [];
     for (const rr of reactionRoles) {
       const rrChannel = message.guild.channels.resolve(rr.channelId) as GuildTextBasedChannel;
       const rrMessage = await rrChannel?.messages.fetch(rr.messageId).catch(nullop);
       if (!rrMessage)
         continue;
 
-      description += pupa(config.messages.listEmbedDescription, {
+      items.push({
         title: rrMessage.embeds[0].title,
         url: rrMessage.url,
         total: rr.reactionRolePairs.length,
       });
     }
 
-    const embed = new MessageEmbed()
-      .setTitle(pupa(config.messages.listEmbedTitle, { message, total: reactionRoles.length }))
-      .setDescription(description);
-    await message.channel.send({ embeds: [embed] });
+    await new PaginatedFieldMessageEmbed()
+      .setTitleField(pupa(config.messages.listTitle, { total: reactionRoles.length }))
+      .setTemplate(new MessageEmbed().setColor(settings.colors.default))
+      .setItems(items)
+      .formatItems(item => pupa(config.messages.listLine, item))
+      .setItemsPerPage(15)
+      .make()
+      .run(message);
   }
 
   public async remove(message: GuildMessage, args: Args): Promise<void> {
