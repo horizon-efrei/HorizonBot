@@ -164,12 +164,12 @@ export default class SetupCommand extends HorizonSubCommand {
     await new PaginatedFieldMessageEmbed<{ name: ConfigEntries; value: string }>()
       .setTitleField(config.messages.listTitle)
       .setTemplate(new MessageEmbed().setColor(settings.colors.default))
-      .setItems(allEntriesFilled.map(([key, entry]) => ({ name: key, value: entry?.value })))
+      .setItems(allEntriesFilled.map(([name, entry]) => ({ name, value: entry?.value })))
       .formatItems(item => pupa(
         item.value ? config.messages.lineWithValue : config.messages.lineWithoutValue,
         { ...item, value: this._getMention(item) },
       ))
-      .setItemsPerPage(10)
+      .setItemsPerPage(15)
       .make()
       .run(message);
   }
