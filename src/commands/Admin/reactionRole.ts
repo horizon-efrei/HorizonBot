@@ -14,7 +14,7 @@ import * as CustomResolvers from '@/resolvers';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import { GuildMessage } from '@/types';
-import type { GuildTextBasedChannel, ReactionRolePair } from '@/types';
+import type { GuildTextBasedChannel, ReactionRolePair, ReactionRoleReturnPayload } from '@/types';
 import type { ReactionRoleDocument } from '@/types/database';
 import { firstAndRest, generateSubcommands, nullop } from '@/utils';
 
@@ -228,9 +228,9 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
   }
 
   private async _promptReactionRolesSafe(message: GuildMessage): Promise<ReactionRolePair[]> {
-    let roles = await this._promptReactionRoles(message);
+    let roles: ReactionRoleReturnPayload;
 
-    while (roles.isError || roles.reactionRoles.length === 0) {
+    do {
       roles = await this._promptReactionRoles(message);
 
       if (roles.isError) {
@@ -247,7 +247,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       } else if (roles.reactionRoles.length === 0) {
         await message.channel.send(config.messages.invalidEntries);
       }
-    }
+    } while (roles.isError || roles.reactionRoles.length === 0);
 
     return roles.reactionRoles;
   }
