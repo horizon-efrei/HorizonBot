@@ -41,8 +41,9 @@ export default class PingRoleIntersectionCommand extends HorizonCommand {
       reason: `${message.author.username} a éxecuté la commande PingRoleIntersection`,
     });
 
-    for (const [, member] of targetedMembers)
+    for (const member of targetedMembers.values())
       await member.roles.add(newRole);
+
     await message.channel.send(
       pupa(
         isPersistent ? config.messages.successPersistent : config.messages.successTemporary,

@@ -2,9 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Args, Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
-import { isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
-import type { GuildMember, Role } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 
@@ -336,48 +334,46 @@ export default class EclassCommand extends HorizonSubCommand {
     // TODO: Add ability to combine same filters with each-other
     const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: message.guild.id });
 
+    const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [];
     const filterDescriptions: string[] = [];
-    let statusValue: EclassStatus;
-    let professorValue: GuildMember;
-    let roleValue: Role;
-    let subjectValue: string;
 
     const statusQuery = args.getOption(...listOptions.status);
     if (statusQuery) {
-      statusValue = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
-      filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.rawStatuses[statusValue] }));
+      const value = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
+      if (value) {
+        filters.push(eclass => eclass.status === value);
+        filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.rawStatuses[value] }));
+      }
     }
 
     const professorQuery = args.getOption(...listOptions.professor);
     if (professorQuery) {
-      professorValue = (await Resolvers.resolveMember(professorQuery, message.guild))?.value;
-      filterDescriptions.push(pupa(config.messages.professorFilter, { value: professorValue }));
+      const value = (await Resolvers.resolveMember(professorQuery, message.guild))?.value;
+      if (value) {
+        filters.push(eclass => eclass.professor === value.id);
+        filterDescriptions.push(pupa(config.messages.professorFilter, { value }));
+      }
     }
 
     const roleQuery = args.getOption(...listOptions.role);
     if (roleQuery) {
-      roleValue = (await Resolvers.resolveRole(roleQuery, message.guild))?.value;
-      filterDescriptions.push(pupa(config.messages.roleFilter, { value: roleValue }));
+      const value = (await Resolvers.resolveRole(roleQuery, message.guild))?.value;
+      if (value) {
+        filters.push(eclass => eclass.targetRole === value.id);
+        filterDescriptions.push(pupa(config.messages.roleFilter, { value }));
+      }
     }
 
     const subjectQuery = args.getOption(...listOptions.subject);
     if (subjectQuery) {
-      subjectValue = subjectQuery;
-      filterDescriptions.push(pupa(config.messages.subjectFilter, { value: subjectValue }));
+      filters.push(eclass => eclass.subject.classCode === subjectQuery || eclass.subject.name === subjectQuery);
+      filterDescriptions.push(pupa(config.messages.subjectFilter, { value: subjectQuery }));
     }
 
     const filterDescription = filterDescriptions.length > 0
       ? pupa(config.messages.filterTitle, { filters: filterDescriptions.join('\n') })
       : config.messages.noFilter;
 
-    const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [
-      (eclass): boolean => (isNullish(statusValue) ? true : eclass.status === statusValue),
-      (eclass): boolean => (isNullish(professorValue) ? true : eclass.professor === professorValue.id),
-      (eclass): boolean => (isNullish(roleValue) ? true : eclass.targetRole === roleValue.id),
-      (eclass): boolean => (isNullish(subjectValue)
-        ? true
-        : (eclass.subject.classCode === subjectValue || eclass.subject.name === subjectValue)),
-    ];
     // Change the ".every" to ".some" to have a "OR" between the filters, rather than "AND".
     const filteredClasses = eclasses.filter(eclass => filters.every(filt => filt(eclass)));
 

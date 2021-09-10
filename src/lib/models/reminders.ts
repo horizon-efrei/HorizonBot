@@ -26,7 +26,7 @@ const ReminderSchema = new Schema<ReminderDocument, ReminderModel>({
     type: String,
     required: true,
   },
-});
+}, { timestamps: true });
 
 ReminderSchema.post('save', async () => {
   await container.client.loadReminders();

@@ -140,16 +140,15 @@ export default class SetupCommand extends HorizonSubCommand {
         await message.channel.send(config.messages.unknown);
         return;
       }
+
       const entry = await Configuration.findOne({ guild: message.guild.id, name: matchArg.entry });
       await message.channel.send(entry
         ? {
-            embeds: [
-              new MessageEmbed()
-                .setDescription(pupa(config.messages.associatedValue, {
-                  ...entry,
-                  // FIXME: Hackiest code in the west
-                  value: this._getMention(entry),
-                })),
+           embeds: [
+              new MessageEmbed().setDescription(
+                // FIXME: Hackiest code in the west (mostly the value)
+                pupa(config.messages.associatedValue, { ...entry, value: this._getMention(entry) }),
+              ),
             ],
           }
         : config.messages.noAssociatedValue);

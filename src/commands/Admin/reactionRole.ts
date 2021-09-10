@@ -9,7 +9,7 @@ import pupa from 'pupa';
 import { reactionRole as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
-import CustomResolvers from '@/resolvers';
+import * as CustomResolvers from '@/resolvers';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type {
@@ -134,10 +134,8 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
 
   public async remove(message: GuildMessage, args: Args): Promise<void> {
     let givenMessage = (await args.pickResult('message')).value;
-    if (!givenMessage) {
-      const argumentPrompter = new ArgumentPrompter(message);
-      givenMessage = await argumentPrompter.autoPromptMessage();
-    }
+    if (!givenMessage)
+      givenMessage = await new ArgumentPrompter(message).autoPromptMessage();
 
     const isRrMenu = this.container.client.reactionRolesIds.has(givenMessage.id);
     if (!isRrMenu) {
@@ -152,10 +150,8 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
 
   public async edit(message: GuildMessage, args: Args): Promise<void> {
     let givenMessage = (await args.pickResult('message')).value;
-    if (!givenMessage) {
-      const argumentPrompter = new ArgumentPrompter(message);
-      givenMessage = await argumentPrompter.autoPromptMessage();
-    }
+    if (!givenMessage)
+      givenMessage = await new ArgumentPrompter(message).autoPromptMessage();
 
     const [title, description] = await this._promptTitle(message);
 

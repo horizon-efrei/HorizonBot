@@ -119,6 +119,7 @@ export default class EclassInteractiveBuilder {
     } catch {
       if (this.aborted)
         return;
+
       await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
       await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
       return;
@@ -137,10 +138,8 @@ export default class EclassInteractiveBuilder {
   private async _askPrompts(): Promise<void> {
     // 1. Ask for the targeted schoolyear
     const schoolYearInteraction = await this._makeSelectMenuStep(schoolYearMenu);
-
     const schoolYear = schoolYearInteraction.values.shift() as SchoolYear;
     await this._updateStep(schoolYearInteraction);
-
 
     // 2. Ask for the subject
     const subjects = await Subject.find({ schoolYear });
@@ -150,32 +149,25 @@ export default class EclassInteractiveBuilder {
     this.responses.subject = subjects.find(subject => subject.classCode === selectedSubjectCode);
     await this._updateStep(subjectInteraction);
 
-
     // 3. Ask for the topic
     this.responses.topic = await this._makeMessageStep('autoPromptText', config.messages.prompts.topic);
-    this.step++;
     await this._updateStep();
-
 
     // 4. Ask for the date
     this.responses.date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, dateValidator);
     await this._updateStep();
 
-
     // 5. Ask for the duration
     this.responses.duration = await this._makeMessageStep('autoPromptDuration', config.messages.prompts.duration);
     await this._updateStep();
-
 
     // 6. Ask for the professor
     this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
     await this._updateStep();
 
-
     // 7. Ask for the targeted role
     this.responses.targetRole = await this._makeMessageStep('autoPromptRole', config.messages.prompts.targetRole);
     await this._updateStep();
-
 
     // 8. Ask whether the class will be recorded
     await this.botMessagePrompt.edit(config.messages.createClassSetup.promptMessageDropdown);
@@ -204,8 +196,6 @@ export default class EclassInteractiveBuilder {
     prompts: PrompterText,
     validator: (resolved: TResult) => boolean = (): boolean => true,
   ): Promise<TResult> {
-    // Await this.mainBotMessage.edit({ components: this.actionRows });
-
     let result;
     let previousIsFailure = false;
     do {

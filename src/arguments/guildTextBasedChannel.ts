@@ -1,6 +1,6 @@
 import type { ArgumentContext, ArgumentResult } from '@sapphire/framework';
 import { Argument } from '@sapphire/framework';
-import CustomResolvers from '@/resolvers';
+import * as CustomResolvers from '@/resolvers';
 import type { GuildTextBasedChannel } from '@/types';
 
 export default class GuildTextBasedChannelArgument extends Argument<GuildTextBasedChannel> {

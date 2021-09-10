@@ -3,7 +3,7 @@ import { Resolvers } from '@sapphire/framework';
 import type { GuildMember, Role } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
-import CustomResolvers from '@/resolvers';
+import * as CustomResolvers from '@/resolvers';
 import type {
   GuildMessage,
   GuildTextBasedChannel,
@@ -95,11 +95,7 @@ export default class ArgumentPrompter {
   }
 
   public async promptTextChannel(prompts?: PrompterText, previousIsFailure = false): Promise<GuildTextBasedChannel> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.channel.invalid} ${prompts?.base || messages.prompts.channel.base}`
-        : prompts?.base || messages.prompts.channel.base,
-    );
+    const response = await this._prompt({ ...messages.prompts.channel, ...prompts }, previousIsFailure);
 
     const firstMention = response.mentions.channels.first();
     if (response.mentions.channels.size > 0 && firstMention.isText() && isGuildBasedChannel(firstMention))
@@ -110,72 +106,37 @@ export default class ArgumentPrompter {
   }
 
   public async promptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.message.invalid} ${prompts?.base || messages.prompts.message.base}`
-        : prompts?.base || messages.prompts.message.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.message, ...prompts }, previousIsFailure);
     return (await Resolvers.resolveMessage(response.content, { message: response })).value as GuildMessage;
   }
 
   public async promptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.text.invalid} ${prompts?.base || messages.prompts.text.base}`
-        : prompts?.base || messages.prompts.text.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.text, ...prompts }, previousIsFailure);
     return Resolvers.resolveString(response.content).value;
   }
 
   public async promptDay(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.day.invalid} ${prompts?.base || messages.prompts.day.base}`
-        : prompts?.base || messages.prompts.day.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.day, ...prompts }, previousIsFailure);
     return CustomResolvers.resolveDay(response.content).value;
   }
 
   public async promptHour(prompts?: PrompterText, previousIsFailure = false): Promise<HourMinutes> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.hour.invalid} ${prompts?.base || messages.prompts.hour.base}`
-        : prompts?.base || messages.prompts.hour.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.hour, ...prompts }, previousIsFailure);
     return CustomResolvers.resolveHour(response.content).value;
   }
 
   public async promptDate(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.date.invalid} ${prompts?.base || messages.prompts.date.base}`
-        : prompts?.base || messages.prompts.date.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.date, ...prompts }, previousIsFailure);
     return CustomResolvers.resolveDate(response.content).value;
   }
 
   public async promptDuration(prompts?: PrompterText, previousIsFailure = false): Promise<number> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.duration.invalid} ${prompts?.base || messages.prompts.duration.base}`
-        : prompts?.base || messages.prompts.duration.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.duration, ...prompts }, previousIsFailure);
     return CustomResolvers.resolveDuration(response.content).value;
   }
 
   public async promptMember(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMember> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.member.invalid} ${prompts?.base || messages.prompts.member.base}`
-        : prompts?.base || messages.prompts.member.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.channel, ...prompts }, previousIsFailure);
     if (response.mentions.members.size > 0)
       return response.mentions.members.first();
 
@@ -183,12 +144,7 @@ export default class ArgumentPrompter {
   }
 
   public async promptRole(prompts?: PrompterText, previousIsFailure = false): Promise<Role> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.role.invalid} ${prompts?.base || messages.prompts.role.base}`
-        : prompts?.base || messages.prompts.role.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.role, ...prompts }, previousIsFailure);
     if (response.mentions.roles.size > 0)
       return response.mentions.roles.first();
 
@@ -196,21 +152,16 @@ export default class ArgumentPrompter {
   }
 
   public async promptBoolean(prompts?: PrompterText, previousIsFailure = false): Promise<boolean> {
-    const response = await this._prompt(
-      previousIsFailure
-        ? `${prompts?.invalid || messages.prompts.role.invalid} ${prompts?.base || messages.prompts.role.base}`
-        : prompts?.base || messages.prompts.role.base,
-    );
-
+    const response = await this._prompt({ ...messages.prompts.boolean, ...prompts }, previousIsFailure);
     return Resolvers.resolveBoolean(response.content, {
       truths: settings.configuration.booleanTruths,
       falses: settings.configuration.booleanFalses,
     }).value;
   }
 
-  private async _prompt(text: string): Promise<GuildMessage> {
+  private async _prompt(prompts: PrompterText, previousIsFailure: boolean): Promise<GuildMessage> {
     const handler = new MessagePrompter(
-      text,
+      previousIsFailure ? `${prompts.invalid} ${prompts.base}` : prompts.base,
       'message',
       { timeout: 60 * 1000, explicitReturn: true, editMessage: this._options?.baseMessage },
     );

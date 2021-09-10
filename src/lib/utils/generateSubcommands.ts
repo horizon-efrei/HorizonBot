@@ -3,6 +3,11 @@ import type { Writable } from '@/types';
 
 type SubcommandRaw = Record<string, { aliases?: string[]; default?: boolean }>;
 
+/**
+ * Generate sapphire-compatible subcommand options from an simplified array.
+ * @param args The input options
+ * @returns The sapphire-compatible subcommand options
+ */
 export default function generateSubcommands(args: SubcommandRaw): SubCommandManager.RawEntries {
   const finalArguments: Writable<SubCommandManager.RawEntries> = [];
 

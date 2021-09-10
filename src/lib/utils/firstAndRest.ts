@@ -1,8 +1,7 @@
-/**
- * Convert a number to a file size in octets.
- * @param {string} str - The text to split
- * @param {string} delimiter - The delimiter to split the text at
- * @returns [first: string, rest: string]
+/** Gets the first part and the rest part of a string, with a defined delimiter.
+ * @param str The text to split
+ * @param delimiter The delimiter to split the text at
+ * @returns A tuple with the first string, and the rest of the string
  */
 export default function firstAndRest(str: string, delimiter: string): [first: string, rest: string] {
   const parts = str.split(delimiter);

@@ -144,6 +144,7 @@ export default class MessageReactionAddListener extends Listener {
     const eprofRole = await this.container.client.configManager.get(eprofRoleIdEntry, message.guild.id);
     if (!eprofRole)
       return;
+
     const eProf = message.guild.roles.cache
       .get(eprofRole.id)
       .members

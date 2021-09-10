@@ -25,25 +25,21 @@ export default class RemindersCommand extends HorizonSubCommand {
   public async add(message: GuildMessage, args: Args): Promise<void> {
     let date: number;
     try {
-      date = await args.pick('duration')
-        .then(duration => Date.now() + duration)
-        .catch(async () => args.pick('date')
-          .then(dat => dat.getTime()));
+      date = await args.pick('duration').then(duration => Date.now() + duration)
+        .catch(async () => args.pick('date').then(dat => dat.getTime()));
     } catch {
       await message.channel.send(config.messages.invalidTime);
       return;
     }
 
-    const description = (await args.restResult('string'))?.value || messages.reminders.noDescription;
-
-    const hasDmOpened = (await message.member.createDM()) instanceof DMChannel;
-
     const reminder = await Reminders.create({
       date,
-      description,
+      description: (await args.restResult('string'))?.value || messages.reminders.noDescription,
       userId: message.author.id,
       guildId: message.guild.id,
     });
+
+    const hasDmOpened = (await message.member.createDM()) instanceof DMChannel;
     await message.channel.send([
       pupa(config.messages.createdReminder, reminder.toJSON()),
       hasDmOpened ? '' : config.messages.openDm,

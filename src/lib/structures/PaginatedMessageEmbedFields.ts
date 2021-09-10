@@ -7,6 +7,7 @@ import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import type { EmbedField, MessageEmbedOptions } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import type { List, Number } from 'ts-toolbelt';
+import settings from '@/config/settings';
 
 type EmbedFields = Array<Omit<EmbedField, 'inline'>>;
 
@@ -47,7 +48,7 @@ export default class PaginatedMessageEmbedFields extends PaginatedMessage {
       clonedTemplate.fields = [];
 
       if (!clonedTemplate.color)
-        clonedTemplate.setColor('RANDOM');
+        clonedTemplate.setColor(settings.colors.default);
 
       const data = this._paginateArray(this._items, i, this._itemsPerPage);
       this.addPage({

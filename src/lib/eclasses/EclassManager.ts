@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
-import twemoji from 'twemoji';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
@@ -19,8 +18,6 @@ import type { EclassPopulatedDocument } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import { massSend, noop, nullop } from '@/utils';
 
-const EMOJI_URL_REGEX = /src="(?<url>.*)"/;
-
 const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntriesChannels> = {
   [SchoolYear.L1]: ConfigEntriesChannels.ClassAnnouncementL1,
   [SchoolYear.L2]: ConfigEntriesChannels.ClassAnnouncementL2,
@@ -28,9 +25,8 @@ const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntriesChannels> =
   general: ConfigEntriesChannels.ClassAnnouncementGeneral,
 };
 
-// eslint-disable-next-line @typescript-eslint/no-extraneous-class
-export default class EclassManager {
-  public static async createClass(
+export default {
+  async createClass(
     message: GuildMessage,
     {
       date, subject, topic, duration, professor, targetRole, isRecorded,
@@ -57,7 +53,7 @@ export default class EclassManager {
     const classChannel = await message.guild.channels.fetch(subject.textChannel) as GuildTextBasedChannel;
 
     // Create & send the announcement embed
-    const embed = EclassManager.createAnnouncementEmbed({
+    const embed = this.createAnnouncementEmbed({
       subject,
       topic,
       formattedDate,
@@ -105,13 +101,14 @@ export default class EclassManager {
     await message.channel.send(pupa(config.messages.successfullyCreated, { eclass }));
 
     container.logger.debug(`[e-class:${classId}] Created eclass.`);
-  }
+  },
 
-  public static async startClass(eclass: EclassPopulatedDocument): Promise<void> {
+  async startClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];
     announcementEmbed.setColor(settings.colors.orange);
@@ -146,13 +143,14 @@ export default class EclassManager {
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.InProgress });
 
     container.logger.debug(`[e-class:${eclass.classId}] Started class.`);
-  }
+  },
 
-  public static async finishClass(eclass: EclassPopulatedDocument): Promise<void> {
+  async finishClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];
     const statusField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
@@ -169,13 +167,14 @@ export default class EclassManager {
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
 
     container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
-  }
+  },
 
-  public static async cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
+  async cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];
     announcementEmbed.setColor(settings.colors.red);
@@ -183,6 +182,7 @@ export default class EclassManager {
     announcementEmbed.spliceFields(0, 25);
     await announcementMessage.edit({ embeds: [announcementEmbed] });
     await announcementMessage.reactions.removeAll();
+
     // Remove from cache
     container.client.eclassRolesIds.delete(announcementMessage.id);
 
@@ -196,13 +196,14 @@ export default class EclassManager {
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Canceled });
 
     container.logger.debug(`[e-class:${eclass.classId}] Canceled class.`);
-  }
+  },
 
-  public static async setRecordLink(eclass: EclassPopulatedDocument, link: string): Promise<void> {
+  async setRecordLink(eclass: EclassPopulatedDocument, link: string): Promise<void> {
     // Fetch the announcement message
     const announcementChannel = await container.client.configManager
       .get(eclass.announcementChannel, eclass.guild);
     const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+
     // Update its embed
     const announcementEmbed = announcementMessage.embeds[0];
     announcementEmbed.fields
@@ -214,12 +215,13 @@ export default class EclassManager {
     await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
 
     container.logger.debug(`[e-class:${eclass.classId}] Added record link.`);
-  }
+  },
 
-  public static async remindClass(eclass: EclassPopulatedDocument): Promise<void> {
+  async remindClass(eclass: EclassPopulatedDocument): Promise<void> {
     // Resolve the associated channel
     const guild = container.client.guilds.resolve(eclass.guild);
     const classChannel = guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
+
     // Send the notification
     await classChannel.send(
       pupa(config.messages.remindClassNotification, {
@@ -258,9 +260,9 @@ export default class EclassManager {
     await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
 
     container.logger.debug(`[e-class:${eclass.classId}] Sent reminders.`);
-  }
+  },
 
-  public static createAnnouncementEmbed({
+  createAnnouncementEmbed({
     subject,
     topic,
     formattedDate,
@@ -270,25 +272,21 @@ export default class EclassManager {
     classId,
     isRecorded,
   }: EclassEmbedOptions): MessageEmbed {
-    const fullName = classChannel.name.split('-');
-    const baseEmoji = fullName.shift();
-    const image = EMOJI_URL_REGEX.exec(twemoji.parse(baseEmoji))?.groups?.url;
-
     const texts = config.messages.newClassEmbed;
     return new MessageEmbed()
       .setColor(settings.colors.green)
       .setTitle(pupa(texts.title, { subject, topic }))
       .setDescription(pupa(texts.description, { subject, classChannel }))
-      .setThumbnail(image)
+      .setThumbnail(subject.emojiImage)
       .setAuthor(texts.author, classChannel.guild.iconURL())
       .addField(texts.date, formattedDate, true)
       .addField(texts.duration, dayjs.duration(duration).humanize(), true)
       .addField(texts.professor, professor.toString(), true)
       .addField(texts.recorded, texts.recordedValues[Number(isRecorded)], true)
       .setFooter(pupa(texts.footer, { classId }));
-  }
+  },
 
-  public static async subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
+  async subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
       container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
@@ -302,9 +300,9 @@ export default class EclassManager {
     member.send(pupa(config.messages.subscribed, eclass)).catch(noop);
 
     container.logger.debug(`[e-class:${eclass.classId}] Subscribed member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
-  }
+  },
 
-  public static async unsubscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
+  async unsubscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
       container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
@@ -318,5 +316,5 @@ export default class EclassManager {
     member.send(pupa(config.messages.unsubscribed, eclass)).catch(noop);
 
     container.logger.debug(`[e-class:${eclass.classId}] Unsubscribed member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
-  }
-}
+  },
+};

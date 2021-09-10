@@ -109,6 +109,10 @@ export default {
       base: 'Entre un rôle (mentionne-le ou entre son nom ou son ID) :',
       invalid: 'Ce rôle est invalide.',
     },
+    boolean: {
+      base: 'Entre un booléen ("oui"/"non") :',
+      invalid: 'Ce booléan est invalide.',
+    },
 
     stoppedPrompting: 'Tu as bien abandonné la commande !',
   },

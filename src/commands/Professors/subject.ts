@@ -33,6 +33,7 @@ export default class SubjectCommand extends HorizonSubCommand {
     const responses = await new SubjectInteractiveBuilder(message).start();
     if (!responses)
       return;
+
     await Subject.create({
       ...responses,
       textChannel: responses.textChannel.id,
@@ -62,7 +63,7 @@ export default class SubjectCommand extends HorizonSubCommand {
       return;
     }
 
-    await Subject.findByIdAndRemove(subject._id);
+    await subject.remove();
     await message.channel.send(config.messages.successfullyRemoved);
   }
 

@@ -16,6 +16,6 @@ const ConfigurationSchema = new Schema<ConfigurationDocument, ConfigurationModel
     type: String,
     required: true,
   },
-});
+}, { timestamps: true });
 
 export default model<ConfigurationDocument, ConfigurationModel>('Configuration', ConfigurationSchema);

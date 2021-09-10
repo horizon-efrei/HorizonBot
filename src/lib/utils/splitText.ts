@@ -1,8 +1,8 @@
 /**
  * Split a long text into an array of strings of `n` characters maximum, and between each line.
- * @param {string} text - The text to split.
- * @param {number} n - The size of each array. Defaults to 2000
- * @returns string[]
+ * @param text The text to split
+ * @param n The size of each array. Defaults to 2000
+ * @returns The splitted text
  */
 export default function splitText(text: string, n = 2000): string[] {
   const blocks: string[] = [];

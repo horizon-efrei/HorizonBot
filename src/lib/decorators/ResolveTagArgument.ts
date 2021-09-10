@@ -9,10 +9,8 @@ export default function ResolveTagArgument(): MethodDecorator {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (message: GuildMessage, args: Args): Promise<void> {
-      const prompter = new ArgumentPrompter(message);
-
       const targetName = (await args.pickResult('string')).value
-        || (await prompter.promptText(config.messages.prompts.name)).split(' ').shift();
+        || (await new ArgumentPrompter(message).promptText(config.messages.prompts.name)).split(' ').shift();
 
       const tag = await Tags.findOne({ name: targetName.toLowerCase(), guildId: message.guild.id });
       if (!tag) {

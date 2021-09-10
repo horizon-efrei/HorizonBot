@@ -21,7 +21,7 @@ const TagSchema = new Schema<TagDocument, TagModel>({
     type: String,
     required: true,
   },
-});
+}, { timestamps: true });
 
 TagSchema.post('save', async () => {
   await container.client.loadTags();

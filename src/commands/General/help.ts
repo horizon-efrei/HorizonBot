@@ -19,11 +19,10 @@ import type { GuildMessage } from '@/types';
 @ApplyOptions<CommandOptions>(config.options)
 export default class HelpCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
-    const requestedCommand = await args.pickResult('command');
+    const command = (await args.pickResult('command'))?.value;
     const embed = new MessageEmbed().setColor(settings.colors.default);
 
-    if (requestedCommand.success) {
-      const command = requestedCommand.value;
+    if (command) {
       const information = config.messages.commandInfo;
       embed.setTitle(pupa(information.title, { command }))
         .addField(information.usage, `\`${settings.prefix}${command.usage}\``)
@@ -43,7 +42,7 @@ export default class HelpCommand extends HorizonCommand {
       embed.setTitle(pupa(information.title, { amount }))
         .setDescription(pupa(information.description, { helpCommand: `${settings.prefix}help <commande>` }));
 
-      const categories = await this._getCategories(message);
+      const categories = await this._getPossibleCategories(message);
 
       for (const [category, commands] of Object.entries(categories)) {
         embed.addField(
@@ -56,11 +55,13 @@ export default class HelpCommand extends HorizonCommand {
     await message.channel.send({ embeds: [embed] });
   }
 
-  private async _getCategories(message: GuildMessage): Promise<Record<string, HorizonCommand[]>> {
+  private async _getPossibleCategories(message: GuildMessage): Promise<Record<string, HorizonCommand[]>> {
     const originalCommands = (this.container.stores.get('commands') as HorizonCommandStore);
     const commands = [];
 
     for (const command of originalCommands.values()) {
+      // Run all the precondition of each command to see if the user can actually run it.
+      // If they can't, the command won't be displayed.
       const preconditions = command.preconditions.entries.map(
         (precondition: PreconditionContainerSingle) => precondition.run(message, command, precondition.context),
       ) as Array<Result<unknown, UserError>>;
@@ -75,6 +76,6 @@ export default class HelpCommand extends HorizonCommand {
 
   private _resolveCategory(command: HorizonCommand): string {
     const paths = command.path.split(path.sep);
-    return paths.slice(paths.indexOf('commands') + 1, -1)[0];
+    return paths.slice(paths.indexOf('commands') + 1, -1).shift();
   }
 }

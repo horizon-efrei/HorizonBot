@@ -14,6 +14,6 @@ const RoleIntersectionSchema = new Schema<RoleIntersectionDocument, RoleIntersec
     type: Number,
     required: true,
   },
-});
+}, { timestamps: true });
 
 export default model<RoleIntersectionDocument, RoleIntersectionModel>('RoleIntersection', RoleIntersectionSchema);

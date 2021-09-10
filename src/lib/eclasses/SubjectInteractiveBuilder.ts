@@ -134,6 +134,7 @@ export default class SubjectInteractiveBuilder {
     } catch {
       if (this.aborted)
         return;
+
       await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
       await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
       return;
@@ -152,49 +153,33 @@ export default class SubjectInteractiveBuilder {
   private async _askPrompts(): Promise<void> {
     // 1. Ask for the targeted schoolyear
     const schoolYearInteraction = await this._makeSelectMenuStep(schoolYearMenu);
-
     this.responses.schoolYear = schoolYearInteraction.values.shift() as SchoolYear;
-    this.step++;
     await this._updateStep(schoolYearInteraction);
-
 
     // 2. Ask for the teaching unit
     const teachingUnitInteraction = await this._makeSelectMenuStep(teachingUnitMenu);
-
     this.responses.teachingUnit = teachingUnitInteraction.values.shift() as TeachingUnit;
-    this.step++;
     await this._updateStep(teachingUnitInteraction);
-
 
     // 3. Ask for the name
     this.responses.name = await this._makeMessageStep('autoPromptText', config.messages.prompts.name);
-    this.step++;
     await this._updateStep();
-
 
     // 4. Ask for the english name
     this.responses.nameEnglish = await this._makeMessageStep('autoPromptText', config.messages.prompts.englishName);
-    this.step++;
     await this._updateStep();
-
 
     // 5. Ask for the subject code
     this.responses.classCode = await this._makeMessageStep('autoPromptText', config.messages.prompts.classCode);
-    this.step++;
     await this._updateStep();
-
 
     // 6. Ask for the moodle link
     this.responses.moodleLink = await this._makeMessageStep('autoPromptText', config.messages.prompts.moodleLink);
-    this.step++;
     await this._updateStep();
-
 
     // 7. Ask for the text channel
     this.responses.textChannel = await this._makeMessageStep('autoPromptTextChannel', config.messages.prompts.textChannel);
-    this.step++;
     await this._updateStep();
-
 
     // 8. Ask for the emoji
     this.responses.emoji = await this._makeMessageStep('autoPromptText', config.messages.prompts.emoji);
@@ -221,8 +206,6 @@ export default class SubjectInteractiveBuilder {
     prompts: PrompterText,
     validator: (resolved: TResult) => boolean = (): boolean => true,
   ): Promise<TResult> {
-    // Await this.mainBotMessage.edit({ components: this.actionRows });
-
     let result;
     let previousIsFailure = false;
     do {
@@ -243,6 +226,7 @@ export default class SubjectInteractiveBuilder {
   }
 
   private async _updateStep(interaction?: SelectMenuInteraction): Promise<void> {
+    this.step++;
     // eslint-disable-next-line unicorn/prefer-ternary
     if (interaction)
       await interaction.update({ embeds: [this._embed], components: this._actionRows });

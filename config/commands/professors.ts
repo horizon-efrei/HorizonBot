@@ -69,7 +69,7 @@ export const eclass = {
     noClassesFound: "Aucune classe n'a été trouvée...",
     someClassesFound: (amount: number): string => `${amount} classe${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
     filterTitle: 'Filtre(s) de recherche appliqué(s) :\n{filters}\n\n',
-    noFilter: 'Aucun filtre de recherche appliqué',
+    noFilter: 'Aucun filtre de recherche appliqué.\n\n',
     statusFilter: '• Statut : {value}',
     professorFilter: '• Professeur : {value}',
     roleFilter: '• Rôle : {value}',
@@ -365,8 +365,8 @@ export const subject = {
         placeholder: 'Aucune UE sélectionnée',
         options: [
           { label: 'Formation Générale', emoji: '🧑‍🎓' },
-          { label: 'Informatique', emoji: '💻' },
           { label: 'Mathématiques', emoji: '🔢' },
+          { label: 'Informatique', emoji: '💻' },
           { label: 'Physique & Électronique', emoji: '🔋' },
         ] as Array<Omit<MessageSelectOptionData, 'value'>>,
       },

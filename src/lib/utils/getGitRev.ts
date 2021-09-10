@@ -5,7 +5,7 @@ let cachedCommit = '';
 
 /**
  * Get the current git commit hash.
- * @returns Promise<string>
+ * @returns The current git commit
  */
 export default async function getGitRev(): Promise<string> {
   if (cachedCommit)

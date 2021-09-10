@@ -59,9 +59,9 @@ function convert(num: number, type: string): number {
 
 /**
  * Parses a human duration to a timestamp in seconds.
- * @param {string} val - The value to parse as a duration.
- * @returns number
- * @throws {TypeError} - If the given duration is invalid, it will throw a TypeError
+ * @param val The value to parse as a duration
+ * @returns The duration in milliseconds
+ * @throws {TypeError} If the given duration is invalid, it will throw a TypeError
  */
 function getDuration(val: string): number {
   let abs: number;

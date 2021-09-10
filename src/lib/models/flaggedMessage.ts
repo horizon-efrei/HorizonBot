@@ -39,6 +39,6 @@ const FlaggedMessageSchema = new Schema<FlaggedMessageDocument, FlaggedMessageMo
     type: Number,
     default: 0,
   },
-});
+}, { timestamps: true });
 
 export default model<FlaggedMessageDocument, FlaggedMessageModel>('FlaggedMessage', FlaggedMessageSchema);

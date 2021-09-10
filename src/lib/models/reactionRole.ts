@@ -18,6 +18,6 @@ const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
     role: String,
     reaction: String,
   }],
-});
+}, { timestamps: true });
 
 export default model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);

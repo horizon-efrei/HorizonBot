@@ -31,14 +31,15 @@ import { generateSubcommands } from '@/utils';
 })
 export default class TagsCommand extends HorizonSubCommand {
   public async add(message: GuildMessage, args: Args): Promise<void> {
-    let name: string = (await args.pickResult('string')).value?.toLowerCase();
+    let name: string = (await args.pickResult('string')).value;
     let content: string = (await args.restResult('string')).value;
 
     // 1. Ask all the necessary questions
     try {
       const prompter = new ArgumentPrompter(message);
 
-      name ||= (await prompter.promptText(config.messages.prompts.name)).toLowerCase();
+      name ||= (await prompter.promptText(config.messages.prompts.name));
+      name = name.toLowerCase();
       if (!this._isValid([name], message.guild.id)) {
         await message.channel.send(config.messages.invalidTag);
         return;
@@ -54,11 +55,7 @@ export default class TagsCommand extends HorizonSubCommand {
     }
 
     // 2. Add it to the database
-    await Tags.create({
-      name,
-      content,
-      guildId: message.guild.id,
-    });
+    await Tags.create({ name, content, guildId: message.guild.id });
     await message.channel.send(config.messages.createdTag);
   }
 
@@ -96,6 +93,7 @@ export default class TagsCommand extends HorizonSubCommand {
       await message.channel.send(config.messages.invalidTag);
       return;
     }
+
     tag.name = newName;
     await tag.save();
     await message.channel.send(config.messages.editedTag);
@@ -116,6 +114,7 @@ export default class TagsCommand extends HorizonSubCommand {
       }
       tag.aliases = aliases;
     }
+
     await tag.save();
     await message.channel.send(config.messages.editedTag);
   }
