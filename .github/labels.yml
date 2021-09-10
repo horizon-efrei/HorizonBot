@@ -40,7 +40,7 @@
   color: '8CE098'
 
 - name: 'priority: critical'
-  description: Issues that must be fixed or PRs that must be finished and merged with maximum priority, letting other issues on stand-by.
+  description: Issues that must be fixed or PRs that must be finished and merged with MAXIMUM PRIORITY.
   color: 'F45B0E'
 - name: 'priority: high'
   description: Issues that must be fixed or PRs that must be finished and merged with high priority.
@@ -52,7 +52,7 @@
   description: Issues that must be fixed or PRs that must be finished and merged with low priority.
   color: '9CEB34'
 - name: 'priority: lowest'
-  description: Issues that must be fixed or PRs that must be finished with the lowest priority, only if there is nothing else to work on.
+  description: Issues that must be fixed or PRs that must be finished with the looowwwest priority.
   color: '41FC02'
 
 - name: 'difficulty: complex'
@@ -72,7 +72,7 @@
   description: Issues and PRs related to e-classes.
   color: 'C2E0C6'
 - name: 'scope: class groups'
-  description: Issues and PRs related to class groups (i.e. class presidents or utilities for within class groups).
+  description: Issues and PRs related to class groups (i.e. class presidents or utils for within class groups).
   color: 'C2E0C6'
 - name: 'scope: tags'
   description: Issues and PRs related to tags.
