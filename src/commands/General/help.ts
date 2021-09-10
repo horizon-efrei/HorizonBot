@@ -1,12 +1,6 @@
 import path from 'path';
 import { ApplyOptions } from '@sapphire/decorators';
-import type {
-  Args,
-  CommandOptions,
-  PreconditionContainerSingle,
-  Result,
-  UserError,
-} from '@sapphire/framework';
+import type { Args, CommandOptions } from '@sapphire/framework';
 import { MessageEmbed } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
@@ -60,14 +54,8 @@ export default class HelpCommand extends HorizonCommand {
     const commands = [];
 
     for (const command of originalCommands.values()) {
-      // Run all the precondition of each command to see if the user can actually run it.
-      // If they can't, the command won't be displayed.
-      const preconditions = command.preconditions.entries.map(
-        (precondition: PreconditionContainerSingle) => precondition.run(message, command, precondition.context),
-      ) as Array<Result<unknown, UserError>>;
-
-      const results = await Promise.allSettled(preconditions);
-      if (results.every(result => result.status === 'fulfilled' && result.value.success))
+      const result = await command.preconditions.run(message, command);
+      if (result.success)
         commands.push(command);
     }
 
