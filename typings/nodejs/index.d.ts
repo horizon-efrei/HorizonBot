@@ -12,3 +12,16 @@ declare namespace NodeJS {
     /* eslint-enable @typescript-eslint/naming-convention */
   }
 }
+
+declare namespace Intl {
+  interface ListFormatOptions {
+    localeMatcher: 'best fit' | 'lookup';
+    type: 'conjunction' | 'disjunction' | 'unit';
+    style: 'long' | 'narrow' | 'short';
+  }
+
+  class ListFormat {
+    constructor(lang: string, options: Partial<ListFormatOptions>)
+    public format(items: Iterable<string>): string;
+  }
+}
