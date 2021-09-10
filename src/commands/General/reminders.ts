@@ -1,4 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
+import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import type { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { DMChannel, MessageEmbed } from 'discord.js';
@@ -10,6 +11,7 @@ import Reminders from '@/models/reminders';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildMessage } from '@/types';
+import type { ReminderBase } from '@/types/database';
 import { generateSubcommands } from '@/utils';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
@@ -53,15 +55,14 @@ export default class RemindersCommand extends HorizonSubCommand {
       return;
     }
 
-    const embed = new MessageEmbed()
-      .setTitle(pupa(config.messages.listEmbedTitle, { total: reminders.size }))
-      .setDescription(
-        reminders.map(rmd => pupa(config.messages.listEmbedItem, {
-          ...rmd.toJSON(),
-          timestamp: Math.round(rmd.date / 1000),
-        })).join('\n'),
-      );
-    await message.channel.send({ embeds: [embed] });
+    await new PaginatedFieldMessageEmbed<ReminderBase & { timestamp: number }>()
+      .setTitleField(pupa(config.messages.listTitle, { total: reminders.size }))
+      .setTemplate(new MessageEmbed().setColor(settings.colors.default))
+      .setItems([...reminders.map(rmd => ({ ...rmd.toJSON(), timestamp: Math.round(rmd.date / 1000) }))])
+      .formatItems(item => pupa(config.messages.listLine, item))
+      .setItemsPerPage(10)
+      .make()
+      .run(message);
   }
 
   public async remove(message: GuildMessage, args: Args): Promise<void> {

@@ -82,7 +82,7 @@ export const ping = {
 
 export const reminders = {
   options: {
-    aliases: ['reminders', 'reminder', 'rappels', 'rappel'],
+    aliases: ['reminders', 'reminder', 'remind', 'remindme', 'rappels', 'rappel'],
     description: 'Permet de créer/modifier et lister des rappels.',
     enabled: true,
     usage: 'reminders <create | list | remove | help>',
@@ -99,8 +99,8 @@ export const reminders = {
 
     // List the reminders
     noReminders: "Je n'ai trouvé aucun rappel t'étant associé dans la base de données !",
-    listEmbedTitle: 'Liste de tes rappels ({total})',
-    listEmbedItem: '• `{reminderId}` (<t:{timestamp}:R>) : {description}',
+    listTitle: 'Liste de tes rappels ({total})',
+    listLine: '• `{reminderId}` (<t:{timestamp}:R>) : {description}',
 
     // Remove a reminder
     removedReminder: 'Ce rappel a bien été supprimé !',
