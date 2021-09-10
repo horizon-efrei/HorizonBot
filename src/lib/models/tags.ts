@@ -7,7 +7,6 @@ const TagSchema = new Schema<TagDocument, TagModel>({
     type: String,
     required: true,
     index: true,
-    unique: true,
   },
   aliases: [{
     type: String,
