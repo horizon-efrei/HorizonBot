@@ -152,8 +152,8 @@ export const tags = {
 
     // List the tags
     noTags: "Je n'ai trouvé aucun tag dans la base de données !",
-    listEmbedTitle: 'Liste des tags ({total})',
-    listEmbedItem: '• `{name}` ({aliases}) : {uses} utilisations',
+    listTitle: 'Liste des tags ({total})',
+    listLine: '• `{name}` ({aliases}) : {uses} utilisations',
 
     // Remove a tag
     removedTag: 'Ce tag a bien été supprimé !',
