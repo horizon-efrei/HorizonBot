@@ -266,17 +266,14 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       roles = await this._promptReactionRoles(message);
 
       if (roles.isError) {
-        if (roles.errorPayload.reactions.length > 0) {
+        const listAnd = (items: string[]): string => new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' }).format(new Set(items));
+        if (roles.errorPayload?.reactions?.length > 0) {
           await message.channel.send(
-            pupa(config.messages.duplicatedEmojis, {
-              duplicatedEmojits: commaListAnd`${[...new Set(roles.errorPayload.reactions)]}`,
-            }),
+            pupa(config.messages.duplicatedEmojis, { duplicatedEmojis: listAnd(roles.errorPayload.reactions) }),
           );
-        } else if (roles.errorPayload.roles.length > 0) {
+        } else if (roles.errorPayload?.roles?.length > 0) {
           await message.channel.send(
-            pupa(config.messages.duplicatedRoles, {
-              duplicatedRoles: commaListAnd`${[...new Set(roles.errorPayload.roles)]}`,
-            }),
+            pupa(config.messages.duplicatedRoles, { duplicatedRoles: listAnd(roles.errorPayload.roles) }),
           );
         }
       } else if (roles.reactionRoles.length === 0) {
