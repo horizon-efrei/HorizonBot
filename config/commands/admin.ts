@@ -35,8 +35,8 @@ export const reactionRole = {
     aliases: ['reactionrole', 'rr', 'autorole', 'ar'],
     description: "Permet de créer des menus de réactions, grâce auxquels les utilisateurs peuvent utiliser les réactions pour s'ajouter des rôles.",
     enabled: true,
-    usage: 'reactionrole <start | list | remove | help>',
-    examples: ['reactionrole start', 'rr start #salon-annonces', 'autorole list', 'ar remove 188341077902753794', 'rr help'],
+    usage: 'reactionrole <create | list | remove | help>',
+    examples: ['reactionrole create', 'rr create #salon-annonces', 'autorole list', 'ar remove 188341077902753794', 'rr help'],
   },
   messages: {
     // Global
@@ -106,8 +106,8 @@ export const setup = {
     aliases: ['setup', 'config', 'configure', 'define'],
     description: 'Permet de définir les salons et rôles particuliers dont le bot à besoin.',
     enabled: true,
-    usage: 'setup <set | see | list | remove | help>',
-    examples: ['setup set cours-semaine #cours-de-la-semaine', 'setup define role-staff 188341077902753794', 'setup remove role-staff', 'setup see @Staff'],
+    usage: 'setup <create | see | list | remove | help>',
+    examples: ['setup add cours-semaine #cours-de-la-semaine', 'setup new role-staff 188341077902753794', 'setup remove role-staff', 'setup see @Staff'],
   },
   messages: {
     successfullyDefined: 'Entrée définie avec succès !',

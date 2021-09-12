@@ -20,12 +20,7 @@ import { generateSubcommands } from '@/utils';
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  subCommands: generateSubcommands({
-    create: { aliases: ['add', 'make', 'new'] },
-    remove: { aliases: ['end', 'stop'] },
-    list: { aliases: ['liste', 'ls'] },
-    help: { aliases: ['aide'], default: true },
-  }),
+  subCommands: generateSubcommands(['create', 'remove', 'list', 'help']),
 })
 export default class SubjectCommand extends HorizonSubCommand {
   @IsEprofOrStaff()

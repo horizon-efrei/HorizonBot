@@ -33,7 +33,7 @@ const wraps = new Map([
       silent: true,
     },
   }],
-  subCommands: generateSubcommands({
+  subCommands: generateSubcommands([], {
     information: { aliases: ['info', 'infos', 'informations', 'list', 'liste', 'ls'] },
     main: { aliases: [], default: true },
   }),

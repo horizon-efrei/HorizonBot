@@ -38,15 +38,12 @@ const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]>
   generateDashLessAliases: true,
   flags: ['ping'],
   options: Object.values(listOptions).flat(),
-  subCommands: generateSubcommands({
-    create: { aliases: ['add', 'make', 'new'] },
+  subCommands: generateSubcommands(['create', 'list', 'help'], {
     start: { aliases: ['begin'] },
-    edit: { aliases: ['modify'] },
+    edit: { aliases: ['change', 'modify'] },
     cancel: { aliases: ['archive'] },
     finish: { aliases: ['end', 'stop'] },
     record: { aliases: ['enregistrement', 'link', 'lien', 'replay', 'recording'] },
-    list: { aliases: ['liste', 'ls'] },
-    help: { aliases: ['aide'], default: true },
   }),
 })
 export default class EclassCommand extends HorizonSubCommand {

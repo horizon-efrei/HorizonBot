@@ -16,15 +16,10 @@ import { generateSubcommands } from '@/utils';
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
-  subCommands: generateSubcommands({
-    add: { aliases: ['create'] },
-    list: { aliases: ['liste', 'show'] },
-    remove: { aliases: ['delete', 'rm', 'rem', 'del'] },
-    help: { aliases: ['aide'], default: true },
-  }),
+  subCommands: generateSubcommands(['create', 'list', 'remove', 'help']),
 })
 export default class RemindersCommand extends HorizonSubCommand {
-  public async add(message: GuildMessage, args: Args): Promise<void> {
+  public async create(message: GuildMessage, args: Args): Promise<void> {
     let date: number;
     try {
       date = await args.pick('duration').then(duration => Date.now() + duration)

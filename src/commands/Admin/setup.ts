@@ -79,16 +79,12 @@ const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry
   ...config.options,
   generateDashLessAliases: true,
   preconditions: ['StaffOnly'],
-  subCommands: generateSubcommands({
-    define: { aliases: ['set', 'create', 'add'] },
+  subCommands: generateSubcommands(['create', 'list', 'remove', 'help'], {
     see: { aliases: ['get', 'info'] },
-    list: { aliases: ['liste', 'show'] },
-    remove: { aliases: ['delete', 'rm', 'rem', 'del'] },
-    help: { aliases: ['aide'], default: true },
   }),
 })
 export default class SetupCommand extends HorizonSubCommand {
-  public async define(message: GuildMessage, args: Args): Promise<void> {
+  public async create(message: GuildMessage, args: Args): Promise<void> {
     const query = await args.pickResult('string');
     const matchArg = argNames.find(argName => argName.possibilities.includes(query.value));
     if (!matchArg) {

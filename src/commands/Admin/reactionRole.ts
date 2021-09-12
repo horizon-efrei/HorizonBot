@@ -27,18 +27,13 @@ interface ExtraContext {
   ...config.options,
   generateDashLessAliases: true,
   preconditions: ['StaffOnly'],
-  subCommands: generateSubcommands({
-    start: { aliases: ['make', 'setup', 'create', 'add'] },
-    list: { aliases: ['liste', 'show'] },
-    edit: { aliases: ['change', 'modify'] },
-    addPair: { aliases: [] },
-    removePair: { aliases: ['deletePair', 'suppr', 'rmPair', 'remPair', 'delPair'] },
-    remove: { aliases: ['delete', 'rm', 'rem', 'del'] },
-    help: { aliases: ['aide'], default: true },
+  subCommands: generateSubcommands(['create', 'edit', 'help', 'list', 'remove'], {
+    addPair: { aliases: ['add-pair', 'new-pair'] },
+    removePair: { aliases: ['remove-pair', 'delete-pair', 'rm-pair', 'del-pair'] },
   }),
 })
 export default class ReactionRoleCommand extends HorizonSubCommand {
-  public async start(message: GuildMessage, args: Args): Promise<void> {
+  public async create(message: GuildMessage, args: Args): Promise<void> {
     let channel: GuildTextBasedChannel = (await args.pickResult('guildTextBasedChannel')).value;
     let title: string;
     let description: string;

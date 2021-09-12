@@ -20,18 +20,13 @@ import { generateSubcommands } from '@/utils';
   ...config.options,
   generateDashLessAliases: true,
   preconditions: ['StaffOnly'],
-  subCommands: generateSubcommands({
-    add: { aliases: ['create'] },
-    list: { aliases: ['liste', 'show'] },
-    edit: { aliases: ['change', 'modify'] },
-    rename: { aliases: [] },
+  subCommands: generateSubcommands(['create', 'list', 'edit', 'remove', 'help'], {
+    rename: {},
     alias: { aliases: ['aliases'] },
-    remove: { aliases: ['delete', 'rm', 'rem', 'del'] },
-    help: { aliases: ['aide'], default: true },
   }),
 })
 export default class TagsCommand extends HorizonSubCommand {
-  public async add(message: GuildMessage, args: Args): Promise<void> {
+  public async create(message: GuildMessage, args: Args): Promise<void> {
     let name: string = (await args.pickResult('string')).value;
     let content: string = (await args.restResult('string')).value;
 
