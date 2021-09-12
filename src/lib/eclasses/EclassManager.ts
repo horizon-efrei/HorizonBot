@@ -299,7 +299,7 @@ export default {
 
     member.send(pupa(config.messages.subscribed, eclass)).catch(noop);
 
-    container.logger.debug(`[e-class:${eclass.classId}] Subscribed member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
+    container.logger.debug(`[e-class:${eclass.classId}] Subscribed member ${member.id} (${member.user.tag}).`);
   },
 
   async unsubscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
@@ -315,6 +315,6 @@ export default {
 
     member.send(pupa(config.messages.unsubscribed, eclass)).catch(noop);
 
-    container.logger.debug(`[e-class:${eclass.classId}] Unsubscribed member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
+    container.logger.debug(`[e-class:${eclass.classId}] Unsubscribed member ${member.id} (${member.user.tag}).`);
   },
 };

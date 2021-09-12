@@ -93,7 +93,7 @@ export default class MessageReactionAddListener extends Listener {
 
     if (!member.roles.cache.get(givenRole.id))
       member.roles.add(givenRole).catch(noop);
-    this.container.logger.debug(`[Reaction Roles] Added role ${givenRole.id} (${givenRole.name}) to member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
+    this.container.logger.debug(`[Reaction Roles] Added role ${givenRole.id} (${givenRole.name}) to member ${member.id} (${member.user.tag}).`);
   }
 
   private async _handleEclassRole(

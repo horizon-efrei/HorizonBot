@@ -91,7 +91,7 @@ export default class FlaggedMessage {
 
     await this.alertUser();
 
-    container.logger.debug(`[Anti Swear] Message ${this.message.id} (${this.message.url}) was just approved by moderator ${moderator.id} (${moderator.displayName}#${moderator.user.discriminator}).`);
+    container.logger.debug(`[Anti Swear] Message ${this.message.id} (${this.message.url}) was just approved by moderator ${moderator.id} (${moderator.user.tag}).`);
   }
 
   public async alertUser(): Promise<void> {

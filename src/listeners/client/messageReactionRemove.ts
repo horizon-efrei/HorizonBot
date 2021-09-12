@@ -57,7 +57,7 @@ export default class MessageReactionRemoveListener extends Listener {
 
     if (member.roles.cache.get(givenRole.id))
       member.roles.remove(givenRole).catch(noop);
-    this.container.logger.debug(`[Reaction Roles] Removed role ${givenRole.id} (${givenRole.name}) from member ${member.id} (${member.displayName}#${member.user.discriminator}).`);
+    this.container.logger.debug(`[Reaction Roles] Removed role ${givenRole.id} (${givenRole.name}) from member ${member.id} (${member.user.tag}).`);
   }
 
   private async _handleEclassRole(
