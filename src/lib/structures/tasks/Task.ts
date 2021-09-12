@@ -1,4 +1,4 @@
-import type { PieceContext, PieceOptions } from '@sapphire/pieces';
+import type { PieceContext, PieceJSON, PieceOptions } from '@sapphire/pieces';
 import { Piece } from '@sapphire/pieces';
 import cron from 'node-cron';
 import type { Object } from 'ts-toolbelt';
@@ -56,7 +56,7 @@ export default abstract class Task extends Piece {
       this._scheduleCron.stop().destroy();
   }
 
-  public toJSON(): Record<PropertyKey, unknown> {
+  public toJSON(): PieceJSON & { interval: number | undefined; cron: string | undefined } {
     return {
       ...super.toJSON(),
       interval: this.interval,

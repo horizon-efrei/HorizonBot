@@ -1,4 +1,3 @@
-import path from 'path';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import { MessageEmbed } from 'discord.js';
@@ -7,7 +6,6 @@ import pupa from 'pupa';
 import { help as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type HorizonCommandStore from '@/structures/commands/HorizonCommandStore';
 import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
@@ -50,20 +48,15 @@ export default class HelpCommand extends HorizonCommand {
   }
 
   private async _getPossibleCategories(message: GuildMessage): Promise<Record<string, HorizonCommand[]>> {
-    const originalCommands = (this.container.stores.get('commands') as HorizonCommandStore);
-    const commands = [];
+    const originalCommands = this.container.stores.get('commands');
+    const commands: HorizonCommand[] = [];
 
     for (const command of originalCommands.values()) {
       const result = await command.preconditions.run(message, command);
       if (result.success)
-        commands.push(command);
+        commands.push(command as HorizonCommand);
     }
 
-    return groupBy(commands, command => this._resolveCategory(command));
-  }
-
-  private _resolveCategory(command: HorizonCommand): string {
-    const paths = command.path.split(path.sep);
-    return paths.slice(paths.indexOf('commands') + 1, -1).shift();
+    return groupBy(commands, command => command.location.directories.shift());
   }
 }
