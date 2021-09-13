@@ -16,6 +16,10 @@ export default class ReadyListener extends Listener {
     this.container.logger.info('[ConfigurationManager] Caching configured channels...');
     await this.container.client.configManager.loadAll();
 
+    this.container.logger.info('[ConfigurationManager] Caching invites...');
+    for (const guild of this.container.client.guilds.cache.values())
+      await guild.invites.fetch();
+
     this.container.logger.info('[Reaction Roles] Caching reactions-roles menus...');
     const reactionRoles = await ReactionRole.find();
     for (const rr of reactionRoles) {

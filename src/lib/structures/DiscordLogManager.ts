@@ -23,7 +23,38 @@ export default {
       .setAuthor(messages.logs.embedTitle)
       .setColor(settings.colors.default)
       .setTitle(messages.logs.readableEvents.get(information.type))
+      .setFields(fields)
       .setTimestamp();
     await logChannel?.send({ embeds: [embed] });
+  },
+
+  getFields(information: DiscordLogBase): EmbedFieldData[] {
+    const guild = container.client.guilds.cache.get(information.guildId);
+    const fieldText = messages.logs.fields[information.type];
+
+    switch (information.type) {
+      case DiscordLogType.GuildJoin: {
+        const invites = guild.invites.cache;
+        return [{
+          name: fieldText.contextName,
+          value: pupa(fieldText.contextValue, information),
+        }, {
+          name: fieldText.contentName,
+          value: information.content.map(link => pupa(fieldText.contentValue, { code: link, link: invites.get(link) })).join('\nou : '),
+        }];
+      }
+      case DiscordLogType.GuildLeave:
+      case DiscordLogType.MessageEdit:
+      case DiscordLogType.MessagePost:
+      case DiscordLogType.MessageRemove:
+      case DiscordLogType.ReactionAdd:
+      case DiscordLogType.ReactionRemove:
+      case DiscordLogType.Rename:
+      case DiscordLogType.RoleAdd:
+      case DiscordLogType.RoleRemove:
+      case DiscordLogType.VoiceJoin:
+      case DiscordLogType.VoiceLeave:
+        return [];
+    }
   },
 };

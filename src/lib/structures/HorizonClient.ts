@@ -73,6 +73,7 @@ export default class HorizonClient extends SapphireClient {
     ]);
     const requiredGuildPermissions = new Permissions([
       ...requiredChannelPermissions,
+      'MANAGE_GUILD',
       'MANAGE_ROLES',
     ]);
 
