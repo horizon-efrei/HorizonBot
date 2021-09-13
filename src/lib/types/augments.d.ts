@@ -13,13 +13,6 @@ import type TaskStore from '@/structures/tasks/TaskStore';
 import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
 import type { ReminderDocument, TagDocument } from '@/types/database';
 
-
-declare module 'discord.js' {
-  interface Client {
-    checkValidity(): void;
-  }
-}
-
 declare module '@sapphire/framework' {
   interface StoreRegistryEntries {
     tasks: TaskStore;
@@ -69,6 +62,7 @@ declare module '@sapphire/framework' {
     loadEclassRoles(): Promise<void>;
     loadTags(): Promise<void>;
     loadReminders(): Promise<void>;
+    checkValidity(): void;
   }
 
   interface ArgType {
