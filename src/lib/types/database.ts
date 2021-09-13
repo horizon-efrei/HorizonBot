@@ -1,4 +1,4 @@
-import type { GuildMember, Role } from 'discord.js';
+import type { GuildMember, MessageReference, Role } from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
 import type { GuildTextBasedChannel, SchoolYear, TeachingUnit } from '@/types';
 
@@ -18,6 +18,7 @@ export enum ConfigEntriesChannels {
   ClassCalendarL3 = 'channel-class-calendar-l3',
   ModeratorFeedback = 'channel-moderator-feedback',
   WeekUpcomingClasses = 'channel-week-upcoming-classes',
+  Logs = 'channel-logs',
 }
 
 export enum ConfigEntriesRoles {
@@ -243,4 +244,83 @@ export interface ReminderDocument extends ReminderBase, Document {}
 
 /** Interface for the "Reminder"'s mongoose model */
 export type ReminderModel = Model<ReminderDocument>;
+// #endregion
+
+/* ***************************** */
+/*  Discord Logs Database Types  */
+/* ***************************** */
+
+// #region Discord Logs Database Types
+/** Enum for the "Discord Logs"'-type mongoose schema */
+export enum DiscordLogType {
+  GuildJoin,
+  GuildLeave,
+  MessageEdit,
+  MessagePost,
+  MessageRemove,
+  ReactionAdd,
+  ReactionRemove,
+  Rename,
+  RoleAdd,
+  RoleRemove,
+  VoiceJoin,
+  VoiceLeave,
+}
+
+interface GuildLeaveUserSnapshot {
+  userId: string;
+  nickname: true;
+  displayName: true;
+  joinedAt: number;
+  roles: string[];
+}
+
+interface ActionReference {
+  userId: string;
+  executorId: string;
+}
+
+/** Type for the "Discord Logs"'s mongoose schema */
+export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
+  & (
+    // Context is user id, content is list of possible invite-code used
+    | { type: DiscordLogType.GuildJoin; context: string; content: string[] }
+    // Context is user id, content is a snapshot of the user
+    | { type: DiscordLogType.GuildLeave; context: string; content: GuildLeaveUserSnapshot }
+    // Context is a MessageReference, content is the message content
+    | { type: DiscordLogType.MessageEdit; context: MessageReference; content: string }
+    // Context is a MessageReference, content is the new message content
+    | { type: DiscordLogType.MessagePost; context: MessageReference; content: string }
+    // Context is a MessageReference, content is the message content
+    | { type: DiscordLogType.MessageRemove; context: MessageReference; content: string }
+    // Context is a MessageReference, content is the emoji used
+    | { type: DiscordLogType.ReactionAdd; context: MessageReference; content: string }
+    // Context is a MessageReference, content is the emoji used
+    | { type: DiscordLogType.ReactionRemove; context: MessageReference; content: string }
+    // Context is user id, content is the new name
+    | { type: DiscordLogType.Rename; context: string; content: string }
+    // Context is ActionReference, content is the role id
+    | { type: DiscordLogType.RoleAdd; context: ActionReference; content: string }
+    // Context is ActionReference, content is the role id
+    | { type: DiscordLogType.RoleRemove; context: ActionReference; content: string }
+    // Context is user id, content is the channel id
+    | { type: DiscordLogType.VoiceJoin; context: string; content: string }
+    // Context is user id, content is the channel id
+    | { type: DiscordLogType.VoiceLeave; context: string; content: string }
+  );
+
+/** Simplified interface for the "Discord Logs"'s mongoose schema */
+interface SimpleDiscordLogBase {
+  severity: 1 | 2 | 3;
+  guildId: string;
+  type: DiscordLogType;
+  context: ActionReference | MessageReference | string;
+  content: GuildLeaveUserSnapshot | string;
+}
+
+/** Simplified interface for the "Discord Logs"'s mongoose document */
+export interface DiscordLogDocument extends SimpleDiscordLogBase, Document {}
+
+/** Interface for the "Discord Logs"'s mongoose model */
+export type DiscordLogModel = Model<DiscordLogDocument>;
 // #endregion

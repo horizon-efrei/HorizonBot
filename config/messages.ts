@@ -1,5 +1,6 @@
 import { Identifiers } from '@sapphire/framework';
 import { oneLine, stripIndent } from 'common-tags';
+import { DiscordLogType } from '@/types/database';
 
 export default {
   global: {
@@ -15,6 +16,23 @@ export default {
     eprofMentionPublic: '{eProf} nous avons besoin de toi !',
     eprofMentionPrivate: '{member} a besoin de toi là-bas : {message.channel}',
     paginatedMessagePrompt: 'À quelle page désires-tu aller ?',
+  },
+  logs: {
+    readableEvents: new Map([
+      [DiscordLogType.GuildJoin, ':green_heart: Membre rejoint le serveur'],
+      [DiscordLogType.GuildLeave, ':broken_heart: Membre quitte le serveur'],
+      [DiscordLogType.MessageEdit, ':incoming_envelope: Message modifié'],
+      [DiscordLogType.MessagePost, ':envelope_with_arrow: Message posté'],
+      [DiscordLogType.MessageRemove, ':wastebasket:Message supprimé'],
+      [DiscordLogType.ReactionAdd, ':smiley: Réaction ajoutée'],
+      [DiscordLogType.ReactionRemove, ':anguished: Réaction supprimée'],
+      [DiscordLogType.Rename, ':label: Changement de pseudo'],
+      [DiscordLogType.RoleAdd, ':beginner: Rôle ajouté'],
+      [DiscordLogType.RoleRemove, ':octagonal_sign: Rôle enlevé'],
+      [DiscordLogType.VoiceJoin, ':loud_sound: Connection en vocal'],
+      [DiscordLogType.VoiceLeave, ':mute: Quitte un vocal'],
+    ]),
+    embedTitle: 'Logs automatiques',
   },
   reminders: {
     alarm: ":alarm_clock: Il est l'heure ! Tu m'avais demandé de te rappeler ceci :\n> {description}",

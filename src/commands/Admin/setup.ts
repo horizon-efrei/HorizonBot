@@ -50,6 +50,10 @@ const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry
   type: 'channel',
   entry: ConfigEntriesChannels.ClassCalendarL3,
 }, {
+  possibilities: ['logs', 'log'],
+  type: 'channel',
+  entry: ConfigEntriesChannels.Logs,
+}, {
   possibilities: ['role-staff', 'staff'],
   type: 'role',
   entry: ConfigEntriesRoles.Staff,
