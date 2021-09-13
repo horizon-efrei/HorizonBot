@@ -8,7 +8,7 @@ import FlaggedMessageDB from '@/models/flaggedMessage';
 import type { GuildMessage, GuildTextBasedChannel } from '@/types';
 import type { FlaggedMessageDocument } from '@/types/database';
 import { ConfigEntriesChannels } from '@/types/database';
-import { nullop } from '@/utils';
+import { noop, nullop } from '@/utils';
 
 type FlaggedMessageData = Object.Either<{ manualModerator: GuildMember; swear: string }, 'manualModerator' | 'swear'>;
 
@@ -35,7 +35,7 @@ export default class FlaggedMessage {
   public static async fromDocument(document: FlaggedMessageDocument): Promise<FlaggedMessage> {
     // Fetch the channel, the "victim", the manual moderator if any, and finally the problematic message
     const channel = container.client.channels.resolve(document.channelId) as GuildTextBasedChannel;
-    await channel.guild.members.fetch(document.authorId);
+    await channel.guild.members.fetch(document.authorId).catch(noop);
     if (document.manualModeratorId)
       await channel.guild.members.fetch(document.manualModeratorId);
     const message = await channel.messages.fetch(document.messageId) as GuildMessage;
