@@ -30,7 +30,7 @@ export default {
       [DiscordLogType.RoleAdd, ':beginner: Rôle ajouté'],
       [DiscordLogType.RoleRemove, ':octagonal_sign: Rôle enlevé'],
       [DiscordLogType.VoiceJoin, ':loud_sound: Connection en vocal'],
-      [DiscordLogType.VoiceLeave, ':mute: Quitte un vocal'],
+      [DiscordLogType.VoiceLeave, ":mute: Déconnexion d'un vocal"],
     ]),
     embedTitle: 'Logs automatiques',
     fields: {
@@ -41,10 +41,14 @@ export default {
         contentValue: '`{code}`: lien créé par {link.inviter}, utilisé {link.uses} fois.',
       },
       [DiscordLogType.GuildLeave]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context}>',
+        contentName: ":file_folder: Récap' des informations",
+        contentValue: stripIndent`
+          Pseudo : "{content.username}" / Surnom : "{content.displayName}" (ID: \`{content.userId}\`)
+          À rejoint : <t:{content.joinedAt}:R>
+          Rôles : {content.roles}
+        `,
       },
       [DiscordLogType.MessageEdit]: {
         contextName: '',
@@ -83,28 +87,28 @@ export default {
         contentValue: '',
       },
       [DiscordLogType.RoleAdd]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        contextName: ':busts_in_silhouette: Membres',
+        contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
+        contentName: ':billed_cap: Rôle ajouté',
+        contentValue: '{content}',
       },
       [DiscordLogType.RoleRemove]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        contextName: ':busts_in_silhouette: Membres',
+        contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
+        contentName: ':billed_cap: Rôle enlevé',
+        contentValue: '{content}',
       },
       [DiscordLogType.VoiceJoin]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context}>',
+        contentName: ':sound: Salon',
+        contentValue: '<#{content}>',
       },
       [DiscordLogType.VoiceLeave]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context}>',
+        contentName: ':sound: Salon',
+        contentValue: '<#{content}>',
       },
     },
   },

@@ -267,10 +267,10 @@ export enum DiscordLogType {
   VoiceLeave,
 }
 
-interface GuildLeaveUserSnapshot {
+export interface GuildLeaveUserSnapshot {
   userId: string;
-  nickname: true;
-  displayName: true;
+  username: string;
+  displayName: string;
   joinedAt: number;
   roles: string[];
 }
@@ -299,10 +299,10 @@ export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
     | { type: DiscordLogType.ReactionRemove; context: MessageReference; content: string }
     // Context is user id, content is the new name
     | { type: DiscordLogType.Rename; context: string; content: string }
-    // Context is ActionReference, content is the role id
-    | { type: DiscordLogType.RoleAdd; context: ActionReference; content: string }
-    // Context is ActionReference, content is the role id
-    | { type: DiscordLogType.RoleRemove; context: ActionReference; content: string }
+    // Context is ActionReference, content is the roles id
+    | { type: DiscordLogType.RoleAdd; context: ActionReference; content: string[] }
+    // Context is ActionReference, content is the roles id
+    | { type: DiscordLogType.RoleRemove; context: ActionReference; content: string[] }
     // Context is user id, content is the channel id
     | { type: DiscordLogType.VoiceJoin; context: string; content: string }
     // Context is user id, content is the channel id
@@ -315,7 +315,7 @@ interface SimpleDiscordLogBase {
   guildId: string;
   type: DiscordLogType;
   context: ActionReference | MessageReference | string;
-  content: GuildLeaveUserSnapshot | string;
+  content: GuildLeaveUserSnapshot | string[] | string;
 }
 
 /** Simplified interface for the "Discord Logs"'s mongoose document */
