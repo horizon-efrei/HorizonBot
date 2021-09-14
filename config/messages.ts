@@ -1,5 +1,6 @@
 import { Identifiers } from '@sapphire/framework';
 import { oneLine, stripIndent } from 'common-tags';
+import settings from '@/config/settings';
 import { DiscordLogType } from '@/types/database';
 
 export default {
@@ -19,14 +20,15 @@ export default {
   },
   logs: {
     readableEvents: new Map([
+      [DiscordLogType.ChangeNickname, ':label: Changement de surnom'],
+      [DiscordLogType.ChangeUsername, ':label: Changement de pseudo'],
       [DiscordLogType.GuildJoin, ':green_heart: Membre rejoint le serveur'],
       [DiscordLogType.GuildLeave, ':broken_heart: Membre quitte le serveur'],
       [DiscordLogType.MessageEdit, ':incoming_envelope: Message modifié'],
       [DiscordLogType.MessagePost, ':envelope_with_arrow: Message posté'],
-      [DiscordLogType.MessageRemove, ':wastebasket:Message supprimé'],
+      [DiscordLogType.MessageRemove, ':wastebasket: Message supprimé'],
       [DiscordLogType.ReactionAdd, ':smiley: Réaction ajoutée'],
-      [DiscordLogType.ReactionRemove, ':anguished: Réaction supprimée'],
-      [DiscordLogType.Rename, ':label: Changement de pseudo'],
+      [DiscordLogType.ReactionRemove, ':anguished: Réaction retirée'],
       [DiscordLogType.RoleAdd, ':beginner: Rôle ajouté'],
       [DiscordLogType.RoleRemove, ':octagonal_sign: Rôle enlevé'],
       [DiscordLogType.VoiceJoin, ':loud_sound: Connection en vocal'],
@@ -34,13 +36,29 @@ export default {
     ]),
     embedTitle: 'Logs automatiques',
     fields: {
+      [DiscordLogType.ChangeNickname]: {
+        color: settings.colors.gray,
+        contextName: ':busts_in_silhouette: Membres',
+        contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
+        contentName: ':label: Surnom',
+        contentValue: '```diff\n- {content.before}\n+ {content.after}```',
+      },
+      [DiscordLogType.ChangeUsername]: {
+        color: settings.colors.gray,
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context}>',
+        contentName: ':label: Nouveau pseudo',
+        contentValue: '```diff\n- {content.before}\n+ {content.after}```',
+      },
       [DiscordLogType.GuildJoin]: {
+        color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: '<@{context}>',
         contentName: ":link: Lien d'invitation",
         contentValue: '`{code}`: lien créé par {link.inviter}, utilisé {link.uses} fois.',
       },
       [DiscordLogType.GuildLeave]: {
+        color: settings.colors.red,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: '<@{context}>',
         contentName: ":file_folder: Récap' des informations",
@@ -51,60 +69,80 @@ export default {
         `,
       },
       [DiscordLogType.MessageEdit]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        color: settings.colors.yellow,
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context.authorId}>',
+        contentName: ':pencil: Message',
+        contentValue: stripIndent`
+          Lien : {url} (dans <#{context.channelId}>)
+          Contenu : {content}
+        `,
       },
       [DiscordLogType.MessagePost]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        color: settings.colors.green,
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context.authorId}>',
+        contentName: ':pencil: Nouveau message',
+        contentValue: stripIndent`
+          Lien : {url} (dans <#{context.channelId}>)
+          Contenu : {content}
+        `,
       },
       [DiscordLogType.MessageRemove]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        color: settings.colors.red,
+        contextName: ':busts_in_silhouette: Membres',
+        contextValue: 'Auteur du message : <@{context.authorId}>\nExécuteur : <@{context.executorId}>',
+        contentName: ':pencil: Message',
+        contentValue: stripIndent`
+          Dans <#{context.channelId}>
+          Contenu : {content}
+        `,
       },
       [DiscordLogType.ReactionAdd]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        color: settings.colors.green,
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context.authorId}>',
+        contentName: 'Réaction',
+        contentValue: stripIndent`
+          Lien du message : {url} (dans <#{context.channelId}>)
+          Auteur du message : <@{context.authorId}>
+          Réaction : {content}
+        `,
       },
       [DiscordLogType.ReactionRemove]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
-      },
-      [DiscordLogType.Rename]: {
-        contextName: '',
-        contextValue: '',
-        contentName: '',
-        contentValue: '',
+        color: settings.colors.red,
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context.authorId}>',
+        contentName: 'Réaction',
+        contentValue: stripIndent`
+          Lien du message : {url} (dans <#{context.channelId}>)
+          Auteur du message : <@{context.authorId}>
+          Réaction : {content}
+        `,
       },
       [DiscordLogType.RoleAdd]: {
+        color: settings.colors.green,
         contextName: ':busts_in_silhouette: Membres',
         contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
         contentName: ':billed_cap: Rôle ajouté',
         contentValue: '{content}',
       },
       [DiscordLogType.RoleRemove]: {
+        color: settings.colors.red,
         contextName: ':busts_in_silhouette: Membres',
         contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
         contentName: ':billed_cap: Rôle enlevé',
         contentValue: '{content}',
       },
       [DiscordLogType.VoiceJoin]: {
+        color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: '<@{context}>',
         contentName: ':sound: Salon',
         contentValue: '<#{content}>',
       },
       [DiscordLogType.VoiceLeave]: {
+        color: settings.colors.red,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: '<@{context}>',
         contentName: ':sound: Salon',

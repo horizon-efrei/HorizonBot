@@ -1,4 +1,4 @@
-import type { GuildMember, MessageReference, Role } from 'discord.js';
+import type { GuildMember, Role } from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
 import type { GuildTextBasedChannel, SchoolYear, TeachingUnit } from '@/types';
 
@@ -253,6 +253,8 @@ export type ReminderModel = Model<ReminderDocument>;
 // #region Discord Logs Database Types
 /** Enum for the "Discord Logs"'-type mongoose schema */
 export enum DiscordLogType {
+  ChangeNickname,
+  ChangeUsername,
   GuildJoin,
   GuildLeave,
   MessageEdit,
@@ -260,7 +262,6 @@ export enum DiscordLogType {
   MessageRemove,
   ReactionAdd,
   ReactionRemove,
-  Rename,
   RoleAdd,
   RoleRemove,
   VoiceJoin,
@@ -275,6 +276,21 @@ export interface GuildLeaveUserSnapshot {
   roles: string[];
 }
 
+interface AuthorMessageReference {
+  messageId: string;
+  channelId: string;
+  authorId: string;
+}
+
+interface ExecutorAndAuthorMessageReference extends AuthorMessageReference {
+  executorId: string;
+}
+
+interface BeforeAfter<T = string> {
+  before: T;
+  after: T;
+}
+
 interface ActionReference {
   userId: string;
   executorId: string;
@@ -283,22 +299,24 @@ interface ActionReference {
 /** Type for the "Discord Logs"'s mongoose schema */
 export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
   & (
+    // Context is user id, content is the new nickname
+    | { type: DiscordLogType.ChangeNickname; context: ActionReference; content: BeforeAfter }
+    // Context is user id, content is the new username
+    | { type: DiscordLogType.ChangeUsername; context: string; content: BeforeAfter }
     // Context is user id, content is list of possible invite-code used
     | { type: DiscordLogType.GuildJoin; context: string; content: string[] }
     // Context is user id, content is a snapshot of the user
     | { type: DiscordLogType.GuildLeave; context: string; content: GuildLeaveUserSnapshot }
-    // Context is a MessageReference, content is the message content
-    | { type: DiscordLogType.MessageEdit; context: MessageReference; content: string }
-    // Context is a MessageReference, content is the new message content
-    | { type: DiscordLogType.MessagePost; context: MessageReference; content: string }
-    // Context is a MessageReference, content is the message content
-    | { type: DiscordLogType.MessageRemove; context: MessageReference; content: string }
-    // Context is a MessageReference, content is the emoji used
-    | { type: DiscordLogType.ReactionAdd; context: MessageReference; content: string }
-    // Context is a MessageReference, content is the emoji used
-    | { type: DiscordLogType.ReactionRemove; context: MessageReference; content: string }
-    // Context is user id, content is the new name
-    | { type: DiscordLogType.Rename; context: string; content: string }
+    // Context is a UserMessageReference, content is the message content
+    | { type: DiscordLogType.MessageEdit; context: AuthorMessageReference; content: BeforeAfter }
+    // Context is a UserMessageReference, content is the new message content
+    | { type: DiscordLogType.MessagePost; context: AuthorMessageReference; content: string }
+    // Context is a UserMessageReference, content is the message content
+    | { type: DiscordLogType.MessageRemove; context: ExecutorAndAuthorMessageReference; content: string }
+    // Context is a UserAuthorMessageReference, content is the emoji used
+    | { type: DiscordLogType.ReactionAdd; context: ExecutorAndAuthorMessageReference; content: string }
+    // Context is a UserAuthorMessageReference, content is the emoji used
+    | { type: DiscordLogType.ReactionRemove; context: ExecutorAndAuthorMessageReference; content: string }
     // Context is ActionReference, content is the roles id
     | { type: DiscordLogType.RoleAdd; context: ActionReference; content: string[] }
     // Context is ActionReference, content is the roles id
@@ -314,8 +332,8 @@ interface SimpleDiscordLogBase {
   severity: 1 | 2 | 3;
   guildId: string;
   type: DiscordLogType;
-  context: ActionReference | MessageReference | string;
-  content: GuildLeaveUserSnapshot | string[] | string;
+  context: ActionReference | AuthorMessageReference | ExecutorAndAuthorMessageReference | string;
+  content: BeforeAfter | GuildLeaveUserSnapshot | string[] | string;
 }
 
 /** Simplified interface for the "Discord Logs"'s mongoose document */

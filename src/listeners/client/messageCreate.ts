@@ -1,14 +1,23 @@
 import { Listener } from '@sapphire/framework';
 import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
+import DiscordLogManager from '@/structures/DiscordLogManager';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
-import { ConfigEntriesRoles } from '@/types/database';
+import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
 
 export default class MessageListener extends Listener {
   public async run(message: GuildMessage): Promise<void> {
     if (message.author.bot || message.system)
       return;
+
+    await DiscordLogManager.logAction({
+      type: DiscordLogType.MessagePost,
+      context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
+      content: message.content,
+      guildId: message.guild.id,
+      severity: 1,
+    });
 
     const mentionnedTempIntersectionRoles = this.container.client.intersectionRoles
       .filter(r => message.mentions.roles.has(r))

@@ -11,6 +11,7 @@ export default {
     yellow: '#e0c748' as ColorResolvable,
     orange: '#f27938' as ColorResolvable,
     red: '#eb2d1c' as ColorResolvable,
+    gray: '#4f4f4f' as ColorResolvable,
   },
   configuration: {
     swears: ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],

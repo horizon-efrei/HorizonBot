@@ -4,15 +4,31 @@ import settings from '@/config/settings';
 import EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
+import DiscordLogManager from '@/structures/DiscordLogManager';
 import type { GuildMessage } from '@/types';
+import { DiscordLogType } from '@/types/database';
 import { noop } from '@/utils';
 
 export default class MessageReactionRemoveListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
-    if (user.bot || !('guild' in reaction.message.channel))
+    if (reaction.message.system || user.bot || !('guild' in reaction.message.channel))
       return;
 
     const message = reaction.message as GuildMessage;
+
+    await DiscordLogManager.logAction({
+      type: DiscordLogType.ReactionRemove,
+      context: {
+        messageId: message.id,
+        channelId: message.channel.id,
+        authorId: message.author.id,
+        executorId: user.id,
+      },
+      content: reaction.emoji.id ?? reaction.emoji.name,
+      guildId: message.guild.id,
+      severity: 1,
+    });
+
     const member = message.guild.members.cache.get(user.id);
     if (!member) {
       this.container.logger.warn('[Message Reaction Remove] Abort event due to unresolved member.');

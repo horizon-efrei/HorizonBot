@@ -7,10 +7,11 @@ import EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
 import Subject from '@/models/subject';
+import DiscordLogManager from '@/structures/DiscordLogManager';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
 import { TeachingUnit } from '@/types';
-import { ConfigEntriesRoles } from '@/types/database';
+import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
 import { noop } from '@/utils';
 
 const teachingUnitEprofMapping = new Map([
@@ -22,10 +23,24 @@ const teachingUnitEprofMapping = new Map([
 
 export default class MessageReactionAddListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
-    if (user.bot || !('guild' in reaction.message.channel))
+    if (reaction.message.system || user.bot || !('guild' in reaction.message.channel))
       return;
 
     const message = reaction.message as GuildMessage;
+
+    await DiscordLogManager.logAction({
+      type: DiscordLogType.ReactionAdd,
+      context: {
+        messageId: message.id,
+        channelId: message.channel.id,
+        authorId: message.author.id,
+        executorId: user.id,
+      },
+      content: reaction.emoji.id ?? reaction.emoji.name,
+      guildId: message.guild.id,
+      severity: 1,
+    });
+
     const member = message.guild.members.cache.get(user.id);
     if (!member) {
       this.container.logger.warn('[Message Reaction Add] Abort event due to unresolved member.');

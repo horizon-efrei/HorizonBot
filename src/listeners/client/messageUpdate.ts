@@ -1,11 +1,21 @@
 import { Listener } from '@sapphire/framework';
+import DiscordLogManager from '@/structures/DiscordLogManager';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
+import { DiscordLogType } from '@/types/database';
 
 export default class MessageUpdateListener extends Listener {
-  public async run(_oldMessage: GuildMessage, newMessage: GuildMessage): Promise<void> {
+  public async run(oldMessage: GuildMessage, newMessage: GuildMessage): Promise<void> {
     if (newMessage.author.bot || newMessage.system)
       return;
+
+    await DiscordLogManager.logAction({
+      type: DiscordLogType.MessageEdit,
+      context: { messageId: newMessage.id, channelId: newMessage.channel.id, authorId: newMessage.author.id },
+      content: { before: oldMessage.content, after: newMessage.content },
+      guildId: newMessage.guild.id,
+      severity: 1,
+    });
 
     // Swearing check
     const flaggedMessage = this.container.client.waitingFlaggedMessages.find(msg => msg.message.id === newMessage.id);

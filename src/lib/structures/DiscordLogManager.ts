@@ -2,12 +2,22 @@ import { container } from '@sapphire/pieces';
 import { Formatters, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import messages from '@/config/messages';
-import settings from '@/config/settings';
 import DiscordLogs from '@/models/discordLogs';
+import * as CustomResolvers from '@/resolvers';
 import type { DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType } from '@/types/database';
 
+type DiscordLogWithMessageContext = DiscordLogBase & { type:
+  | DiscordLogType.MessageEdit
+  | DiscordLogType.MessagePost
+  | DiscordLogType.MessageRemove
+  | DiscordLogType.ReactionAdd
+  | DiscordLogType.ReactionRemove;
+};
+
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
+const trimText = (text: string): string => (text.length > 500 ? `${text.slice(0, 500)}...` : text);
+const getMessageUrl = (payload: DiscordLogWithMessageContext): string => `https://discord.com/channels/${payload.guildId}/${payload.context.channelId}/${payload.context.messageId}`;
 
 export default {
   async logAction(payload: DiscordLogBase): Promise<void> {
@@ -19,15 +29,15 @@ export default {
     if (!logChannel)
       return;
 
-    const fieldTexts = messages.logs.fields[payload.type];
+    const fieldOptions = messages.logs.fields[payload.type];
     const contentValue: string = this.getContentValue(payload);
 
     const embed = new MessageEmbed()
       .setAuthor(messages.logs.embedTitle)
-      .setColor(settings.colors.default)
+      .setColor(fieldOptions.color)
       .setTitle(messages.logs.readableEvents.get(payload.type))
-      .addField(fieldTexts.contextName, pupa(fieldTexts.contextValue, payload), true)
-      .addField(fieldTexts.contentName, contentValue, true)
+      .addField(fieldOptions.contextName, pupa(fieldOptions.contextValue, payload), true)
+      .addField(fieldOptions.contentName, contentValue, true)
       .setTimestamp();
     await logChannel?.send({ embeds: [embed] });
   },
@@ -59,12 +69,23 @@ export default {
           ...payload,
           content: listAndFormatter.format(payload.content.map(Formatters.roleMention)),
         });
-      case DiscordLogType.MessageEdit:
       case DiscordLogType.MessagePost:
+      case DiscordLogType.MessageEdit:
       case DiscordLogType.MessageRemove:
+        return pupa(fieldTexts.contentValue, {
+          ...payload,
+          content: trimText(typeof payload.content === 'string' ? payload.content : payload.content.after),
+          url: getMessageUrl(payload),
+        });
       case DiscordLogType.ReactionAdd:
       case DiscordLogType.ReactionRemove:
-      case DiscordLogType.Rename:
+        return pupa(fieldTexts.contentValue, {
+          ...payload,
+          content: CustomResolvers.resolveEmoji(payload.content, guild).value ?? payload.content,
+          url: getMessageUrl(payload),
+        });
+      case DiscordLogType.ChangeNickname:
+      case DiscordLogType.ChangeUsername:
       case DiscordLogType.VoiceJoin:
       case DiscordLogType.VoiceLeave:
         return pupa(fieldTexts.contentValue, payload);
