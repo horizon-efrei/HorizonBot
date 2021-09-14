@@ -37,6 +37,7 @@
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
     "dotenv": "^10.0.0",
+    "env-paths": "^3.0.0",
     "lodash.difference": "^4.5.0",
     "lodash.groupby": "^4.6.0",
     "lodash.intersection": "^4.4.0",
