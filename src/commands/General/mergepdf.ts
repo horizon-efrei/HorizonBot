@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import envPaths from 'env-paths';
@@ -25,11 +25,11 @@ export default class PdfMergeCommand extends HorizonCommand {
         for (const file of msg.attachments.values()) {
             if (file.name.endsWith('.pdf'))
                 // Writing the pdf in tmp folder
-                await fs.promises.writeFile(tmpFolder, file.url);
+                await fs.writeFile(tmpFolder, file.url);
                 // Add the file into the PdfMerger
                 merger.add(`${tmpFolder}/${file.name}`);
                 // Deleting the file
-                await fs.promises.unlink(`${tmpFolder}/${file.name}`);
+                await fs.unlink(`${tmpFolder}/${file.name}`);
         }
     }
 
