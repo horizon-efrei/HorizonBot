@@ -187,7 +187,7 @@ export const tags = {
     // Help page
     helpEmbedTitle: 'Aide des Tags',
     helpEmbedDescription: [
-      { name: 'Créer un tag', value: '`tags create <nom> <aliases> <contenu>`' },
+      { name: 'Créer un tag', value: '`tags create <nom> <contenu>`' },
       { name: 'Liste des tags', value: '`tags list`' },
       { name: 'Supprimer un tag', value: '`tags remove <nom>`' },
       { name: 'Modifier un tag', value: '`tags edit <nom> <contenu>`' },
