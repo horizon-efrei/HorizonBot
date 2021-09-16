@@ -34,6 +34,21 @@ export default {
       [DiscordLogType.VoiceJoin, ':loud_sound: Connection en vocal'],
       [DiscordLogType.VoiceLeave, ":mute: Déconnexion d'un vocal"],
     ]),
+    simplifiedReadableEvents: new Map([
+      [DiscordLogType.ChangeNickname, 'changement de surnom'],
+      [DiscordLogType.ChangeUsername, 'changement de pseudo'],
+      [DiscordLogType.GuildJoin, 'membre rejoint le serveur'],
+      [DiscordLogType.GuildLeave, 'membre quitte le serveur'],
+      [DiscordLogType.MessageEdit, 'message modifié'],
+      [DiscordLogType.MessagePost, 'message posté'],
+      [DiscordLogType.MessageRemove, 'message supprimé'],
+      [DiscordLogType.ReactionAdd, 'réaction ajoutée'],
+      [DiscordLogType.ReactionRemove, 'réaction retirée'],
+      [DiscordLogType.RoleAdd, 'rôle ajouté'],
+      [DiscordLogType.RoleRemove, 'rôle enlevé'],
+      [DiscordLogType.VoiceJoin, 'connection en vocal'],
+      [DiscordLogType.VoiceLeave, "déconnexion d'un vocal"],
+    ]),
     embedTitle: 'Logs automatiques',
     fields: {
       [DiscordLogType.ChangeNickname]: {

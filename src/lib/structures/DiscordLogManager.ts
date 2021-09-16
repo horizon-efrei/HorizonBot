@@ -5,7 +5,7 @@ import messages from '@/config/messages';
 import DiscordLogs from '@/models/discordLogs';
 import * as CustomResolvers from '@/resolvers';
 import type { DiscordLogBase } from '@/types/database';
-import { ConfigEntriesChannels, DiscordLogType } from '@/types/database';
+import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
 
 type DiscordLogWithMessageContext = DiscordLogBase & { type:
   | DiscordLogType.MessageEdit
@@ -21,9 +21,17 @@ const getMessageUrl = (payload: DiscordLogWithMessageContext): string => `https:
 
 export default {
   async logAction(payload: DiscordLogBase): Promise<void> {
+    const logStatus = container.client.logStatuses.get(payload.guildId).get(payload.type);
+    if (logStatus === LogStatuses.Disabled)
+      return;
+
     await DiscordLogs.create(payload);
+    if (logStatus === LogStatuses.Silent)
+      return;
 
     container.logger.info(`[Logs:${DiscordLogType[payload.type]}] New logged event happend: ${JSON.stringify(payload, (k, v) => (k === 'type' ? DiscordLogType[v] : v))}`);
+    if (logStatus === LogStatuses.Console)
+      return;
 
     const logChannel = await container.client.configManager.get(ConfigEntriesChannels.Logs, payload.guildId);
     if (!logChannel)

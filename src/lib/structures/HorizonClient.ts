@@ -1,15 +1,17 @@
 import { LogLevel, SapphireClient } from '@sapphire/framework';
 import axios from 'axios';
-import { Intents, Permissions } from 'discord.js';
+import { Collection, Intents, Permissions } from 'discord.js';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
+import LogStatuses from '@/models/logStatuses';
 import ReactionRole from '@/models/reactionRole';
 import Reminders from '@/models/reminders';
 import Tags from '@/models/tags';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import TaskStore from '@/structures/tasks/TaskStore';
-import type { ReminderDocument, TagDocument } from '@/types/database';
+import type { LogStatusesBase, ReminderDocument, TagDocument } from '@/types/database';
+import { DiscordLogType, LogStatuses as LogStatusesEnum } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class HorizonClient extends SapphireClient {
@@ -21,6 +23,7 @@ export default class HorizonClient extends SapphireClient {
   intersectionRoles: Set<string>;
   tags: Set<TagDocument>;
   reminders: Set<ReminderDocument>;
+  logStatuses: Collection<string, Collection<DiscordLogType, LogStatusesEnum>>;
 
   constructor() {
     super({
@@ -46,6 +49,7 @@ export default class HorizonClient extends SapphireClient {
 
     this.waitingFlaggedMessages = [];
     this.intersectionRoles = new Set();
+    this.logStatuses = new Collection();
     void this._loadCompilerApiCredits();
     void this.loadReactionRoles();
     void this.loadEclassRoles();
@@ -126,6 +130,25 @@ export default class HorizonClient extends SapphireClient {
     const reminders = await Reminders.find().catch(nullop);
     if (reminders)
       this.reminders.addAll(...reminders);
+  }
+
+  public async syncLogStatuses(): Promise<void> {
+    const logs = await LogStatuses.find();
+    const docs: LogStatusesBase[] = [];
+
+    for (const guildId of this.guilds.cache.keys()) {
+      this.logStatuses.set(guildId, new Collection());
+
+      for (const logType of Object.values(DiscordLogType).filter(Number.isInteger)) {
+        const type = logType as DiscordLogType;
+        const currentSetting = logs.find(log => log.guildId === guildId && log.type === logType);
+
+        this.logStatuses.get(guildId).set(type, currentSetting.status ?? LogStatusesEnum.Discord);
+        if (!currentSetting)
+          docs.push({ guildId, type, status: LogStatusesEnum.Discord });
+      }
+    }
+    await LogStatuses.insertMany(docs);
   }
 
   private async _loadCompilerApiCredits(): Promise<void> {

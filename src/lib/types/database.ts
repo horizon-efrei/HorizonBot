@@ -342,3 +342,30 @@ export interface DiscordLogDocument extends SimpleDiscordLogBase, Document {}
 /** Interface for the "Discord Logs"'s mongoose model */
 export type DiscordLogModel = Model<DiscordLogDocument>;
 // #endregion
+
+/* ***************************** */
+/*  Log Statuses Database Types  */
+/* ***************************** */
+
+// #region Log Statuses Database Types
+/** Enum for the "Log Statuses"'-type mongoose schema */
+export enum LogStatuses {
+  Disabled,
+  Silent,
+  Console,
+  Discord,
+}
+
+/** Type for the "Log Statuses"'s mongoose schema */
+export interface LogStatusesBase {
+  guildId: string;
+  type: DiscordLogType;
+  status: LogStatuses;
+}
+
+/** Simplified interface for the "Log Statuses"'s mongoose document */
+export interface LogStatusesDocument extends LogStatusesBase, Document {}
+
+/** Interface for the "Log Statuses"'s mongoose model */
+export type LogStatusesModel = Model<LogStatusesDocument>;
+// #endregion

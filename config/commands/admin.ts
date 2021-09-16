@@ -1,4 +1,5 @@
 import { stripIndents } from 'common-tags';
+import { LogStatuses } from '@/types/database';
 
 export const limits = {
   options: {
@@ -10,6 +11,29 @@ export const limits = {
   },
   messages: {
     limits: 'Salons : {channels}/500 (reste {channelsLeft})\nRôles : {roles}/250 (reste {rolesLeft})',
+  },
+};
+
+export const logs = {
+  options: {
+    aliases: ['logs', 'log', 'logging', 'logger'],
+    description: 'Permet de gérer comment les logs sont traités.',
+    enabled: true,
+    usage: 'logs',
+    examples: ['logs', 'logs change-nickname', 'logs change-nickname 2'],
+  },
+  messages: {
+    updatedLog: 'Le statut du log **{type}** a bien été changé en **{status}** !',
+    updatedAllLog: 'Le statut de **tous les logs** de ce serveur a bien été changé en **{status}** !',
+    listTitle: 'Liste des statuts des logs',
+    lineValue: '**{type}** : {status}',
+    currentLogStatus: 'Le statut actuel du log **{type}** est : **{status}**`',
+    statuses: {
+      [LogStatuses.Disabled]: ':no_entry_sign: désactivé',
+      [LogStatuses.Silent]: ':no_bell: silencieux',
+      [LogStatuses.Console]: ':thought_balloon: console uniquement',
+      [LogStatuses.Discord]: ':white_check_mark: Discord & console',
+    },
   },
 };
 

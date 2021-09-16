@@ -6,12 +6,18 @@ import type {
   RepeatArgOptions,
   Result,
 } from '@sapphire/framework';
+import type { Collection } from 'discord.js';
 import type ConfigurationManager from '@/structures/ConfigurationManager';
 import type FlaggedMessage from '@/structures/FlaggedMessage';
 import type HorizonCommand from '@/structures/commands/HorizonCommand';
 import type TaskStore from '@/structures/tasks/TaskStore';
 import type { CodeLanguageResult, GuildTextBasedChannel, HourMinutes } from '@/types';
-import type { ReminderDocument, TagDocument } from '@/types/database';
+import type {
+ DiscordLogType,
+ LogStatuses,
+ ReminderDocument,
+ TagDocument,
+} from '@/types/database';
 
 declare module '@sapphire/framework' {
   interface StoreRegistryEntries {
@@ -57,12 +63,14 @@ declare module '@sapphire/framework' {
     intersectionRoles: Set<string>;
     tags: Set<TagDocument>;
     reminders: Set<ReminderDocument>;
+    logStatuses: Collection<string, Collection<DiscordLogType, LogStatuses>>;
 
     loadReactionRoles(): Promise<void>;
     loadEclassRoles(): Promise<void>;
     loadTags(): Promise<void>;
     loadReminders(): Promise<void>;
     checkValidity(): void;
+    syncLogStatuses(): Promise<void>;
   }
 
   interface ArgType {
