@@ -169,6 +169,6 @@ export const mergePDF = {
     description: 'Permet de combiner plusieurs fichiers PDF à partir de liens de messages.',
   },
   messages: {
-    noPdfFound: 'Aucun fichier PDF trouvé',
+    noPdfFound: "Aucun fichier PDF n'a été trouvé parmi ces messages...",
   },
 };
