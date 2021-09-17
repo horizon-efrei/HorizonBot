@@ -164,6 +164,7 @@ export const vocalCount = {
 };
 
 export const mergePDF = {
+  sortingMethod: 'Alphabetical',
   options: {
     aliases: ['mergepdf', 'pdf'],
     description: 'Permet de combiner plusieurs fichiers PDF à partir de messages Discord, via leur lien ou leur ID.',
