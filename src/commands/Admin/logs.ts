@@ -52,7 +52,7 @@ export default class LogsCommand extends HorizonCommand {
     const logType = askedLog.value === 'all' ? 'all' : logNames.findKey(names => names.includes(askedLog.value));
     const guildId = message.guild.id;
 
-    if (logType) {
+    if (Number.isInteger(logType)) {
       const askedStatus = await args.pickResult('string').catch(nullop);
       const logStatus = logStatuses.findKey(statuses => statuses.includes(askedStatus.value));
 
