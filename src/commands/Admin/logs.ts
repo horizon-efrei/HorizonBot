@@ -1,6 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import type { Args, CommandOptions } from '@sapphire/framework';
+import { isNullish } from '@sapphire/utilities';
 import { Collection, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { logs as config } from '@/config/commands/admin';
@@ -50,35 +51,36 @@ export default class LogsCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     const askedLog = await args.pickResult('string').catch(nullop);
     const logType = askedLog.value === 'all' ? 'all' : logNames.findKey(names => names.includes(askedLog.value));
+
+    if (isNullish(logType)) {
+      await this._displayList(message);
+      return;
+    }
+
+    const askedStatus = await args.pickResult('string').catch(nullop);
+    const logStatus = logStatuses.findKey(statuses => statuses.includes(askedStatus.value));
     const guildId = message.guild.id;
 
-    if (Number.isInteger(logType)) {
-      const askedStatus = await args.pickResult('string').catch(nullop);
-      const logStatus = logStatuses.findKey(statuses => statuses.includes(askedStatus.value));
-
-      if (Number.isInteger(logStatus)) {
-        if (logType === 'all') {
-          await LogStatuses.updateMany({ guildId }, { status: logStatus });
-          for (const type of Object.values(DiscordLogType).filter(Number.isInteger))
-            this.container.client.logStatuses.get(guildId).set(type as DiscordLogType, logStatus);
-          await message.channel.send(
-            pupa(config.messages.updatedAllLog, { status: config.messages.statuses[logStatus] }),
-          );
-        } else {
-          await LogStatuses.updateOne({ type: logType, guildId }, { status: logStatus });
-          this.container.client.logStatuses.get(guildId).set(logType, logStatus);
-          await message.channel.send(
-            pupa(config.messages.updatedLog, getLogInfo({ type: logType, status: logStatus })),
-          );
-        }
-      } else if (logType === 'all') {
-        await this._displayList(message);
+    if (Number.isInteger(logStatus)) {
+      if (logType === 'all') {
+        await LogStatuses.updateMany({ guildId }, { status: logStatus });
+        for (const type of Object.values(DiscordLogType).filter(Number.isInteger))
+          this.container.client.logStatuses.get(guildId).set(type as DiscordLogType, logStatus);
+        await message.channel.send(
+          pupa(config.messages.updatedAllLog, { status: config.messages.statuses[logStatus] }),
+        );
       } else {
-        const log = await LogStatuses.findOne({ type: logType, guildId });
-        await message.channel.send(pupa(config.messages.currentLogStatus, getLogInfo(log)));
+        await LogStatuses.updateOne({ type: logType, guildId }, { status: logStatus });
+        this.container.client.logStatuses.get(guildId).set(logType, logStatus);
+        await message.channel.send(
+          pupa(config.messages.updatedLog, getLogInfo({ type: logType, status: logStatus })),
+        );
       }
-    } else {
+    } else if (logType === 'all') {
       await this._displayList(message);
+    } else {
+      const log = await LogStatuses.findOne({ type: logType, guildId });
+      await message.channel.send(pupa(config.messages.currentLogStatus, getLogInfo(log)));
     }
   }
 
