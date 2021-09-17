@@ -2,7 +2,7 @@ import type { SubCommandManager } from '@sapphire/plugin-subcommands';
 import type { Writable } from '@/types';
 
 const commonSubcommands = {
-  create: { aliases: ['add', 'new'] },
+  create: { aliases: ['add', 'new', 'set'] },
   list: { aliases: ['liste', 'ls', 'show'] },
   edit: { aliases: ['change', 'modify'] },
   remove: { aliases: ['delete', 'rm', 'del'] },
