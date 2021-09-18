@@ -4,7 +4,6 @@ import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import envPaths from 'env-paths';
 import PdfMerger from 'pdf-merger-js';
-import listFiles from '@/app/lib/utils/listFiles';
 import { mergePDF as config } from '@/config/commands/general';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
@@ -26,17 +25,12 @@ export default class PdfMergeCommand extends HorizonCommand {
 
     for (const msg of result.value) {
         // Counting files with the same name
-        let duplicateCounter = 1;
+        let counter = 0;
         for (const file of msg.attachments.values()) {
             if (file.name.endsWith('.pdf')) {
-                // Checking if the file has the same name with another
-                if (file.name in listFiles(tmpFolder)) {
-                    // Getting the file name without the extension
-                    file.name = file.name.slice(0, file.name.lastIndexOf('.'));
-                    file.name += ` (${duplicateCounter}).pdf`;
-                    duplicateCounter++;
-                }
-
+                // Renaming the file to avoid duplicates
+                file.name = `${file.name}-${message.id}-${counter}.pdf`;
+                counter++;
                 // Writing the pdf in tmp folder
                 await fs.writeFile(tmpFolder, file.url);
                 // Add the file into the PdfMerger

@@ -66,6 +66,16 @@ export const latex = {
   },
 };
 
+export const mergePDF = {
+  options: {
+    aliases: ['mergepdf', 'pdf'],
+    description: 'Permet de combiner plusieurs fichiers PDF à partir de messages Discord, via leur lien ou leur ID.',
+  },
+  messages: {
+    noPdfFound: "Aucun fichier PDF n'a été trouvé parmi ces messages...",
+  },
+};
+
 export const ping = {
   options: {
     aliases: ['ping', 'pong', 'ms'],
@@ -160,16 +170,5 @@ export const vocalCount = {
   messages: {
     invalidUse: "Tu n'as pas spécifié de salon vocal, et tu n'es dans aucun salon !",
     count: 'Il y a {count} personne{plural} connectée{plural} dans ce salon vocal !',
-  },
-};
-
-export const mergePDF = {
-  sortingMethod: 'Alphabetical',
-  options: {
-    aliases: ['mergepdf', 'pdf'],
-    description: 'Permet de combiner plusieurs fichiers PDF à partir de messages Discord, via leur lien ou leur ID.',
-  },
-  messages: {
-    noPdfFound: "Aucun fichier PDF n'a été trouvé parmi ces messages...",
   },
 };
