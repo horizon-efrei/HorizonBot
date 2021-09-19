@@ -42,11 +42,11 @@ export default class PDFMergeCommand extends HorizonCommand {
     }
 
 
-    const PDFBuffer = await merger.saveAsBuffer();
+    const pdfBuffer = await merger.saveAsBuffer();
 
     await message.channel.send({
         files: [{
-            attachment: PDFBuffer,
+            attachment: pdfBuffer,
             name: 'merged.pdf',
         }],
     });
