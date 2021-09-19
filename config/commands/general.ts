@@ -72,7 +72,7 @@ export const mergePDF = {
     description: 'Permet de combiner plusieurs fichiers PDF à partir de messages Discord, via leur lien ou leur ID.',
   },
   messages: {
-    noPdfFound: "Aucun fichier PDF n'a été trouvé parmi ces messages...",
+    noPDFFound: "Aucun fichier PDF n'a été trouvé parmi ces messages...",
   },
 };
 

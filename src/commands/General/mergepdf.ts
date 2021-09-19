@@ -3,29 +3,29 @@ import path from 'path';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import envPaths from 'env-paths';
-import PdfMerger from 'pdf-merger-js';
+import PDFMerger from 'pdf-merger-js';
 import { mergePDF as config } from '@/config/commands/general';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
-const merger = new PdfMerger();
+const merger = new PDFMerger();
 
 const tmpFolder = envPaths('horizonbot').temp;
 
 @ApplyOptions<CommandOptions>(config.options)
-export default class PdfMergeCommand extends HorizonCommand {
+export default class PDFMergeCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
     // Argument dans l'ordre croissant
     const result = await args.repeatResult('message');
 
     if (!result.success) {
-        await message.channel.send(config.messages.noPdfFound);
+        await message.channel.send(config.messages.noPDFFound);
         return;
     }
 
+    let counter = 0;
     for (const msg of result.value) {
         // Counting files with the same name
-        let counter = 0;
         for (const file of msg.attachments.values()) {
             if (file.name.endsWith('.pdf')) {
                 // Renaming the file to avoid duplicates
@@ -42,11 +42,11 @@ export default class PdfMergeCommand extends HorizonCommand {
     }
 
 
-    const pdfBuffer = await merger.saveAsBuffer();
+    const PDFBuffer = await merger.saveAsBuffer();
 
     await message.channel.send({
         files: [{
-            attachment: pdfBuffer,
+            attachment: PDFBuffer,
             name: 'merged.pdf',
         }],
     });
