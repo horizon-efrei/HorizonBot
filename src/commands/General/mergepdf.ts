@@ -15,7 +15,6 @@ const tmpFolder = envPaths('horizonbot').temp;
 @ApplyOptions<CommandOptions>(config.options)
 export default class PDFMergeCommand extends HorizonCommand {
   public async run(message: GuildMessage, args: Args): Promise<void> {
-    // Argument dans l'ordre croissant
     const result = await args.repeatResult('message');
 
     if (!result.success) {
