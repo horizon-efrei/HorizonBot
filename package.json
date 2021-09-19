@@ -46,6 +46,7 @@
     "nanoid": "^3.1.25",
     "node-cron": "^3.0.0",
     "node-emoji": "^1.11.0",
+    "pdf-merger-js": "^3.2.1",
     "pupa": "^2.1.1",
     "reflect-metadata": "^0.1.13",
     "slug": "^5.1.0",
