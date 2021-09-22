@@ -92,6 +92,8 @@ export default class UpdateClassesCalendarTask extends Task {
       let content = pupa(messages.classesCalendar.textChannel, subject);
       if (subject.textDocsChannel)
         content += pupa(messages.classesCalendar.textDocsChannel, subject);
+      if (subject.voiceChannel)
+        content += pupa(messages.classesCalendar.voiceChannel, subject);
 
       const exams = subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • ');
       content += pupa(messages.classesCalendar.body, {
