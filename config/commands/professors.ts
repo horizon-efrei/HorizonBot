@@ -270,7 +270,7 @@ export const eclass = {
         invalid: 'Ce membre est invalide.',
       },
       targetRole: {
-        base: 'Entre le rôle visé (L1, L2...) (mentionne-le ou entre son nom ou son ID) :',
+        base: 'Entre le rôle de révision visé ("Cours Hors-RAT Maths", "Rattrapages Informatique"...) (mentionne-le ou entre son nom ou son ID) :',
         invalid: 'Ce rôle est invalide.',
       },
       recorded: {
