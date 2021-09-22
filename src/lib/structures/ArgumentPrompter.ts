@@ -163,7 +163,7 @@ export default class ArgumentPrompter {
     const handler = new MessagePrompter(
       previousIsFailure ? `${prompts.invalid} ${prompts.base}` : prompts.base,
       'message',
-      { timeout: 60 * 1000, explicitReturn: true, editMessage: this._options?.baseMessage },
+      { timeout: 2 * 60 * 1000, explicitReturn: true, editMessage: this._options?.baseMessage },
     );
     const { response, appliedMessage } = await handler
       .run(this._message.channel, this._message.author) as PrompterMessageResult;

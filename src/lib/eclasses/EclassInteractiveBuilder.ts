@@ -181,7 +181,7 @@ export default class EclassInteractiveBuilder {
 
     const interaction = await this.mainBotMessage.awaitMessageComponent<SelectMenuInteraction>({
       componentType: component.type,
-      time: 60 * 1000,
+      time: 2 * 60 * 1000,
       filter: i => i.user.id === this.message.author.id && i.customId === component.customId && !this.aborted,
     });
     this._actionRows.splice(1);

@@ -69,7 +69,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     const handler = new MessagePrompter({ embeds: [confirmationEmbed] }, 'confirm', {
       confirmEmoji: settings.emojis.yes,
       cancelEmoji: settings.emojis.no,
-      timeout: 60 * 1000,
+      timeout: 2 * 60 * 1000,
     });
     const isConfirmed = await handler.run(message.channel, message.author).catch(nullop);
 
@@ -213,7 +213,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     const handler = new MessagePrompter(
       config.messages.titlePrompt,
       'message',
-      { timeout: 60 * 1000 },
+      { timeout: 2 * 60 * 1000 },
     );
     const result = await handler.run(message.channel, message.author) as GuildMessage;
     if (settings.configuration.stop.has(result.content))
@@ -251,7 +251,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     const handler = new MessagePrompter(
       config.messages.rolesPrompt,
       'message',
-      { timeout: 60 * 1000 },
+      { timeout: 2 * 60 * 1000 },
     );
     const result = await handler.run(message.channel, message.author) as GuildMessage;
     if (settings.configuration.stop.has(result.content))

@@ -274,7 +274,7 @@ export default class EclassCommand extends HorizonSubCommand {
     const handler = new MessagePrompter(config.messages.confirmCancel, 'confirm', {
       confirmEmoji: settings.emojis.yes,
       cancelEmoji: settings.emojis.no,
-      timeout: 60 * 1000,
+      timeout: 2 * 60 * 1000,
     });
     const isConfirmed = await handler.run(message.channel, message.author).catch(nullop);
     if (!isConfirmed) {
