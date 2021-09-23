@@ -251,6 +251,9 @@ export default class EclassCommand extends HorizonSubCommand {
       })],
     });
 
+    // Edit the global announcement messages (calendar & week upcoming classes)
+    await EclassManager.updateGlobalAnnouncements(message.guild.id, eclass.subject.schoolYear);
+
     // Edit the role
     const { subject, topic } = eclass;
     const originalRole = message.guild.roles.resolve(eclass.classRole);

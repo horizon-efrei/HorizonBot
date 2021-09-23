@@ -5,6 +5,7 @@ import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
+import EclassMessagesManager from '@/eclasses/EclassMessagesManager';
 import Eclass from '@/models/eclass';
 import type {
   AnnouncementSchoolYear,
@@ -97,6 +98,9 @@ export default {
       embeds: [embed.setFooter(pupa(config.messages.newClassEmbed.footer, { eclass }))],
     });
 
+    // Edit the global announcement messages (calendar & week upcoming classes)
+    await this.updateGlobalAnnouncements(eclass.guild, subject.schoolYear);
+
     // Send confirmation message
     await message.channel.send(pupa(config.messages.successfullyCreated, { eclass }));
 
@@ -166,6 +170,9 @@ export default {
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
 
+    // Edit the global announcement messages (calendar & week upcoming classes)
+    await this.updateGlobalAnnouncements(eclass.guild, eclass.subject.schoolYear);
+
     container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
   },
 
@@ -194,6 +201,9 @@ export default {
 
     // Mark the class as finished
     await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Canceled });
+
+    // Edit the global announcement messages (calendar & week upcoming classes)
+    await this.updateGlobalAnnouncements(eclass.guild, eclass.subject.schoolYear);
 
     container.logger.debug(`[e-class:${eclass.classId}] Canceled class.`);
   },
@@ -316,5 +326,10 @@ export default {
     member.send(pupa(config.messages.unsubscribed, eclass)).catch(noop);
 
     container.logger.debug(`[e-class:${eclass.classId}] Unsubscribed member ${member.id} (${member.user.tag}).`);
+  },
+
+  async updateGlobalAnnouncements(guildId: string, schoolYear: SchoolYear): Promise<void> {
+    await EclassMessagesManager.updateUpcomingClassesForGuild(guildId);
+    await EclassMessagesManager.updateClassesCalendarForGuildAndSchoolYear(guildId, schoolYear);
   },
 };
