@@ -13,7 +13,7 @@ export default async function massSend(guild: Guild, memberIds: string[], text: 
 
   for (const [i, memberId] of memberIds.entries()) {
     if (shouldThrottle && i % 10 === 0 && i !== 0)
-      await sleep(2000);
+      await sleep(5000);
 
     const member = await guild.members.fetch({ user: memberId, cache: false }).catch(nullop);
     if (member)
