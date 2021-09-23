@@ -76,7 +76,8 @@ function generateUpcomingClassesMessage(upcomingClasses: EclassDocument[]): stri
   if (classGroups.length > 0) {
     for (const classGroup of classGroups) {
       const begin = dayjs(classGroup[0].date);
-      builder += `**${capitalize(begin.format('dddd DD/MM'))}**\n`;
+      const today = begin.isToday() ? messages.upcomingClasses.today : '';
+      builder += `**${capitalize(begin.format('dddd DD/MM'))}**${today}\n`;
 
       for (const eclass of classGroup) {
         const beginHour = dayjs(eclass.date).format('HH[h]mm');

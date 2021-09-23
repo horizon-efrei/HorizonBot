@@ -10,6 +10,7 @@ import 'source-map-support/register';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
+import isToday from 'dayjs/plugin/isToday';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import mongoose from 'mongoose';
 import HorizonClient from '@/structures/HorizonClient';
@@ -20,6 +21,7 @@ dayjs.locale('fr');
 dayjs.extend(duration);
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
+dayjs.extend(isToday);
 
 const main = async (): Promise<void> => {
   await mongoose.connect(process.env.MONGO_URI);

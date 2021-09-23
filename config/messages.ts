@@ -172,7 +172,8 @@ export default {
   upcomingClasses: {
     header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
     noClasses: 'Aucune séance de prévue !',
-    classLine: '• {beginHour}h-{endHour}h: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
+    today: " (Aujourd'hui)",
+    classLine: '• ({eclass.subject.schoolYear}) {beginHour}h-{endHour}h: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
   },
   classesCalendar: {
     title: "Calendrier des cours sur Ef'Réussite",
