@@ -7,7 +7,7 @@ import ReactionRole from '@/models/reactionRole';
 import DiscordLogManager from '@/structures/DiscordLogManager';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
-import { noop } from '@/utils';
+import { noop, nullop } from '@/utils';
 
 export default class MessageReactionRemoveListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
@@ -29,7 +29,7 @@ export default class MessageReactionRemoveListener extends Listener {
       severity: 1,
     });
 
-    const member = message.guild.members.cache.get(user.id);
+    const member = await message.guild.members.fetch(user.id).catch(nullop);
     if (!member) {
       this.container.logger.warn('[Message Reaction Remove] Abort event due to unresolved member.');
       return;
