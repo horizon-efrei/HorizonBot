@@ -95,7 +95,7 @@ export default {
     // Use the newly created ID in the embed
     await announcementMessage.edit({
       content: announcementMessage.content,
-      embeds: [embed.setFooter(pupa(config.messages.newClassEmbed.footer, { eclass }))],
+      embeds: [embed.setFooter(pupa(config.messages.newClassEmbed.footer, eclass))],
     });
 
     // Edit the global announcement messages (calendar & week upcoming classes)
@@ -136,7 +136,7 @@ export default {
           eclass.subject.voiceChannel ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
         ),
       }))
-      .setFooter(pupa(texts.footer, { eclass }));
+      .setFooter(pupa(texts.footer, eclass));
 
     await classChannel.send({
       content: pupa(config.messages.startClassNotification, { classRole: eclass.classRole }),

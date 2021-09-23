@@ -97,7 +97,7 @@ export const eclass = {
       recorded: 'Enregistré',
       recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
       recordedLink: '\n[Lien]({link})',
-      footer: 'ID : {eclass.classId}',
+      footer: 'ID : {classId}',
     },
 
     createClassSetup: {
@@ -226,7 +226,7 @@ export const eclass = {
       descriptionTextChannel: 'Le salon textuel associé est <#{eclass.subject.textChannel}>.',
       descriptionIsRecorded: ':red_circle: Le cours est enregistré !',
       descriptionIsNotRecorded: ":warning: Le cours n'est pas enregistré !",
-      footer: 'ID : {eclass.classId}',
+      footer: 'ID : {classId}',
     },
 
     // Finish subcommand
