@@ -1,6 +1,7 @@
 import { container } from '@sapphire/pieces';
 import { isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
+import type { Message, MessageOptions } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
@@ -23,6 +24,28 @@ const calendarMapping = new Map([
   [SchoolYear.L2, ConfigEntriesChannels.ClassCalendarL2],
   [SchoolYear.L3, ConfigEntriesChannels.ClassCalendarL3],
 ]);
+
+async function updateMessage(message: Message, content: MessageOptions): Promise<void> {
+  let edited = false;
+  if (message?.editable) {
+    try {
+      await promiseTimeout(
+        new Promise((resolve) => {
+          void message.edit(content)
+            .then(() => { resolve(true); });
+        }),
+        5000,
+      );
+      edited = true;
+    } catch { /* No-op */ }
+  }
+
+  if (!edited) {
+    if (message?.deletable)
+      await message.delete();
+    await message.channel.send(content).then(async msg => await msg.crosspost());
+  }
+}
 
 function generateCalendarEmbed(upcomingClasses: EclassPopulatedDocument[]): MessageEmbed {
   const embed = new MessageEmbed()
@@ -109,20 +132,7 @@ async function updateClassesCalendar(
   //     - field name max 256 chars
   //     - field value max 1024 chars
   const embed = generateCalendarEmbed(upcomingClasses);
-
-  let edited = false;
-  if (firstMessage?.editable) {
-    try {
-      await promiseTimeout(firstMessage.edit({ embeds: [embed] }), 5000);
-      edited = true;
-    } catch { /* No-op */ }
-  }
-
-  if (!edited) {
-    if (firstMessage?.deletable)
-      await firstMessage.delete();
-    await channel.send({ embeds: [embed] }).then(async msg => await msg.crosspost());
-  }
+  await updateMessage(firstMessage, { embeds: [embed] });
 
   for (const msg of allBotMessages)
     await msg.delete();
@@ -142,11 +152,7 @@ async function updateUpcomingClasses(
 
   let i = 0;
   for (const chunk of chunks) {
-    // eslint-disable-next-line unicorn/prefer-ternary
-    if (allBotMessages[i]?.editable)
-      await allBotMessages[i].edit(chunk);
-    else
-      await channel.send(chunk).then(async msg => await msg.crosspost());
+    await updateMessage(allBotMessages[i], { content: chunk });
     i++;
   }
 
