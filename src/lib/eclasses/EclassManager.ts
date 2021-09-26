@@ -221,7 +221,13 @@ export default {
       .value += pupa(config.messages.newClassEmbed.recordedLink, { link });
     await announcementMessage.edit({ embeds: [announcementEmbed] });
 
-    // Mark the class as finished
+    // Send the link in the corresponding text channel
+    const classChannel = container.client
+      .guilds.resolve(eclass.guild)
+      .channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
+    await classChannel.send(pupa(config.messages.linkAnnouncement, { link }));
+
+    // Store the link in the DB
     await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
 
     container.logger.debug(`[e-class:${eclass.classId}] Added record link.`);
