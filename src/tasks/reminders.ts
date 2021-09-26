@@ -9,11 +9,9 @@ import { noop } from '@/utils';
 @ApplyOptions<TaskOptions>({ cron: '* * * * *' })
 export default class ReminderTask extends Task {
   public async run(): Promise<void> {
-    const reminders = await Reminders.find({ date: { $lte: Date.now() } });
-    if (reminders.length === 0)
-      return;
+    const reminders = Reminders.find({ date: { $lte: Date.now() } });
 
-    for (const reminder of reminders) {
+    for await (const reminder of reminders) {
       const member = await this.container.client.guilds.cache.get(reminder.guildId).members.fetch(reminder.userId);
       await member.send(pupa(messages.reminders.alarm, reminder.toJSON())).catch(noop);
       await reminder.remove();
