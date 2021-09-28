@@ -119,6 +119,7 @@ export default {
     announcementEmbed.setColor(settings.colors.orange);
     announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date).value += ` ${config.messages.valueInProgress}`;
     await announcementMessage.edit({ embeds: [announcementEmbed] });
+    await announcementMessage.reactions.removeAll();
 
     // Send an embed in the corresponding text channel
     const classChannel = container.client
@@ -304,6 +305,9 @@ export default {
   },
 
   async subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
+    if (eclass.status !== EclassStatus.Planned)
+      return;
+
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
       container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
@@ -320,6 +324,9 @@ export default {
   },
 
   async unsubscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
+    if (eclass.status !== EclassStatus.Planned)
+      return;
+
     const givenRole = member.guild.roles.cache.get(eclass.classRole);
     if (!givenRole) {
       container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
