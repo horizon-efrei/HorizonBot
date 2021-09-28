@@ -16,17 +16,22 @@ import { GuildMessage } from '@/types';
 import { TagDocument } from '@/types/database';
 import { generateSubcommands } from '@/utils';
 
+const embedFlags = ['embed', 'e'];
+
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
   preconditions: ['StaffOnly'],
+  flags: [...embedFlags],
   subCommands: generateSubcommands(['create', 'list', 'edit', 'remove', 'help'], {
     rename: {},
     alias: { aliases: ['aliases'] },
+    embed: { aliases: ['inembed', 'in-embed', 'set-embed'] },
   }),
 })
 export default class TagsCommand extends HorizonSubCommand {
   public async create(message: GuildMessage, args: Args): Promise<void> {
+    const isEmbed = args.getFlags(...embedFlags);
     let name: string = (await args.pickResult('string')).value;
     let content: string = (await args.restResult('string')).value;
 
@@ -51,7 +56,12 @@ export default class TagsCommand extends HorizonSubCommand {
     }
 
     // 2. Add it to the database
-    await Tags.create({ name, content, guildId: message.guild.id });
+    await Tags.create({
+      name,
+      content,
+      isEmbed,
+      guildId: message.guild.id,
+    });
     await message.channel.send(config.messages.createdTag);
   }
 
@@ -118,6 +128,22 @@ export default class TagsCommand extends HorizonSubCommand {
 
     await tag.save();
     await message.channel.send(config.messages.editedTag);
+  }
+
+  @ResolveTagArgument()
+  public async embed(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
+    const isEmbed = await args.pickResult('boolean');
+
+    const inOrWithout = (inEmbed: boolean): string => config.messages[inEmbed ? 'inEmbed' : 'withoutEmbed'];
+
+    if (isEmbed.error) {
+      await message.channel.send(pupa(config.messages.showTagEmbed, { inOrWithout: inOrWithout(tag.isEmbed) }));
+      return;
+    }
+
+    tag.isEmbed = isEmbed.value;
+    await tag.save();
+    await message.channel.send(pupa(config.messages.editedTagEmbed, { inOrWithout: inOrWithout(tag.isEmbed) }));
   }
 
   @ResolveTagArgument()

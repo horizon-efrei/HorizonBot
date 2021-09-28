@@ -215,6 +215,7 @@ export interface TagBase {
   aliases: string[];
   content: string;
   uses: number;
+  isEmbed: boolean;
   guildId: string;
 }
 

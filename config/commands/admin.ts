@@ -159,10 +159,10 @@ export const setup = {
 export const tags = {
   options: {
     aliases: ['tags', 'tag'],
-    description: 'Permet de créer des tags (= messages dynamiques, entièrement configurable directement via discord).',
+    description: 'Permet de créer des tags (= messages dynamiques, entièrement configurable directement via discord). Lors de leur création, vous pouvez choisir si un tag devra être affiché dans un embed. Vous pouvez changer ce paramètre après, avec `!tag embed <nom> <booléen>',
     enabled: true,
     usage: 'tags <create | list | remove | edit | rename | alias | help>',
-    examples: ['tags create test Ceci est le contenu !', 'tags list', 'tags remove test', 'tags help'],
+    examples: ['tags create --embed test Ceci est le contenu !', 'tags list', 'tags remove test', 'tags help'],
   },
   messages: {
     // Global
@@ -184,15 +184,22 @@ export const tags = {
     // Edit a tag
     editedTag: 'Ce tag a bien été modifié !',
 
+    // Set in an embed (or not)
+    showTagEmbed: 'Ce tag est affiché {inOrWithout} embed.',
+    editedTagEmbed: 'Ce tag sera maintenant affiché {inOrWithout} embed !',
+    inEmbed: 'dans un',
+    withoutEmbed: 'sans',
+
     // Help page
     helpEmbedTitle: 'Aide des Tags',
     helpEmbedDescription: [
-      { name: 'Créer un tag', value: '`tags create <nom> <contenu>`' },
+      { name: 'Créer un tag', value: '`tags create [--embed] <nom> <contenu>`' },
       { name: 'Liste des tags', value: '`tags list`' },
       { name: 'Supprimer un tag', value: '`tags remove <nom>`' },
       { name: 'Modifier un tag', value: '`tags edit <nom> <contenu>`' },
       { name: 'Renommer un tag', value: '`tags rename <nom> <nouveau nom>`' },
       { name: "Définir les aliases d'un tag", value: '`tags aliases <nom> <aliases1, aliases2, ... | clear>`' },
+      { name: "Mode d'affichage du tag", value: '`tags embed <nom> <booléen>`' },
       { name: "Page d'aide", value: '`tags help`' },
     ],
 

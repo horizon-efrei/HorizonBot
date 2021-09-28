@@ -20,6 +20,10 @@ const TagSchema = new Schema<TagDocument, TagModel>({
     type: Number,
     default: 0,
   },
+  isEmbed: {
+    type: Boolean,
+    default: false,
+  },
   guildId: {
     type: String,
     required: true,
