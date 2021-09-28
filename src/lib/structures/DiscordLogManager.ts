@@ -6,6 +6,7 @@ import DiscordLogs from '@/models/discordLogs';
 import * as CustomResolvers from '@/resolvers';
 import type { DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
+import { trimText } from '@/utils';
 
 type DiscordLogWithMessageContext = DiscordLogBase & { type:
   | DiscordLogType.MessageEdit
@@ -16,7 +17,6 @@ type DiscordLogWithMessageContext = DiscordLogBase & { type:
 };
 
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
-const trimText = (text: string): string => (text.length > 500 ? `${text.slice(0, 500)}...` : text);
 const getMessageUrl = (payload: DiscordLogWithMessageContext): string => `https://discord.com/channels/${payload.guildId}/${payload.context.channelId}/${payload.context.messageId}`;
 
 export default {
