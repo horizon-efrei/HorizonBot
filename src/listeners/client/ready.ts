@@ -27,7 +27,7 @@ export default class ReadyListener extends Listener {
     const reactionRoles = await ReactionRole.find();
     for (const rr of reactionRoles) {
       const channel = this.container.client.channels.cache.get(rr.channelId) as TextChannel;
-      channel.messages.fetch(rr.messageId)
+      channel?.messages.fetch(rr.messageId)
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await ReactionRole.findByIdAndDelete(rr._id);
@@ -39,8 +39,7 @@ export default class ReadyListener extends Listener {
     const eclasses = await Eclass.find({ status: EclassStatus.Planned });
     for (const eclass of eclasses) {
       const channel = await this.container.client.configManager.get(eclass.announcementChannel, eclass.guild);
-
-      channel.messages.fetch(eclass.announcementMessage)
+      channel?.messages.fetch(eclass.announcementMessage)
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await ReactionRole.findByIdAndDelete(eclass._id);
@@ -55,7 +54,7 @@ export default class ReadyListener extends Listener {
         ConfigEntriesChannels.ModeratorFeedback,
         flaggedMessage.guildId,
       );
-      logChannel.messages.fetch(flaggedMessage.alertMessageId)
+      logChannel?.messages.fetch(flaggedMessage.alertMessageId)
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await FlaggedMessageDB.findByIdAndDelete(flaggedMessage._id);
