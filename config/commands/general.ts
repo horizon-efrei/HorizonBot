@@ -47,7 +47,7 @@ export const help = {
     },
     commandsList: {
       title: 'Commandes de de HorizonBot ({amount})',
-      description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande en particulier.\nSeulement les commandes que vous pouvez exécuter s'affichent.",
+      description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande en particulier.\nSeulement les commandes que tu peux exécuter s'affichent.",
       category: '❯ {categoryName}',
     },
   },

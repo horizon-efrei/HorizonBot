@@ -40,7 +40,7 @@ export const logs = {
 export const pingRoleIntersection = {
   options: {
     aliases: ['intersects', 'intersect', 'inter'],
-    description: "Permet de créer un rôle temporaire qui est l'intersection de tous les rôles entrés. Il sera donc ajouté à tous les membres ayant *tous les rôles donnés à la fois*, et sera supprimé automatiquement 2 jours après son utilisation, sauf si vous utilisez le drapeau `--keep`.",
+    description: "Permet de créer un rôle temporaire qui est l'intersection de tous les rôles entrés. Il sera donc ajouté à tous les membres ayant *tous les rôles donnés à la fois*, et sera supprimé automatiquement 2 jours après son utilisation, sauf si tu utilise le drapeau `--keep`.",
     enabled: true,
     usage: 'intersect <@mention role | ID role | nom role (entre guillement si plusieurs mots)>',
     examples: ['inter @Role 1 @Role 2 188341077902753794 "Role 4" Role5'],
@@ -165,7 +165,7 @@ export const setup = {
 export const tags = {
   options: {
     aliases: ['tags', 'tag'],
-    description: 'Permet de créer des tags (= messages dynamiques, entièrement configurable directement via discord). Lors de leur création, vous pouvez choisir si un tag devra être affiché dans un embed. Vous pouvez changer ce paramètre après, avec `!tag embed <nom> <booléen>',
+    description: 'Permet de créer des tags (= messages dynamiques, entièrement configurable directement via discord). Lors de leur création, tu peux choisir si un tag devra être affiché dans un embed. Tu peux changer ce paramètre après, avec `!tag embed <nom> <booléen>',
     enabled: true,
     usage: 'tags <create | list | remove | edit | rename | alias | help>',
     examples: ['tags create --embed test Ceci est le contenu !', 'tags list', 'tags remove test', 'tags help'],

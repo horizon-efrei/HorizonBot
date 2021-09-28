@@ -10,7 +10,7 @@ export default {
   errors: {
     precondition: {
       [Identifiers.PreconditionStaffOnly]: ":x: Aïe, tu n'as pas la permission de faire cela :confused:",
-      unknownError: "Une pré-condition de commande inconnue vous empêche d'effectuer cette action.",
+      unknownError: "Une pré-condition de commande inconnue t'empêche d'effectuer cette action.",
     },
   },
   miscellaneous: {
@@ -252,7 +252,7 @@ export default {
       invalid: 'Cette date est invalide.',
     },
     duration: {
-      base: 'Entre une durée (en anglais ou en francais).\nTu pouvez par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
+      base: 'Entre une durée (en anglais ou en francais).\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
       invalid: 'Cette durée est invalide.',
     },
     member: {

@@ -9,10 +9,10 @@ export const eclass = {
     aliases: ['cours', 'class', 'ecours', 'eclass', 'e-cours', 'e-class'],
     description: stripIndent`
       Commande permettant de gérer les cours organisés sur ce Discord.
-      Pour créer un cours, vous pouvez utiliser \`!cours create\` et vous laisser guider par le menu interactif qui apparaîtra.
+      Pour créer un cours, tu peux utiliser \`!cours create\` et te laisser guider par le menu interactif qui apparaîtra.
       Quand le cours sera créé, des messages seront envoyés dans les bons salons pour prévenir les membres, et un rôle spécial sera créé pour que les personnes voulant assister au cours puissent être notifiées.
-      Le cours se lancera tout seul à l'heure indiquée (ou jusqu'à 2 minutes après). Sinon, vous pouvez le lancer manuellement avec \`!cours start <ID cours>\`.
-      Le cours s'arrêtera au bout de la durée spécifiée. S'il se fini avant, vous pouvez l'arrêter manuellement avec \`!cours finish <ID cours>\`.
+      Le cours se lancera tout seul à l'heure indiquée (ou jusqu'à 2 minutes après). Sinon, tu peux le lancer manuellement avec \`!cours start <ID cours>\`.
+      Le cours s'arrêtera au bout de la durée spécifiée. S'il se fini avant, tu peux l'arrêter manuellement avec \`!cours finish <ID cours>\`.
       Pour plus d'informations sur comment utiliser cette commande, faites \`!cours help\`.
     `,
     enabled: true,
@@ -56,8 +56,8 @@ export const eclass = {
           \`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]\`
           • \`--statut\` (ou \`-s\`) : Filtrer par le statut du cours (\`planned\`/\`prévu\`/\`p\`, \`progress\`/\`r\`/\`encours\`/\`e\`, \`finished\`/\`f\`/\`terminé\`/\`t\`, \`canceled\`/\`c\`/\`annulé\`/\`a\`).
           • \`--matière\` (ou \`-m\`) : Filtrer par la matière du cours (code-cours ou nom de la matière en toutes lettres).
-          • \`--professeur\` (ou \`-p\`) : Filtrer par le professeur organisant le cours (utilisez une mention, son pseudo ou son ID).
-          • \`--role\` (ou \`-r\`) : Filtrer par le rôle visé par le cours (utilisez une mention, son nom ou son ID).
+          • \`--professeur\` (ou \`-p\`) : Filtrer par le professeur organisant le cours (utilise une mention, son pseudo ou son ID).
+          • \`--role\` (ou \`-r\`) : Filtrer par le rôle visé par le cours (utilise une mention, son nom ou son ID).
         `,
       },
       { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
@@ -289,7 +289,7 @@ export const subject = {
     aliases: ['subject', 'matière', 'matiere'],
     description: stripIndent`
       Commande permettant de créer une matière.
-      Pour créer une nouvelle matière, vous pouvez utiliser \`!subject create\` et vous laisser guider par le menu interactif qui apparaîtra.
+      Pour créer une nouvelle matière, tu peux utiliser \`!subject create\` et te laisser guider par le menu interactif qui apparaîtra.
       Pour plus d'informations sur comment utiliser cette commande, faites \`!subject help\`.
     `,
     enabled: true,
