@@ -189,18 +189,21 @@ export default {
     swearModAlert: stripIndent`
       {message.member} a dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte. Si ce message est inapproprié, réagissez avec :white_check_mark: à ce message pour le flagger.
 
-      {message.url}
+      Apperçu du message ({message.url}) :
+      > {preview}
     `,
     manualSwearAlert: stripIndent`
       {message.member} à envoyé un message jugé innaproprié par {manualModerator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.
 
-      {message.url}
+      Apperçu du message ({message.url}) :
+      > {preview}
     `,
     swearModAlertUpdate: stripIndent`
       *~~{message.member} à dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte.~~*
       {moderator} a flaggé ce message et l'utilisateur a été sommé en MP.
 
-      {message.url}
+      Apperçu du message ({message.url}) :
+      > {preview}
     `,
     swearUserAlert: oneLine`
       Bonjour {message.member}, je suis le bot du Discord de révision Ef'Réussite. Tu as tenu un propos innaproprié

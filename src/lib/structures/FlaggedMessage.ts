@@ -8,7 +8,7 @@ import FlaggedMessageDB from '@/models/flaggedMessage';
 import type { GuildMessage, GuildTextBasedChannel } from '@/types';
 import type { FlaggedMessageDocument } from '@/types/database';
 import { ConfigEntriesChannels } from '@/types/database';
-import { noop, nullop } from '@/utils';
+import { noop, nullop, trimText } from '@/utils';
 
 type FlaggedMessageData = Object.Either<{ manualModerator: GuildMember; swear: string }, 'manualModerator' | 'swear'>;
 
@@ -86,7 +86,12 @@ export default class FlaggedMessage {
     );
     await this.alertMessage.reactions.removeAll();
     await this.alertMessage.edit(
-      pupa(messages.antiSwear.swearModAlertUpdate, { message: this.message, swear: this.swear, moderator }),
+      pupa(messages.antiSwear.swearModAlertUpdate, {
+        message: this.message,
+        swear: this.swear,
+        moderator,
+        preview: trimText(this.message.content, 200),
+      }),
     );
 
     await this.alertUser();
@@ -144,7 +149,9 @@ export default class FlaggedMessage {
     // Send the alert to the moderators
     if (this.logChannel) {
       const payload = { message: this.message, manualModerator: this.manualModerator };
-      await this.logChannel.send(pupa(messages.antiSwear.manualSwearAlert, payload));
+      await this.logChannel.send(
+        pupa(messages.antiSwear.manualSwearAlert, { ...payload, preview: trimText(this.message.content, 200) }),
+      );
     } else {
       container.logger.warn(`[Anti Swear] A swear was detected but no log channel was found, unable to report. Setup a log channel with "${settings.prefix}setup mod"`);
     }
@@ -162,7 +169,9 @@ export default class FlaggedMessage {
     // Send the alert to the moderators
     if (this.logChannel) {
       const payload = { message: this.message, swear: this.swear };
-      this.alertMessage = await this.logChannel.send(pupa(messages.antiSwear.swearModAlert, payload)) as GuildMessage;
+      this.alertMessage = await this.logChannel.send(
+        pupa(messages.antiSwear.swearModAlert, { ...payload, preview: trimText(this.message.content, 200) }),
+      ) as GuildMessage;
       await this.alertMessage.react(settings.emojis.yes);
     } else {
       container.logger.warn(`[Anti Swear] A swear was detected but no log channel was found, unable to report. Setup a log channel with "${settings.prefix}setup mod"`);
