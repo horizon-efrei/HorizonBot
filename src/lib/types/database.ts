@@ -148,6 +148,7 @@ export interface ReactionRoleBase {
   channelId: string;
   guildId: string;
   reactionRolePairs: Array<{ role: string; reaction: string }>;
+  uniqueRole: boolean;
 }
 
 /** Interface for the "ReactionRole"'s mongoose document */

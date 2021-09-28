@@ -106,8 +106,12 @@ export default class MessageReactionAddListener extends Listener {
       return;
     }
 
-    if (!member.roles.cache.get(givenRole.id))
-      member.roles.add(givenRole).catch(noop);
+    // If we can have only 1 role at a time from the menu (uniqueRole === true) and we have at least one of the menu's
+    // roles   OR   we have the role we are asking for, then stop here
+    if ((document.uniqueRole && member.roles.cache.hasAny(...document.reactionRolePairs.map(pair => pair.role)))
+      || member.roles.cache.get(givenRole.id))
+      return;
+    member.roles.add(givenRole).catch(noop);
     this.container.logger.debug(`[Reaction Roles] Added role ${givenRole.id} (${givenRole.name}) to member ${member.id} (${member.user.tag}).`);
   }
 

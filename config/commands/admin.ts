@@ -111,6 +111,12 @@ export const reactionRole = {
     roleNotUsed: "Ce rôle n'est pas dans ce menu !",
     removedPairSuccessfuly: "C'est fait ! Cette paire à bien été supprimée du menu {rrMessage.url}.",
 
+    // Unique role mode
+    uniqueMode: 'Sur ce menu, le mode "Rôle unique" est : {uniqueMode}.',
+    changedUniqueMode: 'Tu as changé le mode "Rôle unique", qui est maintenant {uniqueMode}.',
+    uniqueEnabled: ':white_check_mark: Activé',
+    uniqueDisabled: ':x: Désactivé',
+
     // Help page
     helpEmbedTitle: 'Aide des menus de réaction',
     helpEmbedDescription: [

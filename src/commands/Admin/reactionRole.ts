@@ -23,17 +23,22 @@ interface ExtraContext {
   rrMessage: GuildMessage;
 }
 
+const uniqueFlags = ['unique', 'u'];
+
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
   preconditions: ['StaffOnly'],
+  flags: [...uniqueFlags],
   subCommands: generateSubcommands(['create', 'edit', 'help', 'list', 'remove'], {
     addPair: { aliases: ['add-pair', 'new-pair'] },
     removePair: { aliases: ['remove-pair', 'delete-pair', 'rm-pair', 'del-pair'] },
+    unique: { aliases: ['unique-role', 'uniquify'] },
   }),
 })
 export default class ReactionRoleCommand extends HorizonSubCommand {
   public async create(message: GuildMessage, args: Args): Promise<void> {
+    const uniqueRole = args.getFlags(...uniqueFlags);
     let channel: GuildTextBasedChannel = (await args.pickResult('guildTextBasedChannel')).value;
     let title: string;
     let description: string;
@@ -87,15 +92,14 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     for (const rr of roles)
       await reactionRoleMessage.react(rr.reaction);
 
-    const document = {
+    this.container.client.reactionRolesIds.add(reactionRoleMessage.id);
+    await ReactionRole.create({
       messageId: reactionRoleMessage.id,
       channelId: reactionRoleMessage.channel.id,
       guildId: reactionRoleMessage.guild.id,
       reactionRolePairs: roles.map(({ reaction, role }) => ({ reaction, role: role.id })),
-    };
-
-    this.container.client.reactionRolesIds.add(document.messageId);
-    await ReactionRole.create(document);
+      uniqueRole,
+    });
   }
 
   public async list(message: GuildMessage, _args: Args): Promise<void> {
@@ -198,6 +202,22 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     document.reactionRolePairs.pull(pair);
     await document.save();
     await message.channel.send(pupa(config.messages.removedPairSuccessfuly, { rrMessage }));
+  }
+
+  @ResolveReactionRoleArgument({ getDocument: true })
+  public async unique(message: GuildMessage, args: Args, { document }: ExtraContext): Promise<void> {
+    const uniqueRole = await args.pickResult('boolean');
+
+    const isUnique = (unique: boolean): string => config.messages[unique ? 'uniqueEnabled' : 'uniqueDisabled'];
+
+    if (uniqueRole.error) {
+      await message.channel.send(pupa(config.messages.uniqueMode, { uniqueMode: isUnique(document.uniqueRole) }));
+      return;
+    }
+
+    document.uniqueRole = uniqueRole.value;
+    await document.save();
+    await message.channel.send(pupa(config.messages.changedUniqueMode, { uniqueMode: isUnique(document.uniqueRole) }));
   }
 
   public async help(message: GuildMessage, _args: Args): Promise<void> {
