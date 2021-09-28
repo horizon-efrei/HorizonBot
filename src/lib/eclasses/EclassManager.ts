@@ -70,6 +70,7 @@ export default {
     });
     // Add the reaction & cache the message
     await announcementMessage.react(settings.emojis.yes);
+    await announcementMessage.crosspost();
     container.client.eclassRolesIds.add(announcementMessage.id);
 
     // Create the role
