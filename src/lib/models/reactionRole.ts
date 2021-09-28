@@ -22,6 +22,10 @@ const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
     type: Boolean,
     default: false,
   },
+  roleCondition: {
+    type: String,
+    default: null,
+  },
 }, { timestamps: true });
 
 export default model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);

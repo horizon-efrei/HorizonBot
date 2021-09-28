@@ -57,9 +57,9 @@ export const pingRoleIntersection = {
 export const reactionRole = {
   options: {
     aliases: ['reactionrole', 'rr', 'autorole', 'ar'],
-    description: "Permet de créer des menus de réactions, grâce auxquels les utilisateurs peuvent utiliser les réactions pour s'ajouter des rôles.",
+    description: "Permet de créer des menus de réactions, grâce auxquels les utilisateurs peuvent utiliser les réactions pour s'ajouter des rôles. Tu peux ajouter le flag `--unique` lors de la création du menu, qui permet de définir si on ne peut récupérer qu'un seul rôle à la fois. Tu peux changer ce mode plus tard avec `!rr unique`. Tu peux également choisir une condition de rôle préalable pour pouvoir réagir, avec `!rr condition`.",
     enabled: true,
-    usage: 'reactionrole <create | list | remove | help>',
+    usage: 'reactionrole <create | list | remove | edit | add-pair | remove-pair | unique | condition | help>',
     examples: ['reactionrole create', 'rr create #salon-annonces', 'autorole list', 'ar remove 188341077902753794', 'rr help'],
   },
   messages: {
@@ -117,6 +117,12 @@ export const reactionRole = {
     uniqueEnabled: ':white_check_mark: Activé',
     uniqueDisabled: ':x: Désactivé',
 
+    // Role condition
+    changedRoleCondition: 'Tu as changé la condition de rôle pour ce menu, au rôle {role}',
+    removedRoleCondition: 'Tu as supprimé la condition de rôle pour ce menu.',
+    roleCondition: 'La condition de rôle pour ce menu est : {role}.',
+    noRoleCondition: "Il n'y a pas de condition de rôle pour ce menu.",
+
     // Help page
     helpEmbedTitle: 'Aide des menus de réaction',
     helpEmbedDescription: [
@@ -124,8 +130,10 @@ export const reactionRole = {
       { name: 'Liste des menus', value: '`!rr list`' },
       { name: 'Supprimer un menu', value: '`!rr remove <ID message>`' },
       { name: 'Modifier un menu', value: '`!rr edit <ID message>` puis répondre aux questions' },
-      { name: 'Ajouter une paire à un menu', value: '`!rr addpair <ID message> <emoji> <role>`' },
-      { name: "Enlever une paire d'un menu", value: '`!rr removepair <ID message> <role>`' },
+      { name: 'Ajouter une paire à un menu', value: '`!rr addpair <ID message> <emoji> <rôle>`' },
+      { name: "Enlever une paire d'un menu", value: '`!rr removepair <ID message> <rôle>`' },
+      { name: 'Gérer le mode "Rôle unique"', value: '`!rr unique <ID message> [booléen]`' },
+      { name: 'Gérer la condition de rôle', value: '`!rr condition <ID message> [rôle | "clear"]`' },
       { name: "Page d'aide", value: '`!rr help`' },
     ],
   },

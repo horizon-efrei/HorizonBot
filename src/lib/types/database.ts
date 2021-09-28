@@ -149,6 +149,7 @@ export interface ReactionRoleBase {
   guildId: string;
   reactionRolePairs: Array<{ role: string; reaction: string }>;
   uniqueRole: boolean;
+  roleCondition: string | null;
 }
 
 /** Interface for the "ReactionRole"'s mongoose document */

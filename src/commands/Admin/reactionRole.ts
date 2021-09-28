@@ -3,7 +3,8 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { MessagePrompter, PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import { Args, Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
-import { MessageEmbed } from 'discord.js';
+import type { MessageOptions } from 'discord.js';
+import { MessageEmbed, Role } from 'discord.js';
 import difference from 'lodash.difference';
 import pupa from 'pupa';
 import { reactionRole as config } from '@/config/commands/admin';
@@ -34,6 +35,7 @@ const uniqueFlags = ['unique', 'u'];
     addPair: { aliases: ['add-pair', 'new-pair'] },
     removePair: { aliases: ['remove-pair', 'delete-pair', 'rm-pair', 'del-pair'] },
     unique: { aliases: ['unique-role', 'uniquify'] },
+    roleCondition: { aliases: ['role-condition', 'condition', 'pre-condition'] },
   }),
 })
 export default class ReactionRoleCommand extends HorizonSubCommand {
@@ -218,6 +220,30 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     document.uniqueRole = uniqueRole.value;
     await document.save();
     await message.channel.send(pupa(config.messages.changedUniqueMode, { uniqueMode: isUnique(document.uniqueRole) }));
+  }
+
+  @ResolveReactionRoleArgument({ getDocument: true })
+  public async roleCondition(message: GuildMessage, args: Args, { document }: ExtraContext): Promise<void> {
+    const askedRole = await args.pick('role').catch(async () => await args.pick('string').catch(nullop));
+
+    const showText = (role: Role | string, contentNoRole: string, contentRole: string): MessageOptions => (
+      role instanceof Role
+        ? { embeds: [new MessageEmbed().setColor(settings.colors.default).setDescription(pupa(contentRole, { role }))] }
+        : { content: contentNoRole }
+    );
+
+    const shouldRemoveCondition = askedRole === 'clear';
+    if (shouldRemoveCondition || askedRole instanceof Role) {
+      document.roleCondition = shouldRemoveCondition ? null : askedRole.id;
+      await document.save();
+      await message.channel.send(
+        showText(askedRole, config.messages.removedRoleCondition, config.messages.changedRoleCondition),
+      );
+      return;
+    }
+
+    const condition = document.roleCondition ? message.guild.roles.cache.get(document.roleCondition) : null;
+    await message.channel.send(showText(condition, config.messages.noRoleCondition, config.messages.roleCondition));
   }
 
   public async help(message: GuildMessage, _args: Args): Promise<void> {
