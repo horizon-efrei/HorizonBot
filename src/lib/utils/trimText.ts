@@ -5,5 +5,5 @@
  * @returns The trimmed text
  */
 export default function trimText(text: string, n = 500): string {
-  return text.length > 500 ? `${text.slice(0, n)}...` : text;
+  return text.length > n ? `${text.slice(0, n)}...` : text;
 }
