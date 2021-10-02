@@ -26,11 +26,14 @@ declare module '@sapphire/framework' {
 
   const enum Identifiers {
     PreconditionStaffOnly = 'preconditionStaffOnly',
+    PreconditionAdminOnly = 'preconditionAdminOnly',
   }
 
   interface Preconditions {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+    /* eslint-disable @typescript-eslint/naming-convention */
     StaffOnly: never;
+    AdminOnly: never;
+    /* eslint-enable @typescript-eslint/naming-convention */
   }
 
   interface Args {
