@@ -1,6 +1,20 @@
 import { stripIndents } from 'common-tags';
 import { LogStatuses } from '@/types/database';
 
+export const evaluate = {
+  options: {
+    aliases: ['eval', 'evaluate', 'ev'],
+    description: "Permet d'éxécuter du code directement dans le bot, avec le contexte actuel.\nUtilise l'option `--depth=<number>` pour controler la profondeur des propriétés affichés.\nUtilise le drapeau `--async` pour imbriquer ton code dans une IIFE async. Cela veut dire qu'il faut retourner ton résultat pour qu'il soit affiché.\n\nUtilise le drapeau `--showHidden` pour afficher les propriétés cachées\nUtilise le drapeau `--json` pour afficher le résultat comme si c'était du JSON.",
+    enabled: true,
+    usage: 'eval',
+    examples: ['limits'],
+  },
+  messages: {
+    noCode: "Tu as oublié d'ajouter du code à exécuter !",
+    evalTimeout: "Le code a pris plus de 1min pour s'éxecuter...",
+    output: '**Résultat**\n{output}\n**Type**\n{type}\n:stopwatch: {time}',
+  },
+};
 export const limits = {
   options: {
     aliases: ['limit', 'limits', 'limite', 'limites'],
