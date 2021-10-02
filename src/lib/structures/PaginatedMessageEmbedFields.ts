@@ -1,6 +1,8 @@
 /**
  * @credits This class is adapted from the PaginatedFieldMessageEmbed class, proposed by
  * kaname-png in this PR: https://github.com/sapphiredev/utilities/pull/144
+ *
+ * SPDX-License-Identifier: MIT
  */
 
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
