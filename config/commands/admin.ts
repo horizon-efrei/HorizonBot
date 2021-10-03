@@ -1,4 +1,4 @@
-import { stripIndents } from 'common-tags';
+import { stripIndent, stripIndents } from 'common-tags';
 import { LogStatuses } from '@/types/database';
 
 export const evaluate = {
@@ -107,7 +107,12 @@ export const reactionRole = {
     // List the menus
     noMenus: "Je n'ai trouvé aucun menu de réaction dans la base de données !",
     listTitle: 'Liste des menus de réaction ({total})',
-    listLine: '• **[{title}]({url})** ({total} rôles)\n',
+    listFieldDescription: stripIndent`
+      [Lien vers le message]({url})
+      Nombre de paires role-réactions : {total}
+      Mode unique : {unique}
+      Condition de rôle : {condition}
+    `,
 
     // Remove a menu
     removedMenu: 'Ce menu a bien été supprimé !',

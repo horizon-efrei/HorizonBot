@@ -1,13 +1,15 @@
 /* eslint-disable @typescript-eslint/member-ordering */
+import { roleMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { IMessagePrompterExplicitConfirmReturn } from '@sapphire/discord.js-utilities';
-import { MessagePrompter, PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
+import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Args, Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import type { MessageOptions } from 'discord.js';
 import { MessageEmbed, Role } from 'discord.js';
 import difference from 'lodash.difference';
 import pupa from 'pupa';
+import PaginatedMessageEmbedFields from '@/app/lib/structures/PaginatedMessageEmbedFields';
 import { reactionRole as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import { ResolveReactionRoleArgument } from '@/decorators';
@@ -18,7 +20,12 @@ import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import { GuildMessage } from '@/types';
 import type { GuildTextBasedChannel, ReactionRolePair, ReactionRoleReturnPayload } from '@/types';
 import type { ReactionRoleDocument } from '@/types/database';
-import { firstAndRest, generateSubcommands, nullop } from '@/utils';
+import {
+ firstAndRest,
+ generateSubcommands,
+ nullop,
+ trimText,
+} from '@/utils';
 
 interface ExtraContext {
   document?: ReactionRoleDocument;
@@ -118,7 +125,13 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       return;
     }
 
-    const items: Array<{ title: string; url: string; total: number }> = [];
+    const items: Array<{
+      condition: string;
+      title: string;
+      total: number;
+      unique: boolean;
+      url: string;
+    }> = [];
     for (const rr of reactionRoles) {
       const rrChannel = message.guild.channels.resolve(rr.channelId) as GuildTextBasedChannel;
       const rrMessage = await rrChannel?.messages.fetch(rr.messageId).catch(nullop);
@@ -126,18 +139,31 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
         continue;
 
       items.push({
+        condition: rr.roleCondition,
         title: rrMessage.embeds[0].title,
-        url: rrMessage.url,
         total: rr.reactionRolePairs.length,
+        unique: rr.uniqueRole,
+        url: rrMessage.url,
       });
     }
 
-    await new PaginatedFieldMessageEmbed()
-      .setTitleField(pupa(config.messages.listTitle, { total: reactionRoles.length }))
-      .setTemplate(new MessageEmbed().setColor(settings.colors.default))
-      .setItems(items)
-      .formatItems(item => pupa(config.messages.listLine, item))
-      .setItemsPerPage(15)
+    const baseEmbed = new MessageEmbed()
+      .setTitle(pupa(config.messages.listTitle, { total: reactionRoles.length }))
+      .setColor(settings.colors.default);
+
+    await new PaginatedMessageEmbedFields()
+      .setTemplate(baseEmbed)
+      .setItems(
+        items.map(rr => ({
+          name: trimText(rr.title, 250),
+          value: pupa(config.messages.listFieldDescription, {
+            ...rr,
+            unique: rr.unique ? settings.emojis.yes : settings.emojis.no,
+            condition: rr.condition ? roleMention(rr.condition) : settings.emojis.no,
+          }),
+        })),
+      )
+      .setItemsPerPage(5)
       .make()
       .run(message);
   }
