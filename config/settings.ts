@@ -23,7 +23,7 @@ export default {
     flagMessageReaction: '🚩',
     flagNeededAnswer: '📝',
     dateFormat: 'DD/MM [à] HH:mm',
-    eclassRoleFormat: '{subject.name}: {topic} ({formattedDate})',
+    eclassRoleFormat: 'Cours {subject.classCode}: {topic} ({formattedDate})',
     eclassReminderTime: 15 * 60 * 1000, // 15 minutes
   },
   apis: {
