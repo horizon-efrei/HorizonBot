@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { ApplyOptions } from '@sapphire/decorators';
+import type { IMessagePrompterExplicitConfirmReturn } from '@sapphire/discord.js-utilities';
 import { MessagePrompter, PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import { Args, Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
@@ -77,11 +78,15 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       confirmEmoji: settings.emojis.yes,
       cancelEmoji: settings.emojis.no,
       timeout: 2 * 60 * 1000,
+      explicitReturn: true,
     });
-    const isConfirmed = await handler.run(message.channel, message.author).catch(nullop);
+    const { confirmed, appliedMessage: prompterMessage } = await handler.run(message.channel, message.author)
+      .catch(nullop) as IMessagePrompterExplicitConfirmReturn;
 
-    if (!isConfirmed) {
+    await prompterMessage.reactions.removeAll();
+    if (!confirmed) {
       await message.channel.send(config.messages.stoppedPrompting);
+      await prompterMessage.edit({ embeds: [prompterMessage.embeds[0].setColor(settings.colors.red)] });
       return;
     }
 
@@ -102,6 +107,8 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       reactionRolePairs: roles.map(({ reaction, role }) => ({ reaction, role: role.id })),
       uniqueRole,
     });
+
+    await prompterMessage.edit({ embeds: [prompterMessage.embeds[0].setColor(settings.colors.green)] });
   }
 
   public async list(message: GuildMessage, _args: Args): Promise<void> {
