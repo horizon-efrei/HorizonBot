@@ -14,10 +14,12 @@ import type {
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
 import { subject as config } from '@/config/commands/professors';
+import messages from '@/config/messages';
 import settings from '@/config/settings';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { GuildMessage, GuildTextBasedChannel, PrompterText } from '@/types';
 import { SchoolYear, TeachingUnit } from '@/types';
+import { noop } from '@/utils';
 
 const schoolYearMenu = new MessageSelectMenu()
   .setCustomId('select-schoolyear')
@@ -131,13 +133,18 @@ export default class SubjectInteractiveBuilder {
 
     try {
       await this._askPrompts();
-    } catch {
+    } catch (err: unknown) {
       if (this.aborted)
         return;
 
       await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
-      await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
-      return;
+      if (err instanceof Error && err.name.includes('INTERACTION_COLLECTOR_ERROR')) {
+        await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
+        return;
+      }
+
+      this.botMessagePrompt.edit(messages.global.oops).catch(noop);
+      throw err;
     } finally {
       collector.stop();
     }

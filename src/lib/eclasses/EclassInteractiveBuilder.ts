@@ -12,12 +12,14 @@ import type { ButtonInteraction, Message, SelectMenuInteraction } from 'discord.
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
 import { eclass as config } from '@/config/commands/professors';
+import messages from '@/config/messages';
 import settings from '@/config/settings';
 import Subject from '@/models/subject';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
 import type { SubjectDocument } from '@/types/database';
+import { noop } from '@/utils';
 
 const schoolYearMenu = new MessageSelectMenu()
   .setCustomId('select-schoolyear')
@@ -116,13 +118,18 @@ export default class EclassInteractiveBuilder {
 
     try {
       await this._askPrompts();
-    } catch {
+    } catch (err: unknown) {
       if (this.aborted)
         return;
 
       await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
-      await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
-      return;
+      if (err instanceof Error && err.name.includes('INTERACTION_COLLECTOR_ERROR')) {
+        await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
+        return;
+      }
+
+      this.botMessagePrompt.edit(messages.global.oops).catch(noop);
+      throw err;
     } finally {
       collector.stop();
     }
