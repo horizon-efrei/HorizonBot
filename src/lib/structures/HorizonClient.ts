@@ -36,6 +36,7 @@ export default class HorizonClient extends SapphireClient {
       loadDefaultErrorListeners: true,
       presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${settings.prefix}help` }] },
       intents: [
+        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, // Access to EmojiDelete events.
         Intents.FLAGS.GUILD_INVITES, // Access to InviteCreate events.
         Intents.FLAGS.GUILD_MEMBERS, // Access to GuildMemberAdd/Update/Remove events.
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS, // Access to MessageReactionAdd/Remove events.
