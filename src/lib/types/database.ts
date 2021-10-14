@@ -155,6 +155,7 @@ export interface ReactionRoleBase {
 /** Interface for the "ReactionRole"'s mongoose document */
 export interface ReactionRoleDocument extends Omit<ReactionRoleBase, 'reactionRolePairs'>, Document {
   reactionRolePairs: Types.Array<{ role: string; reaction: string }>;
+  getMessageUrl(): string;
 }
 
 /** Interface for the "ReactionRole"'s mongoose model */

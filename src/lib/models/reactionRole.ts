@@ -28,4 +28,8 @@ const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
   },
 }, { timestamps: true });
 
+ReactionRoleSchema.methods.getMessageUrl = function (this: ReactionRoleDocument): string {
+  return `https://discord.com/channels/${this.guildId}/${this.channelId}/${this.messageId}`;
+};
+
 export default model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);
