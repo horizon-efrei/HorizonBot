@@ -26,6 +26,7 @@ module.exports = {
     'class-methods-use-this': 'off',
 
     'no-await-in-loop': 'off',
+    'require-atomic-updates': 'off',
   },
   settings: {
     'import/parsers': {

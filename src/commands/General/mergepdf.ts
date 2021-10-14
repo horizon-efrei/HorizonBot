@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import axios from 'axios';

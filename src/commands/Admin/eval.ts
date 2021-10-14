@@ -5,7 +5,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import { Stopwatch } from '@sapphire/stopwatch';

@@ -1,4 +1,4 @@
-import { readdir } from 'fs/promises';
+import { readdir } from 'node:fs/promises';
 
 /**
  * Get all the names of the files in a folder.
