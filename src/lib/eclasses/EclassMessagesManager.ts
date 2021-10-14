@@ -43,7 +43,7 @@ async function updateMessage(message: Message, content: MessageOptions): Promise
   if (!edited) {
     if (message?.deletable)
       await message.delete();
-    await message.channel.send(content).then(async msg => await msg.crosspost());
+    await message.channel.send(content).then(async msg => msg.crosspostable && await msg.crosspost());
   }
 }
 
