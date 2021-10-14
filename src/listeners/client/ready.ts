@@ -26,6 +26,7 @@ export default class ReadyListener extends Listener {
     this.container.logger.info('[Reaction Roles] Caching reactions-roles menus...');
     const reactionRoles = await ReactionRole.find();
     for (const rr of reactionRoles) {
+      // TODO: Improve the "remove-if-fail" logic. What if the channel was deleted? What if we just don't have perm?
       const channel = this.container.client.channels.cache.get(rr.channelId) as TextChannel;
       channel?.messages.fetch(rr.messageId)
         .catch(async () => {
@@ -38,6 +39,7 @@ export default class ReadyListener extends Listener {
     this.container.logger.info('[Reaction Roles] Caching eclass announcement...');
     const eclasses = await Eclass.find({ status: EclassStatus.Planned });
     for (const eclass of eclasses) {
+      // TODO: Improve the "remove-if-fail" logic. What if the channel was deleted? What if we just don't have perm?
       const channel = await this.container.client.configManager.get(eclass.announcementChannel, eclass.guild);
       channel?.messages.fetch(eclass.announcementMessage)
         .catch(async () => {
@@ -50,6 +52,7 @@ export default class ReadyListener extends Listener {
     this.container.logger.info('[Anti Swear] Caching alert messages...');
     let flaggedMessages = await FlaggedMessageDB.find({ approved: false });
     for (const flaggedMessage of flaggedMessages) {
+      // TODO: Improve the "remove-if-fail" logic. What if the channel was deleted? What if we just don't have perm?
       const logChannel = await this.container.client.configManager.get(
         ConfigEntriesChannels.ModeratorFeedback,
         flaggedMessage.guildId,
