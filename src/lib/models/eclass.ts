@@ -86,8 +86,8 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
 
 EclassSchema.statics.generateId = function (professor: GuildMember, date: Date): string {
   return [
-    slug(professor.displayName),
-    dayjs(date).format('hhmmDDMMYYYY'),
+    slug(professor.displayName, '_'),
+    dayjs(date).format('HHmmDDMMYYYY'),
     nanoid(4),
   ].join('_');
 };
