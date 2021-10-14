@@ -5,7 +5,7 @@ import type HorizonCommand from '@/structures/commands/HorizonCommand';
 
 export default function resolveCommand(parameter: string): Result<HorizonCommand, 'commandError'> {
   const command = container.stores.get('commands')
-    .find(cmd => cmd.aliases.includes(parameter));
+    .find(cmd => cmd.aliases.includes(parameter) || cmd.name === parameter);
 
   if (isNullish(command))
     return err('commandError');
