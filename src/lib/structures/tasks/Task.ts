@@ -53,7 +53,7 @@ export default abstract class Task extends Piece {
     if (this._scheduleInterval)
       clearInterval(this._scheduleInterval);
     if (this._scheduleCron)
-      this._scheduleCron.stop().destroy();
+      this._scheduleCron.stop();
   }
 
   public toJSON(): PieceJSON & { interval: number | undefined; cron: string | undefined } {

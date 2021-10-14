@@ -8,7 +8,8 @@ import {
   MessageEmbed,
   MessageSelectMenu,
 } from 'discord.js';
-import type { ButtonInteraction, Message, SelectMenuInteraction } from 'discord.js';
+import type { Message, SelectMenuInteraction } from 'discord.js';
+import { MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
 import { eclass as config } from '@/config/commands/professors';
@@ -107,8 +108,9 @@ export default class EclassInteractiveBuilder {
       baseMessage: this.botMessagePrompt,
     });
 
-    const collector = this.mainBotMessage.createMessageComponentCollector<ButtonInteraction>({ componentType: 'BUTTON' })
-      .on('collect', async (interaction) => {
+    const collector = this.mainBotMessage.createMessageComponentCollector({
+      componentType: MessageComponentTypes.BUTTON,
+    }).on('collect', async (interaction) => {
         if (interaction.customId === 'abort') {
           this.aborted = true;
           await interaction.update({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
@@ -186,7 +188,7 @@ export default class EclassInteractiveBuilder {
     this._actionRows.push(new MessageActionRow().addComponents([component]));
     await this.mainBotMessage.edit({ components: this._actionRows });
 
-    const interaction = await this.mainBotMessage.awaitMessageComponent<SelectMenuInteraction>({
+    const interaction = await this.mainBotMessage.awaitMessageComponent({
       componentType: component.type,
       time: 2 * 60 * 1000,
       filter: i => i.user.id === this.message.author.id && i.customId === component.customId && !this.aborted,

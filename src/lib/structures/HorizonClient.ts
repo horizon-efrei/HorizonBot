@@ -152,12 +152,12 @@ export default class HorizonClient extends SapphireClient {
   }
 
   private async _loadCompilerApiCredits(): Promise<void> {
-    const response = await axios.post(settings.apis.compilerCredits, {
+    const response = await axios.post<{ used: number }>(settings.apis.compilerCredits, {
       clientId: process.env.COMPILERAPI_ID,
       clientSecret: process.env.COMPILERAPI_SECRET,
     }).catch(_ => ({ status: 521, data: {} }));
 
-    if (response.status >= 300 || typeof response.data?.used === 'undefined') {
+    if (response.status >= 300 || !('used' in response.data) || typeof response.data?.used === 'undefined') {
       this.logger.error('[Compiler API] Unable to load remaining CompilerApi credits, command will not be available.');
       return;
     }
