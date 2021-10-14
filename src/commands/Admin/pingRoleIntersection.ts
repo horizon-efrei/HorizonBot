@@ -16,7 +16,7 @@ export default class PingRoleIntersectionCommand extends HorizonCommand {
 
     const allRoles = await args.repeatResult('role');
     if (allRoles.error) {
-      await message.channel.send(pupa(config.messages.roleDoesntExist, { role: allRoles.error.parameter }));
+      await message.channel.send(config.messages.roleDoesntExist);
       return;
     }
 

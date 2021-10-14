@@ -53,14 +53,14 @@ export const logs = {
 
 export const pingRoleIntersection = {
   options: {
-    aliases: ['intersects', 'intersect', 'inter'],
-    description: "Permet de créer un rôle temporaire qui est l'intersection de tous les rôles entrés. Il sera donc ajouté à tous les membres ayant *tous les rôles donnés à la fois*, et sera supprimé automatiquement 2 jours après son utilisation, sauf si tu utilise le drapeau `--keep`.",
+    aliases: ['ping-role-intersection', 'intersects', 'intersect', 'inter'],
+    description: "Permet de créer un rôle temporaire qui est l'intersection de tous les rôles entrés. Il sera donc ajouté à tous les membres ayant *tous les rôles donnés à la fois*, et sera supprimé automatiquement 2 jours après son utilisation, sauf si tu utilises le drapeau `--keep`.",
     enabled: true,
     usage: 'intersect <@mention role | ID role | nom role (entre guillement si plusieurs mots)>',
     examples: ['inter @Role 1 @Role 2 188341077902753794 "Role 4" Role5'],
   },
   messages: {
-    roleDoesntExist: "Es-tu sûr que le rôle \"{role}\" existe ? Je n'ai pas pu le trouver...",
+    roleDoesntExist: "Es-tu sûr que ce rôle existe ? Je n'ai pas pu le trouver...",
     notEnoughRoles: "Tu n'as pas entré assez de rôles ! Il en faut au moins 2.",
     noTargetedUsers: "Personne n'a ces {num} rôles à la fois dans ce serveur, il n'a donc pas été créé.",
     successTemporary: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s). Il sera supprimé 2 jours après sa première utilisation.',
