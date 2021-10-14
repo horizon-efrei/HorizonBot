@@ -36,12 +36,12 @@ export default class HorizonClient extends SapphireClient {
       loadDefaultErrorListeners: true,
       presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${settings.prefix}help` }] },
       intents: [
-        Intents.FLAGS.GUILDS, // Access to Guilds, Channels, Threads, Roles events.
+        Intents.FLAGS.GUILD_INVITES, // Access to InviteCreate events.
         Intents.FLAGS.GUILD_MEMBERS, // Access to GuildMemberAdd/Update/Remove events.
-        Intents.FLAGS.GUILD_INVITES, // Access to InviteCreate.
-        Intents.FLAGS.GUILD_MESSAGES, // Access to MessageCreate/Update/Delete events.
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS, // Access to MessageReactionAdd/Remove events.
+        Intents.FLAGS.GUILD_MESSAGES, // Access to MessageCreate/Update/Delete events.
         Intents.FLAGS.GUILD_VOICE_STATES, // Access to VoiceStateUpdate events.
+        Intents.FLAGS.GUILDS, // Access to Guilds, Channels, Threads, Roles events.
       ],
     });
 
