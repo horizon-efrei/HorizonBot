@@ -170,7 +170,7 @@ export const setup = {
     successfullyDefined: 'Entrée définie avec succès !',
     successfullyUndefined: 'Entrée déréférencé avec succès !',
     invalidRole: 'Ce rôle est invalide.',
-    unknown: 'Entrée inconnu.',
+    unknown: 'Entrée inconnue.',
     associatedKeys: 'Les clés associées à cette valeur sont : `{keys}`.',
     noAssociatedKey: "Ce valeur-là n'a pas de clé associé.",
     associatedValue: 'Le valeur associée est : {value}.',
