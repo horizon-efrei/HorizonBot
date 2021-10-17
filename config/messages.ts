@@ -24,6 +24,7 @@ export default {
       [DiscordLogType.ChangeUsername, ':label: Changement de pseudo'],
       [DiscordLogType.GuildJoin, ':green_heart: Membre rejoint le serveur'],
       [DiscordLogType.GuildLeave, ':broken_heart: Membre quitte le serveur'],
+      [DiscordLogType.InvitePost, ':link: Invitation Discord externe postée'],
       [DiscordLogType.MessageEdit, ':incoming_envelope: Message modifié'],
       [DiscordLogType.MessagePost, ':envelope_with_arrow: Message posté'],
       [DiscordLogType.MessageRemove, ':wastebasket: Message supprimé'],
@@ -39,6 +40,7 @@ export default {
       [DiscordLogType.ChangeUsername, 'changement de pseudo'],
       [DiscordLogType.GuildJoin, 'membre rejoint le serveur'],
       [DiscordLogType.GuildLeave, 'membre quitte le serveur'],
+      [DiscordLogType.InvitePost, 'invitation Discord postée'],
       [DiscordLogType.MessageEdit, 'message modifié'],
       [DiscordLogType.MessagePost, 'message posté'],
       [DiscordLogType.MessageRemove, 'message supprimé'],
@@ -83,13 +85,23 @@ export default {
           Rôles : {content.roles}
         `,
       },
+      [DiscordLogType.InvitePost]: {
+        color: settings.colors.green,
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context.authorId}>',
+        contentName: ':link: Invitation(s) postée(s)',
+        contentValue: stripIndent`
+          [Lien vers le message]({url}) (dans <#{context.channelId}>)
+          Invitations : {content}
+        `,
+      },
       [DiscordLogType.MessageEdit]: {
         color: settings.colors.yellow,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: '<@{context.authorId}>',
         contentName: ':pencil: Message',
         contentValue: stripIndent`
-          Lien : {url} (dans <#{context.channelId}>)
+          [Lien vers le message]({url}) (dans <#{context.channelId}>)
           Contenu : {content}
         `,
       },
@@ -99,7 +111,7 @@ export default {
         contextValue: '<@{context.authorId}>',
         contentName: ':pencil: Nouveau message',
         contentValue: stripIndent`
-          Lien : {url} (dans <#{context.channelId}>)
+          [Lien vers le message]({url}) (dans <#{context.channelId}>)
           Contenu : {content}
         `,
       },
@@ -119,7 +131,7 @@ export default {
         contextValue: '<@{context.authorId}>',
         contentName: 'Réaction',
         contentValue: stripIndent`
-          Lien du message : {url} (dans <#{context.channelId}>)
+          [Lien vers le message]({url}) (dans <#{context.channelId}>)
           Auteur du message : <@{context.authorId}>
           Réaction : {content}
         `,
@@ -130,7 +142,7 @@ export default {
         contextValue: '<@{context.authorId}>',
         contentName: 'Réaction',
         contentValue: stripIndent`
-          Lien du message : {url} (dans <#{context.channelId}>)
+          [Lien vers le message]({url}) (dans <#{context.channelId}>)
           Auteur du message : <@{context.authorId}>
           Réaction : {content}
         `,

@@ -261,6 +261,7 @@ export enum DiscordLogType {
   ChangeUsername,
   GuildJoin,
   GuildLeave,
+  InvitePost,
   MessageEdit,
   MessagePost,
   MessageRemove,
@@ -311,15 +312,17 @@ export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
     | { type: DiscordLogType.GuildJoin; context: string; content: string[] }
     // Context is user id, content is a snapshot of the user
     | { type: DiscordLogType.GuildLeave; context: string; content: GuildLeaveUserSnapshot }
-    // Context is a UserMessageReference, content is the message content
+    // Context is a AuthorMessageReference, content is a list of linked invites
+    | { type: DiscordLogType.InvitePost; context: AuthorMessageReference; content: string[] }
+    // Context is a AuthorMessageReference, content is the message content
     | { type: DiscordLogType.MessageEdit; context: AuthorMessageReference; content: BeforeAfter }
-    // Context is a UserMessageReference, content is the new message content
+    // Context is a AuthorMessageReference, content is the new message content
     | { type: DiscordLogType.MessagePost; context: AuthorMessageReference; content: string }
-    // Context is a UserMessageReference, content is the message content
+    // Context is a ExecutorAndAuthorMessageReference, content is the message content
     | { type: DiscordLogType.MessageRemove; context: ExecutorAndAuthorMessageReference; content: string }
-    // Context is a UserAuthorMessageReference, content is the emoji used
+    // Context is a ExecutorAndAuthorMessageReference, content is the emoji used
     | { type: DiscordLogType.ReactionAdd; context: ExecutorAndAuthorMessageReference; content: string }
-    // Context is a UserAuthorMessageReference, content is the emoji used
+    // Context is a ExecutorAndAuthorMessageReference, content is the emoji used
     | { type: DiscordLogType.ReactionRemove; context: ExecutorAndAuthorMessageReference; content: string }
     // Context is ActionReference, content is the roles id
     | { type: DiscordLogType.RoleAdd; context: ActionReference; content: string[] }

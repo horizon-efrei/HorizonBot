@@ -18,6 +18,7 @@ const logNames = new Collection<DiscordLogType, string[]>([
   [DiscordLogType.ChangeUsername, ['changeusername', 'change-username', 'username-change']],
   [DiscordLogType.GuildJoin, ['guildjoin', 'guild-join', 'join-guild']],
   [DiscordLogType.GuildLeave, ['guildleave', 'guild-leave', 'leave-guild']],
+  [DiscordLogType.InvitePost, ['invitepost', 'invite-post', 'post-invite']],
   [DiscordLogType.MessageEdit, ['messageedit', 'message-edit', 'edit-message']],
   [DiscordLogType.MessagePost, ['messagepost', 'message-post', 'post-message']],
   [DiscordLogType.MessageRemove, ['messageremove', 'message-remove', 'remove-message']],

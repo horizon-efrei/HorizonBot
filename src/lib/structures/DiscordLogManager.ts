@@ -8,16 +8,11 @@ import type { DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
 import { trimText } from '@/utils';
 
-type DiscordLogWithMessageContext = DiscordLogBase & { type:
-  | DiscordLogType.MessageEdit
-  | DiscordLogType.MessagePost
-  | DiscordLogType.MessageRemove
-  | DiscordLogType.ReactionAdd
-  | DiscordLogType.ReactionRemove;
-};
-
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
-const getMessageUrl = (payload: DiscordLogWithMessageContext): string => `https://discord.com/channels/${payload.guildId}/${payload.context.channelId}/${payload.context.messageId}`;
+
+type DiscordLogWithMessageContext = DiscordLogBase & ({ context: { channelId: string; messageId: string } });
+const getMessageUrl = <T extends DiscordLogWithMessageContext>(payload: T): string =>
+  `https://discord.com/channels/${payload.guildId}/${payload.context.channelId}/${payload.context.messageId}`;
 
 export default {
   async logAction(payload: DiscordLogBase): Promise<void> {
@@ -76,6 +71,12 @@ export default {
         return pupa(fieldTexts.contentValue, {
           ...payload,
           content: listAndFormatter.format(payload.content.map(Formatters.roleMention)),
+        });
+      case DiscordLogType.InvitePost:
+        return pupa(fieldTexts.contentValue, {
+          ...payload,
+          content: payload.content.join(', '),
+          url: getMessageUrl(payload),
         });
       case DiscordLogType.MessagePost:
       case DiscordLogType.MessageEdit:

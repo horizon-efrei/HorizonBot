@@ -6,6 +6,8 @@ import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
 import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
 
+const discordInviteLinkRegex = /(?:https?:\/\/)?(?:www\.)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)(?<code>[\w\d-]{2,})/gimu;
+
 export default class MessageListener extends Listener {
   public async run(message: GuildMessage): Promise<void> {
     if (message.author.bot || message.system)
@@ -18,6 +20,22 @@ export default class MessageListener extends Listener {
       guildId: message.guild.id,
       severity: 1,
     });
+
+    const invites = message.content.matchAll(discordInviteLinkRegex);
+    const foreignInvites = [...invites]
+      .map(invite => invite.groups?.code)
+      .filter(code => !message.guild.invites.cache.has(code))
+      .map(code => `https://discord.gg/${code}`);
+
+    if (foreignInvites.length > 0) {
+      await DiscordLogManager.logAction({
+        type: DiscordLogType.InvitePost,
+        context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
+        content: foreignInvites,
+        guildId: message.guild.id,
+        severity: 1,
+      });
+    }
 
     const mentionnedTempIntersectionRoles = this.container.client.intersectionRoles
       .filter(r => message.mentions.roles.has(r))
