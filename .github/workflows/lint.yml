@@ -20,10 +20,10 @@ jobs:
           key: ${{ runner.os }}-build-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-
-      - name: Install Node v14
+      - name: Install Node v16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
