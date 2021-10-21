@@ -264,7 +264,9 @@ export default class EclassCommand extends HorizonSubCommand {
     // Send messages
     const payload = {
       ...eclass.toData(),
+      displayDate: Math.floor(eclass.date / 1000),
       role: message.guild.roles.resolve(eclass.targetRole).name,
+      pingRole: message.guild.roles.resolve(eclass.classRole),
     };
     await message.channel.send(pupa(updateMessage, payload));
     if (shouldPing)

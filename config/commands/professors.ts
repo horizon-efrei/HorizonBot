@@ -161,25 +161,25 @@ export const eclass = {
     invalidEditProperty: 'Cette propriété est invalide. Choisis parmi "sujet", "date", "heure", "durée", "professeur" et "rôle".',
 
     editedTopic: 'Tu as bien modifié le thème du cours en "{topic}".',
-    pingEditedTopic: '{role}, le cours a été modifié : le thème a été changé en "{topic}".',
+    pingEditedTopic: '{pingRole}, le thème du cours a été changé en "{topic}".',
 
-    editedDate: 'Tu as bien modifié la date du cours pour le {date}.',
-    pingEditedDate: '{role}, le cours a été modifié : la date a été changée pour le {date}.',
+    editedDate: 'Tu as bien déplacé le cours pour le <t:{displayDate}:F>.',
+    pingEditedDate: '{pingRole}, le cours a été déplacé le <t:{displayDate}:F> (<t:{displayDate}:R>).',
 
-    editedHour: "Tu as bien modifié l'heure du cours pour le {date}.",
-    pingEditedHour: "{role}, le cours a été modifié : l'heure a été changée pour le {date}.",
+    editedHour: 'Tu as bien déplacé le cours à <t:{displayDate}:t>.',
+    pingEditedHour: '{pingRole}, le cours a été déplacé à <t:{displayDate}:t> (<t:{date}:displayD).',
 
     editedDuration: 'Tu as bien modifié la durée du cours en {duration}.',
-    pingEditedDuration: '{role}, le cours a été modifié : la durée a été changée en {duration}.',
+    pingEditedDuration: '{pingRole}, le cours durera à présent en {duration}.',
 
     editedProfessor: 'Tu as bien modifié le professeur du cours qui est maintenant <@{professor}>.',
-    pingEditedProfessor: '{role}, le cours a été modifié : le professeur est maintenant <@{professor}>.',
+    pingEditedProfessor: '{pingRole}, le professeur a été changé pour <@{professor}>.',
 
     editedRole: 'Tu as bien modifié le rôle visé en "{role}".',
-    pingEditedRole: '{role}, le cours a été modifié : le rôle visé est maintenant "{role}".',
+    pingEditedRole: '{pingRole}, le rôle visé a été changé au rôle "{role}".',
 
     editedRecorded: "Tu as bien modifié le statut d'enregistrement du cours en `{isRecorded}`.",
-    pingEditedRecorded: '{role}, le cours a été modifié : ',
+    pingEditedRecorded: '{pingRole}, le cours a été modifié : ',
     pingEditedRecordedValues: ['il ne sera plus enregistré.', 'il sera maintenant enregistré.'],
 
     // Start subcommand
