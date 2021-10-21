@@ -9,7 +9,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class PDFMergeCommand extends HorizonCommand {
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const result = await args.repeatResult('message');
 
     // If no message are given or they don't have any attachments AND no attachments were given in the command's

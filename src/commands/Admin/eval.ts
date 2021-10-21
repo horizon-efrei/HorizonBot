@@ -39,7 +39,7 @@ interface EvalOptions {
 export default class EvalCommand extends HorizonCommand {
   maxRunTime = 60_000;
 
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const code = await args.restResult('code');
     if (code.error) {
       await message.channel.send(config.messages.noCode);

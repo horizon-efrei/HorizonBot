@@ -7,7 +7,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class LatexCommand extends HorizonCommand {
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const equation = await args.restResult('string');
     if (equation.error) {
       await message.channel.send(config.messages.noEquationGiven);

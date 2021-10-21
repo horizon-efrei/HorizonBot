@@ -7,7 +7,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({ ...config.options, generateDashLessAliases: true })
 export default class VocalCountCommand extends HorizonCommand {
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const channel = (await args.pickResult('guildVoiceChannel'))?.value ?? message.member.voice.channel;
     if (!channel) {
       await message.channel.send(config.messages.invalidUse);

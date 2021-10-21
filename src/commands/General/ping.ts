@@ -7,7 +7,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class PingCommand extends HorizonCommand {
-  public async run(message: GuildMessage): Promise<void> {
+  public async messageRun(message: GuildMessage): Promise<void> {
     const msg = await message.channel.send(config.messages.firstMessage);
 
     await msg.edit(

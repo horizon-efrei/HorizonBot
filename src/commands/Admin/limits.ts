@@ -10,7 +10,7 @@ import type { GuildMessage } from '@/types';
   preconditions: ['StaffOnly'],
 })
 export default class LimitsCommand extends HorizonCommand {
-  public async run(message: GuildMessage): Promise<void> {
+  public async messageRun(message: GuildMessage): Promise<void> {
     await message.channel.send(pupa(config.messages.limits, {
       channels: message.guild.channels.cache.size,
       roles: message.guild.roles.cache.size,

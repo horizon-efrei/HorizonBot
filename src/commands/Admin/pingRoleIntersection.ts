@@ -11,7 +11,7 @@ import type { GuildMessage } from '@/types';
   flags: ['keep'],
 })
 export default class PingRoleIntersectionCommand extends HorizonCommand {
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const isPersistent = args.getFlags('keep');
 
     const allRoles = await args.repeatResult('role');

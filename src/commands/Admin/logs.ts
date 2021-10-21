@@ -49,7 +49,7 @@ const getLogInfo = (
   preconditions: ['StaffOnly'],
 })
 export default class LogsCommand extends HorizonCommand {
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const askedLog = await args.pickResult('string').catch(nullop);
     const logType = askedLog.value === 'all' ? 'all' : logNames.findKey(names => names.includes(askedLog.value));
 

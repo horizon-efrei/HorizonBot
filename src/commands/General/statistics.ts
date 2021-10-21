@@ -12,7 +12,7 @@ import { getGitRev } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class StatisticsCommand extends HorizonCommand {
-  public async run(message: GuildMessage): Promise<void> {
+  public async messageRun(message: GuildMessage): Promise<void> {
     const embedMessages = config.messages.embed;
     const commitHash = await getGitRev();
     const embed = new MessageEmbed()

@@ -10,7 +10,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class HelpCommand extends HorizonCommand {
-  public async run(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const command = (await args.pickResult('command'))?.value;
     const embed = new MessageEmbed().setColor(settings.colors.default);
 
