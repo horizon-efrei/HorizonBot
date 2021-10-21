@@ -11,7 +11,7 @@ import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildMessage } from '@/types';
 import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
 import { ConfigEntriesChannels, ConfigEntriesRoles } from '@/types/database';
-import { generateSubcommands } from '@/utils';
+import { generateSubcommands, inlineCodeList } from '@/utils';
 
 const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry: ConfigEntries }> = [{
   possibilities: ['moderator', 'moderateur', 'mod'],
@@ -79,6 +79,8 @@ const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry
   entry: ConfigEntriesRoles.Eprof,
 }];
 
+const possibilitiesExamples = inlineCodeList(argNames.flatMap(argName => argName.possibilities[0]));
+
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
@@ -92,7 +94,7 @@ export default class SetupCommand extends HorizonSubCommand {
     const query = await args.pickResult('string');
     const matchArg = argNames.find(argName => argName.possibilities.includes(query.value));
     if (!matchArg) {
-      await message.channel.send(config.messages.unknown);
+      await message.channel.send(pupa(config.messages.unknown, { list: possibilitiesExamples }));
       return;
     }
 
@@ -119,7 +121,7 @@ export default class SetupCommand extends HorizonSubCommand {
       await this.container.client.configManager.remove(matchArg.entry, message.guild);
       await message.channel.send(config.messages.successfullyUndefined);
     } else {
-      await message.channel.send(config.messages.unknown);
+      await message.channel.send(pupa(config.messages.unknown, { list: possibilitiesExamples }));
     }
   }
 
@@ -137,7 +139,7 @@ export default class SetupCommand extends HorizonSubCommand {
     } else {
       const matchArg = argNames.find(argName => argName.possibilities.includes(queryString.value));
       if (!matchArg) {
-        await message.channel.send(config.messages.unknown);
+        await message.channel.send(pupa(config.messages.unknown, { list: possibilitiesExamples }));
         return;
       }
 
@@ -163,7 +165,11 @@ export default class SetupCommand extends HorizonSubCommand {
 
     await new PaginatedFieldMessageEmbed<{ name: ConfigEntries; value: string }>()
       .setTitleField(config.messages.listTitle)
-      .setTemplate(new MessageEmbed().setColor(settings.colors.default))
+      .setTemplate(
+        new MessageEmbed()
+          .setColor(settings.colors.default)
+          .addField(config.messages.possibilitiesTitle, possibilitiesExamples),
+      )
       .setItems(allEntriesFilled.map(([name, entry]) => ({ name, value: entry?.value })))
       .formatItems(item => pupa(
         item.value ? config.messages.lineWithValue : config.messages.lineWithoutValue,

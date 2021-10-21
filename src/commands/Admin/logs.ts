@@ -11,23 +11,23 @@ import LogStatuses from '@/models/logStatuses';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType, LogStatuses as LogStatusesEnum } from '@/types/database';
-import { nullop } from '@/utils';
+import { inlineCodeList, nullop } from '@/utils';
 
 const logNames = new Collection<DiscordLogType, string[]>([
-  [DiscordLogType.ChangeNickname, ['changenickname', 'change-nickname', 'nickname-change']],
-  [DiscordLogType.ChangeUsername, ['changeusername', 'change-username', 'username-change']],
-  [DiscordLogType.GuildJoin, ['guildjoin', 'guild-join', 'join-guild']],
-  [DiscordLogType.GuildLeave, ['guildleave', 'guild-leave', 'leave-guild']],
-  [DiscordLogType.InvitePost, ['invitepost', 'invite-post', 'post-invite']],
-  [DiscordLogType.MessageEdit, ['messageedit', 'message-edit', 'edit-message']],
-  [DiscordLogType.MessagePost, ['messagepost', 'message-post', 'post-message']],
-  [DiscordLogType.MessageRemove, ['messageremove', 'message-remove', 'remove-message']],
-  [DiscordLogType.ReactionAdd, ['reactionadd', 'reaction-add', 'add-reaction']],
-  [DiscordLogType.ReactionRemove, ['reactionremove', 'reaction-remove', 'remove-reaction']],
-  [DiscordLogType.RoleAdd, ['roleadd', 'role-add', 'add-role']],
-  [DiscordLogType.RoleRemove, ['roleremove', 'role-remove', 'remove-role']],
-  [DiscordLogType.VoiceJoin, ['voicejoin', 'voice-join', 'join-voice']],
-  [DiscordLogType.VoiceLeave, ['voiceleave', 'voice-leave', 'leave-voice']],
+  [DiscordLogType.ChangeNickname, ['change-nickname', 'changenickname', 'nickname-change', 'nicknamechange']],
+  [DiscordLogType.ChangeUsername, ['change-username', 'changeusername', 'username-change', 'usernamechange']],
+  [DiscordLogType.GuildJoin, ['guild-join', 'guildjoin', 'join-guild', 'joinguild']],
+  [DiscordLogType.GuildLeave, ['guild-leave', 'guildleave', 'leave-guild', 'leaveguild']],
+  [DiscordLogType.InvitePost, ['invite-post', 'invitepost', 'post-invite', 'postinvite']],
+  [DiscordLogType.MessageEdit, ['message-edit', 'messageedit', 'edit-message', 'editmessage']],
+  [DiscordLogType.MessagePost, ['message-post', 'messagepost', 'post-message', 'postmessage']],
+  [DiscordLogType.MessageRemove, ['message-remove', 'messageremove', 'remove-message', 'removemessage']],
+  [DiscordLogType.ReactionAdd, ['reaction-add', 'reactionadd', 'add-reaction', 'addreaction']],
+  [DiscordLogType.ReactionRemove, ['reaction-remove', 'reactionremove', 'remove-reaction', 'removereaction']],
+  [DiscordLogType.RoleAdd, ['role-add', 'roleadd', 'add-role', 'addrole']],
+  [DiscordLogType.RoleRemove, ['role-remove', 'roleremove', 'remove-role', 'removerole']],
+  [DiscordLogType.VoiceJoin, ['voice-join', 'voicejoin', 'join-voice', 'joinvoice']],
+  [DiscordLogType.VoiceLeave, ['voice-leave', 'voiceleave', 'leave-voice', 'leavevoice']],
 ]);
 
 const logStatuses = new Collection<LogStatusesEnum, string[]>([
@@ -36,6 +36,9 @@ const logStatuses = new Collection<LogStatusesEnum, string[]>([
   [LogStatusesEnum.Console, ['console', '2']],
   [LogStatusesEnum.Discord, ['discord', 'all', 'everywhere', '3']],
 ]);
+
+const logsPossibilitiesExamples = [...logNames.values()].map(v => v[0]);
+const statusesPossibilitiesExamples = [...logStatuses.values()].map(v => v[0]);
 
 const getLogInfo = (
   { type, status }: { type: DiscordLogType; status: LogStatusesEnum },
@@ -90,7 +93,14 @@ export default class LogsCommand extends HorizonCommand {
 
     await new PaginatedFieldMessageEmbed<{ type: DiscordLogType; status: LogStatusesEnum }>()
       .setTitleField(config.messages.listTitle)
-      .setTemplate(new MessageEmbed().setColor(settings.colors.default))
+      .setTemplate(
+        new MessageEmbed()
+        .setColor(settings.colors.default)
+        .addField(config.messages.possibilitiesTitle, pupa(config.messages.possibilitiesContent, {
+          logs: inlineCodeList(logsPossibilitiesExamples),
+          statuses: inlineCodeList(statusesPossibilitiesExamples),
+        })),
+      )
       .setItems(logs)
       .formatItems(item => pupa(config.messages.lineValue, getLogInfo(item)))
       .setItemsPerPage(10)
