@@ -7,10 +7,21 @@ import { mergePDF as config } from '@/config/commands/general';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
-@ApplyOptions<CommandOptions>(config.options)
+@ApplyOptions<CommandOptions>({
+  ...config.options,
+  options: ['name'],
+})
 export default class PDFMergeCommand extends HorizonCommand {
   public async messageRun(message: GuildMessage, args: Args): Promise<void> {
+    await message.channel.sendTyping();
+
     const result = await args.repeatResult('message');
+
+    let name = args.getOption('name');
+    if (name?.endsWith('.pdf'))
+      name = name.slice(0, -4);
+    name = name?.replace(/^\.*/, '');
+    name ||= 'merged';
 
     // If no message are given or they don't have any attachments AND no attachments were given in the command's
     // message then we stop here as no PDFs were given at all.
@@ -43,7 +54,7 @@ export default class PDFMergeCommand extends HorizonCommand {
     await message.channel.send({
       files: [{
         attachment: pdfBuffer,
-        name: 'merged.pdf',
+        name: `${name}.pdf`,
       }],
     });
   }
