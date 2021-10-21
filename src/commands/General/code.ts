@@ -9,7 +9,7 @@ import { code as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildMessage } from '@/types';
-import { convertSize, generateSubcommands } from '@/utils';
+import { convertSize, generateSubcommands, inlineCodeList } from '@/utils';
 
 const wraps = new Map([
   ['c', '#include <stdio.h>\n#include <stdlib.h>\nint main() { {code} }'],
@@ -98,7 +98,7 @@ export default class CodeCommand extends HorizonSubCommand {
       .addFields(
         settings.languages.map(lang => ({
           name: lang.display,
-          value: pupa(config.messages.informationBlock, { lang, formattedSlugs: `\`${lang.slugs.join('`, `')}\`` }),
+          value: pupa(config.messages.informationBlock, { lang, formattedSlugs: inlineCodeList(lang.slugs) }),
           inline: true,
         })),
       );

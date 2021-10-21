@@ -7,6 +7,7 @@ import { help as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
+import { inlineCodeList } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class HelpCommand extends HorizonCommand {
@@ -24,9 +25,9 @@ export default class HelpCommand extends HorizonCommand {
         );
 
       if (command.aliases.length > 1)
-        embed.addField(information.aliases, `\`${command.aliases.join('`, `')}\``);
+        embed.addField(information.aliases, inlineCodeList(command.aliases));
       if (command.examples.length > 0)
-        embed.addField(information.examples, `\`${command.examples.join('`\n`')}\``);
+        embed.addField(information.examples, inlineCodeList(command.examples, '\n'));
     } else {
       const information = config.messages.commandsList;
       const amount = this.container.stores.get('commands').size;
@@ -39,7 +40,7 @@ export default class HelpCommand extends HorizonCommand {
       for (const [category, commands] of Object.entries(categories)) {
         embed.addField(
           pupa(information.category, { categoryName: category }),
-          `\`${commands.map(cmd => cmd.name).join('`, `')}\``,
+          inlineCodeList(commands.map(cmd => cmd.name)),
         );
       }
     }

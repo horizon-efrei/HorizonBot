@@ -14,7 +14,7 @@ import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import { GuildMessage } from '@/types';
 import { TagDocument } from '@/types/database';
-import { generateSubcommands } from '@/utils';
+import { generateSubcommands, inlineCodeList } from '@/utils';
 
 const embedFlags = ['embed', 'e'];
 
@@ -78,7 +78,7 @@ export default class TagsCommand extends HorizonSubCommand {
       .setItems([
         ...tags.map(tag => ({
           name: tag.name,
-          aliases: tag.aliases.length > 0 ? `\`${tag.aliases.join('`, `')}\`` : '/',
+          aliases: tag.aliases.length > 0 ? inlineCodeList(tag.aliases) : '/',
           uses: tag.uses,
         })),
       ])
