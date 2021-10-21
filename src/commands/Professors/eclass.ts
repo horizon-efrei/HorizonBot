@@ -117,9 +117,18 @@ export default class EclassCommand extends HorizonSubCommand {
         date.setMonth(newDate.value.getMonth());
         date.setDate(newDate.value.getDate());
 
+        if (!EclassManager.validateDate(date)) {
+          await message.channel.send(config.messages.prompts.date.invalid);
+          return;
+        }
+
+        let { reminded } = eclass;
+        if (reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
+          reminded = false;
+
         eclass = await Eclass.findByIdAndUpdate(
           eclass._id,
-          { date: date.getTime(), end: date.getTime() + eclass.duration },
+          { date: date.getTime(), end: date.getTime() + eclass.duration, reminded },
           { new: true },
         );
         updateMessage = config.messages.editedDate;
@@ -139,9 +148,18 @@ export default class EclassCommand extends HorizonSubCommand {
         date.setHours(newHour.value.hour);
         date.setMinutes(newHour.value.minutes);
 
+        if (!EclassManager.validateDate(date)) {
+          await message.channel.send(config.messages.prompts.hour.invalid);
+          return;
+        }
+
+        let { reminded } = eclass;
+        if (reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
+          reminded = false;
+
         eclass = await Eclass.findByIdAndUpdate(
           eclass._id,
-          { date: date.getTime(), end: date.getTime() + eclass.duration },
+          { date: date.getTime(), end: date.getTime() + eclass.duration, reminded },
           { new: true },
         );
         updateMessage = config.messages.editedHour;
