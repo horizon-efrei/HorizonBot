@@ -15,6 +15,7 @@ import type { A } from 'ts-toolbelt';
 import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
+import * as EclassManager from '@/eclasses/EclassManager';
 import Subject from '@/models/subject';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
@@ -53,8 +54,6 @@ const getSubjectMenu = (subjects: SubjectDocument[]): MessageSelectMenu => new M
   .addOptions(
     subjects.map(subject => ({ label: subject.name, emoji: subject.emoji, value: subject.classCode })),
   );
-
-const dateValidator = (resolved: Date): boolean => dayjs(resolved).isBetween(dayjs(), dayjs().add(2, 'month'));
 
 export default class EclassInteractiveBuilder {
   public step = 0;
@@ -163,7 +162,7 @@ export default class EclassInteractiveBuilder {
     await this._updateStep();
 
     // 4. Ask for the date
-    this.responses.date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, dateValidator);
+    this.responses.date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, EclassManager.validateDate);
     await this._updateStep();
 
     // 5. Ask for the duration

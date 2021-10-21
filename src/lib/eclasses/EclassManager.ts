@@ -346,3 +346,7 @@ export async function unsubscribeMember(member: GuildMember, eclass: EclassPopul
 
   container.logger.debug(`[e-class:${eclass.classId}] Unsubscribed member ${member.id} (${member.user.tag}).`);
 }
+
+export function validateDate(date: Date): boolean {
+  return dayjs(date).isBetween(dayjs(), dayjs().add(2, 'months'));
+  }
