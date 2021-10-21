@@ -1,6 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import ReactionRole from '@/models/reactionRole';
-import DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
 import type { MessageDeleteAuditLogs } from '@/types/discord-js';

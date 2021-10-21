@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import settings from '@/config/settings';
-import EclassManager from '@/eclasses/EclassManager';
+import * as EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import Task from '@/structures/tasks/Task';
 import type { TaskOptions } from '@/structures/tasks/Task';

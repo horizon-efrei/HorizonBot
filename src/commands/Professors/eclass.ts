@@ -11,7 +11,7 @@ import messages from '@/config/messages';
 import settings from '@/config/settings';
 import { IsEprofOrStaff, ValidateEclassArgument } from '@/decorators';
 import EclassInteractiveBuilder from '@/eclasses/EclassInteractiveBuilder';
-import EclassManager from '@/eclasses/EclassManager';
+import * as EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';

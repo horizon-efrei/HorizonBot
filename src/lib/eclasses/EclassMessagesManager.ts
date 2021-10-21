@@ -160,58 +160,56 @@ async function updateUpcomingClasses(
     allBotMessages.slice(i).map(async msg => await msg.delete());
 }
 
-export default {
-  async updateClassesCalendarForGuildAndSchoolYear(
-    guildId: string,
-    schoolYear: SchoolYear,
-    allUpcomingClasses?: EclassPopulatedDocument[],
-  ): Promise<void> {
-    const channel = await container.client.configManager.get(calendarMapping.get(schoolYear), guildId);
-    if (!channel) {
-      container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Setup an calendar channel with "${settings.prefix}setup calendar-${schoolYear}"`);
-      return;
-    }
+export async function updateClassesCalendarForGuildAndSchoolYear(
+  guildId: string,
+  schoolYear: SchoolYear,
+  allUpcomingClasses?: EclassPopulatedDocument[],
+): Promise<void> {
+  const channel = await container.client.configManager.get(calendarMapping.get(schoolYear), guildId);
+  if (!channel) {
+    container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Setup an calendar channel with "${settings.prefix}setup calendar-${schoolYear}"`);
+    return;
+  }
 
-    let upcomingClasses: EclassPopulatedDocument[] = [];
-    if (isNullish(allUpcomingClasses)) {
-      upcomingClasses = await Eclass.find({
-        $and: [
-          { date: { $gte: Date.now() } },
-          { status: EclassStatus.Planned },
-          { guild: guildId },
-        ],
-      });
-    } else {
-      upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId);
-    }
+  let upcomingClasses: EclassPopulatedDocument[] = [];
+  if (isNullish(allUpcomingClasses)) {
+    upcomingClasses = await Eclass.find({
+      $and: [
+        { date: { $gte: Date.now() } },
+        { status: EclassStatus.Planned },
+        { guild: guildId },
+      ],
+    });
+  } else {
+    upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId);
+  }
 
-    await updateClassesCalendar(channel, upcomingClasses.filter(eclass => eclass.subject.schoolYear === schoolYear));
-  },
+  await updateClassesCalendar(channel, upcomingClasses.filter(eclass => eclass.subject.schoolYear === schoolYear));
+}
 
-  async updateUpcomingClassesForGuild(
-    guildId: string,
-    allUpcomingClasses?: EclassPopulatedDocument[],
-  ): Promise<void> {
-    const channel = await container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
-    if (!channel) {
-      container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "${settings.prefix}setup week-class"`);
-      return;
-    }
+export async function updateUpcomingClassesForGuild(
+  guildId: string,
+  allUpcomingClasses?: EclassPopulatedDocument[],
+): Promise<void> {
+  const channel = await container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
+  if (!channel) {
+    container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "${settings.prefix}setup week-class"`);
+    return;
+  }
 
-    let upcomingClasses: EclassPopulatedDocument[] = [];
-    if (isNullish(allUpcomingClasses)) {
-      upcomingClasses = await Eclass.find({
-        $and: [
-          { date: { $lte: dayjs().add(1, 'week').unix() * 1000 } },
-          { date: { $gte: Date.now() } },
-          { status: EclassStatus.Planned },
-          { guild: guildId },
-        ],
-      });
-    } else {
-      upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId);
-    }
+  let upcomingClasses: EclassPopulatedDocument[] = [];
+  if (isNullish(allUpcomingClasses)) {
+    upcomingClasses = await Eclass.find({
+      $and: [
+        { date: { $lte: dayjs().add(1, 'week').unix() * 1000 } },
+        { date: { $gte: Date.now() } },
+        { status: EclassStatus.Planned },
+        { guild: guildId },
+      ],
+    });
+  } else {
+    upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId);
+  }
 
-    await updateUpcomingClasses(channel, upcomingClasses);
-  },
-};
+  await updateUpcomingClasses(channel, upcomingClasses);
+}

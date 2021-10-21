@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import dayjs from 'dayjs';
-import EclassMessagesManager from '@/eclasses/EclassMessagesManager';
+import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
 import Eclass from '@/models/eclass';
 import Task from '@/structures/tasks/Task';
 import type { TaskOptions } from '@/structures/tasks/Task';

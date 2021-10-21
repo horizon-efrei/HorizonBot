@@ -1,6 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import type { Guild, GuildMember } from 'discord.js';
-import DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
 type InviteUses = [code: string, uses: number];

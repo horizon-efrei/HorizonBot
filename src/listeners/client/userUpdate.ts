@@ -1,6 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import type { User } from 'discord.js';
-import DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
 export default class UserUpdateListener extends Listener {

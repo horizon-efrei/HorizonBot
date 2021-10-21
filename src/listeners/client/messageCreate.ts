@@ -1,7 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
-import DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
 import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
