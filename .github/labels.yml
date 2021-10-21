@@ -38,6 +38,9 @@
 - name: 'status: approved'
   description: Issues and PRs that have been approved.
   color: '8CE098'
+- name: 'status: denied'
+  description: Issues and PRs that have been denied.
+  color: 'E85247'
 
 - name: 'priority: critical'
   description: Issues that must be fixed or PRs that must be finished and merged with MAXIMUM PRIORITY.
