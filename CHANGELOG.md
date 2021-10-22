@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2021/10/21
+
+### Added
+
+- Add a handler for channel and role deletions in ConfigManager
+- Add a handler for emoji updates and role deletions for Reaction Roles
+- Add a name option in merge-pdf command
+- Add a new "Invite Post" log
+- Add a new AdminOnly precondition
+- Add an eval command (admin only)
+- Add the list of possibilities in setup and logs
+
+### Improved
+
+- Improve command resolution for the "command" argument
+- Improve eclass role's name and ID format
+- Improve hour parsing for the "hour" argument (allow spaces as hour-minutes separator)
+- Improve messages when editing an eclass
+- Improve some messages and fix some typos
+- Remove the reaction when a condition failed for the Reaction Role
+
+### Fixed
+
+- Fix eclass announcement crossposting
+- Fix incorrect handling of date/hour edits for eclasses
+- Fix the "emoji" argument when a falsy value is passed
+- Fix error handling in InteractiveBuilders
+- Fix crash in `!reactionrrole list`
+
+
 ## [0.3.0] - 2021/09/30
 
 ### Added
@@ -37,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed the display of the ID of an eclass in embed footer
 - Fixed log-type checking once and for all
 - Fixed `messageReactionRemove` event by fetching member if not found, rather than fail
+
 
 ## [0.2.1] - 2021/09/17
 
