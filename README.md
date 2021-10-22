@@ -51,7 +51,7 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
 
 #### Contributeurs
 
-*Aucun pour le moment, mais je veux bien un [petit coup de main] 🙂*
+- [Kethash]
 
 #### License
 
@@ -65,6 +65,8 @@ HorizonBot est sous license [MIT](./LICENSE).
 [discord.js]: https://npmjs.com/package/discord.js
 [Sapphire]: https://www.npmjs.com/package/@sapphire/framework
 [License]: https://github.com/EFREI-Horizon/HorizonBot/blob/master/LICENSE
-[noftaly]: https://github.com/noftaly
-[petit coup de main]: #-développement-et-contributions
 [MIT]: ./LICENSE
+
+<!-- Contributors -->
+[noftaly]: https://github.com/noftaly
+[Kethash]: https://github.com/Kethash
