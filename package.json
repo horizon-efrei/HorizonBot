@@ -1,6 +1,6 @@
 {
   "name": "horizonbot",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The discord bot for Ef'Réussite",
   "main": "./dist/src/main.js",
   "scripts": {
@@ -13,7 +13,9 @@
   },
   "keywords": [],
   "author": "Elliot 'noftaly' Maisl",
-  "contributors": ["Kethash"],
+  "contributors": [
+    "Kethash"
+  ],
   "license": "MIT",
   "repository": {
     "type": "github",
