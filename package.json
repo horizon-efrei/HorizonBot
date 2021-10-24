@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "github",
-    "url": "https://github.com/EFREI-Horizon/HorizonBot"
+    "url": "https://github.com/horizon-efreussite/HorizonBot"
   },
   "dependencies": {
     "@discordjs/builders": "^0.7.0",

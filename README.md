@@ -59,12 +59,12 @@ HorizonBot est sous license [MIT](./LICENSE).
 
 <!-- Link Dump -->
 
-[menu des issues]: https://github.com/EFREI-Horizon/HorizonBot/issues
-[Discussion GitHub]: https://github.com/EFREI-Horizon/HorizonBot/discussions
+[menu des issues]: https://github.com/horizon-efreussite/HorizonBot/issues
+[Discussion GitHub]: https://github.com/horizon-efreussite/HorizonBot/discussions
 [guide de contributions]: ./CONTRIBUTING.md
 [discord.js]: https://npmjs.com/package/discord.js
 [Sapphire]: https://www.npmjs.com/package/@sapphire/framework
-[License]: https://github.com/EFREI-Horizon/HorizonBot/blob/master/LICENSE
+[License]: https://github.com/horizon-efreussite/HorizonBot/blob/master/LICENSE
 [MIT]: ./LICENSE
 
 <!-- Contributors -->

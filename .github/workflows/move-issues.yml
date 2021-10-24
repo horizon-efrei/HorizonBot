@@ -10,13 +10,13 @@ jobs:
     steps:
       - uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
         with:
-          project-url: "https://github.com/EFREI-Horizon/HorizonBot/projects/1"
+          project-url: "https://github.com/horizon-efreussite/HorizonBot/projects/1"
           column-name: "Priority"
           label-name: "priority: high"
           action-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
       - uses: konradpabjan/move-labeled-or-milestoned-issue@v2.0
         with:
-          project-url: "https://github.com/EFREI-Horizon/HorizonBot/projects/1"
+          project-url: "https://github.com/horizon-efreussite/HorizonBot/projects/1"
           column-name: "Priority"
           label-name: "priority: critical"
           action-token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
