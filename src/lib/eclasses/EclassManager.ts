@@ -269,16 +269,6 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
   const guild = container.client.guilds.resolve(eclass.guild);
   const classChannel = guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
 
-  // Send the notification
-  await classChannel.send(
-    pupa(config.messages.remindClassNotification, {
-      classRole: eclass.classRole,
-      duration: dayjs.duration(settings.configuration.eclassReminderTime).humanize(),
-    }),
-  );
-  // Send the private message
-  await massSend(guild, eclass.subscribers, pupa(config.messages.remindClassPrivateNotification, eclass));
-
   // Alert the professor
   const professor = await guild.members.fetch({ user: eclass.professor, cache: false }).catch(nullop);
   const beforeChecklist = [
@@ -302,6 +292,16 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
       notIsRecorded: (!eclass.isRecorded).toString(),
     }),
   ).catch(nullop);
+
+  // Send the notification to the eclass channel
+  await classChannel.send(
+    pupa(config.messages.remindClassNotification, {
+      classRole: eclass.classRole,
+      duration: dayjs.duration(settings.configuration.eclassReminderTime).humanize(),
+    }),
+  );
+  // Send the private message to the subscribers
+  await massSend(guild, eclass.subscribers, pupa(config.messages.remindClassPrivateNotification, eclass));
 
   // Mark the reminder as sent
   await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
