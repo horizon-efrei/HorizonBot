@@ -155,6 +155,10 @@ export const eclass = {
       abortMenu: {
         label: 'Abandonner',
       },
+      errors: {
+        main: 'Oups, une erreur est survenue lors de cette action :confused:\n> {details}',
+        noSubjects: "Aucune matière n'existe pour cette année là.",
+      },
     },
 
     // Edit subcommand

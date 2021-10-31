@@ -8,12 +8,11 @@ import {
   MessageEmbed,
   MessageSelectMenu,
 } from 'discord.js';
-import type { Message, SelectMenuInteraction } from 'discord.js';
+import type { Message, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
 import { MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
 import { eclass as config } from '@/config/commands/professors';
-import messages from '@/config/messages';
 import settings from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
 import Subject from '@/models/subject';
@@ -21,7 +20,6 @@ import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
 import type { SubjectDocument } from '@/types/database';
-import { noop } from '@/utils';
 
 const schoolYearMenu = new MessageSelectMenu()
   .setCustomId('select-schoolyear')
@@ -110,11 +108,8 @@ export default class EclassInteractiveBuilder {
     const collector = this.mainBotMessage.createMessageComponentCollector({
       componentType: MessageComponentTypes.BUTTON,
     }).on('collect', async (interaction) => {
-        if (interaction.customId === 'abort') {
-          this.aborted = true;
-          await interaction.update({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
-          await this.botMessagePrompt.edit(config.messages.prompts.stoppedPrompting);
-        }
+        if (interaction.customId === 'abort')
+          await this._abort(config.messages.prompts.stoppedPrompting, interaction);
       });
 
     try {
@@ -123,17 +118,23 @@ export default class EclassInteractiveBuilder {
       if (this.aborted)
         return;
 
-      await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
       if (err instanceof Error && err.name.includes('INTERACTION_COLLECTOR_ERROR')) {
-        await this.botMessagePrompt.edit(config.messages.prompts.promptTimeout);
+        await this._abort(config.messages.prompts.promptTimeout);
         return;
       }
 
-      this.botMessagePrompt.edit(messages.global.oops).catch(noop);
-      throw err;
+      const details = err instanceof Error ? err.message
+        : typeof err === 'string' ? err
+        : JSON.stringify(err);
+
+      await this._abort(pupa(config.messages.createClassSetup.errors.main, { details }));
+      return;
     } finally {
       collector.stop();
     }
+
+    if (this.aborted)
+      return;
 
     await this.mainBotMessage.edit({
       embeds: [this._embed.setColor(settings.colors.green).spliceFields(1, 1)],
@@ -151,7 +152,10 @@ export default class EclassInteractiveBuilder {
 
     // 2. Ask for the subject
     const subjects = await Subject.find({ schoolYear });
-    const subjectInteraction = await this._makeSelectMenuStep(getSubjectMenu(subjects));
+    const subjectMenu = getSubjectMenu(subjects);
+    if (subjectMenu.options.length === 0)
+      throw new Error(config.messages.createClassSetup.errors.noSubjects);
+    const subjectInteraction = await this._makeSelectMenuStep(subjectMenu);
 
     const selectedSubjectCode = subjectInteraction.values.shift();
     this.responses.subject = subjects.find(subject => subject.classCode === selectedSubjectCode);
@@ -223,13 +227,24 @@ export default class EclassInteractiveBuilder {
     return result;
   }
 
-  private async _updateStep(interaction?: SelectMenuInteraction): Promise<void> {
+  private async _updateStep(interaction?: MessageComponentInteraction): Promise<void> {
     this.step++;
     // eslint-disable-next-line unicorn/prefer-ternary
     if (interaction)
       await interaction.update({ embeds: [this._embed], components: this._actionRows });
     else
       await this.mainBotMessage.edit({ embeds: [this._embed], components: this._actionRows });
+  }
+
+  private async _abort(text: string, interaction?: MessageComponentInteraction): Promise<void> {
+    this.aborted = true;
+    await this.botMessagePrompt.edit(text);
+
+    // eslint-disable-next-line unicorn/prefer-ternary
+    if (interaction)
+      await interaction.update({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
+    else
+      await this.mainBotMessage.edit({ embeds: [this._embed.setColor(settings.colors.orange)], components: [] });
   }
 
   private _buildStepsPreview(): string {
