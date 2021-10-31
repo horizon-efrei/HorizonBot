@@ -185,7 +185,7 @@ export default {
     header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
     noClasses: 'Aucune séance de prévue !',
     today: " (Aujourd'hui)",
-    classLine: '• ({eclass.subject.schoolYear}) {beginHour}h-{endHour}h: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
+    classLine: '• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
   },
   classesCalendar: {
     title: "Calendrier des cours sur Ef'Réussite",
@@ -201,13 +201,13 @@ export default {
     swearModAlert: stripIndent`
       {message.member} a dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte. Si ce message est inapproprié, réagissez avec :white_check_mark: à ce message pour le flagger.
 
-      Apperçu du message ({message.url}) :
+      Aperçu du message ({message.url}) :
       > {preview}
     `,
     manualSwearAlert: stripIndent`
-      {message.member} à envoyé un message jugé innaproprié par {manualModerator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.
+      {message.member} a envoyé un message jugé innaproprié par {manualModerator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.
 
-      Apperçu du message ({message.url}) :
+      Aperçu du message ({message.url}) :
       > {preview}
     `,
     swearModAlertUpdate: stripIndent`
@@ -228,7 +228,7 @@ export default {
       possible. Merci !\n{message.url}
     `,
     swearManualUserAlert: oneLine`
-      Bonjour {message.member}, je suis le bot du discord de révision Ef'Réussite. Tu as tenu un propos innaproprié
+      Bonjour {message.member}, je suis le bot du Discord de révision Ef'Réussite. Tu as tenu un propos innaproprié
       dans {message.channel}. On s'efforce à garder ce serveur sérieux et amical, nous t'invitons donc à supprimer
       ce message ou enlever cette insulte le plus rapidement possible. Merci !\n{message.url}
     `,
