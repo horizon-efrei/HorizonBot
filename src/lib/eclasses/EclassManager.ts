@@ -265,6 +265,9 @@ export async function setRecordLink(eclass: EclassPopulatedDocument, link: strin
 }
 
 export async function remindClass(eclass: EclassPopulatedDocument): Promise<void> {
+  // Mark the reminder as sent
+  await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
+
   // Resolve the associated channel
   const guild = container.client.guilds.resolve(eclass.guild);
   const classChannel = guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
@@ -302,9 +305,6 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
   );
   // Send the private message to the subscribers
   await massSend(guild, eclass.subscribers, pupa(config.messages.remindClassPrivateNotification, eclass));
-
-  // Mark the reminder as sent
-  await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
 
   container.logger.debug(`[e-class:${eclass.classId}] Sent reminders.`);
 }
