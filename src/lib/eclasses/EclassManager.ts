@@ -312,6 +312,8 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
 export async function subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
   if (eclass.status !== EclassStatus.Planned)
     return;
+  if (eclass.professor === member.id)
+    return;
 
   const givenRole = member.guild.roles.cache.get(eclass.classRole);
   if (!givenRole) {

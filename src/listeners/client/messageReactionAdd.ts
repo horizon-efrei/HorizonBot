@@ -125,7 +125,7 @@ export default class MessageReactionAddListener extends Listener {
   }
 
   private async _handleEclassRole(
-    _reaction: MessageReaction,
+    reaction: MessageReaction,
     member: GuildMember,
     message: GuildMessage,
   ): Promise<void> {
@@ -135,7 +135,11 @@ export default class MessageReactionAddListener extends Listener {
       return;
     }
 
-    await EclassManager.subscribeMember(member, document);
+    // eslint-disable-next-line unicorn/prefer-ternary
+    if (document.professor === member.id)
+      await reaction.users.remove(member);
+    else
+      await EclassManager.subscribeMember(member, document);
   }
 
   private async _handleModeratorFlag(

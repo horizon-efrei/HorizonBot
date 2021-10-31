@@ -83,11 +83,7 @@ export default class MessageReactionRemoveListener extends Listener {
     message: GuildMessage,
   ): Promise<void> {
     const document = await Eclass.findOne({ announcementMessage: message.id });
-    if (!document) {
-      this.container.client.reactionRolesIds.delete(message.id);
-      return;
-    }
-
-    await EclassManager.unsubscribeMember(member, document);
+    if (document?.subscribers.includes(member.id))
+      await EclassManager.unsubscribeMember(member, document);
   }
 }
