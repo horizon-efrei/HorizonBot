@@ -1,6 +1,5 @@
 import { Listener } from '@sapphire/framework';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
-import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
 
@@ -16,14 +15,5 @@ export default class MessageUpdateListener extends Listener {
       guildId: newMessage.guild.id,
       severity: 1,
     });
-
-    // Swearing check
-    const flaggedMessage = this.container.client.waitingFlaggedMessages.find(msg => msg.message.id === newMessage.id);
-    const swear = FlaggedMessage.getSwear(newMessage);
-
-    if (flaggedMessage && !swear)
-      await flaggedMessage.remove();
-    else if (!flaggedMessage && swear)
-      await new FlaggedMessage(newMessage, { swear }).start();
   }
 }

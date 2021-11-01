@@ -8,7 +8,6 @@ import ReactionRole from '@/models/reactionRole';
 import Reminders from '@/models/reminders';
 import Tags from '@/models/tags';
 import ConfigurationManager from '@/structures/ConfigurationManager';
-import type FlaggedMessage from '@/structures/FlaggedMessage';
 import TaskStore from '@/structures/tasks/TaskStore';
 import type { LogStatusesBase, ReminderDocument, TagDocument } from '@/types/database';
 import { DiscordLogType, LogStatuses as LogStatusesEnum } from '@/types/database';
@@ -19,7 +18,6 @@ export default class HorizonClient extends SapphireClient {
   remainingCompilerApiCredits = 0;
   reactionRolesIds: Set<string>;
   eclassRolesIds: Set<string>;
-  waitingFlaggedMessages: FlaggedMessage[];
   intersectionRoles: Set<string>;
   tags: Set<TagDocument>;
   reminders: Set<ReminderDocument>;
@@ -48,7 +46,6 @@ export default class HorizonClient extends SapphireClient {
 
     this.stores.register(new TaskStore());
 
-    this.waitingFlaggedMessages = [];
     this.intersectionRoles = new Set();
     this.logStatuses = new Collection();
     void this._loadCompilerApiCredits();

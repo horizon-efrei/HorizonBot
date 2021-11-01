@@ -3,10 +3,8 @@ import type { ListenerOptions } from '@sapphire/framework';
 import { Listener } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import Eclass from '@/models/eclass';
-import FlaggedMessageDB from '@/models/flaggedMessage';
 import ReactionRole from '@/models/reactionRole';
-import FlaggedMessage from '@/structures/FlaggedMessage';
-import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
+import { EclassStatus } from '@/types/database';
 
 @ApplyOptions<ListenerOptions>({ once: true })
 export default class ReadyListener extends Listener {
@@ -47,31 +45,6 @@ export default class ReadyListener extends Listener {
           await ReactionRole.findByIdAndDelete(eclass._id);
           this.container.client.reactionRolesIds.delete(eclass.announcementMessage);
         });
-    }
-
-    this.container.logger.info('[Anti Swear] Caching alert messages...');
-    let flaggedMessages = await FlaggedMessageDB.find({ approved: false });
-    for (const flaggedMessage of flaggedMessages) {
-      // TODO: Improve the "remove-if-fail" logic. What if the channel was deleted? What if we just don't have perm?
-      const logChannel = await this.container.client.configManager.get(
-        ConfigEntriesChannels.ModeratorFeedback,
-        flaggedMessage.guildId,
-      );
-      logChannel?.messages.fetch(flaggedMessage.alertMessageId)
-        .catch(async () => {
-          // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
-          await FlaggedMessageDB.findByIdAndDelete(flaggedMessage._id);
-          flaggedMessages = flaggedMessages.filter(msg => msg._id !== flaggedMessage._id);
-          this.container.client.waitingFlaggedMessages = this.container.client.waitingFlaggedMessages
-            .filter(elt => elt.message.id !== flaggedMessage.messageId);
-        });
-    }
-
-    // TODO: Do we even need to parse them all now?
-    // FIXME: dont await each in the loop, parse them all in parallel and bulk-add them after.
-    for (const flaggedMessage of flaggedMessages) {
-      const parsedFlaggedMessage = await FlaggedMessage.fromDocument(flaggedMessage);
-      this.container.client.waitingFlaggedMessages.push(parsedFlaggedMessage);
     }
 
     this.container.logger.info('All caching done!');

@@ -62,11 +62,6 @@ export default class MessageReactionAddListener extends Listener {
       && reaction.emoji.name === settings.emojis.yes)
       await this._handleEclassRole(reaction, member, message);
 
-    // If we are reacting to a flag message alert
-    if (this.container.client.waitingFlaggedMessages.some(msg => msg.alertMessage.id === reaction.message.id)
-      && reaction.emoji.name === settings.emojis.yes)
-      await this._handleModeratorFlag(reaction, member, message);
-
     // If we want to flag a question to call a professor
     if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagNeededAnswer)
       await this._handleEprofFlag(reaction, member, message);
@@ -77,7 +72,7 @@ export default class MessageReactionAddListener extends Listener {
     member: GuildMember,
     message: GuildMessage,
   ): Promise<void> {
-    await new FlaggedMessage(message, { manualModerator: member }).start(true);
+    await new FlaggedMessage(message, member).start();
   }
 
   private async _handleReactionRole(
@@ -140,25 +135,6 @@ export default class MessageReactionAddListener extends Listener {
       await reaction.users.remove(member);
     else
       await EclassManager.subscribeMember(member, document);
-  }
-
-  private async _handleModeratorFlag(
-    reaction: MessageReaction,
-    member: GuildMember,
-    message: GuildMessage,
-  ): Promise<void> {
-    // Wait for a moderator to approve the suppression of the message
-    if (reaction.emoji.name !== settings.emojis.yes)
-      return;
-
-    const flagMessage = this.container.client.waitingFlaggedMessages.find(msg => msg.alertMessage.id === message.id);
-    try {
-      await flagMessage.approve(member);
-    } catch (error: unknown) {
-      this.container.logger.error('[Anti Swear] An error occured while trying to confirm a flagged message.');
-      this.container.logger.error(error);
-      flagMessage.alertMessage.channel.send(messages.global.oops).catch(noop);
-    }
   }
 
   private async _handleEprofFlag(

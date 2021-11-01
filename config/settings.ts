@@ -14,7 +14,6 @@ export default {
     gray: '#4f4f4f' as ColorResolvable,
   },
   configuration: {
-    swears: ['putain', 'con', 'connard', 'fdp', 'pute', 'putes'],
     stop: new Set(['stop', 'cancel', 'retour']),
     booleanTruths: ['oui', 'o', 'yes', 'y', 'vrai', 'v', 'true', 't'],
     booleanFalses: ['non', 'no', 'n', 'faux', 'f', 'false'],

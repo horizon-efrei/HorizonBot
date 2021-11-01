@@ -198,41 +198,18 @@ export default {
     classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic}',
   },
   antiSwear: {
-    swearModAlert: stripIndent`
-      {message.member} a dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte. Si ce message est inapproprié, réagissez avec :white_check_mark: à ce message pour le flagger.
+    swearModeratorAlert: stripIndent`
+      {message.member} a envoyé un message jugé innaproprié par {moderator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.
 
       Aperçu du message ({message.url}) :
       > {preview}
     `,
-    manualSwearAlert: stripIndent`
-      {message.member} a envoyé un message jugé innaproprié par {manualModerator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.
-
-      Aperçu du message ({message.url}) :
-      > {preview}
-    `,
-    swearModAlertUpdate: stripIndent`
-      *~~{message.member} à dit "{swear}" dans {message.channel} et j'ai detecté cela comme une insulte.~~*
-      {moderator} a flaggé ce message et l'utilisateur a été sommé en MP.
-
-      Apperçu du message ({message.url}) :
-      > {preview}
-    `,
-    swearUserAlert: oneLine`
-      Bonjour {message.member}, je suis le bot du Discord de révision Ef'Réussite. Tu as tenu un propos innaproprié
-      ("{swear}") dans {message.channel}. On s'efforce à garder ce serveur sérieux et amical, nous t'invitons donc à
-      supprimer ce message ou enlever cette insulte le plus rapidement possible. Merci !\n{message.url}
-    `,
-    swearUserAlertPublic: oneLine`
-      Bonjour {message.member}. Tu as tenu un propos innaproprié ("{swear}") dans ce salon. On s'efforce à garder ce
-      serveur sérieux et amical, nous t'invitons donc à supprimer ce message ou enlever cette insulte le plus rapidement
-      possible. Merci !\n{message.url}
-    `,
-    swearManualUserAlert: oneLine`
+    swearUserAlertPrivate: oneLine`
       Bonjour {message.member}, je suis le bot du Discord de révision Ef'Réussite. Tu as tenu un propos innaproprié
       dans {message.channel}. On s'efforce à garder ce serveur sérieux et amical, nous t'invitons donc à supprimer
       ce message ou enlever cette insulte le plus rapidement possible. Merci !\n{message.url}
     `,
-    swearManualUserAlertPublic: oneLine`
+    swearUserAlertPublic: oneLine`
       Bonjour {message.member}. Tu as tenu un propos innaproprié dans ce salon. On s'efforce à garder ce serveur
       sérieux et amical, nous t'invitons donc à supprimer ce message ou enlever cette insulte le plus rapidement possible.
       Merci !\n{message.url}

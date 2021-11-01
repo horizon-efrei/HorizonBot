@@ -2,9 +2,8 @@ import { Listener } from '@sapphire/framework';
 import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
-import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
-import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
+import { DiscordLogType } from '@/types/database';
 
 const discordInviteLinkRegex = /(?:https?:\/\/)?(?:www\.)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)(?<code>[\w\d-]{2,})/gimu;
 
@@ -51,11 +50,5 @@ export default class MessageListener extends Listener {
         );
       }
     }
-
-    // Swearing check
-    const swear = settings.configuration.swears.find(swr => message.cleanContent.split(' ').includes(swr));
-    const staffRole = await this.container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
-    if (swear && !message.member.roles.cache.has(staffRole.id))
-      await new FlaggedMessage(message, { swear }).start();
   }
 }

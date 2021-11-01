@@ -192,12 +192,7 @@ export interface FlaggedMessageBase {
   channelId: string;
   messageId: string;
   authorId: string;
-  alertMessageId?: string;
-  swear?: string;
-  isManual?: boolean;
-  manualModeratorId?: string;
-  approved: boolean;
-  approvedDate: number;
+  moderatorId: string;
 }
 
 /** Interface for the "FlaggedMessage"'s mongoose document */

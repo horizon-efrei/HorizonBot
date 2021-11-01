@@ -18,26 +18,9 @@ const FlaggedMessageSchema = new Schema<FlaggedMessageDocument, FlaggedMessageMo
     type: String,
     required: true,
   },
-  alertMessageId: {
+  moderatorId: {
     type: String,
-  },
-  swear: {
-    type: String,
-  },
-  isManual: {
-    type: Boolean,
-    default: false,
-  },
-  manualModeratorId: {
-    type: String,
-  },
-  approved: {
-    type: Boolean,
-    default: false,
-  },
-  approvedDate: {
-    type: Number,
-    default: 0,
+    required: true,
   },
 }, { timestamps: true });
 
