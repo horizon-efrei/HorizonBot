@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2021/10/21
+
+### Added
+
+- Add a check to prevent professors to subscribe to their own eclass
+- Ensure the professor's reminder is sent first
+- Add a top-board when no arguments to `vocalcount`
+
+### Improved
+
+- Update GitHub URL for new organization's name (`EFREI-Horizon` -> `horizon-teamdev`)
+- Remove automatic swear detection
+
+### Fixed
+
+- Fixed reminders sending twice if it took more than 2 minutes to send them all
+- Fix some errors in EclassInteractiveBuilder, and catch unexpected errors more efficiently
+- Fix various typos
+- Update GitHub's CI secret's name
+
+
 ## [0.4.0] - 2021/10/21
 
 ### Added
