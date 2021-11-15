@@ -165,8 +165,19 @@ export default class ArgumentPrompter {
       'message',
       { timeout: 2 * 60 * 1000, explicitReturn: true, editMessage: this._options?.baseMessage },
     );
-    const { response, appliedMessage } = await handler
-      .run(this._message.channel, this._message.author) as PrompterMessageResult;
+    // FIXME: Yeahh.... We might want to refactor this. Every minute that goes by with this code
+    // in production kills a koala.
+    let response: GuildMessage;
+    let appliedMessage: GuildMessage;
+    try {
+      const result = await handler.run(this._message.channel, this._message.author) as PrompterMessageResult;
+      response = result.response;
+      appliedMessage = result.appliedMessage;
+    } catch (err: unknown) {
+      if (err instanceof Map && err.size === 0)
+        throw new Error('TIME OUT');
+      throw err;
+    }
     if (this._options?.messageArray)
       this._options.messageArray.addAll(response, appliedMessage);
 

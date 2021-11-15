@@ -118,8 +118,14 @@ export default class EclassInteractiveBuilder {
       if (this.aborted)
         return;
 
-      if (err instanceof Error && err.name.includes('INTERACTION_COLLECTOR_ERROR')) {
+      // FIXME: Bruh this error management is so disgusting it makes me wanna throw please refactor that ASAP
+      if (err instanceof Error && (err.name.includes('INTERACTION_COLLECTOR_ERROR') || err.message === 'TIME OUT')) {
         await this._abort(config.messages.prompts.promptTimeout);
+        return;
+      }
+
+      if (err instanceof Error && err.message === 'STOP') {
+        await this._abort(config.messages.prompts.stoppedPrompting);
         return;
       }
 
@@ -206,9 +212,9 @@ export default class EclassInteractiveBuilder {
   >(
     prompter: Key,
     prompts: PrompterText,
-    validator: (resolved: TResult) => boolean = (): boolean => true,
+    validator = (_resolved: TResult): boolean => true,
   ): Promise<TResult> {
-    let result;
+    let result: TResult;
     let previousIsFailure = false;
     do {
       result = await this.prompter[prompter](prompts, previousIsFailure) as TResult;
@@ -249,24 +255,24 @@ export default class EclassInteractiveBuilder {
 
   private _buildStepsPreview(): string {
     return pupa(config.messages.createClassSetup.stepPreview, {
-        schoolYear: this.responses.subject?.schoolYear ?? this._emoteForStep(0),
-        subject: this.responses.subject?.name ?? this._emoteForStep(1),
-        topic: this.responses.topic ?? this._emoteForStep(2),
-        date: this.responses.date && this.step === 3
-          ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDate)
-          : this.responses.date
-            ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDateTime)
-            : this._emoteForStep(3),
-        duration: this.responses.duration
-          ? dayjs.duration(this.responses.duration).humanize()
-          : this._emoteForStep(4),
-          professor: this.responses.professor ?? this._emoteForStep(5),
-          role: this.responses.targetRole ?? this._emoteForStep(6),
-        isRecorded: isNullish(this.responses.isRecorded)
-          ? this._emoteForStep(7)
-          : this.responses.isRecorded
-            ? 'Oui :white_check_mark:'
-            : 'Non :x:',
+      schoolYear: this.responses.subject?.schoolYear ?? this._emoteForStep(0),
+      subject: this.responses.subject?.name ?? this._emoteForStep(1),
+      topic: this.responses.topic ?? this._emoteForStep(2),
+      date: this.responses.date && this.step === 3
+        ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDate)
+        : this.responses.date
+          ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDateTime)
+          : this._emoteForStep(3),
+      duration: this.responses.duration
+        ? dayjs.duration(this.responses.duration).humanize()
+        : this._emoteForStep(4),
+        professor: this.responses.professor ?? this._emoteForStep(5),
+        role: this.responses.targetRole ?? this._emoteForStep(6),
+      isRecorded: isNullish(this.responses.isRecorded)
+        ? this._emoteForStep(7)
+        : this.responses.isRecorded
+          ? 'Oui :white_check_mark:'
+          : 'Non :x:',
     });
   }
 
