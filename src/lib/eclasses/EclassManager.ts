@@ -260,16 +260,23 @@ export async function setRecordLink(eclass: EclassPopulatedDocument, link: strin
 
   // Update its embed
   const announcementEmbed = announcementMessage.embeds[0];
-  announcementEmbed.fields
-    .find(field => field.name === config.messages.newClassEmbed.recorded)
-    .value += pupa(config.messages.newClassEmbed.recordedLink, { link });
+  const recordField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
+
+  const baseValue = config.messages.newClassEmbed.recordedValues[Number(eclass.isRecorded)];
+  const linkValue = pupa(config.messages.newClassEmbed.recordedLink, { link });
+  recordField.value = `${baseValue}\n${linkValue}`;
+
   await announcementMessage.edit({ embeds: [announcementEmbed] });
 
   // Send the link in the corresponding text channel
   const classChannel = container.client
     .guilds.resolve(eclass.guild)
     .channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
-  await classChannel.send(pupa(config.messages.linkAnnouncement, { link }));
+  await classChannel.send(pupa(config.messages.linkAnnouncement, {
+    topic: eclass.topic,
+    date: dayjs(eclass.date).format(settings.configuration.dateFormat),
+    link,
+  }));
 
   // Store the link in the DB
   await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
@@ -364,4 +371,4 @@ export async function unsubscribeMember(member: GuildMember, eclass: EclassPopul
 
 export function validateDate(date: Date): boolean {
   return dayjs(date).isBetween(dayjs(), dayjs().add(2, 'months'));
-  }
+}

@@ -96,7 +96,7 @@ export const eclass = {
       professor: 'Professeur',
       recorded: 'Enregistré',
       recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
-      recordedLink: '\n[Lien]({link})',
+      recordedLink: '[Lien]({link})',
       footer: 'ID : {classId}',
     },
 
@@ -245,7 +245,7 @@ export const eclass = {
     // Record subcommand
     recordLink: "Le lien d'enregistrement de ce cours est <{link}>.",
     noRecordLink: "Il n'y a pas de lien d'enregistrement disponible pour ce cours !",
-    linkAnnouncement: "L'enregistrement du cours a été publié sur ce lien : <{link}> !",
+    linkAnnouncement: "L'enregistrement du cours \"{topic}\" ({date}) a été publié sur ce lien : <{link}> !",
     successfullyAddedLink: 'Le lien a bien été ajouté au cours !',
 
     // Subscribing
