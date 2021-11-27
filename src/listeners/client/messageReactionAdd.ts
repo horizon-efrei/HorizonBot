@@ -51,7 +51,7 @@ export default class MessageReactionAddListener extends Listener {
     const staffRole = await this.container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
     if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagMessageReaction
       && member.roles.cache.has(staffRole.id))
-      await this._flagMessage(reaction, member, message);
+      await this._handleModFlag(reaction, member, message);
 
     // If we are reacting to a reaction role
     if (this.container.client.reactionRolesIds.has(reaction.message.id))
@@ -67,12 +67,13 @@ export default class MessageReactionAddListener extends Listener {
       await this._handleEprofFlag(reaction, member, message);
   }
 
-  private async _flagMessage(
+  private async _handleModFlag(
     _reaction: MessageReaction,
     member: GuildMember,
     message: GuildMessage,
   ): Promise<void> {
-    await new FlaggedMessage(message, member).start();
+    if (member.id !== message.author.id)
+      await new FlaggedMessage(message, member).start();
   }
 
   private async _handleReactionRole(
