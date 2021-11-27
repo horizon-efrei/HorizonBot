@@ -6,13 +6,13 @@ import DiscordLogs from '@/models/discordLogs';
 import * as CustomResolvers from '@/resolvers';
 import type { DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
-import { trimText } from '@/utils';
+import { makeMessageLink, trimText } from '@/utils';
 
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
 
 type DiscordLogWithMessageContext = DiscordLogBase & ({ context: { channelId: string; messageId: string } });
 const getMessageUrl = <T extends DiscordLogWithMessageContext>(payload: T): string =>
-  `https://discord.com/channels/${payload.guildId}/${payload.context.channelId}/${payload.context.messageId}`;
+  makeMessageLink(payload.guildId, payload.context.channelId, payload.context.messageId);
 
 export function getContentValue(payload: DiscordLogBase): string {
   const guild = container.client.guilds.cache.get(payload.guildId);

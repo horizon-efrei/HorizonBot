@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import type { ReactionRoleDocument, ReactionRoleModel } from '@/types/database';
+import { makeMessageLink } from '@/utils';
 
 const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
   messageId: {
@@ -29,7 +30,7 @@ const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
 }, { timestamps: true });
 
 ReactionRoleSchema.methods.getMessageUrl = function (this: ReactionRoleDocument): string {
-  return `https://discord.com/channels/${this.guildId}/${this.channelId}/${this.messageId}`;
+  return makeMessageLink(this.guildId, this.channelId, this.messageId);
 };
 
 export default model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);
