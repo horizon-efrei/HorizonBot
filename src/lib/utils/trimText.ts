@@ -5,5 +5,7 @@
  * @returns The trimmed text
  */
 export default function trimText(text: string, n = 500): string {
-  return text.length > n ? `${text.slice(0, n)}...` : text;
+  if (n < 3)
+    throw new RangeError('trimText requires at least 3 characters');
+  return text.length > n ? `${text.slice(0, n - 3).trimEnd()}...` : text;
 }
