@@ -2,6 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Args, Resolvers } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import { oneLine } from 'common-tags';
 import dayjs from 'dayjs';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
@@ -15,10 +16,15 @@ import * as EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
-import { GuildMessage } from '@/types';
 import type { GuildTextBasedChannel } from '@/types';
+import { GuildMessage } from '@/types';
 import { EclassPopulatedDocument, EclassStatus } from '@/types/database';
-import { capitalize, generateSubcommands, nullop } from '@/utils';
+import {
+  capitalize,
+  generateSubcommands,
+  makeMessageLink,
+  nullop,
+} from '@/utils';
 
 const listOptions = {
   status: ['status', 'statut', 's'],
@@ -44,6 +50,7 @@ const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]>
     cancel: { aliases: ['archive'] },
     finish: { aliases: ['end', 'stop'] },
     record: { aliases: ['enregistrement', 'link', 'lien', 'replay', 'recording'] },
+    show: { aliases: ['info', 'infos', 'information', 'informations'] },
   }),
 })
 export default class EclassCommand extends HorizonSubCommand {
@@ -346,6 +353,37 @@ export default class EclassCommand extends HorizonSubCommand {
     // Change the URL & confirm
     await EclassManager.setRecordLink(eclass, link.value.toString());
     await message.channel.send(config.messages.successfullyAddedLink);
+  }
+
+  @ValidateEclassArgument()
+  public async show(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
+    const announcementChannel = await this.container.client.configManager
+      .get(eclass.announcementChannel, eclass.guild);
+
+    const messageLink = makeMessageLink(eclass.guild, announcementChannel.id, eclass.announcementMessage);
+    const capitalizedStatus = capitalize(config.messages.rawStatuses[eclass.status]);
+    const recordedText = oneLine`
+      ${config.messages.recordedValues[Number(eclass.isRecorded)]}
+      ${eclass.recordLink ? pupa(config.messages.recordedLink, eclass) : ''}
+    `;
+
+    const texts = config.messages.showEmbed;
+    const embed = new MessageEmbed()
+      .setColor(settings.colors.primary)
+      .setTitle(pupa(texts.title, eclass))
+      .addField(texts.subjectName, pupa(texts.subjectValue, eclass), true)
+      .addField(texts.statusName, pupa(texts.statusValue, { ...eclass, status: capitalizedStatus }), true)
+      .addField(texts.dateName, pupa(texts.dateValue, {
+          ...eclass,
+          ...eclass.normalizeDates(true),
+        }),
+        true)
+      .addField(texts.professorName, pupa(texts.professorValue, eclass), true)
+      .addField(texts.recordedName, pupa(texts.recordedValue, { ...eclass, recorded: recordedText }), true)
+      .addField(texts.relatedName, pupa(texts.relatedValue, { ...eclass, messageLink }), true);
+
+    // Change the URL & confirm
+    await message.channel.send({ embeds: [embed] });
   }
 
   public async list(message: GuildMessage, args: Args): Promise<void> {

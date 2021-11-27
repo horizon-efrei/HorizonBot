@@ -16,8 +16,8 @@ export const eclass = {
       Pour plus d'informations sur comment utiliser cette commande, faites \`!cours help\`.
     `,
     enabled: true,
-    usage: 'cours <create | start | finish | edit | cancel | list | help>',
-    examples: ['!cours setup', '!cours list', '!cours start pierre_232623082021_jneh'],
+    usage: 'cours <create | start | finish | edit | cancel | list | info | help>',
+    examples: ['!cours setup', '!cours list', '!cours start pierre_230023082021_jneh'],
   },
   messages: {
     // Global
@@ -41,6 +41,7 @@ export const eclass = {
       [EclassStatus.Finished]: 'terminé',
       [EclassStatus.Canceled]: 'annulé',
     },
+    recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
 
     // Help subcommand
     helpEmbedTitle: 'Aide de la commande de cours',
@@ -61,6 +62,7 @@ export const eclass = {
         `,
       },
       { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
+      { name: 'Informations sur un cours', value: '`!cours info <ID-cours>`' },
       { name: "Page d'aide", value: '`!cours help`' },
     ],
 
@@ -87,6 +89,7 @@ export const eclass = {
     alreadyExists: 'Ce cours (même matière, sujet, heure, jour) a déjà été prévu !',
     newClassNotification: ':bell: {targetRole}, un nouveau cours a été plannifié ! :arrow_heading_down:',
 
+    recordedLink: '[Lien]({recordLink})',
     newClassEmbed: {
       title: '{subject.name} - {topic}',
       description: "Un nouveau cours en {classChannel} a été planifié sur Ef'Réussite !\nRéagis avec :white_check_mark: pour être notifié du cours !",
@@ -95,8 +98,6 @@ export const eclass = {
       duration: 'Durée prévue',
       professor: 'Professeur',
       recorded: 'Enregistré',
-      recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
-      recordedLink: '[Lien]({link})',
       footer: 'ID : {classId}',
     },
 
@@ -247,6 +248,23 @@ export const eclass = {
     noRecordLink: "Il n'y a pas de lien d'enregistrement disponible pour ce cours !",
     linkAnnouncement: "L'enregistrement du cours \"{topic}\" ({date}) a été publié sur ce lien : <{link}> !",
     successfullyAddedLink: 'Le lien a bien été ajouté au cours !',
+
+    // Show subcommand
+    showEmbed: {
+      title: '{topic}',
+      subjectName: 'Matière',
+      subjectValue: '`{subject.classCode}`: {subject.name} ({subject.teachingUnit})',
+      statusName: 'Statut du cours',
+      statusValue: '{status}.',
+      dateName: 'Date',
+      dateValue: '<t:{date}:D>, <t:{date}:R>\nDe <t:{date}:t> à <t:{end}:t>, dure {duration}.',
+      professorName: 'Professeur',
+      professorValue: '<@{professor}>',
+      recordedName: 'Enregistré',
+      recordedValue: '{recorded}',
+      relatedName: 'Autres données associées',
+      relatedValue: "Rôle visé : <@&{targetRole}>\n[Message d'annonce]({messageLink})",
+    },
 
     // Subscribing
     subscribed: "Tu t'es bien inscrit au cours de \"{topic}\" ({subject.name}) ! Je te le rappellerai un peu avant :)",

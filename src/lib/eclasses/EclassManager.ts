@@ -56,7 +56,7 @@ export function createAnnouncementEmbed({
     .addField(texts.date, formattedDate, true)
     .addField(texts.duration, dayjs.duration(duration).humanize(), true)
     .addField(texts.professor, professor.toString(), true)
-    .addField(texts.recorded, texts.recordedValues[Number(isRecorded)], true)
+    .addField(texts.recorded, config.messages.recordedValues[Number(isRecorded)], true)
     .setFooter(pupa(texts.footer, { classId }));
 }
 
@@ -252,7 +252,7 @@ export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void
   container.logger.debug(`[e-class:${eclass.classId}] Canceled class.`);
 }
 
-export async function setRecordLink(eclass: EclassPopulatedDocument, link: string): Promise<void> {
+export async function setRecordLink(eclass: EclassPopulatedDocument, recordLink: string): Promise<void> {
   // Fetch the announcement message
   const announcementChannel = await container.client.configManager
     .get(eclass.announcementChannel, eclass.guild);
@@ -262,8 +262,8 @@ export async function setRecordLink(eclass: EclassPopulatedDocument, link: strin
   const announcementEmbed = announcementMessage.embeds[0];
   const recordField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
 
-  const baseValue = config.messages.newClassEmbed.recordedValues[Number(eclass.isRecorded)];
-  const linkValue = pupa(config.messages.newClassEmbed.recordedLink, { link });
+  const baseValue = config.messages.recordedValues[Number(eclass.isRecorded)];
+  const linkValue = pupa(config.messages.recordedLink, { recordLink });
   recordField.value = `${baseValue}\n${linkValue}`;
 
   await announcementMessage.edit({ embeds: [announcementEmbed] });
@@ -275,11 +275,11 @@ export async function setRecordLink(eclass: EclassPopulatedDocument, link: strin
   await classChannel.send(pupa(config.messages.linkAnnouncement, {
     topic: eclass.topic,
     date: dayjs(eclass.date).format(settings.configuration.dateFormat),
-    link,
+    link: recordLink,
   }));
 
   // Store the link in the DB
-  await Eclass.findByIdAndUpdate(eclass._id, { recordLink: link });
+  await Eclass.findByIdAndUpdate(eclass._id, { recordLink });
 
   container.logger.debug(`[e-class:${eclass.classId}] Added record link.`);
 }
