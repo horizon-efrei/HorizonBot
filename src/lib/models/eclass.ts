@@ -2,12 +2,14 @@ import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import { model, Schema } from 'mongoose';
 import autopopulate from 'mongoose-autopopulate';
-import { nanoid } from 'nanoid';
+import { customAlphabet, urlAlphabet } from 'nanoid';
 import slug from 'slug';
 import { eclass as eclassConfig } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import type { EclassDocument, EclassModel, PrettyEclass } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
+
+const nanoid = customAlphabet(urlAlphabet.replace(/[_-]/, ''), 4);
 
 const EclassSchema = new Schema<EclassDocument, EclassModel>({
   classId: {
@@ -84,13 +86,11 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
 }, { timestamps: true });
 
 
-EclassSchema.statics.generateId = function (professor: GuildMember, date: Date): string {
-  return [
-    slug(professor.displayName, '_'),
-    dayjs(date).format('HHmmDDMMYYYY'),
-    nanoid(4),
-  ].join('_');
-};
+EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string => [
+  slug(professor.displayName.replace(/\s+/, ''), '_'),
+  dayjs(date).format('HHmmDDMMYYYY'),
+  nanoid(),
+].join('_');
 
 EclassSchema.methods.toData = function (): PrettyEclass {
   // eslint-disable-next-line @typescript-eslint/naming-convention
