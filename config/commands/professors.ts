@@ -51,16 +51,7 @@ export const eclass = {
       { name: 'Terminer un cours manuellement', value: '`!cours finish <ID-cours>`' },
       { name: 'Modifier un cours', value: '`!cours edit <ID-cours> <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
       { name: 'Annuler un cours', value: '`!cours cancel <ID-cours>`' },
-      {
-        name: 'Liste des cours',
-        value: stripIndent`
-          \`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]\`
-          • \`--statut\` (ou \`-s\`) : Filtrer par le statut du cours (\`planned\`/\`prévu\`/\`p\`, \`progress\`/\`r\`/\`encours\`/\`e\`, \`finished\`/\`f\`/\`terminé\`/\`t\`, \`canceled\`/\`c\`/\`annulé\`/\`a\`).
-          • \`--matière\` (ou \`-m\`) : Filtrer par la matière du cours (code-cours ou nom de la matière en toutes lettres).
-          • \`--professeur\` (ou \`-p\`) : Filtrer par le professeur organisant le cours (utilise une mention, son pseudo ou son ID).
-          • \`--role\` (ou \`-r\`) : Filtrer par le rôle visé par le cours (utilise une mention, son nom ou son ID).
-        `,
-      },
+      { name: 'Liste des cours', value: '`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]`' },
       { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
       { name: 'Informations sur un cours', value: '`!cours info <ID-cours>`' },
       { name: "Page d'aide", value: '`!cours help`' },
