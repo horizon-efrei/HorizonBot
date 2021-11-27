@@ -275,7 +275,7 @@ export default class EclassCommand extends HorizonSubCommand {
     // Edit the role
     const { subject, topic } = eclass;
     const originalRole = message.guild.roles.resolve(eclass.classRole);
-    const newRoleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic, formattedDate });
+    const newRoleName = EclassManager.getRoleNameForClass({ formattedDate, subject, topic });
     if (originalRole.name !== newRoleName)
       await originalRole.setName(newRoleName);
 

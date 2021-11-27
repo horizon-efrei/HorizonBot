@@ -17,7 +17,12 @@ import type {
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
-import { massSend, noop, nullop } from '@/utils';
+import {
+  massSend,
+  noop,
+  nullop,
+  trimText,
+} from '@/utils';
 
 const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntriesChannels> = {
   [SchoolYear.L1]: ConfigEntriesChannels.ClassAnnouncementL1,
@@ -55,6 +60,14 @@ export function createAnnouncementEmbed({
     .setFooter(pupa(texts.footer, { classId }));
 }
 
+export function getRoleNameForClass(
+  { formattedDate, subject, topic }: Pick<EclassCreationOptions, 'subject' | 'topic'> & { formattedDate: string },
+): string {
+  const baseRoleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic: '{topic}', formattedDate });
+  const remainingLength = 100 - baseRoleName.length + '{topic}'.length;
+  return pupa(baseRoleName, { topic: trimText(topic, remainingLength) });
+}
+
 export async function createClass(
   message: GuildMessage,
   {
@@ -64,7 +77,7 @@ export async function createClass(
   // Prepare the date
   const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
 
-  const roleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic, formattedDate });
+  const roleName = getRoleNameForClass({ formattedDate, subject, topic });
   if (message.guild.roles.cache.some(r => r.name === roleName)) {
     await message.channel.send(config.messages.alreadyExists);
     return;
