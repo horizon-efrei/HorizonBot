@@ -6,7 +6,7 @@ import { customAlphabet, urlAlphabet } from 'nanoid';
 import slug from 'slug';
 import { eclass as eclassConfig } from '@/config/commands/professors';
 import settings from '@/config/settings';
-import type { EclassDocument, EclassModel, PrettyEclass } from '@/types/database';
+import type { EclassDocument, EclassModel } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 
 const nanoid = customAlphabet(urlAlphabet.replace(/[_-]/, ''), 4);
@@ -92,15 +92,26 @@ EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string =
   nanoid(),
 ].join('_');
 
-EclassSchema.methods.toData = function (): PrettyEclass {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { _id, __v, ...doc } = this.toObject();
+EclassSchema.methods.formatDates = function (): { date: string; end: string; duration: string } {
+  const { date, end, duration } = this.toObject();
 
   return {
-    ...doc,
-    date: dayjs(doc.date).format(settings.configuration.dateFormat),
-    end: dayjs(doc.end).format(settings.configuration.dateFormat),
-    duration: dayjs.duration(doc.duration).humanize(),
+    date: dayjs(date).format(settings.configuration.dateFormat),
+    end: dayjs(end).format(settings.configuration.dateFormat),
+    duration: dayjs.duration(duration).humanize(),
+  };
+};
+
+EclassSchema.methods.normalizeDates = function (
+  this: EclassDocument,
+  formatDuration?: boolean,
+): { date: number; end: number; duration: number | string } {
+  const { date, end, duration } = this.toObject();
+
+  return {
+    date: Math.floor(date / 1000),
+    end: Math.floor(end / 1000),
+    duration: formatDuration ? dayjs.duration(duration).humanize() : Math.floor(duration / 1000),
   };
 };
 

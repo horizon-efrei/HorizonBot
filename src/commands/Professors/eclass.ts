@@ -281,8 +281,7 @@ export default class EclassCommand extends HorizonSubCommand {
 
     // Send messages
     const payload = {
-      ...eclass.toData(),
-      displayDate: Math.floor(eclass.date / 1000),
+      ...eclass.normalizeDates(true),
       role: message.guild.roles.resolve(eclass.targetRole).name,
       pingRole: message.guild.roles.resolve(eclass.classRole),
     };
@@ -414,10 +413,8 @@ export default class EclassCommand extends HorizonSubCommand {
         filteredClasses.map((eclass) => {
           const eclassInfos = {
             ...eclass.toJSON(),
+            ...eclass.normalizeDates(true),
             status: capitalize(config.messages.rawStatuses[eclass.status]),
-            date: Math.floor(eclass.date / 1000),
-            duration: dayjs.duration(eclass.duration).humanize(),
-            end: Math.floor(eclass.end / 1000),
           };
           return {
             name: pupa(config.messages.listFieldTitle, eclassInfos),

@@ -167,11 +167,11 @@ export const eclass = {
     editedTopic: 'Tu as bien modifié le thème du cours en "{topic}".',
     pingEditedTopic: '{pingRole}, le thème du cours a été changé en "{topic}".',
 
-    editedDate: 'Tu as bien déplacé le cours pour le <t:{displayDate}:F>.',
-    pingEditedDate: '{pingRole}, le cours a été déplacé le <t:{displayDate}:F> (<t:{displayDate}:R>).',
+    editedDate: 'Tu as bien déplacé le cours pour le <t:{date}:F>.',
+    pingEditedDate: '{pingRole}, le cours a été déplacé le <t:{date}:F> (<t:{date}:R>).',
 
-    editedHour: 'Tu as bien déplacé le cours à <t:{displayDate}:t>.',
-    pingEditedHour: '{pingRole}, le cours a été déplacé à <t:{displayDate}:t> (<t:{date}:displayD).',
+    editedHour: 'Tu as bien déplacé le cours à <t:{date}:t>.',
+    pingEditedHour: '{pingRole}, le cours a été déplacé à <t:{date}:t> (<t:{date}:R).',
 
     editedDuration: 'Tu as bien modifié la durée du cours en {duration}.',
     pingEditedDuration: '{pingRole}, le cours durera à présent en {duration}.',

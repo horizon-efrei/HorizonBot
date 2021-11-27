@@ -304,7 +304,7 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
   await professor?.send(
     pupa(config.messages.alertProfessor, {
       ...eclass.toJSON(),
-      date: Math.floor(eclass.date / 1000),
+      ...eclass.normalizeDates(),
       beforeChecklist,
       afterChecklist: eclass.isRecorded
         ? pupa(config.messages.alertProfessorComplements.registerRecording, eclass)

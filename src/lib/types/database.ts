@@ -82,13 +82,12 @@ export interface EclassBase {
   recordLink: string | null;
 }
 
-export type PrettyEclass = Omit<EclassBase, 'date' | 'duration' | 'end'> & { date: string; duration: string; end: string };
-
 /** Interface for the "Eclass"'s mongoose document */
 interface EclassBaseDocument extends EclassBase, Document {
   subscribers: Types.Array<string>;
-  toData(): PrettyEclass;
+  formatDates(): { date: string; end: string; duration: string };
   getStatus(): string;
+  normalizeDates(formatDuration?: boolean): { date: number; end: number; duration: number | string };
 }
 
 /** Interface for the "Eclass"'s mongoose document, when the subject field is not populated */
