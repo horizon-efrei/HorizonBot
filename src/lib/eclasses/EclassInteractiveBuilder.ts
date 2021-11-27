@@ -12,6 +12,7 @@ import type { Message, MessageComponentInteraction, SelectMenuInteraction } from
 import { MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
+import { noop } from '../utils';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
@@ -134,7 +135,7 @@ export default class EclassInteractiveBuilder {
         : JSON.stringify(err);
 
       await this._abort(pupa(config.messages.createClassSetup.errors.main, { details }));
-      return;
+      throw err;
     } finally {
       collector.stop();
     }
@@ -224,7 +225,7 @@ export default class EclassInteractiveBuilder {
       previousIsFailure = true;
       for (const response of this._userResponses) {
         if (!response.author.bot) {
-          await response.delete();
+          await response.delete().catch(noop);
           this._userResponses.delete(response);
         }
       }
