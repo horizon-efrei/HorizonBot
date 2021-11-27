@@ -397,7 +397,7 @@ export default class EclassCommand extends HorizonSubCommand {
     const statusQuery = args.getOption(...listOptions.status);
     if (statusQuery) {
       const value = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
-      if (value) {
+      if (typeof value !== 'undefined') {
         filters.push(eclass => eclass.status === value);
         filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.rawStatuses[value] }));
       }
