@@ -14,7 +14,7 @@ export default class ReadyListener extends Listener {
     this.container.logger.info('[Logs] Syncing logs statuses...');
     await this.container.client.syncLogStatuses();
 
-    this.container.logger.info('[ConfigurationManager] Caching configured channels...');
+    this.container.logger.info('[ConfigurationManager] Caching configured channels and roles...');
     await this.container.client.configManager.loadAll();
 
     this.container.logger.info('[Logs] Caching invites...');

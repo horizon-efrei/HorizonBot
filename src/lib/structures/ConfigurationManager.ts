@@ -33,14 +33,19 @@ export default class ConfigurationManager {
     this._entries.delete(this._getKey(name, guild.id));
   }
 
-  // TODO: Better typings for return value
+  public getFromCache<
+    T extends ConfigEntries,
+    Return = T extends ConfigEntriesChannels ? GuildTextBasedChannel : Role,
+  >(name: T, guildId: string): Return {
+    const key = this._getKey(name, guildId);
+    if (this._entries.get(key))
+      return this._entries.get(key).value as unknown as Return;
+  }
+
   public async get<
     T extends ConfigEntries,
     Return = T extends ConfigEntriesChannels ? GuildTextBasedChannel : Role,
-  >(
-    name: T,
-    guildId: string,
-  ): Promise<Return> {
+  >(name: T, guildId: string): Promise<Return> {
     const key = this._getKey(name, guildId);
     if (this._entries.get(key))
       return this._entries.get(key).value as unknown as Return;
