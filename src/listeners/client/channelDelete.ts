@@ -13,7 +13,7 @@ export default class ChannelDeleteListener extends Listener {
       await ReactionRole.deleteMany({ channelId: channel.id });
       const messageIds = affectedReactionRoles.map(rr => rr.messageId);
       this.container.client.reactionRolesIds.deleteAll(...messageIds);
-      this.container.logger.debug(`[Reaction Roles] Removed ${affectedReactionRoles.length} reaction-role(s) because the channel ${channel.id} (#${channel.name}) was deleted. Affected reaction-roles: ${affectedReactionRoles.map(rr => rr.getMessageUrl()).join(', ')}`);
+      this.container.logger.debug(`[Reaction Roles] Removed ${affectedReactionRoles.length} reaction-role(s) because the channel ${channel.id} (#${channel.name}) was deleted. Affected reaction-roles: ${affectedReactionRoles.map(rr => rr.getMessageLink()).join(', ')}`);
     }
 
     const affectedConfigurations = await Configuration.find({ value: channel.id });

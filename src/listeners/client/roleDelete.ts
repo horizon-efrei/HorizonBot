@@ -28,7 +28,7 @@ export default class RoleDeleteListener extends Listener {
           ?.reactions.cache.get(pair.reaction);
         await reaction?.remove();
       }
-      this.container.logger.debug(`[ReactionRoles] Removed pairs with role ${role.id} for reaction-roles because the role (@${role.name}) was deleted. Affected reaction-roles: ${affectedReactionRoles.map(rr => rr.getMessageUrl()).join(', ')}`);
+      this.container.logger.debug(`[ReactionRoles] Removed pairs with role ${role.id} for reaction-roles because the role (@${role.name}) was deleted. Affected reaction-roles: ${affectedReactionRoles.map(rr => rr.getMessageLink()).join(', ')}`);
     }
 
     const affectedConfigurations = await Configuration.find({ value: role.id });

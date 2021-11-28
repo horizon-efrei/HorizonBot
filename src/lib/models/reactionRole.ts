@@ -29,7 +29,7 @@ const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
   },
 }, { timestamps: true });
 
-ReactionRoleSchema.methods.getMessageUrl = function (this: ReactionRoleDocument): string {
+ReactionRoleSchema.methods.getMessageLink = function (this: ReactionRoleDocument): string {
   return makeMessageLink(this.guildId, this.channelId, this.messageId);
 };
 
