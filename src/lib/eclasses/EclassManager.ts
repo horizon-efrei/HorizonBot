@@ -333,10 +333,7 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
 
   // Send the notification to the eclass channel
   await classChannel.send(
-    pupa(config.messages.remindClassNotification, {
-      classRole: eclass.classRole,
-      duration: dayjs.duration(settings.configuration.eclassReminderTime).humanize(),
-    }),
+    pupa(config.messages.remindClassNotification, { ...eclass.toJSON(), ...eclass.normalizeDates() }),
   );
   // Send the private message to the subscribers
   await massSend(guild, eclass.subscribers, pupa(config.messages.remindClassPrivateNotification, eclass));

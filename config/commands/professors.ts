@@ -182,7 +182,7 @@ export const eclass = {
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
     startClassNotification: ':bell: <@&{classRole}>, le cours commence !',
-    remindClassNotification: ':bell: <@&{classRole}> rappel : le cours commence dans {duration}',
+    remindClassNotification: ':bell: <@&{classRole}> rappel : le cours commence <t:{date}:R>',
     remindClassPrivateNotification: ":bell: Tu t'es inscrit au cours \"{topic}\". Il va commencer dans environ 15 minutes ! Tiens-toi prêt :\\)",
     valueInProgress: '[En cours]',
     alertProfessor: stripIndent`
