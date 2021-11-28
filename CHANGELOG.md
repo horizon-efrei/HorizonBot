@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2021/11/28
+
+### Added
+
+- Add `serverInfo` command
+- Add a show subcommand to `eclass`
+- Add configurable school year roles in `setup` command
+- Add useful class links in calendars (such as original class notification, and record link)
+- Add VoiceMove log
+
+### Improved
+
+- Improve `mergepdf`'s help metadata
+- Improve eclass announcements by using integrated timestamps
+- Improve eclass calendars and upcoming announcements
+- Improve eclass help page's readability by removing command lines options for the list subcommand
+- Improve eclass notifications by using integrated timestamps
+- Improve record link modification process
+- Improve reminder's creation by adding the ability to bypass the 'create' subcommand (`!reminder 2h description`)
+- Make eclass' targetRole always be the school year role
+- Make it impossible to flag our own messages
+
+### Fixed
+
+- Fix `--status=planned` option in eclass list
+- Fix alphabet for IDs, making some eclass uneditable because of Discord's escaping
+- Fix crash in eclass creation if unable to delete a message
+- Fix potential crash with role's name length
+- Fix typos
+
+
 ## [0.5.1] - 2021/11/15
 
 ### Fixed
