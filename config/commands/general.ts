@@ -97,10 +97,10 @@ export const ping = {
 export const reminders = {
   options: {
     aliases: ['reminders', 'reminder', 'remind', 'remindme', 'rappels', 'rappel'],
-    description: 'Permet de créer/modifier et lister des rappels.',
+    description: "Permet de créer/modifier et lister des rappels. Pour la création d'un rappel, vous pouvez écrire directement la durée, sans passée par la sous-commande `create` (cf exemples). Pour entrer une date, utilisez des guillemets pour pouvoir entrer une date et une heure.",
     enabled: true,
     usage: 'reminders <create | list | remove | help>',
-    examples: ['reminder create 2h Aller me coucher', 'reminders list', 'tags remove 12we6f', 'reminders help'],
+    examples: ['reminder 2h Aller me coucher', 'reminders "25/12 00h" Joyeux Noël !', 'tags remove 12we6f', 'reminders list'],
   },
   messages: {
     // Global
@@ -122,7 +122,7 @@ export const reminders = {
     // Help page
     helpEmbedTitle: 'Aide des rappels',
     helpEmbedDescription: [
-      { name: 'Créer un rappel', value: '`reminders create <durée | date> [description]`' },
+      { name: 'Créer un rappel', value: '`reminders [create] <durée | "date"> [description]`' },
       { name: 'Liste de tes rappels', value: '`reminders list`' },
       { name: 'Supprimer un rappel', value: '`reminders remove <ID>`' },
       { name: "Page d'aide", value: '`reminders help`' },

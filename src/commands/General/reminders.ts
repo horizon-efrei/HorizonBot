@@ -1,29 +1,55 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
-import type { Args } from '@sapphire/framework';
-import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import type { CommandOptions } from '@sapphire/framework';
+import { Args } from '@sapphire/framework';
 import { DMChannel, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
+import { commonSubcommands } from '@/app/lib/utils/generateSubcommands';
 import { reminders as config } from '@/config/commands/general';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import Reminders from '@/models/reminders';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
+import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 import type { ReminderBase } from '@/types/database';
-import { generateSubcommands } from '@/utils';
 
-@ApplyOptions<SubCommandPluginCommandOptions>({
-  ...config.options,
-  subCommands: generateSubcommands(['create', 'list', 'remove', 'help']),
-})
-export default class RemindersCommand extends HorizonSubCommand {
+enum Subcommand {
+  Create = 'create',
+  List = 'list',
+  Remove = 'remove',
+  Help = 'help',
+}
+
+@ApplyOptions<CommandOptions>(config.options)
+export default class RemindersCommand extends HorizonCommand {
+  private static readonly _action = Args.make<Subcommand>((parameter, { argument }) => {
+    const query = parameter.toLowerCase();
+    if (commonSubcommands.list.aliases.includes(query))
+      return Args.ok(Subcommand.List);
+    if (commonSubcommands.remove.aliases.includes(query))
+      return Args.ok(Subcommand.Remove);
+    if (commonSubcommands.create.aliases.includes(query))
+      return Args.ok(Subcommand.Create);
+    if (commonSubcommands.help.aliases.includes(query))
+      return Args.ok(Subcommand.Help);
+    return Args.error({ argument, parameter });
+  });
+
+  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
+    const action = args.finished
+      ? Subcommand.List
+      : await args.pick(RemindersCommand._action).catch(() => Subcommand.Create);
+    await this[action](message, args);
+  }
+
   public async create(message: GuildMessage, args: Args): Promise<void> {
     let date: number;
     try {
-      date = await args.pick('duration').then(duration => Date.now() + duration)
-        .catch(async () => args.pick('date').then(dat => dat.getTime()));
+      date = await args.pick('duration')
+        .then(duration => Date.now() + duration)
+        .catch(async () => args.pick('date')
+          .then(dat => dat.getTime()));
     } catch {
       await message.channel.send(config.messages.invalidTime);
       return;

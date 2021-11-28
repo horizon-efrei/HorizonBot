@@ -1,12 +1,12 @@
 import type { SubCommandManager } from '@sapphire/plugin-subcommands';
 import type { Writable } from '@/types';
 
-const commonSubcommands = {
-  create: { aliases: ['add', 'new', 'set'] },
-  list: { aliases: ['liste', 'ls', 'show'] },
-  edit: { aliases: ['change', 'modify'] },
-  remove: { aliases: ['delete', 'rm', 'del'] },
-  help: { aliases: ['aide'], default: true },
+export const commonSubcommands = {
+  create: { aliases: ['create', 'add', 'new', 'set'] },
+  list: { aliases: ['list', 'liste', 'ls', 'show'] },
+  edit: { aliases: ['edit', 'change', 'modify'] },
+  remove: { aliases: ['remove', 'delete', 'rm', 'del'] },
+  help: { aliases: ['help', 'aide'], default: true },
 };
 
 type SubcommandRaw = Record<string, { aliases?: string[]; default?: boolean }>;
