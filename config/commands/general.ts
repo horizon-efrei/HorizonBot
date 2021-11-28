@@ -68,8 +68,11 @@ export const latex = {
 
 export const mergePDF = {
   options: {
-    aliases: ['mergepdf', 'pdf'],
-    description: "Permet de combiner plusieurs fichiers PDF à partir de messages Discord, via leur lien ou leur ID. Vous pouvez utiliser l'option `--name=\"nom\"` afin de définir le nom du fichier résultant, qui sera sinon \"merged.pdf\".",
+    aliases: ['merge-pdf', 'pdf'],
+    description: "Permet de combiner plusieurs fichiers PDF en pièces jointes ou via **des messages Discord**, via leurs liens ou leurs IDs. Vous pouvez utiliser l'option `--name=\"nom\"` afin de définir le nom du fichier résultant, qui sera sinon \"merged.pdf\".",
+    enabled: true,
+    usage: 'mergepdf <lien message discord 1> <lien message discord 2> <lien message discord 3>',
+    examples: ['mergepdf (avec en pièces jointes des PDFs)', 'mergepdf 850464765536763904-902974093366812772 913345932106543114'],
   },
   messages: {
     noPDFGiven: 'Il faut ajouter des PDFs à ton message, ou donner le lien de messages contenant des PDFs !',
