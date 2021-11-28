@@ -269,6 +269,7 @@ export enum DiscordLogType {
   RoleRemove,
   VoiceJoin,
   VoiceLeave,
+  VoiceMove,
 }
 
 export interface GuildLeaveUserSnapshot {
@@ -302,9 +303,9 @@ interface ActionReference {
 /** Type for the "Discord Logs"'s mongoose schema */
 export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
   & (
-    // Context is user id, content is the new nickname
+    // Context is user id, content is the nickname before and after
     | { type: DiscordLogType.ChangeNickname; context: ActionReference; content: BeforeAfter }
-    // Context is user id, content is the new username
+    // Context is user id, content is the username before and after
     | { type: DiscordLogType.ChangeUsername; context: string; content: BeforeAfter }
     // Context is user id, content is list of possible invite-code used
     | { type: DiscordLogType.GuildJoin; context: string; content: string[] }
@@ -312,7 +313,7 @@ export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
     | { type: DiscordLogType.GuildLeave; context: string; content: GuildLeaveUserSnapshot }
     // Context is a AuthorMessageReference, content is a list of linked invites
     | { type: DiscordLogType.InvitePost; context: AuthorMessageReference; content: string[] }
-    // Context is a AuthorMessageReference, content is the message content
+    // Context is a AuthorMessageReference, content is the message content before and after
     | { type: DiscordLogType.MessageEdit; context: AuthorMessageReference; content: BeforeAfter }
     // Context is a AuthorMessageReference, content is the new message content
     | { type: DiscordLogType.MessagePost; context: AuthorMessageReference; content: string }
@@ -330,6 +331,8 @@ export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
     | { type: DiscordLogType.VoiceJoin; context: string; content: string }
     // Context is user id, content is the channel id
     | { type: DiscordLogType.VoiceLeave; context: string; content: string }
+    // Context is user id, content is the channel id before and after
+    | { type: DiscordLogType.VoiceMove; context: string; content: BeforeAfter }
   );
 
 /** Simplified interface for the "Discord Logs"'s mongoose schema */

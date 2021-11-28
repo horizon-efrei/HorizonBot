@@ -66,6 +66,7 @@ export function getContentValue(payload: DiscordLogBase): string {
     case DiscordLogType.ChangeUsername:
     case DiscordLogType.VoiceJoin:
     case DiscordLogType.VoiceLeave:
+    case DiscordLogType.VoiceMove:
       return pupa(fieldTexts.contentValue, payload);
   }
 }

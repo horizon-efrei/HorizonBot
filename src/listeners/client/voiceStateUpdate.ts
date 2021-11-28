@@ -19,10 +19,22 @@ export default class VoiceStateUpdateListener extends Listener {
         severity: 1,
       });
     } else if (oldState.channel?.isVoice() && isNullish(newState.channel)) {
+      // Was in a channel, but now isn't
       await DiscordLogManager.logAction({
         type: DiscordLogType.VoiceLeave,
         context: newState.member.id,
         content: oldState.channel.id,
+        guildId: newState.guild.id,
+        severity: 1,
+      });
+    } else if (oldState.channel?.isVoice()
+      && newState.channel?.isVoice()
+      && oldState.channel.id !== newState.channel.id) {
+      // Changed its channel
+      await DiscordLogManager.logAction({
+        type: DiscordLogType.VoiceMove,
+        context: newState.member.id,
+        content: { before: oldState.channel.id, after: newState.channel.id },
         guildId: newState.guild.id,
         severity: 1,
       });

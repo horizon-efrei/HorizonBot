@@ -34,6 +34,7 @@ export default {
       [DiscordLogType.RoleRemove, ':octagonal_sign: Rôle enlevé'],
       [DiscordLogType.VoiceJoin, ':loud_sound: Connection en vocal'],
       [DiscordLogType.VoiceLeave, ":mute: Déconnexion d'un vocal"],
+      [DiscordLogType.VoiceMove, ':repeat: Changement de salon vocal'],
     ]),
     simplifiedReadableEvents: new Map([
       [DiscordLogType.ChangeNickname, 'changement de surnom'],
@@ -49,7 +50,7 @@ export default {
       [DiscordLogType.RoleAdd, 'rôle ajouté'],
       [DiscordLogType.RoleRemove, 'rôle enlevé'],
       [DiscordLogType.VoiceJoin, 'connection en vocal'],
-      [DiscordLogType.VoiceLeave, "déconnexion d'un vocal"],
+      [DiscordLogType.VoiceLeave, 'changement de salon vocal'],
     ]),
     embedTitle: 'Logs automatiques',
     fields: {
@@ -174,6 +175,13 @@ export default {
         contextValue: '<@{context}>',
         contentName: ':sound: Salon',
         contentValue: '<#{content}>',
+      },
+      [DiscordLogType.VoiceMove]: {
+        color: settings.colors.yellow,
+        contextName: ':bust_in_silhouette: Membre',
+        contextValue: '<@{context}>',
+        contentName: ':sound: Salon',
+        contentValue: 'Avant : <#{content.before}>\nAprès : <#{content.after}>',
       },
     },
   },
