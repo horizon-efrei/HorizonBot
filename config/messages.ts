@@ -188,13 +188,22 @@ export default {
     classLine: '• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
   },
   classesCalendar: {
-    title: "Calendrier des cours sur Ef'Réussite",
     noClasses: 'Aucun cours prévu pour le moment.',
+    noSubjects: 'Aucune matière disponible.',
     subjectTitle: '{emoji} {name}',
     textChannel: '<#{textChannel}>',
     textDocsChannel: ' • Documents : <#{textDocsChannel}>',
     voiceChannel: ' • Vocal : <#{voiceChannel}> *(cliquez pour rejoindre)*',
-    body: '{exams}\n\n**Cours à venir :**\n{classes}\n**\n**',
+    body: stripIndent`
+      {exams}
+
+      **Cours terminés ou annulés :**
+      {finishedClasses}
+
+      **Cours prévus :**
+      {plannedClasses}
+      **\n**
+    `,
     classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic}',
   },
   antiSwear: {

@@ -1,16 +1,18 @@
 import { container } from '@sapphire/pieces';
 import { isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
-import type { Message, MessageOptions } from 'discord.js';
+import type { MessageOptions } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import groupBy from 'lodash.groupby';
+import take from 'lodash.take';
 import pupa from 'pupa';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
+import Subject from '@/models/subject';
 import { SchoolYear } from '@/types';
-import type { GuildTextBasedChannel } from '@/types';
-import type { EclassDocument, EclassPopulatedDocument } from '@/types/database';
+import type { GuildMessage, GuildTextBasedChannel } from '@/types';
+import type { EclassDocument, EclassPopulatedDocument, SubjectDocument } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import {
   capitalize,
@@ -25,9 +27,20 @@ const calendarMapping = new Map([
   [SchoolYear.L3, ConfigEntriesChannels.ClassCalendarL3],
 ]);
 
-async function updateMessage(message: Message, content: MessageOptions): Promise<void> {
+async function updateMessage(
+  message: GuildMessage,
+  channel: GuildTextBasedChannel,
+  content: MessageOptions,
+): Promise<void> {
+  const sendMessage = async (chan: GuildTextBasedChannel): Promise<void> => void await chan.send(content)
+    .then(async msg => msg.crosspostable && await msg.crosspost());
+  if (!message) {
+    await sendMessage(channel);
+    return;
+  }
+
   let edited = false;
-  if (message?.editable) {
+  if (message.editable) {
     try {
       await promiseTimeout(
         new Promise((resolve) => {
@@ -41,48 +54,67 @@ async function updateMessage(message: Message, content: MessageOptions): Promise
   }
 
   if (!edited) {
-    if (message?.deletable)
+    if (message.deletable)
       await message.delete();
-    await message.channel.send(content).then(async msg => msg.crosspostable && await msg.crosspost());
+    await sendMessage(message.channel);
   }
 }
 
-function generateCalendarEmbed(upcomingClasses: EclassPopulatedDocument[]): MessageEmbed {
-  const embed = new MessageEmbed()
-    .setColor(settings.colors.default)
-    .setTitle(messages.classesCalendar.title);
+function getCalendarClassContentForSubject(
+  allClasses: EclassPopulatedDocument[],
+  subject: SubjectDocument,
+): string {
+  let content = pupa(messages.classesCalendar.textChannel, subject);
+  if (subject.textDocsChannel)
+    content += pupa(messages.classesCalendar.textDocsChannel, subject);
+  if (subject.voiceChannel)
+    content += pupa(messages.classesCalendar.voiceChannel, subject);
 
-  if (upcomingClasses.length === 0) {
-    embed.setDescription(messages.classesCalendar.noClasses);
-    return embed;
+  const exams = subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • ');
+
+  const formatter = (eclass: EclassPopulatedDocument): string => pupa(messages.classesCalendar.classLine, {
+    ...eclass.toJSON(),
+    ...eclass.normalizeDates(),
+    beginHour: dayjs(eclass.date).format('HH[h]mm'),
+    endHour: dayjs(eclass.end).format('HH[h]mm'),
+  });
+  const finishedClasses = allClasses
+    .filter(eclass => [EclassStatus.Canceled, EclassStatus.Finished].includes(eclass.status));
+  const plannedClasses = allClasses
+    .filter(eclass => [EclassStatus.Planned, EclassStatus.InProgress].includes(eclass.status));
+
+  content += pupa(messages.classesCalendar.body, {
+    exams: exams.length > 0 ? `\n${exams}` : '',
+    finishedClasses: finishedClasses.length > 0
+      ? finishedClasses.map(formatter).join('\n')
+      : 'Aucun cours terminé',
+    plannedClasses: plannedClasses.length > 0
+      ? plannedClasses.map(formatter).join('\n')
+      : 'Aucun cours prévu',
+  });
+  return content;
+}
+
+function generateCalendarEmbeds(allClasses: EclassPopulatedDocument[], subjects: SubjectDocument[]): MessageEmbed[] {
+  const embeds: MessageEmbed[] = [];
+
+  for (const subject of take(subjects, 25)) {
+    const embed = new MessageEmbed()
+      .setColor(settings.colors.default)
+      .setTitle(subject.name)
+      .setThumbnail(subject.emojiImage);
+
+    const subjectUpcomingClasses = allClasses.filter(eclass => eclass.subject.classCode === subject.classCode);
+    const content = getCalendarClassContentForSubject(subjectUpcomingClasses, subject);
+    embed.setDescription(content);
+
+    embeds.push(embed);
   }
 
-  const groupedClasses = groupBy(upcomingClasses, val => val.subject.classCode);
-  for (const classes of Object.values(groupedClasses)) {
-    const { subject } = classes[0];
+  if (embeds.length === 0)
+    embeds.push(new MessageEmbed().setTitle(messages.classesCalendar.noSubjects));
 
-    let content = pupa(messages.classesCalendar.textChannel, subject);
-    if (subject.textDocsChannel)
-      content += pupa(messages.classesCalendar.textDocsChannel, subject);
-    if (subject.voiceChannel)
-      content += pupa(messages.classesCalendar.voiceChannel, subject);
-
-    const exams = subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • ');
-    content += pupa(messages.classesCalendar.body, {
-      exams: exams.length > 0 ? `\n${exams}` : '',
-      classes: classes.map(eclass =>
-        pupa(messages.classesCalendar.classLine, {
-          ...eclass.toJSON(),
-          date: Math.floor(eclass.date / 1000),
-          beginHour: dayjs(eclass.date).format('HH[h]mm'),
-          endHour: dayjs(eclass.end).format('HH[h]mm'),
-        })).join('\n'),
-    });
-
-    embed.addField(pupa(messages.classesCalendar.subjectTitle, subject), content);
-  }
-
-  return embed;
+  return embeds;
 }
 
 function generateUpcomingClassesMessage(upcomingClasses: EclassDocument[]): string {
@@ -116,23 +148,27 @@ function generateUpcomingClassesMessage(upcomingClasses: EclassDocument[]): stri
   return builder;
 }
 
-async function updateClassesCalendar(
+async function updateClassesCalendarForSchoolYear(
   channel: GuildTextBasedChannel,
   upcomingClasses: EclassPopulatedDocument[],
+  schoolYear: SchoolYear,
 ): Promise<void> {
   const allMessages = await channel.messages.fetch().catch(nullop);
   const allBotMessages = [
     ...(allMessages?.filter(msg => msg.author.id === container.client.id).values() ?? []),
   ].reverse();
-  const firstMessage = allBotMessages.shift();
+  const firstMessage = allBotMessages.shift() as GuildMessage;
+
+  const subjects = await Subject.find({ schoolYear });
+  const yearClasses = upcomingClasses.filter(eclass => eclass.subject.schoolYear === schoolYear);
 
   // TODO: Check that limits are not crossed
   //     - max 6000 chars in all embed
   //     - less than 25 fields
   //     - field name max 256 chars
   //     - field value max 1024 chars
-  const embed = generateCalendarEmbed(upcomingClasses);
-  await updateMessage(firstMessage, { embeds: [embed] });
+  const embeds = generateCalendarEmbeds(yearClasses, subjects);
+  await updateMessage(firstMessage, channel, { embeds: take(embeds, 10) });
 
   for (const msg of allBotMessages)
     await msg.delete();
@@ -152,7 +188,7 @@ async function updateUpcomingClasses(
 
   let i = 0;
   for (const chunk of chunks) {
-    await updateMessage(allBotMessages[i], { content: chunk });
+    await updateMessage(allBotMessages[i] as GuildMessage, channel, { content: chunk });
     i++;
   }
 
@@ -163,7 +199,6 @@ async function updateUpcomingClasses(
 export async function updateClassesCalendarForGuildAndSchoolYear(
   guildId: string,
   schoolYear: SchoolYear,
-  allUpcomingClasses?: EclassPopulatedDocument[],
 ): Promise<void> {
   const channel = await container.client.configManager.get(calendarMapping.get(schoolYear), guildId);
   if (!channel) {
@@ -171,20 +206,12 @@ export async function updateClassesCalendarForGuildAndSchoolYear(
     return;
   }
 
-  let upcomingClasses: EclassPopulatedDocument[] = [];
-  if (isNullish(allUpcomingClasses)) {
-    upcomingClasses = await Eclass.find({
-      $and: [
-        { date: { $gte: Date.now() } },
-        { status: EclassStatus.Planned },
-        { guild: guildId },
-      ],
-    });
-  } else {
-    upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId);
-  }
+  const upcomingClasses: EclassPopulatedDocument[] = await Eclass.find({
+    date: { $gte: dayjs().subtract(2, 'month').startOf('day').unix() * 1000 },
+    guild: guildId,
+  });
 
-  await updateClassesCalendar(channel, upcomingClasses.filter(eclass => eclass.subject.schoolYear === schoolYear));
+  await updateClassesCalendarForSchoolYear(channel, upcomingClasses, schoolYear);
 }
 
 export async function updateUpcomingClassesForGuild(
