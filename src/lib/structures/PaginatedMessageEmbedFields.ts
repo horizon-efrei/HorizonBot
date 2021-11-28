@@ -42,7 +42,7 @@ export default class PaginatedMessageEmbedFields extends PaginatedMessage {
 
   private _generatePages(): void {
     const template = this._embedTemplate instanceof MessageEmbed
-      ? (this._embedTemplate.toJSON() as MessageEmbedOptions)
+      ? this._embedTemplate.toJSON()
       : this._embedTemplate;
     for (let i = 0; i < this._totalPages; i++) {
       const clonedTemplate = new MessageEmbed(template);
