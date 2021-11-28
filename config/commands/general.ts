@@ -108,7 +108,7 @@ export const reminders = {
     invalidTime: "Cette durée ou cette date n'est pas valide.",
 
     // Create a reminder
-    createdReminder: "D'accord, je te rappelerai ça ! Ce rappel à l'ID `{reminderId}`.",
+    createdReminder: "D'accord, je te rappellerai ça ! Ce rappel a l'ID `{reminderId}`.",
     openDm: "\n:warning: Tes messages privés ne sont pas ouverts ou tu m'as bloqué, je ne pourrai donc pas t'envoyer le message de rappel ! Active-les ou débloque-moi pour les recevoir.",
 
     // List the reminders
