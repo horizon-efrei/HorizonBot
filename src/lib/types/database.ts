@@ -87,7 +87,8 @@ interface EclassBaseDocument extends EclassBase, Document {
   subscribers: Types.Array<string>;
   formatDates(): { date: string; end: string; duration: string };
   getStatus(): string;
-  normalizeDates(formatDuration?: boolean): { date: number; end: number; duration: number | string };
+  normalizeDates(formatDuration: true): { date: number; end: number; duration: string };
+  normalizeDates(formatDuration?: false): { date: number; end: number; duration: number };
 }
 
 /** Interface for the "Eclass"'s mongoose document, when the subject field is not populated */
