@@ -19,12 +19,7 @@ import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildTextBasedChannel } from '@/types';
 import { GuildMessage } from '@/types';
 import { EclassPopulatedDocument, EclassStatus } from '@/types/database';
-import {
-  capitalize,
-  generateSubcommands,
-  makeMessageLink,
-  nullop,
-} from '@/utils';
+import { capitalize, generateSubcommands, nullop } from '@/utils';
 
 const listOptions = {
   status: ['status', 'statut', 's'],
@@ -339,10 +334,7 @@ export default class EclassCommand extends HorizonSubCommand {
 
   @ValidateEclassArgument()
   public async show(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
-    const announcementChannel = await this.container.client.configManager
-      .get(eclass.announcementChannel, eclass.guild);
-
-    const messageLink = makeMessageLink(eclass.guild, announcementChannel.id, eclass.announcementMessage);
+    const messageLink = eclass.getMessageLink();
     const capitalizedStatus = capitalize(config.messages.rawStatuses[eclass.status]);
     const recordedText = oneLine`
       ${config.messages.recordedValues[Number(eclass.isRecorded)]}

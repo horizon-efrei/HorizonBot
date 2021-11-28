@@ -88,6 +88,7 @@ export interface EclassBase {
 /** Interface for the "Eclass"'s mongoose document */
 interface EclassBaseDocument extends EclassBase, Document {
   subscribers: Types.Array<string>;
+  getMessageLink(): string;
   formatDates(): { date: string; end: string; duration: string };
   getStatus(): string;
   normalizeDates(formatDuration: true): { date: number; end: number; duration: string };

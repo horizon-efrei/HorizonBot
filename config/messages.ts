@@ -212,7 +212,8 @@ export default {
       {plannedClasses}
       **\n**
     `,
-    classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic}',
+    recordLink: '| [[Enregistrement]]({recordLink})',
+    classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic} [[Voir plus]]({messageLink})',
   },
   antiSwear: {
     swearModeratorAlert: stripIndent`

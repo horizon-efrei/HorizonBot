@@ -1,5 +1,6 @@
 import { container } from '@sapphire/pieces';
 import { isNullish } from '@sapphire/utilities';
+import { oneLine } from 'common-tags';
 import dayjs from 'dayjs';
 import type { MessageOptions } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
@@ -72,12 +73,17 @@ function getCalendarClassContentForSubject(
 
   const exams = subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • ');
 
-  const formatter = (eclass: EclassPopulatedDocument): string => pupa(messages.classesCalendar.classLine, {
-    ...eclass.toJSON(),
-    ...eclass.normalizeDates(),
-    beginHour: dayjs(eclass.date).format('HH[h]mm'),
-    endHour: dayjs(eclass.end).format('HH[h]mm'),
-  });
+  const formatter = (eclass: EclassPopulatedDocument): string => oneLine`
+    ${pupa(messages.classesCalendar.classLine, {
+      ...eclass.toJSON(),
+      ...eclass.normalizeDates(),
+      beginHour: dayjs(eclass.date).format('HH[h]mm'),
+      endHour: dayjs(eclass.end).format('HH[h]mm'),
+      messageLink: eclass.getMessageLink(),
+    })}
+    ${eclass.recordLink ? pupa(messages.classesCalendar.recordLink, eclass) : ''}
+  `;
+
   const finishedClasses = allClasses
     .filter(eclass => [EclassStatus.Canceled, EclassStatus.Finished].includes(eclass.status));
   const plannedClasses = allClasses

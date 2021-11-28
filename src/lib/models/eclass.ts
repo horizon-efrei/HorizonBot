@@ -1,3 +1,4 @@
+import { container } from '@sapphire/pieces';
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import { model, Schema } from 'mongoose';
@@ -8,6 +9,7 @@ import { eclass as eclassConfig } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import type { EclassDocument, EclassModel } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
+import { makeMessageLink } from '@/utils';
 
 const nanoid = customAlphabet(urlAlphabet.replace(/[_-]/, ''), 4);
 
@@ -91,6 +93,11 @@ EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string =
   dayjs(date).format('HHmmDDMMYYYY'),
   nanoid(),
 ].join('_');
+
+EclassSchema.methods.getMessageLink = function (): string {
+  const announcementChannel = container.client.configManager.getFromCache(this.announcementChannel, this.guild);
+  return makeMessageLink(this.guild, announcementChannel.id, this.announcementMessage);
+};
 
 EclassSchema.methods.formatDates = function (): { date: string; end: string; duration: string } {
   const { date, end, duration } = this.toObject();
