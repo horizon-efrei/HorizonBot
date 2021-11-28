@@ -25,6 +25,7 @@ export const eclass = {
     onlyProfessor: 'Seul les professeurs peuvent effectuer cette action !',
     unresolvedProfessor: ':x: Impossible de retrouver le professeur pour ce cours !',
     unconfiguredChannel: "Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configures-en un en tapant la commande `setup set class-<promo> #salon`.",
+    unconfiguredRole: "Oups, impossible de créer ce cours car aucun rôle de promo n'a été configuré. Configures-en un en tapant la commande `setup set role-<promo> @Role`.",
     editUnauthorized: "Tu ne peux pas modifier un cours qui n'est pas à toi !",
     statusIncompatible: 'Tu ne peux pas faire cette action alors que le cours {status}.',
 
@@ -83,7 +84,7 @@ export const eclass = {
     recordedLink: '[Lien]({recordLink})',
     newClassEmbed: {
       title: '{subject.name} - {topic}',
-      description: "Un nouveau cours en {classChannel} a été planifié sur Ef'Réussite !\nRéagis avec :white_check_mark: pour être notifié du cours !",
+      description: 'Cours en {classChannel} le **<t:{date}>** !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !',
       author: "Ef'Réussite - Nouveau cours !",
       date: 'Date et heure',
       dateValue: '<t:{date}> - <t:{end}:t>',
@@ -119,8 +120,7 @@ export const eclass = {
         **4.** __Date :__ {date}
         **5.** __Durée :__ {duration}
         **6.** __Professeur :__ {professor}
-        **7.** __Rôle visé :__ {role}
-        **8.** __Enregistré :__ {isRecorded}
+        **7.** __Enregistré :__ {isRecorded}
       `,
       schoolYearMenu: {
         placeholder: 'Aucune année sélectionnée',
@@ -283,10 +283,6 @@ export const eclass = {
       professor: {
         base: 'Entre le professeur qui va donner le cours (mentionne-le ou entre son pseudo ou son ID) :',
         invalid: 'Ce membre est invalide.',
-      },
-      targetRole: {
-        base: 'Entre le rôle de révision visé ("Cours Hors-RAT Maths", "Rattrapages Informatique"...) (mentionne-le ou entre son nom ou son ID) :',
-        invalid: 'Ce rôle est invalide.',
       },
       recorded: {
         invalid: 'Cette valeur est invalide.',

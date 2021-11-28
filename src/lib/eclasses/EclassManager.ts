@@ -16,7 +16,7 @@ import type {
 } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
-import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
+import { ConfigEntriesChannels, ConfigEntriesRoles, EclassStatus } from '@/types/database';
 import {
   massSend,
   noop,
@@ -29,6 +29,12 @@ const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntriesChannels> =
   [SchoolYear.L2]: ConfigEntriesChannels.ClassAnnouncementL2,
   [SchoolYear.L3]: ConfigEntriesChannels.ClassAnnouncementL3,
   general: ConfigEntriesChannels.ClassAnnouncementGeneral,
+};
+
+const schoolYearRoles: Record<SchoolYear, ConfigEntriesRoles> = {
+  [SchoolYear.L1]: ConfigEntriesRoles.SchoolYearL1,
+  [SchoolYear.L2]: ConfigEntriesRoles.SchoolYearL2,
+  [SchoolYear.L3]: ConfigEntriesRoles.SchoolYearL3,
 };
 
 export async function updateGlobalAnnouncements(guildId: string, schoolYear: SchoolYear): Promise<void> {
@@ -51,7 +57,7 @@ export function createAnnouncementEmbed({
   return new MessageEmbed()
     .setColor(settings.colors.green)
     .setTitle(pupa(texts.title, { subject, topic }))
-    .setDescription(pupa(texts.description, { subject, classChannel }))
+    .setDescription(pupa(texts.description, { subject, classChannel, date }))
     .setThumbnail(subject.emojiImage)
     .setAuthor(texts.author, classChannel.guild.iconURL())
     .addField(texts.date, pupa(texts.dateValue, { date, end }), true)
@@ -72,11 +78,18 @@ export function getRoleNameForClass(
 export async function createClass(
   message: GuildMessage,
   {
-    date, subject, topic, duration, professor, targetRole, isRecorded,
+    date, subject, topic, duration, professor, isRecorded,
   }: EclassCreationOptions,
 ): Promise<void> {
   // Prepare the date
   const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
+
+  const targetRole = await container.client.configManager.get(schoolYearRoles[subject.schoolYear], message.guild.id);
+  if (!targetRole) {
+    container.logger.warn('[e-class:not-created] A new e-class was planned but no school year role found, unable to create.');
+    await message.channel.send(config.messages.unconfiguredRole);
+    return;
+  }
 
   const roleName = getRoleNameForClass({ formattedDate, subject, topic });
   if (message.guild.roles.cache.some(r => r.name === roleName)) {
@@ -88,7 +101,7 @@ export async function createClass(
   const announcementChannel = await container.client.configManager
     .get(classAnnouncement[subject.schoolYear], message.guild.id);
   if (!announcementChannel) {
-    container.logger.warn(`[e-class:not-created] A new e-class was planned but no announcement channel was found, unable to create. Setup an announcement channel with "${settings.prefix}setup class"`);
+    container.logger.warn('[e-class:not-created] A new e-class was planned but no announcement channel was found, unable to create.');
     await message.channel.send(config.messages.unconfiguredChannel);
     return;
   }

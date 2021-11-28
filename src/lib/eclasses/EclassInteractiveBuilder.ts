@@ -184,11 +184,7 @@ export default class EclassInteractiveBuilder {
     this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
     await this._updateStep();
 
-    // 7. Ask for the targeted role
-    this.responses.targetRole = await this._makeMessageStep('autoPromptRole', config.messages.prompts.targetRole);
-    await this._updateStep();
-
-    // 8. Ask whether the class will be recorded
+    // 7. Ask whether the class will be recorded
     await this.botMessagePrompt.edit(config.messages.createClassSetup.promptMessageDropdown);
     const isRecordedInteraction = await this._makeSelectMenuStep(isRecordedMenu);
     this.responses.isRecorded = isRecordedInteraction.values.shift() === 'yes';
@@ -267,10 +263,9 @@ export default class EclassInteractiveBuilder {
       duration: this.responses.duration
         ? dayjs.duration(this.responses.duration).humanize()
         : this._emoteForStep(4),
-        professor: this.responses.professor ?? this._emoteForStep(5),
-        role: this.responses.targetRole ?? this._emoteForStep(6),
+      professor: this.responses.professor ?? this._emoteForStep(5),
       isRecorded: isNullish(this.responses.isRecorded)
-        ? this._emoteForStep(7)
+        ? this._emoteForStep(6)
         : this.responses.isRecorded
           ? 'Oui :white_check_mark:'
           : 'Non :x:',

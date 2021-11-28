@@ -212,24 +212,6 @@ export default class EclassCommand extends HorizonSubCommand {
         break;
       }
 
-      case 'role':
-      case 'rôle': {
-        const targetRole = await args.pickResult('role');
-        if (targetRole.error) {
-          await message.channel.send(config.messages.prompts.targetRole.invalid);
-          return;
-        }
-
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { targetRole: targetRole.value.id },
-          { new: true },
-        );
-        updateMessage = config.messages.editedRole;
-        notificationMessage = config.messages.pingEditedRole;
-        break;
-      }
-
       case 'record':
       case 'recorded':
       case 'enregistre':
