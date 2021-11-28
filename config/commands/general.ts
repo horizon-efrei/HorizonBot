@@ -135,6 +135,32 @@ export const reminders = {
   },
 };
 
+export const serverInfo = {
+  options: {
+    aliases: ['server-info', 'serveur-info'],
+    description: 'Affiche diverses informations sur la guilde où la commande est exécutée.',
+    enabled: true,
+    usage: 'serverinfo',
+    examples: ['serverinfo'],
+  },
+  messages: {
+    embed: {
+      title: 'Informations sur {name}',
+      membersTitle: 'Membres',
+      membersValue: 'Total : **{memberCount}**\nPropriétaire : <@{ownerId}>',
+      channelsTitle: 'Salons',
+      channelsValue: 'Total : **{channels.cache.size}**\n:hash: Salons textuels : **{text}**\n:loud_sound: Salons vocaux : **{voice}**\n:pushpin: Catégories : **{categories}**',
+      boostsTitle: 'Boosts',
+      boostsValue: 'Niveau **{premiumTier}**\n**{premiumSubscriptionCount}**/15 boosts',
+      rolesTitle: 'Rôles',
+      rolesValue: 'Total : **{roles.cache.size}**',
+      createdAtTitle: 'Création',
+      createdAtValue: 'Crée le <t:{createdTimestamp}>\n<t:{createdTimestamp}:R>',
+      footer: 'ID : {id}',
+    },
+  },
+};
+
 export const statistics = {
   options: {
     aliases: ['statistiques', 'statistique', 'statistics', 'statistic', 'stats', 'stat', 'botinfo'],
