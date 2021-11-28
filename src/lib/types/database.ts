@@ -16,17 +16,20 @@ export enum ConfigEntriesChannels {
   ClassCalendarL1 = 'channel-class-calendar-l1',
   ClassCalendarL2 = 'channel-class-calendar-l2',
   ClassCalendarL3 = 'channel-class-calendar-l3',
+  Logs = 'channel-logs',
   ModeratorFeedback = 'channel-moderator-feedback',
   WeekUpcomingClasses = 'channel-week-upcoming-classes',
-  Logs = 'channel-logs',
 }
 
 export enum ConfigEntriesRoles {
+  Eprof = 'role-eprof',
   EprofComputerScience = 'role-eprof-computer-science',
   EprofGeneralFormation = 'role-eprof-general-formation',
   EprofMathematics = 'role-eprof-mathematics',
   EprofPhysicsElectronics = 'role-eprof-physics-electronics',
-  Eprof = 'role-eprof',
+  SchoolYearL1 = 'role-l1',
+  SchoolYearL2 = 'role-l2',
+  SchoolYearL3 = 'role-l3',
   Staff = 'role-staff',
 }
 

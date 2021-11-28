@@ -77,6 +77,18 @@ const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry
   possibilities: ['prof', 'eprof', 'prof-general', 'eprof-general'],
   type: 'role',
   entry: ConfigEntriesRoles.Eprof,
+}, {
+  possibilities: ['role-l1', 'role-promo-l1'],
+  type: 'role',
+  entry: ConfigEntriesRoles.SchoolYearL1,
+}, {
+  possibilities: ['role-l2', 'role-promo-l2'],
+  type: 'role',
+  entry: ConfigEntriesRoles.SchoolYearL2,
+}, {
+  possibilities: ['role-l3', 'role-promo-l3'],
+  type: 'role',
+  entry: ConfigEntriesRoles.SchoolYearL3,
 }];
 
 const possibilitiesExamples = inlineCodeList(argNames.flatMap(argName => argName.possibilities[0]));
