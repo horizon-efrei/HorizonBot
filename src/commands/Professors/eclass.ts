@@ -329,6 +329,10 @@ export default class EclassCommand extends HorizonSubCommand {
 
     // Change the URL & confirm
     await EclassManager.setRecordLink(eclass, link.value.toString());
+
+    // Edit the global announcement messages (calendar & week upcoming classes)
+    await EclassManager.updateGlobalAnnouncements(message.guild.id, eclass.subject.schoolYear);
+
     await message.channel.send(config.messages.successfullyAddedLink);
   }
 
