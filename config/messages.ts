@@ -202,15 +202,13 @@ export default {
     textChannel: '<#{textChannel}>',
     textDocsChannel: ' • Documents : <#{textDocsChannel}>',
     voiceChannel: ' • Vocal : <#{voiceChannel}> *(cliquez pour rejoindre)*',
-    body: stripIndent`
-      {exams}
-
+    finishedClasses: stripIndent`
       **Cours terminés ou annulés :**
       {finishedClasses}
-
+    `,
+    plannedClasses: stripIndent`
       **Cours prévus :**
       {plannedClasses}
-      **\n**
     `,
     recordLink: '| [[Enregistrement]]({recordLink})',
     classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic} [[Voir plus]]({messageLink})',

@@ -4,6 +4,7 @@ import { oneLine } from 'common-tags';
 import dayjs from 'dayjs';
 import type { MessageOptions } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
+import drop from 'lodash.drop';
 import groupBy from 'lodash.groupby';
 import take from 'lodash.take';
 import pupa from 'pupa';
@@ -64,6 +65,7 @@ async function updateMessage(
 function getCalendarClassContentForSubject(
   allClasses: EclassPopulatedDocument[],
   subject: SubjectDocument,
+  dropOffset = 0,
 ): string {
   let content = pupa(messages.classesCalendar.textChannel, subject);
   if (subject.textDocsChannel)
@@ -72,6 +74,8 @@ function getCalendarClassContentForSubject(
     content += pupa(messages.classesCalendar.voiceChannel, subject);
 
   const exams = subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • ');
+  if (exams.length > 0)
+    content += `\n${exams}`;
 
   const formatter = (eclass: EclassPopulatedDocument): string => oneLine`
     ${pupa(messages.classesCalendar.classLine, {
@@ -84,20 +88,27 @@ function getCalendarClassContentForSubject(
     ${eclass.recordLink ? pupa(messages.classesCalendar.recordLink, eclass) : ''}
   `;
 
-  const finishedClasses = allClasses
-    .filter(eclass => [EclassStatus.Canceled, EclassStatus.Finished].includes(eclass.status));
+  const finishedClasses = drop(
+    allClasses.filter(eclass => [EclassStatus.Canceled, EclassStatus.Finished].includes(eclass.status)),
+    dropOffset,
+  );
   const plannedClasses = allClasses
     .filter(eclass => [EclassStatus.Planned, EclassStatus.InProgress].includes(eclass.status));
 
-  content += pupa(messages.classesCalendar.body, {
-    exams: exams.length > 0 ? `\n${exams}` : '',
-    finishedClasses: finishedClasses.length > 0
-      ? finishedClasses.map(formatter).join('\n')
-      : 'Aucun cours terminé',
-    plannedClasses: plannedClasses.length > 0
-      ? plannedClasses.map(formatter).join('\n')
-      : 'Aucun cours prévu',
-  });
+  if (finishedClasses.length > 0) {
+    content += '\n\n';
+    content += pupa(messages.classesCalendar.finishedClasses, {
+      finishedClasses: finishedClasses.map(formatter).join('\n'),
+    });
+  }
+
+  if (plannedClasses.length > 0) {
+    content += '\n\n';
+    content += pupa(messages.classesCalendar.plannedClasses, {
+      plannedClasses: plannedClasses.map(formatter).join('\n'),
+    });
+  }
+
   return content;
 }
 
@@ -111,7 +122,12 @@ function generateCalendarEmbeds(allClasses: EclassPopulatedDocument[], subjects:
       .setThumbnail(subject.emojiImage);
 
     const subjectUpcomingClasses = allClasses.filter(eclass => eclass.subject.classCode === subject.classCode);
-    const content = getCalendarClassContentForSubject(subjectUpcomingClasses, subject);
+    let content: string;
+    let dropOffset = 0;
+    do
+      content = getCalendarClassContentForSubject(subjectUpcomingClasses, subject, dropOffset++);
+     while (content.length > 5950);
+
     embed.setDescription(content);
 
     embeds.push(embed);
