@@ -265,9 +265,9 @@ export default class EclassCommand extends HorizonSubCommand {
     await originalMessage.edit({
       content: originalMessage.content,
       embeds: [EclassManager.createAnnouncementEmbed({
+        ...eclass.normalizeDates(),
         subject: eclass.subject,
         topic: eclass.topic,
-        formattedDate,
         duration: eclass.duration,
         professor: await message.guild.members.fetch(eclass.professor),
         classChannel,

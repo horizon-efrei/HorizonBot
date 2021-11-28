@@ -37,14 +37,15 @@ export async function updateGlobalAnnouncements(guildId: string, schoolYear: Sch
 }
 
 export function createAnnouncementEmbed({
-  subject,
-  topic,
-  formattedDate,
-  duration,
-  professor,
   classChannel,
   classId,
+  date,
+  duration,
+  end,
   isRecorded,
+  professor,
+  subject,
+  topic,
 }: EclassEmbedOptions): MessageEmbed {
   const texts = config.messages.newClassEmbed;
   return new MessageEmbed()
@@ -53,7 +54,7 @@ export function createAnnouncementEmbed({
     .setDescription(pupa(texts.description, { subject, classChannel }))
     .setThumbnail(subject.emojiImage)
     .setAuthor(texts.author, classChannel.guild.iconURL())
-    .addField(texts.date, formattedDate, true)
+    .addField(texts.date, pupa(texts.dateValue, { date, end }), true)
     .addField(texts.duration, dayjs.duration(duration).humanize(), true)
     .addField(texts.professor, professor.toString(), true)
     .addField(texts.recorded, config.messages.recordedValues[Number(isRecorded)], true)
@@ -96,14 +97,15 @@ export async function createClass(
 
   // Create & send the announcement embed
   const embed = createAnnouncementEmbed({
+    classChannel,
+    classId: 'Création en cours...',
+    date: Math.floor(date.getTime() / 1000),
+    duration,
+    end: Math.floor((date.getTime() + duration) / 1000),
+    isRecorded,
+    professor,
     subject,
     topic,
-    formattedDate,
-    duration,
-    professor,
-    classChannel,
-    classId: '',
-    isRecorded,
   });
   const announcementMessage = await announcementChannel.send({
     content: pupa(config.messages.newClassNotification, { targetRole }),

@@ -86,6 +86,7 @@ export const eclass = {
       description: "Un nouveau cours en {classChannel} a été planifié sur Ef'Réussite !\nRéagis avec :white_check_mark: pour être notifié du cours !",
       author: "Ef'Réussite - Nouveau cours !",
       date: 'Date et heure',
+      dateValue: '<t:{date}> - <t:{end}:t>',
       duration: 'Durée prévue',
       professor: 'Professeur',
       recorded: 'Enregistré',

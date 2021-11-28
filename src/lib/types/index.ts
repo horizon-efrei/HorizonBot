@@ -51,14 +51,15 @@ export interface EclassCreationOptions {
 }
 
 export interface EclassEmbedOptions {
-  subject: SubjectBase;
-  topic: string;
-  formattedDate: string;
-  duration: number;
-  professor: GuildMember;
   classChannel: GuildTextBasedChannel;
   classId: string;
+  date: number;
+  duration: number;
+  end: number;
   isRecorded: boolean;
+  professor: GuildMember;
+  subject: SubjectBase;
+  topic: string;
 }
 
 export type HorizonCommandOptions = CommandOptions & {
