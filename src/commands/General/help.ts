@@ -43,6 +43,14 @@ export default class HelpCommand extends HorizonCommand {
           inlineCodeList(commands.map(cmd => cmd.name)),
         );
       }
+
+      const tags = this.container.client.tags.filter(tag => tag.guildId === message.guild.id);
+      if (tags.size > 0) {
+        embed.addField(
+          pupa(information.category, { categoryName: config.messages.tagsCategory }),
+          inlineCodeList([...tags.map(tag => tag.name)]),
+        );
+      }
     }
 
     await message.channel.send({ embeds: [embed] });

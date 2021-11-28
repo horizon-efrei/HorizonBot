@@ -50,6 +50,7 @@ export const help = {
       description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande en particulier.\nSeulement les commandes que tu peux exécuter s'affichent.",
       category: '❯ {categoryName}',
     },
+    tagsCategory: 'Tags',
   },
 };
 
