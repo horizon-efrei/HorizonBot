@@ -1,10 +1,12 @@
+import { MessageLimits } from '@sapphire/discord-utilities';
+
 /**
  * Split a long text into an array of strings of `n` characters maximum, and between each line.
  * @param text The text to split
- * @param n The size of each array. Defaults to 2000
+ * @param n The size of each array. Defaults to 2000 (@sapphire/discord-utilities#MessageLimits.MaximumLength)
  * @returns The splitted text
  */
-export default function splitText(text: string, n = 2000): string[] {
+export default function splitText(text: string, n = MessageLimits.MaximumLength): string[] {
   const blocks: string[] = [];
   const lines = text.split(/\n/g);
   let index = 0;

@@ -1,4 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
+import { GuildLimits } from '@sapphire/discord-utilities';
 import type { CommandOptions } from '@sapphire/framework';
 import pupa from 'pupa';
 import { limits as config } from '@/config/commands/admin';
@@ -14,8 +15,8 @@ export default class LimitsCommand extends HorizonCommand {
     await message.channel.send(pupa(config.messages.limits, {
       channels: message.guild.channels.cache.size,
       roles: message.guild.roles.cache.size,
-      channelsLeft: 500 - message.guild.channels.cache.size,
-      rolesLeft: 250 - message.guild.roles.cache.size,
+      channelsLeft: GuildLimits.MaximumChannels - message.guild.channels.cache.size,
+      rolesLeft: GuildLimits.MaximumRoles - message.guild.roles.cache.size,
     }));
   }
 }

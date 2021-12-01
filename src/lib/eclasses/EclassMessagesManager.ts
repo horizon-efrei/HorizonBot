@@ -1,3 +1,4 @@
+import { EmbedLimits, MessageLimits } from '@sapphire/discord-utilities';
 import { container } from '@sapphire/pieces';
 import { isNullish } from '@sapphire/utilities';
 import { oneLine } from 'common-tags';
@@ -126,7 +127,7 @@ function generateCalendarEmbeds(allClasses: EclassPopulatedDocument[], subjects:
     let dropOffset = 0;
     do
       content = getCalendarClassContentForSubject(subjectUpcomingClasses, subject, dropOffset++);
-     while (content.length > 5950);
+     while (content.length > EmbedLimits.MaximumTotalCharacters - 50);
 
     embed.setDescription(content);
 
@@ -190,7 +191,7 @@ async function updateClassesCalendarForSchoolYear(
   //     - field name max 256 chars
   //     - field value max 1024 chars
   const embeds = generateCalendarEmbeds(yearClasses, subjects);
-  await updateMessage(firstMessage, channel, { embeds: take(embeds, 10) });
+  await updateMessage(firstMessage, channel, { embeds: take(embeds, MessageLimits.MaximumEmbeds) });
 
   for (const msg of allBotMessages)
     await msg.delete();

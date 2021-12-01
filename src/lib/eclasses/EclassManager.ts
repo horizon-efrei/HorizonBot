@@ -1,3 +1,4 @@
+import { EmbedLimits, RoleLimits } from '@sapphire/discord-utilities';
 import { container } from '@sapphire/pieces';
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
@@ -71,7 +72,7 @@ export function getRoleNameForClass(
   { formattedDate, subject, topic }: Pick<EclassCreationOptions, 'subject' | 'topic'> & { formattedDate: string },
 ): string {
   const baseRoleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic: '{topic}', formattedDate });
-  const remainingLength = 100 - baseRoleName.length + '{topic}'.length;
+  const remainingLength = RoleLimits.MaximumNameLength - baseRoleName.length + '{topic}'.length;
   return pupa(baseRoleName, { topic: trimText(topic, remainingLength) });
 }
 
@@ -245,7 +246,7 @@ export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void
   const announcementEmbed = announcementMessage.embeds[0];
   announcementEmbed.setColor(settings.colors.red);
   announcementEmbed.setDescription(config.messages.valueCanceled);
-  announcementEmbed.spliceFields(0, 25);
+  announcementEmbed.spliceFields(0, EmbedLimits.MaximumFields);
   await announcementMessage.edit({ embeds: [announcementEmbed] });
   await announcementMessage.reactions.removeAll();
 

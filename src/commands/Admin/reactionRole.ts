@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { roleMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
+import { EmbedLimits } from '@sapphire/discord-utilities';
 import type { IMessagePrompterExplicitConfirmReturn } from '@sapphire/discord.js-utilities';
 import { MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Args, Resolvers } from '@sapphire/framework';
@@ -155,7 +156,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       .setTemplate(baseEmbed)
       .setItems(
         items.map(rr => ({
-          name: trimText(rr.title, 250),
+          name: trimText(rr.title, EmbedLimits.MaximumFieldNameLength),
           value: pupa(config.messages.listFieldDescription, {
             ...rr,
             unique: rr.unique ? settings.emojis.yes : settings.emojis.no,
