@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import { SchoolYear, TeachingUnit } from '@/types';
 import type { SubjectDocument, SubjectModel } from '@/types/database';
 
-const SubjectSchema = new Schema<SubjectDocument, SubjectModel>({
+const SubjectSchema = new Schema<SubjectDocument, SubjectModel, null>({
   name: {
     type: String,
     required: true,

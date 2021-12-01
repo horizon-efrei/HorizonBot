@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import type { ReactionRoleDocument, ReactionRoleModel } from '@/types/database';
 import { makeMessageLink } from '@/utils';
 
-const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
+const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel, null>({
   messageId: {
     type: String,
     required: true,

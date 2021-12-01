@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import type { DiscordLogDocument, DiscordLogModel } from '@/types/database';
 
-const DiscordLogSchema = new Schema<DiscordLogDocument, DiscordLogModel>({
+const DiscordLogSchema = new Schema<DiscordLogDocument, DiscordLogModel, null>({
   type: {
     type: Number,
     required: true,

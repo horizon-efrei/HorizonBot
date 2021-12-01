@@ -3,7 +3,7 @@ import { model, Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 import type { ReminderDocument, ReminderModel } from '@/types/database';
 
-const ReminderSchema = new Schema<ReminderDocument, ReminderModel>({
+const ReminderSchema = new Schema<ReminderDocument, ReminderModel, null>({
   reminderId: {
     type: String,
     default: (): string => nanoid(6),

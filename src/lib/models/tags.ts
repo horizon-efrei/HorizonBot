@@ -2,7 +2,7 @@ import { container } from '@sapphire/pieces';
 import { model, Schema } from 'mongoose';
 import type { TagDocument, TagModel } from '@/types/database';
 
-const TagSchema = new Schema<TagDocument, TagModel>({
+const TagSchema = new Schema<TagDocument, TagModel, null>({
   name: {
     type: String,
     required: true,

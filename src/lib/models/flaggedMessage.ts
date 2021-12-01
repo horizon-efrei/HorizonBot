@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import type { FlaggedMessageDocument, FlaggedMessageModel } from '@/types/database';
 
-const FlaggedMessageSchema = new Schema<FlaggedMessageDocument, FlaggedMessageModel>({
+const FlaggedMessageSchema = new Schema<FlaggedMessageDocument, FlaggedMessageModel, null>({
   guildId: {
     type: String,
     required: true,

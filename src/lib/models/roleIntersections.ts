@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
 import type { RoleIntersectionDocument, RoleIntersectionModel } from '@/types/database';
 
-const RoleIntersectionSchema = new Schema<RoleIntersectionDocument, RoleIntersectionModel>({
+const RoleIntersectionSchema = new Schema<RoleIntersectionDocument, RoleIntersectionModel, null>({
   roleId: {
     type: String,
     required: true,

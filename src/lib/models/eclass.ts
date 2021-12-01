@@ -13,7 +13,7 @@ import { makeMessageLink } from '@/utils';
 
 const nanoid = customAlphabet(urlAlphabet.replace(/[_-]/, ''), 4);
 
-const EclassSchema = new Schema<EclassDocument, EclassModel>({
+const EclassSchema = new Schema<EclassDocument, EclassModel, null>({
   classId: {
     type: String,
     required: true,
