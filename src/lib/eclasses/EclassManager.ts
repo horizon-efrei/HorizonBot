@@ -333,11 +333,15 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
   ).catch(nullop);
 
   // Send the notification to the eclass channel
-  await classChannel.send(
-    pupa(config.messages.remindClassNotification, { ...eclass.toJSON(), ...eclass.normalizeDates() }),
-  );
+  const payload = { ...eclass.toJSON(), ...eclass.normalizeDates() };
+  await classChannel.send(pupa(config.messages.remindClassNotification, payload));
+
   // Send the private message to the subscribers
-  await massSend(guild, eclass.subscribers, pupa(config.messages.remindClassPrivateNotification, eclass));
+  const baseReminder = pupa(config.messages.remindClassPrivateNotification, payload);
+  const fullReminder = eclass.subject.voiceChannel
+    ? `${baseReminder} ${pupa(config.messages.remindClassPrivateNotificationVoiceChannel, payload)}`
+    : baseReminder;
+  await massSend(guild, eclass.subscribers, fullReminder);
 
   container.logger.debug(`[e-class:${eclass.classId}] Sent reminders.`);
 }

@@ -87,7 +87,7 @@ export const eclass = {
       description: 'Cours en {classChannel} le **<t:{date}>** !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !',
       author: "Ef'Réussite - Nouveau cours !",
       date: 'Date et heure',
-      dateValue: '<t:{date}> - <t:{end}:t>',
+      dateValue: '<t:{date}> - <t:{end}:t>\n<t:{date}:R>',
       duration: 'Durée prévue',
       professor: 'Professeur',
       recorded: 'Enregistré',
@@ -183,7 +183,8 @@ export const eclass = {
     successfullyStarted: 'Le cours a bien été lancé !',
     startClassNotification: ':bell: <@&{classRole}>, le cours commence !',
     remindClassNotification: ':bell: <@&{classRole}> rappel : le cours commence <t:{date}:R>',
-    remindClassPrivateNotification: ":bell: Tu t'es inscrit au cours \"{topic}\". Il va commencer dans environ 15 minutes ! Tiens-toi prêt :\\)",
+    remindClassPrivateNotification: ":bell: Tu t'es inscrit au cours \"{topic}\". Il commence <t:{date}:R> ! Tiens-toi prêt :\\)\nIl se passera dans <#{subject.textChannel}>.",
+    remindClassPrivateNotificationVoiceChannel: 'Salon vocal : <#{subject.voiceChannel}>.',
     valueInProgress: '[En cours]',
     alertProfessor: stripIndent`
       Bonjour, ton cours "{topic}" (en {subject.teachingUnit}) va commencer dans environ 15 minutes.
