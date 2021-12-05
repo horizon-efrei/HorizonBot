@@ -109,9 +109,9 @@ export default class EclassInteractiveBuilder {
     const collector = this.mainBotMessage.createMessageComponentCollector({
       componentType: MessageComponentTypes.BUTTON,
     }).on('collect', async (interaction) => {
-        if (interaction.customId === 'abort')
-          await this._abort(config.messages.prompts.stoppedPrompting, interaction);
-      });
+      if (interaction.customId === 'abort')
+        await this._abort(config.messages.prompts.stoppedPrompting, interaction);
+    });
 
     try {
       await this._askPrompts();

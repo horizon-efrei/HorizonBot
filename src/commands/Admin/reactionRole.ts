@@ -22,10 +22,10 @@ import { GuildMessage } from '@/types';
 import type { GuildTextBasedChannel, ReactionRolePair, ReactionRoleReturnPayload } from '@/types';
 import type { ReactionRoleDocument } from '@/types/database';
 import {
- firstAndRest,
- generateSubcommands,
- nullop,
- trimText,
+  firstAndRest,
+  generateSubcommands,
+  nullop,
+  trimText,
 } from '@/utils';
 
 interface ExtraContext {
