@@ -13,6 +13,8 @@ import type {
 } from '@/types';
 
 export default class ArgumentPrompter {
+  private _terminated = false;
+
   constructor(
     private readonly _message: GuildMessage,
     private readonly _options?: {
@@ -159,6 +161,10 @@ export default class ArgumentPrompter {
     }).value;
   }
 
+  public terminate(): void {
+    this._terminated = true;
+  }
+
   private async _prompt(prompts: PrompterText, previousIsFailure: boolean): Promise<GuildMessage> {
     const handler = new MessagePrompter(
       previousIsFailure ? `${prompts.invalid} ${prompts.base}` : prompts.base,
@@ -171,6 +177,9 @@ export default class ArgumentPrompter {
     let appliedMessage: GuildMessage;
     try {
       const result = await handler.run(this._message.channel, this._message.author) as PrompterMessageResult;
+      if (this._terminated)
+        return;
+
       response = result.response;
       appliedMessage = result.appliedMessage;
     } catch (err: unknown) {
