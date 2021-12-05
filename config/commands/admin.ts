@@ -1,6 +1,100 @@
 import { stripIndent, stripIndents } from 'common-tags';
 import { LogStatuses } from '@/types/database';
 
+export const contact = {
+  options: {
+    aliases: ['contact', 'contacts'],
+    description: 'contact',
+    enabled: true,
+    usage: 'contact',
+    examples: ['contact'],
+  },
+  messages: {
+    // Global
+    invalidContact: 'Impossible de trouver le contact demandé.',
+
+    // Create a contact
+    createdContact: 'Ce contact a bien été créé !',
+    createContactSetup: {
+      embed: {
+        title: "Création d'un contact",
+        description: "Bienvenue dans l'assistant de création de contacts ! Suis les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il te sera demandé. Tu peux, à tout moment, abandonner la création du contact en cliquant sur \"Abandonner\".",
+        stepPreviewTitle: 'Aperçu des étapes',
+        currentStepTitle: 'Étape actuelle : {step}',
+        currentStepDescription: [
+          'Envoie un message contenant le nom de la personne.',
+          'Envoie un message contenant le moyen de contact de la personne (probablement son e-mail).',
+          'Choisis dans le menu déroulant OU envoie un message contenant le nom du service associé à la personne.',
+          'Envoie un message contenant une description de la personne (son rôle par exemple).',
+          'Terminé !',
+        ],
+      },
+      promptMessageDropdown: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
+      promptMessageDropdownOrSendMessage: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ou envoie un message',
+      stepPreview: stripIndent`
+        **1.** __Nom :__ {name}
+        **2.** __Contact :__ {contact}
+        **3.** __Service :__ {team}
+        **4.** __Description :__ {description}
+      `,
+      teamMenu: {
+        placeholder: 'Aucune équipe sélectionnée',
+      },
+      abortMenu: {
+        label: 'Abandonner',
+      },
+      error: 'Oups, une erreur est survenue lors de cette action :confused:\n> {details}',
+    },
+
+    // List the contacts
+    noContacts: "Je n'ai trouvé aucun contacts dans la base de données !",
+    listLine: '**__{contact}__**\n*{description}*',
+    pageTitle: 'Contact {teamName}',
+    selectMenuItemDescription: 'Page {pageIndex}',
+    selectMenuItemEmoji: '🏷',
+
+    // Edit contact
+    invalidField: 'Le champs à modifier doit-être "nom", "contact", "service" ou "description"',
+    editedContact: 'Le contact a bien été modifié !',
+
+    // Remove contact
+    removedContact: 'Le contact a bien été supprimé !',
+
+    // Help page
+    helpEmbedTitle: 'Aide des Contacts',
+    helpEmbedDescription: [
+      { name: 'Créer un contact', value: '`contact create`' },
+      { name: 'Liste des contacts', value: '`contact list`' },
+      { name: 'Modifier un contact', value: "`contact edit <nom> <'nom' | 'contact' | 'service' | 'description'> <nouveau nom/contact/service/description>`" },
+      { name: 'Supprimer un contact', value: '`contact remove <nom>`' },
+      { name: "Page d'aide", value: '`contact help`' },
+    ],
+
+    // Prompts
+    prompts: {
+      name: {
+        base: 'Entre le nom de la personne :',
+        invalid: 'Ce nom est invalide.',
+      },
+      contact: {
+        base: 'Entre le moyen de contact de la personne, probablement son e-mail :',
+        invalid: 'Ce moyen de contact est invalide.',
+      },
+      team: {
+        base: 'Entre le nom du service associé à la personne :',
+        invalid: 'Ce service est invalide.',
+      },
+      description: {
+        base: 'Entre une description de la personne, son rôle par exemple.',
+        invalid: 'Cette description est invalide.',
+      },
+
+      stoppedPrompting: "Tu as bien abandonné la commande ! Aucun contact n'a été créé.",
+      promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucun contact n'a été créé.",
+    },
+  },
+};
+
 export const evaluate = {
   options: {
     aliases: ['eval', 'evaluate', 'ev'],
@@ -15,6 +109,7 @@ export const evaluate = {
     output: '**Résultat**\n{output}\n**Type**\n{type}\n:stopwatch: {time}',
   },
 };
+
 export const limits = {
   options: {
     aliases: ['limit', 'limits', 'limite', 'limites'],

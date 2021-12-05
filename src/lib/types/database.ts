@@ -378,3 +378,23 @@ export interface LogStatusesDocument extends LogStatusesBase, Document {}
 /** Interface for the "Log Statuses"'s mongoose model */
 export type LogStatusesModel = Model<LogStatusesDocument>;
 // #endregion
+
+/* ***************************** */
+/*     Contact Database Types    */
+/* ***************************** */
+
+// #region Contact Database Types
+/** Type for the "Contact"'s mongoose schema */
+export interface ContactBase {
+  team: string;
+  name: string;
+  contact: string;
+  description: string;
+}
+
+/** Simplified interface for the "Contact"'s mongoose document */
+export interface ContactDocument extends ContactBase, Document {}
+
+/** Interface for the "Contact"'s mongoose model */
+export type ContactModel = Model<ContactDocument>;
+// #endregion
