@@ -1,4 +1,3 @@
-
 import type { Args } from '@sapphire/framework';
 import { container } from '@sapphire/framework';
 import { eclass as config } from '@/config/commands/professors';

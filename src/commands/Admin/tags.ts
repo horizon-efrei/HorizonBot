@@ -8,7 +8,7 @@ import intersection from 'lodash.intersection';
 import pupa from 'pupa';
 import { tags as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
-import { ResolveTagArgument } from '@/decorators';
+import { IsStaff, ResolveTagArgument } from '@/decorators';
 import Tags from '@/models/tags';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
@@ -21,7 +21,6 @@ const embedFlags = ['embed', 'e'];
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  preconditions: ['StaffOnly'],
   flags: [...embedFlags],
   subCommands: generateSubcommands(['create', 'list', 'edit', 'remove', 'help'], {
     rename: {},
@@ -30,6 +29,7 @@ const embedFlags = ['embed', 'e'];
   }),
 })
 export default class TagsCommand extends HorizonSubCommand {
+  @IsStaff()
   public async create(message: GuildMessage, args: Args): Promise<void> {
     const isEmbed = args.getFlags(...embedFlags);
     let name: string = (await args.pickResult('string')).value;
@@ -88,6 +88,7 @@ export default class TagsCommand extends HorizonSubCommand {
       .run(message);
   }
 
+  @IsStaff()
   @ResolveTagArgument()
   public async edit(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
     tag.content = (await args.restResult('string')).value
@@ -96,6 +97,7 @@ export default class TagsCommand extends HorizonSubCommand {
     await message.channel.send(config.messages.editedTag);
   }
 
+  @IsStaff()
   @ResolveTagArgument()
   public async rename(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
     const newName = (await args.pickResult('string')).value
@@ -110,6 +112,7 @@ export default class TagsCommand extends HorizonSubCommand {
     await message.channel.send(config.messages.editedTag);
   }
 
+  @IsStaff()
   @ResolveTagArgument()
   public async alias(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
     const rawValue = (await args.restResult('string')).value
@@ -130,6 +133,7 @@ export default class TagsCommand extends HorizonSubCommand {
     await message.channel.send(config.messages.editedTag);
   }
 
+  @IsStaff()
   @ResolveTagArgument()
   public async embed(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
     const isEmbed = await args.pickResult('boolean');
@@ -146,6 +150,7 @@ export default class TagsCommand extends HorizonSubCommand {
     await message.channel.send(pupa(config.messages.editedTagEmbed, { inOrWithout: inOrWithout(tag.isEmbed) }));
   }
 
+  @IsStaff()
   @ResolveTagArgument()
   public async remove(message: GuildMessage, _args: Args, tag: TagDocument): Promise<void> {
     await tag.remove();
