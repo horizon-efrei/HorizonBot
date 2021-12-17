@@ -1,25 +1,26 @@
 import type { SubCommandManager } from '@sapphire/plugin-subcommands';
-import type { Writable } from '@/types';
 
 export const commonSubcommands = {
-  create: { aliases: ['create', 'add', 'new', 'set'] },
-  list: { aliases: ['list', 'liste', 'ls', 'show'] },
-  edit: { aliases: ['edit', 'change', 'modify'] },
-  remove: { aliases: ['remove', 'delete', 'rm', 'del'] },
-  help: { aliases: ['help', 'aide'], default: true },
+  create: { aliases: ['add', 'new', 'set'] },
+  list: { aliases: ['liste', 'ls', 'show'] },
+  edit: { aliases: ['change', 'modify'] },
+  remove: { aliases: ['delete', 'rm', 'del'] },
+  help: { aliases: ['aide'] },
 };
 
+type DefaultSubCommands = keyof typeof commonSubcommands;
 type SubcommandRaw = Record<string, { aliases?: string[]; default?: boolean }>;
 
-function getEntries(subcommand: { name: string; aliases?: string[]; default?: boolean }): SubCommandManager.RawEntries {
-  const allSubcommands: Writable<SubCommandManager.RawEntries> = [];
+function getEntries(subcommand: { name: string; aliases?: string[] }): SubCommandManager.Entry[] {
+  const allSubcommands: SubCommandManager.Entry[] = [];
 
-  allSubcommands.push({ input: subcommand.name, default: subcommand.default ?? false });
+  allSubcommands.push({ input: subcommand.name, default: false });
   for (const alias of (subcommand.aliases ?? []))
     allSubcommands.push({ input: alias, output: subcommand.name });
 
   return allSubcommands;
 }
+
 
 /**
  * Generate sapphire-compatible subcommand options from an simplified array.
@@ -27,17 +28,28 @@ function getEntries(subcommand: { name: string; aliases?: string[]; default?: bo
  * @returns The sapphire-compatible subcommand options
  */
 export default function generateSubcommands(
-  common: Array<keyof typeof commonSubcommands>,
-  args?: SubcommandRaw,
+  common: DefaultSubCommands[],
+  args?: DefaultSubCommands | SubcommandRaw,
+  defaultOverwrite?: DefaultSubCommands,
 ): SubCommandManager.RawEntries {
-  const finalArguments: Writable<SubCommandManager.RawEntries> = [];
+  const finalArguments: SubCommandManager.Entry[] = [];
 
   for (const name of common)
     finalArguments.push(...getEntries({ name, ...commonSubcommands[name] }));
 
-  if (args) {
+  if (typeof args === 'object') {
     for (const [name, options] of Object.entries(args))
       finalArguments.push(...getEntries({ name, ...options }));
+  }
+
+  if (!finalArguments.some(arg => arg.default)) {
+    const defaultSubCommand = typeof args === 'string'
+      ? args
+      : typeof defaultOverwrite === 'string'
+      ? defaultOverwrite
+      : 'help';
+    for (const argument of finalArguments)
+      argument.default = argument.input === defaultSubCommand;
   }
 
   return finalArguments;

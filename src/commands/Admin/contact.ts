@@ -19,7 +19,7 @@ import { generateSubcommands } from '@/utils';
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  subCommands: generateSubcommands(['create', 'list', 'edit', 'remove', 'help']),
+  subCommands: generateSubcommands(['create', 'list', 'edit', 'remove', 'help'], 'list'),
 })
 export default class ContactCommand extends HorizonSubCommand {
   @IsStaff()
