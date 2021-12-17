@@ -96,7 +96,7 @@ const possibilitiesExamples = inlineCodeList(argNames.flatMap(argName => argName
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  preconditions: ['StaffOnly'],
+  preconditions: ['GuildOnly', 'StaffOnly'],
   subCommands: generateSubcommands(['create', 'list', 'remove', 'help'], {
     see: { aliases: ['get', 'info'] },
   }),
@@ -111,7 +111,7 @@ export default class SetupCommand extends HorizonSubCommand {
     }
 
     if (matchArg.type === 'channel') {
-      const channel = (await args.pickResult('guildTextBasedChannel'))?.value || message.channel;
+      const channel = (await args.pickResult('guildTextBasedChannel'))?.value ?? message.channel;
       await this.container.client.configManager.set(matchArg.entry, channel);
     } else if (matchArg.type === 'role') {
       const role = (await args.pickResult('role'))?.value;

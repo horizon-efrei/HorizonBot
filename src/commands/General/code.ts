@@ -3,12 +3,12 @@ import type { Args } from '@sapphire/framework';
 import { BucketScope } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import axios from 'axios';
+import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { code as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
-import type { GuildMessage } from '@/types';
 import { convertSize, generateSubcommands, inlineCodeList } from '@/utils';
 
 const wraps = {
@@ -39,7 +39,7 @@ const wraps = {
   }),
 })
 export default class CodeCommand extends HorizonSubCommand {
-  public async main(message: GuildMessage, args: Args): Promise<void> {
+  public async main(message: Message, args: Args): Promise<void> {
     if (this.container.client.remainingCompilerApiCredits <= 0) {
       await message.channel.send(config.messages.noMoreCredits);
       return;
@@ -90,7 +90,7 @@ export default class CodeCommand extends HorizonSubCommand {
     await message.channel.send(`\`\`\`ph\n${response.data.output}\`\`\``);
   }
 
-  public async information(message: GuildMessage, _args: Args): Promise<void> {
+  public async information(message: Message, _args: Args): Promise<void> {
     const remaining = this.container.client.remainingCompilerApiCredits;
     const embed = new MessageEmbed()
       .setColor(settings.colors.default)

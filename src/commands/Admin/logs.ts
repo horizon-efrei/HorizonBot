@@ -49,7 +49,7 @@ const getLogInfo = (
 
 @ApplyOptions<CommandOptions>({
   ...config.options,
-  preconditions: ['StaffOnly'],
+  preconditions: ['GuildOnly', 'StaffOnly'],
 })
 export default class LogsCommand extends HorizonCommand {
   public async messageRun(message: GuildMessage, args: Args): Promise<void> {

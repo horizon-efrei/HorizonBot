@@ -1,14 +1,14 @@
 import { Listener } from '@sapphire/framework';
+import type { Message } from 'discord.js';
 import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
-import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
 import type { MessageDeleteAuditLogs } from '@/types/discord-js';
-import { nullop } from '@/utils';
+import { isGuildMessage, nullop } from '@/utils';
 
 export default class MessageDeleteListener extends Listener {
-  public async run(message: GuildMessage): Promise<void> {
-    if (message.system)
+  public async run(message: Message): Promise<void> {
+    if (message.system || message.partial || message.channel.partial || !isGuildMessage(message))
       return;
 
     if (!message.author.bot) {

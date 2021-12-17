@@ -7,7 +7,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({
   ...config.options,
-  preconditions: ['StaffOnly'],
+  preconditions: ['GuildOnly', 'StaffOnly'],
   flags: ['keep'],
 })
 export default class PingRoleIntersectionCommand extends HorizonCommand {

@@ -2,17 +2,17 @@ import path from 'node:path';
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import axios from 'axios';
+import type { Message } from 'discord.js';
 import PDFMerger from 'pdf-merger-js';
 import { mergePDF as config } from '@/config/commands/general';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({
   ...config.options,
   options: ['name'],
 })
 export default class PDFMergeCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: Message, args: Args): Promise<void> {
     await message.channel.sendTyping();
 
     const result = await args.repeatResult('message');

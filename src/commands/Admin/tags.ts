@@ -22,6 +22,7 @@ const embedFlags = ['embed', 'e'];
   ...config.options,
   generateDashLessAliases: true,
   flags: [...embedFlags],
+  preconditions: ['GuildOnly'],
   subCommands: generateSubcommands(['create', 'list', 'edit', 'remove', 'help'], {
     rename: {},
     alias: { aliases: ['aliases'] },
@@ -92,7 +93,7 @@ export default class TagsCommand extends HorizonSubCommand {
   @ResolveTagArgument()
   public async edit(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
     tag.content = (await args.restResult('string')).value
-      || await new ArgumentPrompter(message).promptText(config.messages.prompts.content);
+      ?? await new ArgumentPrompter(message).promptText(config.messages.prompts.content);
     await tag.save();
     await message.channel.send(config.messages.editedTag);
   }
@@ -101,7 +102,7 @@ export default class TagsCommand extends HorizonSubCommand {
   @ResolveTagArgument()
   public async rename(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
     const newName = (await args.pickResult('string')).value
-      || (await new ArgumentPrompter(message).promptText(config.messages.prompts.newName)).split(' ').shift();
+      ?? (await new ArgumentPrompter(message).promptText(config.messages.prompts.newName)).split(' ').shift();
     if (!this._isValid([newName], message.guild.id)) {
       await message.channel.send(config.messages.invalidTag);
       return;
@@ -116,7 +117,7 @@ export default class TagsCommand extends HorizonSubCommand {
   @ResolveTagArgument()
   public async alias(message: GuildMessage, args: Args, tag: TagDocument): Promise<void> {
     const rawValue = (await args.restResult('string')).value
-      || await new ArgumentPrompter(message).promptText(config.messages.prompts.aliases);
+      ?? await new ArgumentPrompter(message).promptText(config.messages.prompts.aliases);
 
     if (rawValue === 'clear') {
       tag.aliases = [];

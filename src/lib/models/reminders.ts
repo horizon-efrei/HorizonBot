@@ -22,10 +22,6 @@ const ReminderSchema = new Schema<ReminderDocument, ReminderModel, null>({
     type: String,
     required: true,
   },
-  guildId: {
-    type: String,
-    required: true,
-  },
 }, { timestamps: true });
 
 ReminderSchema.post('save', async () => {

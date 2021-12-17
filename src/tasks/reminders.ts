@@ -12,8 +12,8 @@ export default class ReminderTask extends Task {
     const reminders = Reminders.find({ date: { $lte: Date.now() } });
 
     for await (const reminder of reminders) {
-      const member = await this.container.client.guilds.cache.get(reminder.guildId).members.fetch(reminder.userId);
-      await member.send(pupa(messages.reminders.alarm, reminder.toJSON())).catch(noop);
+      const user = await this.container.client.users.fetch(reminder.userId);
+      await user.send(pupa(messages.reminders.alarm, reminder.toJSON())).catch(noop);
       await reminder.remove();
     }
   }

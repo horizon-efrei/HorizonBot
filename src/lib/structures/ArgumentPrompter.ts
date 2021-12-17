@@ -1,6 +1,6 @@
 import { isGuildBasedChannel, MessagePrompter } from '@sapphire/discord.js-utilities';
 import { Resolvers } from '@sapphire/framework';
-import type { GuildMember, Role } from 'discord.js';
+import type { GuildMember, Message, Role } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import * as CustomResolvers from '@/resolvers';
@@ -16,10 +16,10 @@ export default class ArgumentPrompter {
   private _terminated = false;
 
   constructor(
-    private readonly _message: GuildMessage,
+    private readonly _message: Message,
     private readonly _options?: {
-      messageArray?: Set<GuildMessage>;
-      baseMessage?: GuildMessage;
+      messageArray?: Set<Message>;
+      baseMessage?: Message;
     },
   ) {}
 
@@ -33,7 +33,7 @@ export default class ArgumentPrompter {
     return response;
   }
 
-  public async autoPromptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
+  public async autoPromptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<Message> {
     let response = await this.promptMessage(prompts, previousIsFailure);
     while (!response)
       response = await this.promptMessage(prompts, true);
@@ -107,9 +107,9 @@ export default class ArgumentPrompter {
     return CustomResolvers.resolveGuildTextBasedChannel(query, response).value;
   }
 
-  public async promptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<GuildMessage> {
+  public async promptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<Message> {
     const response = await this._prompt({ ...messages.prompts.message, ...prompts }, previousIsFailure);
-    return (await Resolvers.resolveMessage(response.content, { message: response })).value as GuildMessage;
+    return (await Resolvers.resolveMessage(response.content, { message: response })).value;
   }
 
   public async promptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {

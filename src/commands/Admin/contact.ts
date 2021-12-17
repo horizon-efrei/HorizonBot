@@ -2,6 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
@@ -83,7 +84,7 @@ export default class ContactCommand extends HorizonSubCommand {
     await message.channel.send(config.messages.removedContact);
   }
 
-  public async list(message: GuildMessage, _args: Args): Promise<void> {
+  public async list(message: Message, _args: Args): Promise<void> {
     const contacts = await Contact.find();
     if (contacts.length === 0) {
       await message.channel.send(config.messages.noContacts);
@@ -115,7 +116,7 @@ export default class ContactCommand extends HorizonSubCommand {
     await paginator.run(message);
   }
 
-  public async help(message: GuildMessage, _args: Args): Promise<void> {
+  public async help(message: Message, _args: Args): Promise<void> {
     const embed = new MessageEmbed()
       .setTitle(config.messages.helpEmbedTitle)
       .addFields([...config.messages.helpEmbedDescription])

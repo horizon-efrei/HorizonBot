@@ -7,14 +7,18 @@ import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
-import { noop, nullop } from '@/utils';
+import { isGuildMessage, noop, nullop } from '@/utils';
 
 export default class MessageReactionRemoveListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
-    if (reaction.message.system || user.bot || !('guild' in reaction.message.channel))
+    if (reaction.message.system
+      || user.bot
+      || reaction.message.partial
+      || reaction.message.channel.partial
+      || !isGuildMessage(reaction.message))
       return;
 
-    const message = reaction.message as GuildMessage;
+    const { message } = reaction;
 
     await DiscordLogManager.logAction({
       type: DiscordLogType.ReactionRemove,

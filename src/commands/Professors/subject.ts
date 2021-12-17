@@ -20,6 +20,7 @@ import { generateSubcommands } from '@/utils';
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
+  preconditions: ['GuildOnly'],
   subCommands: generateSubcommands(['create', 'remove', 'list', 'help']),
 })
 export default class SubjectCommand extends HorizonSubCommand {

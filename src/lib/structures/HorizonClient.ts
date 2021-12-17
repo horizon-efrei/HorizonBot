@@ -34,6 +34,8 @@ export default class HorizonClient extends SapphireClient {
       loadDefaultErrorListeners: true,
       presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${settings.prefix}help` }] },
       intents: [
+        Intents.FLAGS.DIRECT_MESSAGES, // Access to Direct Messages.
+        Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, // Access to MessageReactionAdd/Remove events in DMs.
         Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, // Access to EmojiDelete events.
         Intents.FLAGS.GUILD_INVITES, // Access to InviteCreate events.
         Intents.FLAGS.GUILD_MEMBERS, // Access to GuildMemberAdd/Update/Remove events.
@@ -42,6 +44,7 @@ export default class HorizonClient extends SapphireClient {
         Intents.FLAGS.GUILD_VOICE_STATES, // Access to VoiceStateUpdate events.
         Intents.FLAGS.GUILDS, // Access to Guilds, Channels, Threads, Roles events.
       ],
+      partials: ['CHANNEL'],
     });
 
     this.stores.register(new TaskStore());

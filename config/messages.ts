@@ -10,6 +10,7 @@ export default {
   errors: {
     precondition: {
       [Identifiers.PreconditionStaffOnly]: ":x: Aïe, tu n'as pas la permission de faire cela :confused:",
+      [Identifiers.PreconditionGuildOnly]: ':x: Aïe, cette commande ne peut être utilisée que dans un serveur :confused:',
       unknownError: "Une pré-condition de commande inconnue t'empêche d'effectuer cette action.",
     },
   },

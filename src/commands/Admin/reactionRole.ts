@@ -38,7 +38,7 @@ const uniqueFlags = ['unique', 'u'];
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  preconditions: ['StaffOnly'],
+  preconditions: ['GuildOnly', 'StaffOnly'],
   flags: [...uniqueFlags],
   subCommands: generateSubcommands(['create', 'edit', 'help', 'list', 'remove'], {
     addPair: { aliases: ['add-pair', 'new-pair'] },

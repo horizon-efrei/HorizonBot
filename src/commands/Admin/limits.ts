@@ -8,7 +8,7 @@ import type { GuildMessage } from '@/types';
 
 @ApplyOptions<CommandOptions>({
   ...config.options,
-  preconditions: ['StaffOnly'],
+  preconditions: ['GuildOnly', 'StaffOnly'],
 })
 export default class LimitsCommand extends HorizonCommand {
   public async messageRun(message: GuildMessage): Promise<void> {

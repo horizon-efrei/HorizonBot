@@ -7,7 +7,10 @@ import settings from '@/config/settings';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
-@ApplyOptions<CommandOptions>(config.options)
+@ApplyOptions<CommandOptions>({
+  ...config.options,
+  preconditions: ['GuildOnly'],
+})
 export default class ServerInfoCommand extends HorizonCommand {
   public async messageRun(message: GuildMessage): Promise<void> {
     const texts = config.messages.embed;

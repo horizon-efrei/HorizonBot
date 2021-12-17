@@ -11,6 +11,7 @@ const allFlags = ['a', 'all'];
 @ApplyOptions<CommandOptions>({
   ...config.options,
   flags: [...allFlags],
+  preconditions: ['GuildOnly'],
   generateDashLessAliases: true,
 })
 export default class VocalCountCommand extends HorizonCommand {

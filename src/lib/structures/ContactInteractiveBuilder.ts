@@ -15,7 +15,7 @@ import { contact as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import Contact from '@/models/contact';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import type { GuildMessage, PrompterText } from '@/types';
+import type { PrompterText } from '@/types';
 import { capitalize, noop } from '@/utils';
 
 const getTeamsMenu = (teams: string[]): MessageSelectMenu => new MessageSelectMenu()
@@ -26,7 +26,7 @@ const getTeamsMenu = (teams: string[]): MessageSelectMenu => new MessageSelectMe
 export default class ContactInteractiveBuilder {
   public step = 0;
   public mainBotMessage: Message;
-  public botMessagePrompt: GuildMessage;
+  public botMessagePrompt: Message;
   public prompter: ArgumentPrompter;
   public aborted = false;
   public responses = {
@@ -36,7 +36,7 @@ export default class ContactInteractiveBuilder {
     description: null,
   } as ContactBase;
 
-  private readonly _userResponses = new Set<GuildMessage>();
+  private readonly _userResponses = new Set<Message>();
   private readonly _actionRows = [
     new MessageActionRow()
       .addComponents(
@@ -47,7 +47,7 @@ export default class ContactInteractiveBuilder {
       ),
   ];
 
-  constructor(public message: GuildMessage) {}
+  constructor(public message: Message) {}
 
   private get _embed(): MessageEmbed {
     return new MessageEmbed()
@@ -63,7 +63,7 @@ export default class ContactInteractiveBuilder {
 
   public async start(): Promise<ContactBase | null> {
     this.mainBotMessage = await this.message.channel.send({ embeds: [this._embed], components: this._actionRows });
-    this.botMessagePrompt = await this.message.channel.send(config.messages.prompts.name.base) as GuildMessage;
+    this.botMessagePrompt = await this.message.channel.send(config.messages.prompts.name.base);
 
     this.prompter = new ArgumentPrompter(this.message, {
       messageArray: this._userResponses,

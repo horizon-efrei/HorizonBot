@@ -38,6 +38,7 @@ const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]>
   ...config.options,
   generateDashLessAliases: true,
   flags: ['ping'],
+  preconditions: ['GuildOnly'],
   options: Object.values(listOptions).flat(),
   subCommands: generateSubcommands(['create', 'list', 'help'], {
     start: { aliases: ['begin'] },

@@ -2,6 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import type { CommandOptions } from '@sapphire/framework';
 import { Args } from '@sapphire/framework';
+import type { Message } from 'discord.js';
 import { DMChannel, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { commonSubcommands } from '@/app/lib/utils/generateSubcommands';
@@ -11,7 +12,6 @@ import settings from '@/config/settings';
 import Reminders from '@/models/reminders';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
 import type { ReminderBase } from '@/types/database';
 
 enum Subcommand {
@@ -39,14 +39,14 @@ export default class RemindersCommand extends HorizonCommand {
     return Args.error({ argument, parameter });
   });
 
-  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: Message, args: Args): Promise<void> {
     const action = args.finished
       ? Subcommand.List
       : await args.pick(RemindersCommand._action).catch(() => Subcommand.Create);
     await this[action](message, args);
   }
 
-  public async create(message: GuildMessage, args: Args): Promise<void> {
+  public async create(message: Message, args: Args): Promise<void> {
     let date: number;
     try {
       date = await args.pick('duration')
@@ -62,17 +62,16 @@ export default class RemindersCommand extends HorizonCommand {
       date,
       description: (await args.restResult('string'))?.value ?? messages.reminders.noDescription,
       userId: message.author.id,
-      guildId: message.guild.id,
     });
 
-    const hasDmOpened = (await message.member.createDM()) instanceof DMChannel;
+    const hasDmOpened = (await message.author.createDM()) instanceof DMChannel;
     await message.channel.send([
       pupa(config.messages.createdReminder, reminder.toJSON()),
       hasDmOpened ? '' : config.messages.openDm,
     ].filter(Boolean).join('\n'));
   }
 
-  public async list(message: GuildMessage, _args: Args): Promise<void> {
+  public async list(message: Message, _args: Args): Promise<void> {
     const reminders = this.container.client.reminders.filter(rmd => rmd.userId === message.author.id);
     if (!reminders || reminders.size === 0) {
       await message.channel.send(config.messages.noReminders);
@@ -89,7 +88,7 @@ export default class RemindersCommand extends HorizonCommand {
       .run(message);
   }
 
-  public async edit(message: GuildMessage, args: Args): Promise<void> {
+  public async edit(message: Message, args: Args): Promise<void> {
     const targetId = (await args.pickResult('string')).value;
     const reminder = await Reminders.findOne({ reminderId: targetId, userId: message.author.id });
     if (!reminder) {
@@ -118,7 +117,7 @@ export default class RemindersCommand extends HorizonCommand {
     await message.channel.send(config.messages.editedReminder);
   }
 
-  public async remove(message: GuildMessage, args: Args): Promise<void> {
+  public async remove(message: Message, args: Args): Promise<void> {
     const targetId = (await args.pickResult('string')).value
       ?? (await new ArgumentPrompter(message).promptText(config.messages.prompts.id)).split(' ').shift();
 
@@ -132,7 +131,7 @@ export default class RemindersCommand extends HorizonCommand {
     await message.channel.send(config.messages.removedReminder);
   }
 
-  public async help(message: GuildMessage, _args: Args): Promise<void> {
+  public async help(message: Message, _args: Args): Promise<void> {
     const embed = new MessageEmbed()
       .setTitle(config.messages.helpEmbedTitle)
       .addFields([...config.messages.helpEmbedDescription])

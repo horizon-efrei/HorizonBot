@@ -1,17 +1,19 @@
 import { ApplyOptions } from '@sapphire/decorators';
+import { isDMChannel } from '@sapphire/discord.js-utilities';
 import type { Args, CommandOptions } from '@sapphire/framework';
+import { ok } from '@sapphire/framework';
+import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
 import { help as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
-import { inlineCodeList } from '@/utils';
+import { inlineCodeList, isGuildMessage } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class HelpCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
+  public async messageRun(message: Message, args: Args): Promise<void> {
     const command = (await args.pickResult('command'))?.value;
     const embed = new MessageEmbed().setColor(settings.colors.default);
 
@@ -44,24 +46,26 @@ export default class HelpCommand extends HorizonCommand {
         );
       }
 
-      const tags = this.container.client.tags.filter(tag => tag.guildId === message.guild.id);
-      if (tags.size > 0) {
-        embed.addField(
-          pupa(information.category, { categoryName: config.messages.tagsCategory }),
-          inlineCodeList([...tags.map(tag => tag.name)]),
-        );
+      if (isGuildMessage(message)) {
+        const tags = this.container.client.tags.filter(tag => tag.guildId === message.guild.id);
+        if (tags.size > 0) {
+          embed.addField(
+            pupa(information.category, { categoryName: config.messages.tagsCategory }),
+            inlineCodeList([...tags.map(tag => tag.name)]),
+          );
+        }
       }
     }
 
     await message.channel.send({ embeds: [embed] });
   }
 
-  private async _getPossibleCategories(message: GuildMessage): Promise<Record<string, HorizonCommand[]>> {
+  private async _getPossibleCategories(message: Message): Promise<Record<string, HorizonCommand[]>> {
     const originalCommands = this.container.stores.get('commands');
     const commands: HorizonCommand[] = [];
 
     for (const command of originalCommands.values()) {
-      const result = await command.preconditions.run(message, command);
+      const result = isDMChannel(message.channel) ? ok() : await command.preconditions.run(message, command);
       if (result.success)
         commands.push(command as HorizonCommand);
     }

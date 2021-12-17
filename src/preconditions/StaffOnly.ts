@@ -1,10 +1,14 @@
 import type { AsyncPreconditionResult } from '@sapphire/framework';
 import { Identifiers, Precondition } from '@sapphire/framework';
 import type { Message } from 'discord.js';
+import { isGuildMessage } from '../lib/utils';
 import { ConfigEntriesRoles } from '@/types/database';
 
 export default class StaffOnlyPrecondition extends Precondition {
   public async run(message: Message): AsyncPreconditionResult {
+    if (!isGuildMessage(message))
+      return this.error({ identifier: Identifiers.PreconditionGuildOnly, message: 'You cannot run this command in DMs.' });
+
     if (message.member.permissions.has('ADMINISTRATOR'))
       return this.ok();
 

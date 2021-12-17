@@ -239,7 +239,6 @@ export interface ReminderBase {
   date: number;
   description: string;
   userId: string;
-  guildId: string;
 }
 
 /** Interface for the "Reminder"'s mongoose document */

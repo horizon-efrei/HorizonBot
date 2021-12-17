@@ -1,18 +1,18 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { CommandOptions } from '@sapphire/framework';
 import dayjs from 'dayjs';
+import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import pkg from '@/root/package.json';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
 import { getGitRev } from '@/utils';
 
 @ApplyOptions<CommandOptions>(config.options)
 export default class StatisticsCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage): Promise<void> {
+  public async messageRun(message: Message): Promise<void> {
     const embedMessages = config.messages.embed;
     const commitHash = await getGitRev();
     const embed = new MessageEmbed()

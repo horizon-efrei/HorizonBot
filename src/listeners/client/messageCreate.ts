@@ -1,15 +1,20 @@
 import { Listener } from '@sapphire/framework';
+import type { Message } from 'discord.js';
 import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
-import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
+import { isGuildMessage } from '@/utils';
 
 const discordInviteLinkRegex = /(?:https?:\/\/)?(?:www\.)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)(?<code>[\w\d-]{2,})/gimu;
 
 export default class MessageListener extends Listener {
-  public async run(message: GuildMessage): Promise<void> {
-    if (message.author.bot || message.system)
+  public async run(message: Message): Promise<void> {
+    if (message.author.bot
+      || message.partial
+      || message.channel.partial
+      || message.system
+      || !isGuildMessage(message))
       return;
 
     await DiscordLogManager.logAction({

@@ -12,7 +12,7 @@ import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
 import { TeachingUnit } from '@/types';
 import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
-import { noop } from '@/utils';
+import { isGuildMessage, noop } from '@/utils';
 
 const teachingUnitEprofMapping = {
   [TeachingUnit.ComputerScience]: ConfigEntriesRoles.EprofComputerScience,
@@ -23,10 +23,14 @@ const teachingUnitEprofMapping = {
 
 export default class MessageReactionAddListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
-    if (reaction.message.system || user.bot || !('guild' in reaction.message.channel))
+    if (reaction.message.system
+      || user.bot
+      || reaction.message.partial
+      || reaction.message.channel.partial
+      || !isGuildMessage(reaction.message))
       return;
 
-    const message = reaction.message as GuildMessage;
+    const { message } = reaction;
 
     await DiscordLogManager.logAction({
       type: DiscordLogType.ReactionAdd,

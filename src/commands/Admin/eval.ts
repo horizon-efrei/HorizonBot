@@ -34,7 +34,7 @@ interface EvalOptions {
   ...config.options,
   flags: ['async', 'showHidden', 'hidden', 'json'],
   options: ['depth'],
-  preconditions: ['AdminOnly'],
+  preconditions: ['GuildOnly', 'AdminOnly'],
 })
 export default class EvalCommand extends HorizonCommand {
   maxRunTime = 60_000;
