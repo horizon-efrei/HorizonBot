@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2021/12/17
+
+### Added
+
+- Add a contact command
+- Add eclass record link to calendar when updated
+- Add tags list to help command
+- Add message for the cooldown precondition
+- Add a command to edit reminders
+
+### Improved
+
+- Make commands work in DMs
+- Improve eclass DM reminders
+- Improve permissions for commands with subcommands
+
+### Fixed
+
+- Attempt to make calendars safer length-wise
+
+
 ## [0.6.0] - 2021/11/28
 
 ### Added
