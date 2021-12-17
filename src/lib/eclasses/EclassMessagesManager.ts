@@ -24,11 +24,11 @@ import {
   splitText,
 } from '@/utils';
 
-const calendarMapping = new Map([
-  [SchoolYear.L1, ConfigEntriesChannels.ClassCalendarL1],
-  [SchoolYear.L2, ConfigEntriesChannels.ClassCalendarL2],
-  [SchoolYear.L3, ConfigEntriesChannels.ClassCalendarL3],
-]);
+const calendarMapping = {
+  [SchoolYear.L1]: ConfigEntriesChannels.ClassCalendarL1,
+  [SchoolYear.L2]: ConfigEntriesChannels.ClassCalendarL2,
+  [SchoolYear.L3]: ConfigEntriesChannels.ClassCalendarL3,
+} as const;
 
 async function updateMessage(
   message: GuildMessage,
@@ -223,7 +223,7 @@ export async function updateClassesCalendarForGuildAndSchoolYear(
   guildId: string,
   schoolYear: SchoolYear,
 ): Promise<void> {
-  const channel = await container.client.configManager.get(calendarMapping.get(schoolYear), guildId);
+  const channel = await container.client.configManager.get(calendarMapping[schoolYear], guildId);
   if (!channel) {
     container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Setup an calendar channel with "${settings.prefix}setup calendar-${schoolYear}"`);
     return;

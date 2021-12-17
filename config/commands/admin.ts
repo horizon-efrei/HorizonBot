@@ -93,7 +93,7 @@ export const contact = {
       promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucun contact n'a été créé.",
     },
   },
-};
+} as const;
 
 export const evaluate = {
   options: {
@@ -108,7 +108,7 @@ export const evaluate = {
     evalTimeout: "Le code a pris plus de 1min pour s'éxecuter...",
     output: '**Résultat**\n{output}\n**Type**\n{type}\n:stopwatch: {time}',
   },
-};
+} as const;
 
 export const limits = {
   options: {
@@ -121,7 +121,7 @@ export const limits = {
   messages: {
     limits: 'Salons : {channels}/500 (reste {channelsLeft})\nRôles : {roles}/250 (reste {rolesLeft})',
   },
-};
+} as const;
 
 export const logs = {
   options: {
@@ -146,7 +146,7 @@ export const logs = {
       [LogStatuses.Discord]: ':white_check_mark: Discord & console',
     },
   },
-};
+} as const;
 
 export const pingRoleIntersection = {
   options: {
@@ -163,7 +163,7 @@ export const pingRoleIntersection = {
     successTemporary: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s). Il sera supprimé 2 jours après sa première utilisation.',
     successPersistent: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s).',
   },
-};
+} as const;
 
 export const reactionRole = {
   options: {
@@ -253,7 +253,7 @@ export const reactionRole = {
       { name: "Page d'aide", value: '`!rr help`' },
     ],
   },
-};
+} as const;
 
 export const setup = {
   options: {
@@ -285,7 +285,7 @@ export const setup = {
       { name: "Page d'aide", value: '`!setup help`' },
     ],
   },
-};
+} as const;
 
 export const tags = {
   options: {
@@ -353,4 +353,4 @@ export const tags = {
       },
     },
   },
-};
+} as const;

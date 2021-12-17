@@ -43,7 +43,7 @@ const statusesPossibilitiesExamples = [...logStatuses.values()].map(v => v[0]);
 const getLogInfo = (
   { type, status }: { type: DiscordLogType; status: LogStatusesEnum },
 ): { type: string; status: string } => ({
-  type: messages.logs.simplifiedReadableEvents.get(type),
+  type: messages.logs.simplifiedReadableEvents[type],
   status: config.messages.statuses[status],
 });
 

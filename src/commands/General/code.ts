@@ -11,12 +11,12 @@ import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildMessage } from '@/types';
 import { convertSize, generateSubcommands, inlineCodeList } from '@/utils';
 
-const wraps = new Map([
-  ['c', '#include <stdio.h>\n#include <stdlib.h>\nint main() { {code} }'],
-  ['cpp', '#include <iostream>\nint main() { {code} }'],
-  ['java', 'public class Main {\n\tpublic static void main(String[] args) {\n\t{code}\n\t}\n}'],
-  ['javascript', ';(async () => { {code} } )();'],
-]);
+const wraps = {
+  c: '#include <stdio.h>\n#include <stdlib.h>\nint main() { {code} }',
+  cpp: '#include <iostream>\nint main() { {code} }',
+  java: 'public class Main {\n\tpublic static void main(String[] args) {\n\t{code}\n\t}\n}',
+  javascript: ';(async () => { {code} } )();',
+} as const;
 
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
@@ -60,8 +60,8 @@ export default class CodeCommand extends HorizonSubCommand {
       return;
     }
     let code = codeArg.value;
-    if (shouldWrap)
-      code = pupa(wraps.get(lang.value.language), { code });
+    if (shouldWrap && Object.keys(wraps).includes(lang.value.language))
+      code = pupa(wraps[lang.value.language as keyof typeof wraps], { code });
 
     void message.channel.sendTyping();
 

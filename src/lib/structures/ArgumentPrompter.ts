@@ -156,7 +156,9 @@ export default class ArgumentPrompter {
   public async promptBoolean(prompts?: PrompterText, previousIsFailure = false): Promise<boolean> {
     const response = await this._prompt({ ...messages.prompts.boolean, ...prompts }, previousIsFailure);
     return Resolvers.resolveBoolean(response.content, {
+      // @ts-expect-error: currently doesnt support readonly arrays, fixed by https://github.com/sapphiredev/framework/pull/338
       truths: settings.configuration.booleanTruths,
+      // @ts-expect-error: currently doesnt support readonly arrays, fixed by https://github.com/sapphiredev/framework/pull/338
       falses: settings.configuration.booleanFalses,
     }).value;
   }

@@ -118,7 +118,7 @@ export default class ContactCommand extends HorizonSubCommand {
   public async help(message: GuildMessage, _args: Args): Promise<void> {
     const embed = new MessageEmbed()
       .setTitle(config.messages.helpEmbedTitle)
-      .addFields(config.messages.helpEmbedDescription)
+      .addFields([...config.messages.helpEmbedDescription])
       .setColor(settings.colors.default);
 
     await message.channel.send({ embeds: [embed] });

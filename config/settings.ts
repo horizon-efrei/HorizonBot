@@ -116,4 +116,4 @@ export default {
   ] as CodeLanguageResult[],
   maintainers: ['Elliot Maisl (<@188341077902753794>)'],
   thanks: ['Kétessar Tan (<@222050512684580876>) : contributions'],
-};
+} as const;

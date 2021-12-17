@@ -26,7 +26,7 @@ export const code = {
       Version : {lang.version}
     `,
   },
-};
+} as const;
 
 export const help = {
   options: {
@@ -52,7 +52,7 @@ export const help = {
     },
     tagsCategory: 'Tags',
   },
-};
+} as const;
 
 export const latex = {
   options: {
@@ -65,7 +65,7 @@ export const latex = {
   messages: {
     noEquationGiven: "Tu as oublié d'ajouter une équation à formatter !",
   },
-};
+} as const;
 
 export const mergePDF = {
   options: {
@@ -79,7 +79,7 @@ export const mergePDF = {
     noPDFGiven: 'Il faut ajouter des PDFs à ton message, ou donner le lien de messages contenant des PDFs !',
     notEnoughFiles: 'Il faut me donner au moins 2 fichiers pour que je puisse les fusionner !',
   },
-};
+} as const;
 
 export const ping = {
   options: {
@@ -93,7 +93,7 @@ export const ping = {
     firstMessage: 'Ping !',
     secondMessage: "Pong ! Latence de HorizonBot : {botPing}ms. Latence de l'API : {apiPing}ms.",
   },
-};
+} as const;
 
 export const reminders = {
   options: {
@@ -137,7 +137,7 @@ export const reminders = {
       },
     },
   },
-};
+} as const;
 
 export const serverInfo = {
   options: {
@@ -163,7 +163,7 @@ export const serverInfo = {
       footer: 'ID : {id}',
     },
   },
-};
+} as const;
 
 export const statistics = {
   options: {
@@ -188,7 +188,7 @@ export const statistics = {
       thanks: '❯ Remerciements',
     },
   },
-};
+} as const;
 
 export const vocalCount = {
   options: {
@@ -204,4 +204,4 @@ export const vocalCount = {
     noOnlineMembers: "Personne n'est connecté dans un salon vocal dans ce serveur.",
     count: 'Il y a {count} personnes connectées dans ce salon vocal !',
   },
-};
+} as const;

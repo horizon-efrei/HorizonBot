@@ -14,12 +14,12 @@ import { TeachingUnit } from '@/types';
 import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
 import { noop } from '@/utils';
 
-const teachingUnitEprofMapping = new Map([
-  [TeachingUnit.ComputerScience, ConfigEntriesRoles.EprofComputerScience],
-  [TeachingUnit.GeneralFormation, ConfigEntriesRoles.EprofGeneralFormation],
-  [TeachingUnit.Mathematics, ConfigEntriesRoles.EprofMathematics],
-  [TeachingUnit.PhysicsElectronics, ConfigEntriesRoles.EprofPhysicsElectronics],
-]);
+const teachingUnitEprofMapping = {
+  [TeachingUnit.ComputerScience]: ConfigEntriesRoles.EprofComputerScience,
+  [TeachingUnit.GeneralFormation]: ConfigEntriesRoles.EprofGeneralFormation,
+  [TeachingUnit.Mathematics]: ConfigEntriesRoles.EprofMathematics,
+  [TeachingUnit.PhysicsElectronics]: ConfigEntriesRoles.EprofPhysicsElectronics,
+} as const;
 
 export default class MessageReactionAddListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
@@ -149,7 +149,10 @@ export default class MessageReactionAddListener extends Listener {
         { textDocsChannel: message.channel.id },
       ],
     });
-    const eprofRoleIdEntry = teachingUnitEprofMapping.get(subject.teachingUnit);
+    if (!subject)
+      return;
+
+    const eprofRoleIdEntry = teachingUnitEprofMapping[subject.teachingUnit];
     const eprofRole = await this.container.client.configManager.get(eprofRoleIdEntry, message.guild.id);
     if (!eprofRole)
       return;

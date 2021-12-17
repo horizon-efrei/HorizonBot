@@ -293,7 +293,7 @@ export const eclass = {
       promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucun cours n'a été créé.",
     },
   },
-};
+} as const;
 
 export const subject = {
   options: {
@@ -422,4 +422,4 @@ export const subject = {
       promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucune matière n'a été créée.",
     },
   },
-};
+} as const;
