@@ -117,6 +117,9 @@ export const reminders = {
     listTitle: 'Liste de tes rappels ({total})',
     listLine: '• `{reminderId}` (<t:{timestamp}:R>) : {description}',
 
+    // Edit a reminder
+    editedReminder: 'Ce rappel a bien été modifié !',
+
     // Remove a reminder
     removedReminder: 'Ce rappel a bien été supprimé !',
 
@@ -125,6 +128,7 @@ export const reminders = {
     helpEmbedDescription: [
       { name: 'Créer un rappel', value: '`reminders [create] <durée | "date"> [description]`' },
       { name: 'Liste de tes rappels', value: '`reminders list`' },
+      { name: 'Modifier un rappel', value: '`reminders edit <ID> <date | [description]>`' },
       { name: 'Supprimer un rappel', value: '`reminders remove <ID>`' },
       { name: "Page d'aide", value: '`reminders help`' },
     ],

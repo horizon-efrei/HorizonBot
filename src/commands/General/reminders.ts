@@ -19,6 +19,7 @@ enum Subcommand {
   List = 'list',
   Remove = 'remove',
   Help = 'help',
+  Edit = 'edit',
 }
 
 @ApplyOptions<CommandOptions>(config.options)
@@ -29,6 +30,8 @@ export default class RemindersCommand extends HorizonCommand {
       return Args.ok(Subcommand.List);
     if (commonSubcommands.remove.aliases.includes(query))
       return Args.ok(Subcommand.Remove);
+    if (commonSubcommands.edit.aliases.includes(query))
+      return Args.ok(Subcommand.Edit);
     if (commonSubcommands.create.aliases.includes(query))
       return Args.ok(Subcommand.Create);
     if (commonSubcommands.help.aliases.includes(query))
@@ -57,7 +60,7 @@ export default class RemindersCommand extends HorizonCommand {
 
     const reminder = await Reminders.create({
       date,
-      description: (await args.restResult('string'))?.value || messages.reminders.noDescription,
+      description: (await args.restResult('string'))?.value ?? messages.reminders.noDescription,
       userId: message.author.id,
       guildId: message.guild.id,
     });
@@ -86,9 +89,38 @@ export default class RemindersCommand extends HorizonCommand {
       .run(message);
   }
 
+  public async edit(message: GuildMessage, args: Args): Promise<void> {
+    const targetId = (await args.pickResult('string')).value;
+    const reminder = await Reminders.findOne({ reminderId: targetId, userId: message.author.id });
+    if (!reminder) {
+      await message.channel.send(config.messages.invalidReminder);
+      return;
+    }
+
+    let updateValue: number | string;
+    let updatedType: 'date' | 'description';
+    args.save();
+    try {
+      updateValue = await this._getTime(args, true);
+      updatedType = 'date';
+    } catch {
+      args.restore();
+      updateValue = (await args.restResult('string'))?.value ?? messages.reminders.noDescription;
+      updatedType = 'description';
+    }
+
+    if (updatedType === 'date')
+      reminder.date = updateValue as number;
+    else
+      reminder.description = updateValue as string;
+
+    await reminder.save();
+    await message.channel.send(config.messages.editedReminder);
+  }
+
   public async remove(message: GuildMessage, args: Args): Promise<void> {
     const targetId = (await args.pickResult('string')).value
-      || (await new ArgumentPrompter(message).promptText(config.messages.prompts.id)).split(' ').shift();
+      ?? (await new ArgumentPrompter(message).promptText(config.messages.prompts.id)).split(' ').shift();
 
     const reminder = await Reminders.findOne({ reminderId: targetId, userId: message.author.id });
     if (!reminder) {
@@ -103,9 +135,17 @@ export default class RemindersCommand extends HorizonCommand {
   public async help(message: GuildMessage, _args: Args): Promise<void> {
     const embed = new MessageEmbed()
       .setTitle(config.messages.helpEmbedTitle)
-      .addFields(config.messages.helpEmbedDescription)
+      .addFields([...config.messages.helpEmbedDescription])
       .setColor(settings.colors.default);
 
     await message.channel.send({ embeds: [embed] });
+  }
+
+  private async _getTime(args: Args, rest = false): Promise<number> {
+    const method = rest ? 'rest' : 'pick';
+    return await args[method]('duration')
+      .then(duration => Date.now() + duration)
+      .catch(async () => args[method]('date')
+        .then(dat => dat.getTime()));
   }
 }
