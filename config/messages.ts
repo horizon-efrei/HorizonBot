@@ -11,6 +11,7 @@ export default {
     precondition: {
       [Identifiers.PreconditionStaffOnly]: ":x: Aïe, tu n'as pas la permission de faire cela :confused:",
       [Identifiers.PreconditionGuildOnly]: ':x: Aïe, cette commande ne peut être utilisée que dans un serveur :confused:',
+      [Identifiers.PreconditionCooldown]: 'Pas si vite ! Cette commande est sous cooldown, attendez un peu avant de la réutiliser.',
       unknownError: "Une pré-condition de commande inconnue t'empêche d'effectuer cette action.",
     },
   },
