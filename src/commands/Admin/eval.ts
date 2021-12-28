@@ -63,7 +63,7 @@ export default class EvalCommand extends HorizonCommand {
       throw error;
     }
 
-    const result = (output.result || String.fromCharCode(8203)) as string;
+    const result = (output.result || String.fromCodePoint(8203)) as string;
     const messageWithoutResult = pupa(config.messages.output, {
       output: '{output}',
       type: codeBlock('ts', options.isJson ? 'JSON' : output.type),

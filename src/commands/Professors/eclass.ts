@@ -384,7 +384,8 @@ export default class EclassCommand extends HorizonSubCommand {
 
     const professorQuery = args.getOption(...listOptions.professor);
     if (professorQuery) {
-      const value = (await Resolvers.resolveMember(professorQuery, message.guild))?.value;
+      const resolvedMember = await Resolvers.resolveMember(professorQuery, message.guild);
+      const value = resolvedMember?.value;
       if (value) {
         filters.push(eclass => eclass.professor === value.id);
         filterDescriptions.push(pupa(config.messages.professorFilter, { value }));
@@ -393,7 +394,8 @@ export default class EclassCommand extends HorizonSubCommand {
 
     const roleQuery = args.getOption(...listOptions.role);
     if (roleQuery) {
-      const value = (await Resolvers.resolveRole(roleQuery, message.guild))?.value;
+      const resolvedRole = await Resolvers.resolveRole(roleQuery, message.guild);
+      const value = resolvedRole?.value;
       if (value) {
         filters.push(eclass => eclass.targetRole === value.id);
         filterDescriptions.push(pupa(config.messages.roleFilter, { value }));

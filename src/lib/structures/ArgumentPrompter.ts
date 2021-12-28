@@ -109,7 +109,8 @@ export default class ArgumentPrompter {
 
   public async promptMessage(prompts?: PrompterText, previousIsFailure = false): Promise<Message> {
     const response = await this._prompt({ ...messages.prompts.message, ...prompts }, previousIsFailure);
-    return (await Resolvers.resolveMessage(response.content, { message: response })).value;
+    const message = await Resolvers.resolveMessage(response.content, { message: response });
+    return message.value;
   }
 
   public async promptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {
@@ -142,7 +143,8 @@ export default class ArgumentPrompter {
     if (response.mentions.members.size > 0)
       return response.mentions.members.first();
 
-    return (await Resolvers.resolveMember(response.content, response.guild)).value;
+    const member = await Resolvers.resolveMember(response.content, response.guild);
+    return member.value;
   }
 
   public async promptRole(prompts?: PrompterText, previousIsFailure = false): Promise<Role> {
@@ -150,7 +152,8 @@ export default class ArgumentPrompter {
     if (response.mentions.roles.size > 0)
       return response.mentions.roles.first();
 
-    return (await Resolvers.resolveRole(response.content, response.guild)).value;
+    const role = await Resolvers.resolveRole(response.content, response.guild);
+    return role.value;
   }
 
   public async promptBoolean(prompts?: PrompterText, previousIsFailure = false): Promise<boolean> {

@@ -21,12 +21,11 @@ export default class RoleDeleteListener extends Listener {
     if (affectedReactionRoles.length > 0) {
       for (const reactionRole of affectedReactionRoles) {
         const pair = reactionRole.reactionRolePairs.find(rrp => rrp.role === role.id);
-        const reaction = (await (this.container.client
+        const message = await (this.container.client
           .guilds.cache.get(reactionRole.guildId)
           .channels.cache.get(reactionRole.channelId) as GuildTextBasedChannel)
-          ?.messages.fetch(reactionRole.messageId))
-          ?.reactions.cache.get(pair.reaction);
-        await reaction?.remove();
+          ?.messages.fetch(reactionRole.messageId);
+        await message?.reactions.cache.get(pair.reaction)?.remove();
       }
       this.container.logger.debug(`[ReactionRoles] Removed pairs with role ${role.id} for reaction-roles because the role (@${role.name}) was deleted. Affected reaction-roles: ${affectedReactionRoles.map(rr => rr.getMessageLink()).join(', ')}`);
     }

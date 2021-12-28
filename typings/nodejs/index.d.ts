@@ -21,7 +21,7 @@ declare namespace Intl {
   }
 
   class ListFormat {
-    constructor(lang: string, options: Partial<ListFormatOptions>)
+    constructor(lang: string, options: Partial<ListFormatOptions>);
     public format(items: Iterable<string>): string;
   }
 }
