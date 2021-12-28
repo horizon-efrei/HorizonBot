@@ -11,10 +11,10 @@ export const commonSubcommands = {
 type DefaultSubCommands = keyof typeof commonSubcommands;
 type SubcommandRaw = Record<string, { aliases?: string[]; default?: boolean }>;
 
-function getEntries(subcommand: { name: string; aliases?: string[] }): SubCommandManager.Entry[] {
+function getEntries(subcommand: { name: string; aliases?: string[]; default?: boolean }): SubCommandManager.Entry[] {
   const allSubcommands: SubCommandManager.Entry[] = [];
 
-  allSubcommands.push({ input: subcommand.name, default: false });
+  allSubcommands.push({ input: subcommand.name, default: subcommand.default ?? false });
   for (const alias of (subcommand.aliases ?? []))
     allSubcommands.push({ input: alias, output: subcommand.name });
 
