@@ -1,6 +1,7 @@
 export { default as capitalize } from './capitalize';
 export { default as convertSize } from './convertSize';
 export { default as firstAndRest } from './firstAndRest';
+export { default as firstSemesterDay } from './firstSemesterDay';
 export { default as generateSubcommands } from './generateSubcommands';
 export { default as getDuration } from './getDuration';
 export { default as getGitRev } from './getGitRev';
