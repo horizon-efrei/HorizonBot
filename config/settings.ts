@@ -22,6 +22,7 @@ export default {
     flagMessageReaction: '🚩',
     flagNeededAnswer: '📝',
     dateFormat: 'DD/MM [à] HH:mm',
+    dayFormat: 'DD/MM/YYYY',
     eclassRoleFormat: 'Cours {subject.classCode}: {topic} ({formattedDate})',
     eclassReminderTime: 15 * 60 * 1000, // 15 minutes
   },
