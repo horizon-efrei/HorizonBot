@@ -62,7 +62,7 @@ export default class RemindersCommand extends HorizonCommand {
 
     const hasDmOpened = (await message.author.createDM()) instanceof DMChannel;
     await message.channel.send([
-      pupa(config.messages.createdReminder, reminder.toJSON()),
+      pupa(config.messages.createdReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
       hasDmOpened ? '' : config.messages.openDm,
     ].filter(Boolean).join('\n'));
   }

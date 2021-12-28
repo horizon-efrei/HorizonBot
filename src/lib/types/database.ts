@@ -242,7 +242,9 @@ export interface ReminderBase {
 }
 
 /** Interface for the "Reminder"'s mongoose document */
-export interface ReminderDocument extends ReminderBase, Document {}
+export interface ReminderDocument extends ReminderBase, Document {
+  normalizeDates(): { date: number };
+}
 
 /** Interface for the "Reminder"'s mongoose model */
 export type ReminderModel = Model<ReminderDocument>;

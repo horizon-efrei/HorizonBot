@@ -31,4 +31,12 @@ ReminderSchema.post('remove', async () => {
   await container.client.loadReminders();
 });
 
+ReminderSchema.methods.normalizeDates = function (this: ReminderDocument): { date: number } {
+  const { date } = this.toObject();
+
+  return {
+    date: Math.floor(date / 1000),
+  };
+};
+
 export default model<ReminderDocument, ReminderModel>('Reminders', ReminderSchema);
