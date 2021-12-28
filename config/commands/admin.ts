@@ -148,6 +148,21 @@ export const logs = {
   },
 } as const;
 
+export const pave = {
+  options: {
+    aliases: ['pave'],
+    description: "Permet d'obtenir la liste des heures de cours données par les eProfs durant le semestre actuel, afin de pouvoir leur attribuer les points PAVE correspondants.",
+    enabled: true,
+    usage: 'pave',
+    examples: ['pave'],
+  },
+  messages: {
+    summary: 'Liste des heures de cours données par les eProfs durant le semestre actuel (depuis le {firstDay}) :',
+    summaryLine: '    • <@!{prof}> : {time} heures',
+    noEclasses: "Aucun cours n'a été donné durant le semestre actuel (depuis le {firstDay}).",
+  },
+} as const;
+
 export const pingRoleIntersection = {
   options: {
     aliases: ['ping-role-intersection', 'intersects', 'intersect', 'inter'],
