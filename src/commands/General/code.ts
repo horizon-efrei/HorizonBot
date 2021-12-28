@@ -33,8 +33,7 @@ const wraps = {
       silent: true,
     },
   }],
-  subCommands: generateSubcommands([], {
-    information: { aliases: ['info', 'infos', 'informations', 'list', 'liste', 'ls'] },
+  subCommands: generateSubcommands(['list'], {
     main: { aliases: [], default: true },
   }),
 })
@@ -47,7 +46,8 @@ export default class CodeCommand extends HorizonSubCommand {
 
     const lang = await args.pickResult('codeLanguage');
     if (lang.error) {
-      await message.channel.send(pupa(config.messages.unknownLanguage, { parameter: lang.error.parameter }));
+      const languages = settings.languages.map(lng => lng.slugs[0]);
+      await message.channel.send(pupa(config.messages.unknownLanguage, { languages: inlineCodeList(languages) }));
       return;
     }
 
@@ -90,7 +90,7 @@ export default class CodeCommand extends HorizonSubCommand {
     await message.channel.send(`\`\`\`ph\n${response.data.output}\`\`\``);
   }
 
-  public async information(message: Message, _args: Args): Promise<void> {
+  public async list(message: Message, _args: Args): Promise<void> {
     const remaining = this.container.client.remainingCompilerApiCredits;
     const embed = new MessageEmbed()
       .setColor(settings.colors.default)
