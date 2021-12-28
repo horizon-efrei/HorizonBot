@@ -26,16 +26,12 @@ enum Subcommand {
 export default class RemindersCommand extends HorizonCommand {
   private static readonly _action = Args.make<Subcommand>((parameter, { argument }) => {
     const query = parameter.toLowerCase();
-    if (commonSubcommands.list.aliases.includes(query))
-      return Args.ok(Subcommand.List);
-    if (commonSubcommands.remove.aliases.includes(query))
-      return Args.ok(Subcommand.Remove);
-    if (commonSubcommands.edit.aliases.includes(query))
-      return Args.ok(Subcommand.Edit);
-    if (commonSubcommands.create.aliases.includes(query))
-      return Args.ok(Subcommand.Create);
-    if (commonSubcommands.help.aliases.includes(query))
-      return Args.ok(Subcommand.Help);
+
+    for (const action of Object.values(Subcommand)) {
+      if (query === action || commonSubcommands[action].aliases.includes(query))
+        return Args.ok(action);
+    }
+
     return Args.error({ argument, parameter });
   });
 
