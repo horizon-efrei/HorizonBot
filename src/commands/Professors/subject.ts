@@ -1,3 +1,4 @@
+import { channelMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
@@ -83,7 +84,7 @@ export default class SubjectCommand extends HorizonSubCommand {
           value: pupa(config.messages.listFieldDescription, {
             ...subject.toJSON(),
             channels: [subject.textChannel, subject.textDocsChannel, subject.voiceChannel]
-              .map(channel => (channel ? `<#${channel}>` : 'N/A'))
+              .map(channel => (channel ? channelMention(channel) : 'N/A'))
               .join(' • '),
           }),
         })),

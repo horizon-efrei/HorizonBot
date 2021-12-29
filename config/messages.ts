@@ -1,7 +1,14 @@
+import {
+  channelMention,
+  roleMention,
+  TimestampStyles,
+  userMention,
+} from '@discordjs/builders';
 import { Identifiers } from '@sapphire/framework';
 import { oneLine, stripIndent } from 'common-tags';
 import settings from '@/config/settings';
 import { DiscordLogType } from '@/types/database';
+import { timeFormat } from '@/utils';
 
 export default {
   global: {
@@ -60,131 +67,131 @@ export default {
       [DiscordLogType.ChangeNickname]: {
         color: settings.colors.gray,
         contextName: ':busts_in_silhouette: Membres',
-        contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
+        contextValue: `Cible : ${userMention('{context.userId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':label: Surnom',
         contentValue: '```diff\n- {content.before}\n+ {content.after}```',
       },
       [DiscordLogType.ChangeUsername]: {
         color: settings.colors.gray,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context}>',
+        contextValue: userMention('{context}'),
         contentName: ':label: Nouveau pseudo',
         contentValue: '```diff\n- {content.before}\n+ {content.after}```',
       },
       [DiscordLogType.GuildJoin]: {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context}>',
+        contextValue: userMention('{context}'),
         contentName: ":link: Lien d'invitation",
         contentValue: '`{code}`: lien créé par {link.inviter}, utilisé {link.uses} fois.',
       },
       [DiscordLogType.GuildLeave]: {
         color: settings.colors.red,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context}>',
+        contextValue: userMention('{context}'),
         contentName: ":file_folder: Récap' des informations",
         contentValue: stripIndent`
           Pseudo : "{content.username}" / Surnom : "{content.displayName}" (ID: \`{content.userId}\`)
-          À rejoint : <t:{content.joinedAt}:R>
+          À rejoint : ${timeFormat('{content.joinedAt}', TimestampStyles.RelativeTime)}
           Rôles : {content.roles}
         `,
       },
       [DiscordLogType.InvitePost]: {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context.authorId}>',
+        contextValue: userMention('{context.authorId}'),
         contentName: ':link: Invitation(s) postée(s)',
         contentValue: stripIndent`
-          [Lien vers le message]({url}) (dans <#{context.channelId}>)
+          [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
           Invitations : {content}
         `,
       },
       [DiscordLogType.MessageEdit]: {
         color: settings.colors.yellow,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context.authorId}>',
+        contextValue: userMention('{context.authorId}'),
         contentName: ':pencil: Message',
         contentValue: stripIndent`
-          [Lien vers le message]({url}) (dans <#{context.channelId}>)
+          [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
           Contenu : {content}
         `,
       },
       [DiscordLogType.MessagePost]: {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context.authorId}>',
+        contextValue: userMention('{context.authorId}'),
         contentName: ':pencil: Nouveau message',
         contentValue: stripIndent`
-          [Lien vers le message]({url}) (dans <#{context.channelId}>)
+          [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
           Contenu : {content}
         `,
       },
       [DiscordLogType.MessageRemove]: {
         color: settings.colors.red,
         contextName: ':busts_in_silhouette: Membres',
-        contextValue: 'Auteur du message : <@{context.authorId}>\nExécuteur : <@{context.executorId}>',
+        contextValue: `Auteur du message : ${userMention('{context.authorId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':pencil: Message',
         contentValue: stripIndent`
-          Dans <#{context.channelId}>
+          Dans ${channelMention('{context.channelId}')}
           Contenu : {content}
         `,
       },
       [DiscordLogType.ReactionAdd]: {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context.authorId}>',
+        contextValue: userMention('{context.authorId}'),
         contentName: 'Réaction',
         contentValue: stripIndent`
-          [Lien vers le message]({url}) (dans <#{context.channelId}>)
-          Auteur du message : <@{context.authorId}>
+          [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
+          Auteur du message : ${userMention('{context.authorId}')}
           Réaction : {content}
         `,
       },
       [DiscordLogType.ReactionRemove]: {
         color: settings.colors.red,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context.authorId}>',
+        contextValue: userMention('{context.authorId}'),
         contentName: 'Réaction',
         contentValue: stripIndent`
-          [Lien vers le message]({url}) (dans <#{context.channelId}>)
-          Auteur du message : <@{context.authorId}>
+          [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
+          Auteur du message : ${userMention('{context.authorId}')}
           Réaction : {content}
         `,
       },
       [DiscordLogType.RoleAdd]: {
         color: settings.colors.green,
         contextName: ':busts_in_silhouette: Membres',
-        contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
+        contextValue: `Cible : ${userMention('{context.userId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':billed_cap: Rôle ajouté',
         contentValue: '{content}',
       },
       [DiscordLogType.RoleRemove]: {
         color: settings.colors.red,
         contextName: ':busts_in_silhouette: Membres',
-        contextValue: 'Cible : <@{context.userId}>\nExécuteur : <@{context.executorId}>',
+        contextValue: `Cible : ${userMention('{context.userId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':billed_cap: Rôle enlevé',
         contentValue: '{content}',
       },
       [DiscordLogType.VoiceJoin]: {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context}>',
+        contextValue: userMention('{context}'),
         contentName: ':sound: Salon',
-        contentValue: '<#{content}>',
+        contentValue: channelMention('{content}'),
       },
       [DiscordLogType.VoiceLeave]: {
         color: settings.colors.red,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context}>',
+        contextValue: userMention('{context}'),
         contentName: ':sound: Salon',
-        contentValue: '<#{content}>',
+        contentValue: channelMention('{content}'),
       },
       [DiscordLogType.VoiceMove]: {
         color: settings.colors.yellow,
         contextName: ':bust_in_silhouette: Membre',
-        contextValue: '<@{context}>',
+        contextValue: userMention('{context}'),
         contentName: ':sound: Salon',
-        contentValue: 'Avant : <#{content.before}>\nAprès : <#{content.after}>',
+        contentValue: `Avant : ${channelMention('{content.before}')}\nAprès : ${channelMention('{content.after}')}`,
       },
     },
   },
@@ -196,15 +203,15 @@ export default {
     header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
     noClasses: 'Aucune séance de prévue !',
     today: " (Aujourd'hui)",
-    classLine: '• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} <#{eclass.subject.textChannel}> (par <@{eclass.professor}>) [<@&{eclass.targetRole}>]\n',
+    classLine: `• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} ${channelMention('{eclass.subject.textChannel}')} (par ${userMention('{eclass.professor}')}) [${roleMention('{eclass.targetRole}')}]\n`,
   },
   classesCalendar: {
     noClasses: 'Aucun cours prévu pour le moment.',
     noSubjects: 'Aucune matière disponible.',
     subjectTitle: '{emoji} {name}',
-    textChannel: '<#{textChannel}>',
-    textDocsChannel: ' • Documents : <#{textDocsChannel}>',
-    voiceChannel: ' • Vocal : <#{voiceChannel}> *(cliquez pour rejoindre)*',
+    textChannel: channelMention('{textChannel}'),
+    textDocsChannel: ` • Documents : ${channelMention('{textDocsChannel}')}`,
+    voiceChannel: ` • Vocal : ${channelMention('{voiceChannel}')} *(cliquez pour rejoindre)*`,
     finishedClasses: stripIndent`
       **Cours terminés ou annulés :**
       {finishedClasses}
@@ -214,7 +221,7 @@ export default {
       {plannedClasses}
     `,
     recordLink: '| [[Enregistrement]]({recordLink})',
-    classLine: '• <t:{date}:R> - {beginHour}-{endHour} (<@{professor}>) : {topic} [[Voir plus]]({messageLink})',
+    classLine: `• ${timeFormat('{date}', TimestampStyles.RelativeTime)} - {beginHour}-{endHour} (${userMention('{professor}')}) : {topic} [[Voir plus]]({messageLink})`,
   },
   antiSwear: {
     swearModeratorAlert: stripIndent`

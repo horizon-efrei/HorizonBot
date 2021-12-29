@@ -1,3 +1,4 @@
+import { hideLinkEmbed, userMention } from '@discordjs/builders';
 import { stripIndent, stripIndents } from 'common-tags';
 import { LogStatuses } from '@/types/database';
 
@@ -158,7 +159,7 @@ export const pave = {
   },
   messages: {
     summary: 'Liste des heures de cours données par les eProfs durant le semestre actuel (depuis le {firstDay}) :',
-    summaryLine: '    • <@!{prof}> : {time} heures',
+    summaryLine: `    • ${userMention('{prof}')} : {time} heures`,
     noEclasses: "Aucun cours n'a été donné durant le semestre actuel (depuis le {firstDay}).",
   },
 } as const;
@@ -235,12 +236,12 @@ export const reactionRole = {
     // Add a role to a menu
     reactionAlreadyUsed: 'Cette réaction est déjà utilisée dans ce menu !',
     roleAlreadyUsed: 'Ce rôle est déjà utilisé dans ce menu !',
-    addedPairSuccessfuly: "C'est fait ! La réaction {reaction} donnera le rôle \"{role.name}\" sur le menu <{rrMessage.url}>.",
+    addedPairSuccessfuly: `C'est fait ! La réaction {reaction} donnera le rôle "{role.name}" sur le menu ${hideLinkEmbed('{rrMessage.url}')}.`,
 
     // Remove a role from a menu
     reactionNotUsed: "Cette réaction n'est pas dans ce menu !",
     roleNotUsed: "Ce rôle n'est pas dans ce menu !",
-    removedPairSuccessfuly: "C'est fait ! Cette paire à bien été supprimée du menu <{rrMessage.url}>.",
+    removedPairSuccessfuly: `C'est fait ! Cette paire à bien été supprimée du menu ${hideLinkEmbed('{rrMessage.url}')}.`,
 
     // Unique role mode
     uniqueMode: 'Sur ce menu, le mode "Rôle unique" est : {uniqueMode}.',

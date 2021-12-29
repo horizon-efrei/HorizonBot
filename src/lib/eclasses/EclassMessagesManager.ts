@@ -1,3 +1,4 @@
+import { time, TimestampStyles } from '@discordjs/builders';
 import { EmbedLimits, MessageLimits } from '@sapphire/discord-utilities';
 import { container } from '@sapphire/pieces';
 import { isNullish } from '@sapphire/utilities';
@@ -74,7 +75,7 @@ function getCalendarClassContentForSubject(
   if (subject.voiceChannel)
     content += pupa(messages.classesCalendar.voiceChannel, subject);
 
-  const exams = subject.exams.map(exam => `${exam.name} <t:${Math.floor(exam.date / 1000)}:R>`).join(' • ');
+  const exams = subject.exams.map(exam => `${exam.name} ${time(Math.floor(exam.date / 1000), TimestampStyles.RelativeTime)}`).join(' • ');
   if (exams.length > 0)
     content += `\n${exams}`;
 

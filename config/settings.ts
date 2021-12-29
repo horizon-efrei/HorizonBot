@@ -1,3 +1,4 @@
+import { userMention } from '@discordjs/builders';
 import type { ColorResolvable } from 'discord.js';
 import type { CodeLanguageResult } from '@/types';
 
@@ -115,6 +116,6 @@ export default {
       versionIndex: '3',
     },
   ] as CodeLanguageResult[],
-  maintainers: ['Elliot Maisl (<@188341077902753794>)'],
-  thanks: ['Kétessar Tan (<@222050512684580876>) : contributions'],
+  maintainers: [`Elliot Maisl (${userMention('188341077902753794')})`],
+  thanks: [`Kétessar Tan (${userMention('222050512684580876')}) : contributions`],
 } as const;

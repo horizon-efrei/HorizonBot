@@ -1,8 +1,15 @@
+import {
+  channelMention,
+  hideLinkEmbed,
+  roleMention,
+  TimestampStyles,
+  userMention,
+} from '@discordjs/builders';
 import { stripIndent } from 'common-tags';
 import type { MessageSelectOptionData } from 'discord.js';
 import { SchoolYear } from '@/types';
 import { EclassStatus } from '@/types/database';
-import { getGraduationYear } from '@/utils';
+import { getGraduationYear, timeFormat } from '@/utils';
 
 export const eclass = {
   options: {
@@ -70,8 +77,8 @@ export const eclass = {
     subjectFilter: '• Matière : {value}',
     listFieldTitle: '{topic} ({subject.name})',
     listFieldDescription: stripIndent`
-      Prévu <t:{date}:R>, dure {duration}, se termine à <t:{end}:t>
-      **Salon :** <#{subject.textChannel}>
+      Prévu ${timeFormat('{date}', TimestampStyles.RelativeTime)}, dure {duration}, se termine à ${timeFormat('{end}', TimestampStyles.ShortTime)}
+      **Salon :** ${channelMention('{subject.textChannel}')}
       **Statut :** {status}
       **Identifiant :** \`{classId}\`
     `,
@@ -84,10 +91,10 @@ export const eclass = {
     recordedLink: '[Lien]({recordLink})',
     newClassEmbed: {
       title: '{subject.name} - {topic}',
-      description: 'Cours en {classChannel} le **<t:{date}>** !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !',
+      description: `Cours en {classChannel} le **${timeFormat('{date}')}** !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !`,
       author: "Ef'Réussite - Nouveau cours !",
       date: 'Date et heure',
-      dateValue: '<t:{date}> - <t:{end}:t>\n<t:{date}:R>',
+      dateValue: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}`,
       duration: 'Durée prévue',
       professor: 'Professeur',
       recorded: 'Enregistré',
@@ -160,17 +167,17 @@ export const eclass = {
     editedTopic: 'Tu as bien modifié le thème du cours en "{topic}".',
     pingEditedTopic: '{pingRole}, le thème du cours a été changé en "{topic}".',
 
-    editedDate: 'Tu as bien déplacé le cours pour le <t:{date}:F>.',
-    pingEditedDate: '{pingRole}, le cours a été déplacé le <t:{date}:F> (<t:{date}:R>).',
+    editedDate: `Tu as bien déplacé le cours pour le ${timeFormat('{date}', TimestampStyles.LongDateTime)}.`,
+    pingEditedDate: `{pingRole}, le cours a été déplacé le ${timeFormat('{date}', TimestampStyles.LongDateTime)} (${timeFormat('{date}', TimestampStyles.RelativeTime)}).`,
 
-    editedHour: 'Tu as bien déplacé le cours à <t:{date}:t>.',
-    pingEditedHour: '{pingRole}, le cours a été déplacé à <t:{date}:t> (<t:{date}:R).',
+    editedHour: `Tu as bien déplacé le cours à ${timeFormat('{date}', TimestampStyles.ShortTime)}.`,
+    pingEditedHour: `{pingRole}, le cours a été déplacé à ${timeFormat('{date}', TimestampStyles.ShortTime)} (${timeFormat('{date}', TimestampStyles.RelativeTime)}).`,
 
     editedDuration: 'Tu as bien modifié la durée du cours en {duration}.',
     pingEditedDuration: '{pingRole}, le cours durera à présent en {duration}.',
 
-    editedProfessor: 'Tu as bien modifié le professeur du cours qui est maintenant <@{professor}>.',
-    pingEditedProfessor: '{pingRole}, le professeur a été changé pour <@{professor}>.',
+    editedProfessor: `Tu as bien modifié le professeur du cours qui est maintenant ${userMention('{professor}')}.`,
+    pingEditedProfessor: `{pingRole}, le professeur a été changé pour ${userMention('{professor}')}.`,
 
     editedRole: 'Tu as bien modifié le rôle visé en "{role}".',
     pingEditedRole: '{pingRole}, le rôle visé a été changé au rôle "{role}".',
@@ -181,10 +188,10 @@ export const eclass = {
 
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
-    startClassNotification: ':bell: <@&{classRole}>, le cours commence !',
-    remindClassNotification: ':bell: <@&{classRole}> rappel : le cours commence <t:{date}:R>',
-    remindClassPrivateNotification: ":bell: Tu t'es inscrit au cours \"{topic}\". Il commence <t:{date}:R> ! Tiens-toi prêt :\\)\nIl se passera dans <#{subject.textChannel}>.",
-    remindClassPrivateNotificationVoiceChannel: 'Salon vocal : <#{subject.voiceChannel}>.',
+    startClassNotification: `:bell: ${roleMention('{classRole}')}, le cours commence !`,
+    remindClassNotification: `:bell: ${roleMention('{classRole}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}`,
+    remindClassPrivateNotification: `:bell: Tu t'es inscrit au cours "{topic}". Il commence ${timeFormat('{date}', TimestampStyles.RelativeTime)} ! Tiens-toi prêt :\\)\nIl se passera dans ${channelMention('{subject.textChannel}')}.`,
+    remindClassPrivateNotificationVoiceChannel: `Salon vocal : ${channelMention('{subject.voiceChannel}')}.`,
     valueInProgress: '[En cours]',
     alertProfessor: stripIndent`
       Bonjour, ton cours "{topic}" (en {subject.teachingUnit}) va commencer dans environ 15 minutes.
@@ -195,7 +202,7 @@ export const eclass = {
       {beforeChecklist}
 
       **PENDANT**
-      - Je lancerai le cours automatiquement autour de l'heure définie (<t:{date}:F>) (ou jusqu'à 2 minutes après), et je mentionnerai toutes les personnes directement intéressées par le cours ;
+      - Je lancerai le cours automatiquement autour de l'heure définie (${timeFormat('{date}', TimestampStyles.LongDateTime)}) (ou jusqu'à 2 minutes après), et je mentionnerai toutes les personnes directement intéressées par le cours ;
       - Anime ton cours comme tu le souhaites, en essayant d'être le plus clair possible dans tes propos ;
       - N'hésite-pas à demander à des fauteurs de trouble de partir, ou prévient un membre du staff si besoin ;
 
@@ -209,9 +216,9 @@ export const eclass = {
     `,
     alertProfessorComplements: {
       startRecord: "- Lance ton logiciel d'enregistrement pour filmer le cours ;",
-      connectVoiceChannel: '- Connecte-toi au salon vocal défini, en cliquant ici : <#{subject.voiceChannel}> ;',
-      announceVoiceChannel: "- Annonce le salon vocal que tu vas utiliser dans <#{subject.textChannel}>, car aucun salon vocal n'a été trouvé pour la matière \"{subject.name}\" ;",
-      registerRecording: "- Télécharge ton enregistrement sur ce lien <https://drive.google.com/drive/u/2/folders/1rKNNU1NYFf-aE4kKTe_eC-GiUIgqdsZg>. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle \"Respo eProf\"). Ensuite, lance la commande `!ecours record {classId} <ton lien>` ;",
+      connectVoiceChannel: `- Connecte-toi au salon vocal défini, en cliquant ici : ${channelMention('{subject.voiceChannel}')} ;`,
+      announceVoiceChannel: `- Annonce le salon vocal que tu vas utiliser dans ${channelMention('{subject.textChannel}')}, car aucun salon vocal n'a été trouvé pour la matière "{subject.name}" ;`,
+      registerRecording: `- Télécharge ton enregistrement sur ce lien ${hideLinkEmbed('https://drive.google.com/drive/u/2/folders/1rKNNU1NYFf-aE4kKTe_eC-GiUIgqdsZg')}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`!ecours record {classId} <ton lien>\` ;`,
       isRecorded: 'soit',
       isNotRecorded: 'ne soit pas',
     },
@@ -219,9 +226,9 @@ export const eclass = {
     startClassEmbed: {
       title: 'Le cours en {eclass.subject.name} va commencer !',
       author: "Ef'Réussite - Un cours commence !",
-      baseDescription: 'Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par <@{eclass.professor}> commence ! {textChannels}\n{isRecorded}',
-      descriptionAllChannels: 'Le salon textuel associé est <#{eclass.subject.textChannel}>, et le salon vocal est <#{eclass.subject.voiceChannel}>.',
-      descriptionTextChannel: 'Le salon textuel associé est <#{eclass.subject.textChannel}>.',
+      baseDescription: `Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par ${userMention('{eclass.professor}')} commence ! {textChannels}\n{isRecorded}`,
+      descriptionAllChannels: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannel}')}, et le salon vocal est ${channelMention('{eclass.subject.voiceChannel}')}.`,
+      descriptionTextChannel: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannel}')}.`,
       descriptionIsRecorded: ':red_circle: Le cours est enregistré !',
       descriptionIsNotRecorded: ":warning: Le cours n'est pas enregistré !",
       footer: 'ID : {classId}',
@@ -237,9 +244,9 @@ export const eclass = {
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
 
     // Record subcommand
-    recordLink: "Le lien d'enregistrement de ce cours est <{link}>.",
+    recordLink: `Le lien d'enregistrement de ce cours est ${hideLinkEmbed('{link}')}.`,
     noRecordLink: "Il n'y a pas de lien d'enregistrement disponible pour ce cours !",
-    linkAnnouncement: "L'enregistrement du cours \"{topic}\" ({date}) a été publié sur ce lien : <{link}> !",
+    linkAnnouncement: `L'enregistrement du cours "{topic}" ({date}) a été publié sur ce lien : ${hideLinkEmbed('{link}')} !`,
     successfullyAddedLink: 'Le lien a bien été ajouté au cours !',
 
     // Show subcommand
@@ -250,13 +257,13 @@ export const eclass = {
       statusName: 'Statut du cours',
       statusValue: '{status}.',
       dateName: 'Date',
-      dateValue: '<t:{date}:D>, <t:{date}:R>\nDe <t:{date}:t> à <t:{end}:t>, dure {duration}.',
+      dateValue: `${timeFormat('{date}', TimestampStyles.LongDate)}, ${timeFormat('{date}', TimestampStyles.RelativeTime)}\nDe ${timeFormat('{date}', TimestampStyles.ShortTime)} à ${timeFormat('{end}', TimestampStyles.ShortTime)}, dure {duration}.`,
       professorName: 'Professeur',
-      professorValue: '<@{professor}>',
+      professorValue: userMention('{professor}'),
       recordedName: 'Enregistré',
       recordedValue: '{recorded}',
       relatedName: 'Autres données associées',
-      relatedValue: "Rôle visé : <@&{targetRole}>\n[Message d'annonce]({messageLink})",
+      relatedValue: `Rôle visé : ${roleMention('{targetRole}')}\n[Message d'annonce]({messageLink})`,
     },
 
     // Subscribing

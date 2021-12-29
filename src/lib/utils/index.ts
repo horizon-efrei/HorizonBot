@@ -14,4 +14,5 @@ export { noop, nullop } from './noop';
 export { default as promiseTimeout } from './promiseTimeout';
 export { default as sleep } from './sleep';
 export { default as splitText } from './splitText';
+export { default as timeFormat } from './timeFormat';
 export { default as trimText } from './trimText';

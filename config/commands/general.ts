@@ -1,4 +1,6 @@
+import { channelMention, TimestampStyles, userMention } from '@discordjs/builders';
 import { stripIndent } from 'common-tags';
+import { timeFormat } from '@/utils';
 
 export const code = {
   options: {
@@ -109,13 +111,13 @@ export const reminders = {
     invalidTime: "Cette durée ou cette date n'est pas valide.",
 
     // Create a reminder
-    createdReminder: "D'accord, je te rappellerai ça le <t:{date}> ! Ce rappel a l'ID `{reminderId}`.",
+    createdReminder: `D'accord, je te rappellerai ça le ${timeFormat('{date}')} ! Ce rappel a l'ID \`{reminderId}\`.`,
     openDm: "\n:warning: Tes messages privés ne sont pas ouverts ou tu m'as bloqué, je ne pourrai donc pas t'envoyer le message de rappel ! Active-les ou débloque-moi pour les recevoir.",
 
     // List the reminders
     noReminders: "Je n'ai trouvé aucun rappel t'étant associé dans la base de données !",
     listTitle: 'Liste de tes rappels ({total})',
-    listLine: '• `{reminderId}` (<t:{timestamp}:R>) : {description}',
+    listLine: `• \`{reminderId}\` (${timeFormat('{timestamp}', TimestampStyles.RelativeTime)}) : {description}`,
 
     // Edit a reminder
     editedReminder: 'Ce rappel a bien été modifié !',
@@ -155,7 +157,7 @@ export const serverInfo = {
     embed: {
       title: 'Informations sur {name}',
       membersTitle: 'Membres',
-      membersValue: 'Total : **{memberCount}**\nPropriétaire : <@{ownerId}>',
+      membersValue: `Total : **{memberCount}**\nPropriétaire : ${userMention('{ownerId}')}`,
       channelsTitle: 'Salons',
       channelsValue: 'Total : **{channels.cache.size}**\n:hash: Salons textuels : **{text}**\n:loud_sound: Salons vocaux : **{voice}**\n:pushpin: Catégories : **{categories}**',
       boostsTitle: 'Boosts',
@@ -163,7 +165,7 @@ export const serverInfo = {
       rolesTitle: 'Rôles',
       rolesValue: 'Total : **{roles.cache.size}**',
       createdAtTitle: 'Création',
-      createdAtValue: 'Crée le <t:{createdTimestamp}>\n<t:{createdTimestamp}:R>',
+      createdAtValue: `Crée le ${timeFormat('{createdTimestamp}')}\n${timeFormat('{createdTimestamp}', TimestampStyles.RelativeTime)}`,
       footer: 'ID : {id}',
     },
   },
@@ -204,7 +206,7 @@ export const vocalCount = {
   },
   messages: {
     invalidUse: "Tu n'as pas spécifié de salon vocal, et tu n'es dans aucun salon !",
-    topLine: '`{index}.` <#{channelId}> : {count} membres',
+    topLine: `\`{index}.\` ${channelMention('{channelId}')} : {count} membres`,
     noOnlineMembers: "Personne n'est connecté dans un salon vocal dans ce serveur.",
     count: 'Il y a {count} personnes connectées dans ce salon vocal !',
   },
