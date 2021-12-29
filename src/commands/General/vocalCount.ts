@@ -6,33 +6,24 @@ import { vocalCount as config } from '@/config/commands/general';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 
-const allFlags = ['a', 'all'];
-
 @ApplyOptions<CommandOptions>({
   ...config.options,
-  flags: [...allFlags],
   preconditions: ['GuildOnly'],
   generateDashLessAliases: true,
 })
 export default class VocalCountCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
-    const channel = (await args.pickResult('guildVoiceChannel'))?.value ?? message.member.voice.channel;
-    if (!channel || args.getFlags(...allFlags)) {
-      const allChannels = [...message.guild.channels.cache.values()];
-      const voiceChannels = allChannels
-        .filter(chan => chan.isVoice() && chan.members.size > 0) as BaseGuildVoiceChannel[];
-      const lines = voiceChannels
-        .sort((chan1, chan2) => chan2.members.size - chan1.members.size)
-        .map((chan, i) => pupa(config.messages.topLine, { index: i + 1, name: chan.name, count: chan.members.size }));
+  public async messageRun(message: GuildMessage, _args: Args): Promise<void> {
+    const allChannels = [...message.guild.channels.cache.values()];
+    const voiceChannels = allChannels
+      .filter(chan => chan.isVoice() && chan.members.size > 0) as BaseGuildVoiceChannel[];
+    const lines = voiceChannels
+      .sort((chan1, chan2) => chan2.members.size - chan1.members.size)
+      .map((chan, i) => pupa(config.messages.topLine, { index: i + 1, channelId: chan.id, count: chan.members.size }));
 
-      await message.channel.send(
-        lines.length > 0
-          ? lines.join('\n')
-          : config.messages.noOnlineMembers,
-      );
-      return;
-    }
-
-    await message.channel.send(pupa(config.messages.count, { count: channel.members.size }));
+    await message.channel.send(
+      lines.length > 0
+        ? lines.join('\n')
+        : config.messages.noOnlineMembers,
+    );
   }
 }
