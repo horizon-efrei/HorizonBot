@@ -65,7 +65,7 @@ export function createAnnouncementEmbed({
     .addField(texts.duration, dayjs.duration(duration).humanize(), true)
     .addField(texts.professor, professor.toString(), true)
     .addField(texts.recorded, config.messages.recordedValues[Number(isRecorded)], true)
-    .setFooter(pupa(texts.footer, { classId }));
+    .setFooter({ text: pupa(texts.footer, { classId }) });
 }
 
 export function getRoleNameForClass(
@@ -154,7 +154,7 @@ export async function createClass(
   // Use the newly created ID in the embed
   await announcementMessage.edit({
     content: announcementMessage.content,
-    embeds: [embed.setFooter(pupa(config.messages.newClassEmbed.footer, eclass))],
+    embeds: [embed.setFooter({ text: pupa(config.messages.newClassEmbed.footer, eclass) })],
   });
 
   // Edit the global announcement messages (calendar & week upcoming classes)
@@ -196,7 +196,7 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
         eclass.subject.voiceChannel ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
       ),
     }))
-    .setFooter(pupa(texts.footer, eclass));
+    .setFooter({ text: pupa(texts.footer, eclass) });
 
   await classChannel.send({
     content: pupa(config.messages.startClassNotification, { classRole: eclass.classRole }),

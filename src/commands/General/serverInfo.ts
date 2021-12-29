@@ -35,7 +35,7 @@ export default class ServerInfoCommand extends HorizonCommand {
         ...message.guild,
         createdTimestamp: Math.round(message.guild.createdTimestamp / 1000),
       }), true)
-      .setFooter(pupa(texts.footer, message.guild));
+      .setFooter({ text: pupa(texts.footer, message.guild) });
 
     await message.channel.send({ embeds: [embed] });
   }
