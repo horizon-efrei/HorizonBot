@@ -18,14 +18,16 @@ export default class VocalCountCommand extends HorizonCommand {
   public async messageRun(message: GuildMessage, args: Args): Promise<void> {
     const channel = (await args.pickResult('guildVoiceChannel'))?.value ?? message.member.voice.channel;
     if (!channel || args.getFlags(...allFlags)) {
-      const voiceChannels = [...message.guild.channels.cache.values()]
-        .filter((chan): chan is BaseGuildVoiceChannel => chan.isVoice() && chan.members.size > 0)
+      const allChannels = [...message.guild.channels.cache.values()];
+      const voiceChannels = allChannels
+        .filter(chan => chan.isVoice() && chan.members.size > 0) as BaseGuildVoiceChannel[];
+      const lines = voiceChannels
         .sort((chan1, chan2) => chan2.members.size - chan1.members.size)
         .map((chan, i) => pupa(config.messages.topLine, { index: i + 1, name: chan.name, count: chan.members.size }));
 
       await message.channel.send(
-        voiceChannels.length > 0
-          ? voiceChannels.join('\n')
+        lines.length > 0
+          ? lines.join('\n')
           : config.messages.noOnlineMembers,
       );
       return;

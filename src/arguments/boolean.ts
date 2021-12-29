@@ -7,7 +7,6 @@ const falses = settings.configuration.booleanFalses;
 
 export default class BooleanArgument extends Argument<boolean> {
   public async run(parameter: string, context: ArgumentContext<boolean>): AsyncArgumentResult<boolean> {
-    // @ts-expect-error: currently doesnt support readonly arrays, fixed by https://github.com/sapphiredev/framework/pull/338
     const resolved = Resolvers.resolveBoolean(parameter, { truths, falses });
 
     if (resolved.success)

@@ -3,7 +3,6 @@ import type { Message } from 'discord.js';
 import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
-import type { MessageDeleteAuditLogs } from '@/types/discord-js';
 import { isGuildMessage, nullop } from '@/utils';
 
 export default class MessageDeleteListener extends Listener {
@@ -12,7 +11,7 @@ export default class MessageDeleteListener extends Listener {
       return;
 
     if (!message.author.bot) {
-      const auditLogs = await message.guild.fetchAuditLogs({ type: 'MESSAGE_DELETE' }).catch(nullop) as MessageDeleteAuditLogs;
+      const auditLogs = await message.guild.fetchAuditLogs({ type: 'MESSAGE_DELETE' }).catch(nullop);
       // We can't filter by the message's id, the best we can do is filter by the channel id...
       const lastMessageDelete = auditLogs.entries.filter(entry => (
         typeof entry.extra.channel === 'string'
