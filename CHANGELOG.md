@@ -5,15 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0] - 2021/12/30
+
+### Added
+
+- Add `dump` command
+- Add `pave` command
+- Add reminder's date to reminder's creation message
+- Add a dayFormat (DD/MM/YYYY) to internal settings
+
+### Improved
+
+- Improve subcommand's inner workings
+- Improve `vocalcount` by showing all channels every time
+- Improve invalid argument error in `code`'s command
+
+### Fixed
+
+- Fix help command by showing command's descriptions in embed's description
+
+
 ## [0.7.0] - 2021/12/17
 
 ### Added
 
-- Add a contact command
+- Add `contact` command
 - Add eclass record link to calendar when updated
-- Add tags list to help command
+- Add tags list to `help` command
 - Add message for the cooldown precondition
-- Add a command to edit reminders
+- Add a subcommand to edit reminders
 
 ### Improved
 
@@ -31,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `serverInfo` command
-- Add a show subcommand to `eclass`
+- Add a `show` subcommand to `eclass`
 - Add configurable school year roles in `setup` command
 - Add useful class links in calendars (such as original class notification, and record link)
 - Add VoiceMove log
