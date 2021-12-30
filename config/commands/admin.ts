@@ -96,6 +96,61 @@ export const contact = {
   },
 } as const;
 
+export const dump = {
+  options: {
+    aliases: ['dump'],
+    description: stripIndent`
+      Permet de consulter le liste des membres du serveur actuel qui répond (ou non) à certains critères.
+      Les critères sont exprimés sous forme d'options et de drapeaux.
+
+
+      :blue_book: **__OPTIONS__**
+
+          :small_blue_diamond: \`--format=<format>\`/\`-f=<format>\` : Formatte les membres en fonction du template donné. Voir "Formattage des membres" pour plus d'informations.
+          :small_blue_diamond: \`--has-roles=<rôles>\`/\`-r=<rôles>\` : Affiche les membres qui ont au moins un des rôles donnés. Voir "Liste de rôles" pour plus d'informations.
+          :small_blue_diamond: \`--has-all-roles=<rôles>\`/\`-a=<rôles>\` : Affiche les membres qui ont tous les rôles donnés. Voir "Liste de rôles" pour plus d'informations.
+          :small_blue_diamond: \`--order=<ordre>\`/\`-o=<ordre>\` :  Trie les membres par ordre alphabétique (\`name\` pour les noms d'utilisateur, ou \`nick\` pour les pseudos), ID (\`id\`), date de création du compte (\`created\`) ou date d'arrivée sur ce serveur (\`joined\`).
+          :small_blue_diamond: \`--limit=<nombre>\`/\`-l=<nombre>\` : Affiche uniquement le nombre de membres indiqué.
+          :small_blue_diamond: \`--separator=<séparateur>\`/\`-s=<séparateur>\` : Change le séparateur entre chaque membre. Par défaut, il s'agit d'une nouvelle ligne.
+          :small_blue_diamond: \`--dateformat=<format>\`/\`-df=<format>\` : Change la manière dont les dates sont représentées. Voir ["Formattage des dates"](https://day.js.org/docs/en/display/format) pour plus d'informations.
+
+
+      :closed_book: **__DRAPEAUX__**
+
+          :small_blue_diamond: \`--no-roles\`/\`-n\` : Affiche les membres sans rôles.
+          :small_blue_diamond: \`--enumerate\`/\`-e\` : Affiche des numéros devant chaque membre.
+          :small_blue_diamond: \`--desc\`/\`-d\` : Trie les membres par ordre décroissant.
+
+
+      :orange_book: **__FORMATTAGE DES MEMBRES__**
+
+      Après l'option \`--format=\`, vous devez fournir un modèle d'affichage. Vous devrez utiliser des guillemets autour du texte s'il contient des espaces.
+      Vous avez accès aux variables suivantes :
+          :small_orange_diamond: \`{​u}\` : Affiche le nom d'utilisateur et le discriminant du membre (ex: \`membre#1234\`). ${/* eslint-disable-line no-irregular-whitespace */ ''}
+          :small_orange_diamond: \`{​n}\` : Affiche le pseudo du membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
+          :small_orange_diamond: \`{​i}\` : Affiche l'ID du membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
+          :small_orange_diamond: \`{​c}\` : Affiche la date de création du compte du membre. Peut être changé via l'option \`--dateformat\`. ${/* eslint-disable-line no-irregular-whitespace */ ''}
+          :small_orange_diamond: \`{​j}\` : Affiche la date d'arrivée sur le serveur du membre. Peut être changé via l'option \`--dateformat\`. ${/* eslint-disable-line no-irregular-whitespace */ ''}
+
+
+      :green_book: **__LISTE DE RÔLES__**
+
+      Pour fournir une liste de rôles pour les options \`--has-roles=\` et \`--has-all-roles=\`, les rôles doivent être séparés par une virgule, sans aucun espace. Vous pouvez utiliser le nom du rôle ou son id. Utilisez des guillemets autour de toute la liste si un des noms des rôles contient un espace.
+      Exemple : \`--has-roles="Administrateur,Super Modérateur,188341077902753794"\`.
+    `,
+    enabled: true,
+    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc]',
+    examples: [
+      'dump --format="{u} : {n}" --has-roles=188341077902753794 --order=id --enumerate',
+      'dump --format="{i} (à rejoint le {j})" --has-all-roles="Administrateur,Super Modérateur" --order=nick --desc --limit=5 --dateformat="DD/MM/YYYY [à] HH[h]mm"',
+      'dump --no-roles --separator=,',
+    ],
+  },
+  messages: {
+    noMatchFound: "Aucun membre correspondant à ces critères n'a été trouvé.",
+  },
+} as const;
+
 export const evaluate = {
   options: {
     aliases: ['eval', 'evaluate', 'ev'],
