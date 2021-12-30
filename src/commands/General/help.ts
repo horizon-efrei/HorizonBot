@@ -20,11 +20,8 @@ export default class HelpCommand extends HorizonCommand {
     if (command) {
       const information = config.messages.commandInfo;
       embed.setTitle(pupa(information.title, { command }))
-        .addField(information.usage, `\`${settings.prefix}${command.usage}\``)
-        .addField(
-          information.description,
-          pupa(command.description, { prefix: settings.prefix }),
-        );
+        .setDescription(pupa(command.description, { prefix: settings.prefix }))
+        .addField(information.usage, `\`${settings.prefix}${command.usage}\``);
 
       if (command.aliases.length > 1)
         embed.addField(information.aliases, inlineCodeList(command.aliases));
