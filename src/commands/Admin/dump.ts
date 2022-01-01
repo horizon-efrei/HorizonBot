@@ -1,4 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
+import { MessageLimits } from '@sapphire/discord-utilities';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
@@ -105,20 +106,30 @@ export default class DumpCommand extends HorizonCommand {
     const format = args.getOption(...dumpOptions.format);
     const dateFormat = args.getOption(...dumpOptions.dateFormat) ?? settings.configuration.dateFormat;
     const formatter = memberFormatterFactory(format ?? '{u} ({i})', dateFormat);
-    let membersString = members.map(formatter);
+    let formattedMembers = members.map(formatter);
 
     // Reverse the order if asked
     const desc = args.getFlags(...dumpFlags.descending);
     if (desc)
-      membersString.reverse();
+      formattedMembers.reverse();
 
     // Enumerates the members if asked
     const enumerate = args.getFlags(...dumpFlags.enumerate);
     if (enumerate)
-      membersString = membersString.map((member, i) => `${i + 1}. ${member}`);
+      formattedMembers = formattedMembers.map((member, i) => `${i + 1}. ${member}`);
 
     // Joins the members together with the specified separator
     const separator = args.getOption(...dumpOptions.separator) ?? '\n';
-    await message.channel.send(membersString.join(separator) || config.messages.noMatchFound);
+    if (formattedMembers.length === 0) {
+      await message.channel.send(config.messages.noMatchFound);
+      return;
+    }
+
+    const output = formattedMembers.join(separator);
+    const payload = output.length > MessageLimits.MaximumLength
+      ? { files: [{ attachment: Buffer.from(output), name: 'dump.txt' }] }
+      : output;
+
+    await message.channel.send(payload);
   }
 }
