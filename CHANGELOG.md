@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2022/01/01
+
+### Added
+
+- Add `--dm` flag in `dump` command to send content in dm
+
+### Fixed
+
+- Fixed crash in `dump` command if content is too long, send as file instead
+- Fix `pave` command by add missing new line at end of line
+
+
 ## [0.8.0] - 2021/12/30
 
 ### Added
