@@ -214,7 +214,7 @@ export const pave = {
   },
   messages: {
     summary: 'Liste des heures de cours données par les eProfs durant le semestre actuel (depuis le {firstDay}) :',
-    summaryLine: `    • ${userMention('{prof}')} : {time} heures`,
+    summaryLine: `    • ${userMention('{prof}')} : {time} heures\n`,
     noEclasses: "Aucun cours n'a été donné durant le semestre actuel (depuis le {firstDay}).",
   },
 } as const;
