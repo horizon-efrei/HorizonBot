@@ -5,9 +5,11 @@ import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import pupa from 'pupa';
 import { dump as config } from '@/config/commands/admin';
+import messages from '@/config/messages';
 import settings from '@/config/settings';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
+import { nullop } from '@/utils';
 
 function memberSorterFactory(order: string): (a: GuildMember, b: GuildMember) => number {
   return (a, b): number => {
@@ -52,6 +54,7 @@ const dumpFlags = {
   descending: ['desc', 'd'],
   noRole: ['no-roles', 'n'],
   enumerate: ['enumerate', 'e'],
+  dm: ['dm', 'mp'],
 };
 
 @ApplyOptions<CommandOptions>({
@@ -130,6 +133,15 @@ export default class DumpCommand extends HorizonCommand {
       ? { files: [{ attachment: Buffer.from(output), name: 'dump.txt' }] }
       : output;
 
-    await message.channel.send(payload);
+    if (args.getFlags(...dumpFlags.dm)) {
+      try {
+        await message.member.send(payload);
+        await message.react(settings.emojis.yes).catch(nullop);
+      } catch {
+        await message.channel.send(messages.global.dmFailed);
+      }
+    } else {
+      await message.channel.send(payload);
+    }
   }
 }

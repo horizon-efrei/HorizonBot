@@ -13,6 +13,7 @@ import { timeFormat } from '@/utils';
 export default {
   global: {
     oops: ":warning: Oups... Quelque chose s'est mal passé en réalisant cette action. Il se peut qu'elle ne se soit pas complètement terminée, voire pas commencée. Désolé !",
+    dmFailed: ":warning: Impossible de t'envoyer le message en privé. Vérifie que tu ne bloques pas les messages privés provenant de ce serveur, ou que tu ne m'ai pas bloqué.",
   },
   errors: {
     precondition: {

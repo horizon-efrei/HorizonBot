@@ -120,6 +120,7 @@ export const dump = {
           :small_blue_diamond: \`--no-roles\`/\`-n\` : Affiche les membres sans rôles.
           :small_blue_diamond: \`--enumerate\`/\`-e\` : Affiche des numéros devant chaque membre.
           :small_blue_diamond: \`--desc\`/\`-d\` : Trie les membres par ordre décroissant.
+          :small_blue_diamond: \`--dm\`/\`--mp\` : Envoie le résultat en message privé.
 
 
       :orange_book: **__FORMATTAGE DES MEMBRES__**
@@ -139,11 +140,11 @@ export const dump = {
       Exemple : \`--has-roles="Administrateur,Super Modérateur,188341077902753794"\`.
     `,
     enabled: true,
-    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc]',
+    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc] [--dm]',
     examples: [
       'dump --format="{u} : {n}" --has-roles=188341077902753794 --order=id --enumerate',
       'dump --format="{i} (à rejoint le {j})" --has-all-roles="Administrateur,Super Modérateur" --order=nick --desc --limit=5 --dateformat="DD/MM/YYYY [à] HH[h]mm"',
-      'dump --no-roles --separator=,',
+      'dump --no-roles --separator=, --mp',
     ],
   },
   messages: {
