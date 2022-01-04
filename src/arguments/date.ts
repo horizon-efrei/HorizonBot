@@ -3,8 +3,8 @@ import { Argument } from '@sapphire/framework';
 import * as CustomResolvers from '@/resolvers';
 
 export default class DayArgument extends Argument<Date> {
-  public run(parameter: string, context: ArgumentContext<Date>): ArgumentResult<Date> {
-    const resolved = CustomResolvers.resolveDate(parameter);
+  public run(parameter: string, context: ArgumentContext<Date> & { canBePast: boolean }): ArgumentResult<Date> {
+    const resolved = CustomResolvers.resolveDate(parameter, context);
 
     if (resolved.success)
       return this.ok(resolved.value);
