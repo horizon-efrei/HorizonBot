@@ -196,6 +196,67 @@ export const statistics = {
   },
 } as const;
 
+export const userInfo = {
+  options: {
+    aliases: ['userinfo'],
+    description: "Permet d'afficher diverses informations sur un membre en particulier du Discord.",
+    enabled: true,
+    usage: 'userinfo [@mention | pseudo | ID]',
+    examples: ['userinfo', 'userinfo Ivan STEPANIAN'],
+  },
+  messages: {
+    embed: {
+      title: 'Informations sur {member.user.username}',
+      names: {
+        title: '❯ Noms',
+        content: `
+          Pseudo : {member.user.username}
+          Surnom : {member.displayName}
+          Discriminant : \`{member.user.discriminator}\`
+          Identifiant : \`{member.id}\``,
+      },
+      created: {
+        title: '❯ A créé son compte',
+        content: 'le {creation}',
+      },
+      joined: {
+        title: '❯ A rejoint le serveur',
+        content: 'le {joined}',
+        unknown: 'Inconnu',
+      },
+      roles: {
+        title: '❯ Rôles',
+        content: '{amount} : {roles}',
+        noRole: 'Aucun',
+      },
+      presence: {
+        title: '❯ Présence',
+        content: stripIndent`
+          Statut : {status}
+          {presenceDetails}`,
+        types: {
+          PLAYING: 'Joue à {activity.name}\n',
+          STREAMING: 'Est en live\n',
+          LISTENING: 'Écoute (sur {activity.name}) :\n',
+          WATCHING: 'Regarde : {activity.name}\n',
+          CUSTOM: '{activity.name}\n',
+          COMPETING: 'En compétition ({activity.name})',
+        },
+        details: '↳ {activity.details}\n',
+        state: '↳ {activity.state}\n',
+        timestamps: '↳ A commencé {time}',
+        status: {
+          online: 'En ligne',
+          idle: 'AFK',
+          dnd: 'Ne pas déranger',
+          offline: 'Hors ligne',
+          invisible: 'Hors ligne',
+        },
+      },
+    },
+ },
+} as const;
+
 export const vocalCount = {
   options: {
     aliases: ['vocal-count', 'voc-count', 'vocount'],
