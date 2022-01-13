@@ -5,7 +5,7 @@ const DATE_REGEX = /^(?<day>\d{1,2})[/-](?<month>\d{1,2})(?:[/-](?<year>\d{1,4})
 
 export default function resolveDay(parameter: string): Result<Date, 'dayError'> {
   if (!DATE_REGEX.test(parameter))
-    return this.error({ parameter });
+    return err('dayError');
 
   const groups = DATE_REGEX.exec(parameter)?.groups;
   const date = new Date();

@@ -8,7 +8,7 @@ const isPast = (date: Date): boolean => date.getTime() < Date.now();
 
 export default function resolveDate(parameter: string, options?: { canBePast: boolean }): Result<Date, 'dateError'> {
   if (!DATE_REGEX.test(parameter))
-    return this.error({ parameter });
+    return err('dateError');
 
   const groups = DATE_REGEX.exec(parameter)?.groups;
   if (!groups)
