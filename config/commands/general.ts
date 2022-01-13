@@ -1,5 +1,6 @@
 import { channelMention, TimestampStyles, userMention } from '@discordjs/builders';
 import { stripIndent } from 'common-tags';
+import { Formatters } from 'discord.js';
 import { timeFormat } from '@/utils';
 
 export const code = {
@@ -94,6 +95,22 @@ export const ping = {
   messages: {
     firstMessage: 'Ping !',
     secondMessage: "Pong ! Latence de HorizonBot : {botPing}ms. Latence de l'API : {apiPing}ms.",
+  },
+} as const;
+
+export const records = {
+  options: {
+    aliases: ['records', 'record', 'enregistrements', 'enregistrement', 'vidéos', 'vidéo', 'videos', 'video'],
+    description: 'Permet de voir la liste des enregistrements des eclasses disponibles.',
+    enabled: true,
+    usage: 'records',
+    examples: ['records'],
+  },
+  messages: {
+    noRecords: "Je n'ai trouvé aucun enregistrement de classes dans la base de données !",
+    listTitle: 'Liste des enregistrements ({total})',
+    listLine: `• [{topic}]({recordLink}) par ${Formatters.userMention('{professor}')} (${timeFormat('{date}', TimestampStyles.RelativeTime)})`,
+    pageDescription: '{total} enregistrement(s)',
   },
 } as const;
 
