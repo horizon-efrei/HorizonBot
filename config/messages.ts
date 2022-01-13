@@ -27,6 +27,7 @@ export default {
     eprofMentionPublic: '{eProf} nous avons besoin de toi !',
     eprofMentionPrivate: '{member} a besoin de toi là-bas : {message.channel}',
     paginatedMessagePrompt: 'À quelle page désires-tu aller ?',
+    wrongUserInteractionReply: 'Tu ne peux pas cliquer sur ces boutons, ils sont réservés à {user}.',
   },
   logs: {
     readableEvents: {

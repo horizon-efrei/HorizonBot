@@ -5,10 +5,13 @@
  * SPDX-License-Identifier: MIT
  */
 
+import type { PaginatedMessageOptions } from '@sapphire/discord.js-utilities';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import type { EmbedField, MessageEmbedOptions } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
+import pupa from 'pupa';
 import type { List, Number } from 'ts-toolbelt';
+import messages from '@/config/messages';
 import settings from '@/config/settings';
 
 type EmbedFields = Array<Omit<EmbedField, 'inline'>>;
@@ -18,6 +21,15 @@ export default class PaginatedMessageEmbedFields extends PaginatedMessage {
   private _totalPages = 0;
   private _items: EmbedFields = [];
   private _itemsPerPage = 10;
+
+  constructor(options?: PaginatedMessageOptions) {
+    super(options);
+    this.setWrongUserInteractionReply(user => ({
+      content: pupa(messages.miscellaneous.wrongUserInteractionReply, { user }),
+      ephemeral: true,
+      allowedMentions: { users: [], roles: [] },
+    }));
+  }
 
   public setItems(items: EmbedFields): this {
     this._items = items;
