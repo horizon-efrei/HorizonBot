@@ -110,7 +110,9 @@ export default class RemindersCommand extends HorizonCommand {
       reminder.description = updateValue as string;
 
     await reminder.save();
-    await message.channel.send(config.messages.editedReminder);
+    await message.channel.send(
+      pupa(config.messages.editedReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
+    );
   }
 
   public async remove(message: Message, args: Args): Promise<void> {

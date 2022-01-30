@@ -137,7 +137,7 @@ export const reminders = {
     listLine: `• \`{reminderId}\` (${timeFormat('{timestamp}', TimestampStyles.RelativeTime)}) : {description}`,
 
     // Edit a reminder
-    editedReminder: 'Ce rappel a bien été modifié !',
+    editedReminder: `Ce rappel a bien été modifié, je te le rappellerai le ${timeFormat('{date}')} !`,
 
     // Remove a reminder
     removedReminder: 'Ce rappel a bien été supprimé !',
