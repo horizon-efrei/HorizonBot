@@ -198,7 +198,7 @@ export default {
     },
   },
   reminders: {
-    alarm: ":alarm_clock: Il est l'heure ! Tu m'avais demandé de te rappeler ceci :\n> {description}",
+    alarm: ":alarm_clock: Il est l'heure ! Tu m'avais demandé de te rappeler ceci :\n>>> {description}",
     noDescription: 'Aucune description',
   },
   upcomingClasses: {
