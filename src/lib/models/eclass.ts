@@ -13,7 +13,7 @@ import { makeMessageLink } from '@/utils';
 
 const nanoid = customAlphabet(urlAlphabet.replace(/[_-]/, ''), 4);
 
-const EclassSchema = new Schema<EclassDocument, EclassModel, null>({
+const EclassSchema = new Schema<EclassDocument, EclassModel>({
   classId: {
     type: String,
     required: true,
@@ -94,12 +94,12 @@ EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string =
   nanoid(),
 ].join('_');
 
-EclassSchema.methods.getMessageLink = function (): string {
+EclassSchema.methods.getMessageLink = function (this: EclassDocument): string {
   const announcementChannel = container.client.configManager.getFromCache(this.announcementChannel, this.guild);
   return makeMessageLink(this.guild, announcementChannel.id, this.announcementMessage);
 };
 
-EclassSchema.methods.formatDates = function (): { date: string; end: string; duration: string } {
+EclassSchema.methods.formatDates = function (this: EclassDocument): { date: string; end: string; duration: string } {
   const { date, end, duration } = this.toObject();
 
   return {
@@ -122,10 +122,11 @@ EclassSchema.methods.normalizeDates = function (
   };
 };
 
-EclassSchema.methods.getStatus = function (): string {
+EclassSchema.methods.getStatus = function (this: EclassDocument): string {
   return eclassConfig.messages.statuses[this.status];
 };
 
 EclassSchema.plugin(autopopulate);
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 export default model<EclassDocument, EclassModel>('Eclass', EclassSchema);

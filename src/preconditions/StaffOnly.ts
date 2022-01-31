@@ -1,8 +1,8 @@
 import type { AsyncPreconditionResult } from '@sapphire/framework';
 import { Identifiers, Precondition } from '@sapphire/framework';
 import type { Message } from 'discord.js';
-import { isGuildMessage } from '../lib/utils';
 import { ConfigEntriesRoles } from '@/types/database';
+import { isGuildMessage } from '@/utils';
 
 export default class StaffOnlyPrecondition extends Precondition {
   public async run(message: Message): AsyncPreconditionResult {

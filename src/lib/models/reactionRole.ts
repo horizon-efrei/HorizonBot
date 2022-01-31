@@ -2,7 +2,7 @@ import { model, Schema } from 'mongoose';
 import type { ReactionRoleDocument, ReactionRoleModel } from '@/types/database';
 import { makeMessageLink } from '@/utils';
 
-const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel, null>({
+const ReactionRoleSchema = new Schema<ReactionRoleDocument, ReactionRoleModel>({
   messageId: {
     type: String,
     required: true,
@@ -33,4 +33,5 @@ ReactionRoleSchema.methods.getMessageLink = function (this: ReactionRoleDocument
   return makeMessageLink(this.guildId, this.channelId, this.messageId);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 export default model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);

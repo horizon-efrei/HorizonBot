@@ -3,7 +3,7 @@ import { model, Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 import type { ReminderDocument, ReminderModel } from '@/types/database';
 
-const ReminderSchema = new Schema<ReminderDocument, ReminderModel, null>({
+const ReminderSchema = new Schema<ReminderDocument, ReminderModel>({
   reminderId: {
     type: String,
     default: (): string => nanoid(6),
@@ -39,4 +39,5 @@ ReminderSchema.methods.normalizeDates = function (this: ReminderDocument): { dat
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 export default model<ReminderDocument, ReminderModel>('Reminders', ReminderSchema);

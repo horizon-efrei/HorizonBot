@@ -12,7 +12,6 @@ import type { Message, MessageComponentInteraction, SelectMenuInteraction } from
 import { MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
-import { noop } from '../utils';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
@@ -21,6 +20,7 @@ import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
 import type { SubjectDocument } from '@/types/database';
+import { noop } from '@/utils';
 
 const schoolYearMenu = new MessageSelectMenu()
   .setCustomId('select-schoolyear')

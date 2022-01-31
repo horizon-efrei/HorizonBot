@@ -34,7 +34,8 @@ export default class PingCommand extends HorizonCommand {
         description: pupa(config.messages.pageDescription, { total: Object.values(groups)[index - 1].length }),
         emoji: Object.values(groups)[index - 1][0].subject.emoji,
       }));
-    const selectMenuAction = PaginatedMessage.defaultActions.find(action => action.customId === '@sapphire/paginated-messages.goToPage');
+    const selectMenuAction = PaginatedMessage.defaultActions
+      .find(action => 'customId' in action && action.customId === '@sapphire/paginated-messages.goToPage');
     paginator.setActions([selectMenuAction]);
 
     for (const { name, value } of fields)

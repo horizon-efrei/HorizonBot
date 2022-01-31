@@ -100,7 +100,8 @@ export default class ContactCommand extends HorizonSubCommand {
         description: pupa(config.messages.selectMenuItemDescription, { pageIndex }),
         emoji: config.messages.selectMenuItemEmoji,
       }));
-    const selectMenuAction = PaginatedMessage.defaultActions.find(action => action.customId === '@sapphire/paginated-messages.goToPage');
+    const selectMenuAction = PaginatedMessage.defaultActions
+      .find(action => 'customId' in action && action.customId === '@sapphire/paginated-messages.goToPage');
     paginator.setActions([selectMenuAction]);
 
     for (const [teamName, teamContacts] of teams) {

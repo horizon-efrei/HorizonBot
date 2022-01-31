@@ -1,6 +1,6 @@
 import { isGuildBasedChannel } from '@sapphire/discord.js-utilities';
 import type { Message, PartialMessage } from 'discord.js';
-import type { GuildMessage } from '../types';
+import type { GuildMessage } from '@/types';
 
 /**
  * Checks if a message is a guild message.

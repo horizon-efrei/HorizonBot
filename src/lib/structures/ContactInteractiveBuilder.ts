@@ -10,12 +10,12 @@ import type { Message, MessageComponentInteraction } from 'discord.js';
 import { MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
-import type { ContactBase, ContactDocument } from '../types/database';
 import { contact as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import Contact from '@/models/contact';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { PrompterText } from '@/types';
+import type { ContactBase, ContactDocument } from '@/types/database';
 import { capitalize, noop } from '@/utils';
 
 const getTeamsMenu = (teams: string[]): MessageSelectMenu => new MessageSelectMenu()
