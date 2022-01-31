@@ -1,9 +1,9 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import type { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { Formatters, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
+import PaginatedContentMessageEmbed from '@/app/lib/structures/PaginatedContentMessageEmbed';
 import { setup as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import Configuration from '@/models/configuration';
@@ -175,18 +175,17 @@ export default class SetupCommand extends HorizonSubCommand {
     const allEntriesFilled: Array<[key: ConfigEntries, v: ConfigurationDocument]> = allEntries
       .map(entry => [entry, definedEntries.find(e => e.name === entry)]);
 
-    await new PaginatedFieldMessageEmbed<{ name: ConfigEntries; value: string }>()
-      .setTitleField(config.messages.listTitle)
+    await new PaginatedContentMessageEmbed()
       .setTemplate(
         new MessageEmbed()
-          .setColor(settings.colors.default)
+          .setTitle(config.messages.listTitle)
           .addField(config.messages.possibilitiesTitle, possibilitiesExamples),
       )
-      .setItems(allEntriesFilled.map(([name, entry]) => ({ name, value: entry?.value })))
-      .formatItems(item => pupa(
-        item.value ? config.messages.lineWithValue : config.messages.lineWithoutValue,
-        { ...item, value: this._getMention(item) },
-      ))
+      .setItems(allEntriesFilled
+        .map(([name, entry]) => pupa(
+          entry ? config.messages.lineWithValue : config.messages.lineWithoutValue,
+          { name, value: this._getMention({ name, value: entry?.value }) },
+        )))
       .setItemsPerPage(15)
       .make()
       .run(message);

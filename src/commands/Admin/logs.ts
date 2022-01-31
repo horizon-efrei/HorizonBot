@@ -1,12 +1,11 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import type { Args, CommandOptions } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import { Collection, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
+import PaginatedContentMessageEmbed from '@/app/lib/structures/PaginatedContentMessageEmbed';
 import { logs as config } from '@/config/commands/admin';
 import messages from '@/config/messages';
-import settings from '@/config/settings';
 import LogStatuses from '@/models/logStatuses';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
@@ -91,18 +90,16 @@ export default class LogsCommand extends HorizonCommand {
   private async _displayList(message: GuildMessage): Promise<void> {
     const logs = await LogStatuses.find({ guildId: message.guild.id });
 
-    await new PaginatedFieldMessageEmbed<{ type: DiscordLogType; status: LogStatusesEnum }>()
-      .setTitleField(config.messages.listTitle)
+    await new PaginatedContentMessageEmbed()
       .setTemplate(
         new MessageEmbed()
-        .setColor(settings.colors.default)
+        .setTitle(config.messages.listTitle)
         .addField(config.messages.possibilitiesTitle, pupa(config.messages.possibilitiesContent, {
           logs: inlineCodeList(logsPossibilitiesExamples),
           statuses: inlineCodeList(statusesPossibilitiesExamples),
         })),
       )
-      .setItems(logs)
-      .formatItems(item => pupa(config.messages.lineValue, getLogInfo(item)))
+      .setItems(logs.map(log => pupa(config.messages.lineValue, getLogInfo(log))))
       .setItemsPerPage(10)
       .make()
       .run(message);

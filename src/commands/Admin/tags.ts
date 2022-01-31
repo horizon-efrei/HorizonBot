@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { ApplyOptions } from '@sapphire/decorators';
-import { PaginatedFieldMessageEmbed } from '@sapphire/discord.js-utilities';
 import { Args } from '@sapphire/framework';
 import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { MessageEmbed } from 'discord.js';
 import intersection from 'lodash.intersection';
 import pupa from 'pupa';
+import PaginatedContentMessageEmbed from '@/app/lib/structures/PaginatedContentMessageEmbed';
 import { tags as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import { IsStaff, ResolveTagArgument } from '@/decorators';
@@ -73,17 +73,15 @@ export default class TagsCommand extends HorizonSubCommand {
       return;
     }
 
-    await new PaginatedFieldMessageEmbed<{ name: string; aliases: string; uses: number }>()
-      .setTitleField(pupa(config.messages.listTitle, { total: tags.size }))
-      .setTemplate(new MessageEmbed().setColor(settings.colors.default))
+    await new PaginatedContentMessageEmbed()
+      .setTemplate(new MessageEmbed().setTitle(pupa(config.messages.listTitle, { total: tags.size })))
       .setItems([
-        ...tags.map(tag => ({
+        ...tags.map(tag => pupa(config.messages.listLine, {
           name: tag.name,
           aliases: tag.aliases.length > 0 ? inlineCodeList(tag.aliases) : '/',
           uses: tag.uses,
         })),
       ])
-      .formatItems(item => pupa(config.messages.listLine, item))
       .setItemsPerPage(10)
       .make()
       .run(message);
