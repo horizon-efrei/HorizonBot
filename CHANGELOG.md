@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2022/03/20
+
+### Fixed
+
+- Fix crash when creating a class with more than 25 subjects
+
+
 ## [0.9.0] - 2022/01/31
 
 ### Added
@@ -19,13 +26,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improve pagination errors by localizing the interaction error message
 - Improve reminders's list by presenting multiline reminders better
 
-
 ### Fixed
 
 - Fix crash due to a old misplaced `this.error()`
-- Fix date resolve by auto-pading years to be in 21th century
-- Fix date resolve by disallowing dates in the past (unless `context.canBePast` is true)
-- Fix date resolve by making hours & minutes optional, defaulting to current date
+- Fix date resolver by auto-pading years to be in 21th century
+- Fix date resolver by disallowing dates in the past (unless `context.canBePast` is true)
+- Fix date resolver by making hours & minutes optional, defaulting to current date
 
 
 ## [0.8.1] - 2022/01/01
