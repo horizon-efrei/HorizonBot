@@ -9,6 +9,7 @@ declare namespace NodeJS {
     COMPILERAPI_SECRET: string;
 
     MONGO_URI: string;
+    ECLASS_DRIVE_URL: string;
     /* eslint-enable @typescript-eslint/naming-convention */
   }
 }

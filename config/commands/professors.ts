@@ -218,7 +218,7 @@ export const eclass = {
       startRecord: "- Lance ton logiciel d'enregistrement pour filmer le cours ;",
       connectVoiceChannel: `- Connecte-toi au salon vocal défini, en cliquant ici : ${channelMention('{subject.voiceChannel}')} ;`,
       announceVoiceChannel: `- Annonce le salon vocal que tu vas utiliser dans ${channelMention('{subject.textChannel}')}, car aucun salon vocal n'a été trouvé pour la matière "{subject.name}" ;`,
-      registerRecording: `- Télécharge ton enregistrement sur ce lien ${hideLinkEmbed('https://drive.google.com/drive/u/2/folders/1rKNNU1NYFf-aE4kKTe_eC-GiUIgqdsZg')}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`!ecours record {classId} <ton lien>\` ;`,
+      registerRecording: `- Télécharge ton enregistrement sur ce lien ${hideLinkEmbed(process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`!ecours record {classId} <ton lien>\` ;`,
       isRecorded: 'soit',
       isNotRecorded: 'ne soit pas',
     },
