@@ -55,7 +55,7 @@ const getSubjectMenus = (subjects: SubjectDocument[]): MessageSelectMenu[] => {
         .setCustomId(`select-subject-${i}`)
         .setPlaceholder(config.messages.createClassSetup.subjectMenu.placeholder)
         .addOptions(
-          part.map((subject, j) => ({ label: subject.name, emoji: subject.emoji, value: `${subject.classCode}-${i}-${j}` })),
+          part.map(subject => ({ label: subject.name, emoji: subject.emoji, value: subject.classCode })),
         ),
     );
   }
