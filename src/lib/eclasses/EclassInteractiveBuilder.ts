@@ -1,5 +1,5 @@
 import * as Formatters from '@discordjs/builders';
-import { isNullish } from '@sapphire/utilities';
+import { chunk, isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
 import {
   Constants,
@@ -47,12 +47,20 @@ const isRecordedMenu = new MessageSelectMenu()
     value: 'no',
   }]);
 
-const getSubjectMenu = (subjects: SubjectDocument[]): MessageSelectMenu => new MessageSelectMenu()
-  .setCustomId('select-subject')
-  .setPlaceholder(config.messages.createClassSetup.subjectMenu.placeholder)
-  .addOptions(
-    subjects.map(subject => ({ label: subject.name, emoji: subject.emoji, value: subject.classCode })),
-  );
+const getSubjectMenus = (subjects: SubjectDocument[]): MessageSelectMenu[] => {
+  const menus: MessageSelectMenu[] = [];
+  for (const [i, part] of chunk(subjects, 25).entries()) {
+    menus.push(
+      new MessageSelectMenu()
+        .setCustomId(`select-subject-${i}`)
+        .setPlaceholder(config.messages.createClassSetup.subjectMenu.placeholder)
+        .addOptions(
+          part.map((subject, j) => ({ label: subject.name, emoji: subject.emoji, value: `${subject.classCode}-${i}-${j}` })),
+        ),
+    );
+  }
+  return menus;
+};
 
 export default class EclassInteractiveBuilder {
   public step = 0;
@@ -159,10 +167,10 @@ export default class EclassInteractiveBuilder {
 
     // 2. Ask for the subject
     const subjects = await Subject.find({ schoolYear });
-    const subjectMenu = getSubjectMenu(subjects);
-    if (subjectMenu.options.length === 0)
+    if (subjects.length === 0)
       throw new Error(config.messages.createClassSetup.errors.noSubjects);
-    const subjectInteraction = await this._makeSelectMenuStep(subjectMenu);
+    const subjectMenus = getSubjectMenus(subjects);
+    const subjectInteraction = await this._makeSelectMenuStep(subjectMenus);
 
     const selectedSubjectCode = subjectInteraction.values.shift();
     this.responses.subject = subjects.find(subject => subject.classCode === selectedSubjectCode);
@@ -190,14 +198,20 @@ export default class EclassInteractiveBuilder {
     this.responses.isRecorded = isRecordedInteraction.values.shift() === 'yes';
   }
 
-  private async _makeSelectMenuStep(component: MessageSelectMenu): Promise<SelectMenuInteraction> {
-    this._actionRows.push(new MessageActionRow().addComponents([component]));
+  private async _makeSelectMenuStep(
+    component: MessageSelectMenu | MessageSelectMenu[],
+  ): Promise<SelectMenuInteraction> {
+    const components = Array.isArray(component) ? component : [component];
+
+    this._actionRows.push(...components.map(comp => new MessageActionRow().addComponents([comp])));
     await this.mainBotMessage.edit({ components: this._actionRows });
 
     const interaction = await this.mainBotMessage.awaitMessageComponent({
-      componentType: component.type,
+      componentType: MessageComponentTypes.SELECT_MENU,
       time: 2 * 60 * 1000,
-      filter: i => i.user.id === this.message.author.id && i.customId === component.customId && !this.aborted,
+      filter: int => int.user.id === this.message.author.id
+        && components.some(comp => comp.customId === int.customId)
+        && !this.aborted,
     });
     this._actionRows.splice(1);
     return interaction;
