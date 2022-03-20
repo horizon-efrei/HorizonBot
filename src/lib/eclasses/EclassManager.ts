@@ -358,7 +358,7 @@ export async function subscribeMember(member: GuildMember, eclass: EclassPopulat
     return;
   }
 
-  await Eclass.findByIdAndUpdate(eclass._id, { $push: { subscribers: member.id } });
+  await Eclass.findByIdAndUpdate(eclass._id, { $addToSet: { subscribers: member.id } });
   if (!member.roles.cache.get(givenRole.id))
     await member.roles.add(givenRole);
 
