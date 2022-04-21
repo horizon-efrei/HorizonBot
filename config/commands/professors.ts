@@ -119,7 +119,7 @@ export const eclass = {
           'Terminé !',
         ],
       },
-      promptMessageDropdown: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
+      promptMessageMenu: 'Choisis une option dans le menu ci-dessus :arrow_heading_up: ',
       stepPreview: stripIndent`
         **1.** __Promotion :__ {schoolYear}
         **2.** __Matière :__ {subject}
@@ -151,6 +151,24 @@ export const eclass = {
           description: 'Le cours ne sera pas enregistré',
           emoji: '❌',
         }] as Array<Omit<MessageSelectOptionData, 'value'>>,
+      },
+      targetRoleL3: {
+        all: {
+          emoji: '👥',
+          label: 'L3 - Toute la promotion',
+        },
+        abroad: {
+          emoji: '✈️',
+          label: 'L3 - Étranger',
+        },
+        campusFullYear: {
+          emoji: '🏫',
+          label: 'L3 - Villejuif (septembre à juin)',
+        },
+        campusHalfYear: {
+          emoji: '<:pantheonassas:957749365940822107>',
+          label: 'L3 - Campus (janvier à juin)',
+        },
       },
       abortMenu: {
         label: 'Abandonner',

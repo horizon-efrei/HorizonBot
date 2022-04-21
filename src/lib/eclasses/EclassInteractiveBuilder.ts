@@ -1,4 +1,5 @@
 import * as Formatters from '@discordjs/builders';
+import { container } from '@sapphire/framework';
 import { chunk, isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
 import {
@@ -8,8 +9,13 @@ import {
   MessageEmbed,
   MessageSelectMenu,
 } from 'discord.js';
-import type { Message, MessageComponentInteraction, SelectMenuInteraction } from 'discord.js';
-import { MessageComponentTypes } from 'discord.js/typings/enums';
+import type {
+  ButtonInteraction,
+  Message,
+  MessageComponentInteraction,
+  SelectMenuInteraction,
+} from 'discord.js';
+import { MessageButtonStyles, MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
 import { eclass as config } from '@/config/commands/professors';
@@ -20,6 +26,7 @@ import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
 import type { SubjectDocument } from '@/types/database';
+import { ConfigEntriesRoles } from '@/types/database';
 import { noop } from '@/utils';
 
 const schoolYearMenu = new MessageSelectMenu()
@@ -46,6 +53,36 @@ const isRecordedMenu = new MessageSelectMenu()
     ...config.messages.createClassSetup.isRecordedMenu.options[1],
     value: 'no',
   }]);
+
+const targetRoleL3 = [
+  new MessageButton()
+    .setCustomId('button-target-role-l3-all')
+    .setStyle(MessageButtonStyles.PRIMARY)
+    .setEmoji(config.messages.createClassSetup.targetRoleL3.all.emoji)
+    .setLabel(config.messages.createClassSetup.targetRoleL3.all.label),
+  new MessageButton()
+    .setCustomId('button-target-role-l3-abroad')
+    .setStyle(MessageButtonStyles.SECONDARY)
+    .setEmoji(config.messages.createClassSetup.targetRoleL3.abroad.emoji)
+    .setLabel(config.messages.createClassSetup.targetRoleL3.abroad.label),
+  new MessageButton()
+    .setCustomId('button-target-role-l3-half-campus')
+    .setStyle(MessageButtonStyles.SECONDARY)
+    .setEmoji(config.messages.createClassSetup.targetRoleL3.campusHalfYear.emoji)
+    .setLabel(config.messages.createClassSetup.targetRoleL3.campusHalfYear.label),
+  new MessageButton()
+    .setCustomId('button-target-role-l3-full-campus')
+    .setStyle(MessageButtonStyles.SECONDARY)
+    .setEmoji(config.messages.createClassSetup.targetRoleL3.campusFullYear.emoji)
+    .setLabel(config.messages.createClassSetup.targetRoleL3.campusFullYear.label),
+];
+
+const targetRoles = {
+  'button-target-role-l3-all': ConfigEntriesRoles.SchoolYearL3,
+  'button-target-role-l3-abroad': ConfigEntriesRoles.SchoolYearL3Abroad,
+  'button-target-role-l3-half-campus': ConfigEntriesRoles.SchoolYearL3HalfCampus,
+  'button-target-role-l3-full-campus': ConfigEntriesRoles.SchoolYearL3FullCampus,
+};
 
 const getSubjectMenus = (subjects: SubjectDocument[]): MessageSelectMenu[] => {
   const menus: MessageSelectMenu[] = [];
@@ -106,7 +143,7 @@ export default class EclassInteractiveBuilder {
   public async start(): Promise<EclassCreationOptions | null> {
     this.mainBotMessage = await this.message.channel.send({ embeds: [this._embed], components: this._actionRows });
     this.botMessagePrompt = await this.message.channel.send(
-      config.messages.createClassSetup.promptMessageDropdown,
+      config.messages.createClassSetup.promptMessageMenu,
     ) as GuildMessage;
 
     this.prompter = new ArgumentPrompter(this.message, {
@@ -170,7 +207,7 @@ export default class EclassInteractiveBuilder {
     if (subjects.length === 0)
       throw new Error(config.messages.createClassSetup.errors.noSubjects);
     const subjectMenus = getSubjectMenus(subjects);
-    const subjectInteraction = await this._makeSelectMenuStep(subjectMenus);
+    const subjectInteraction = await this._makeSelectMenuStep(...subjectMenus);
 
     const selectedSubjectCode = subjectInteraction.values.shift();
     this.responses.subject = subjects.find(subject => subject.classCode === selectedSubjectCode);
@@ -192,22 +229,46 @@ export default class EclassInteractiveBuilder {
     this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
     await this._updateStep();
 
-    // 7. Ask whether the class will be recorded
-    await this.botMessagePrompt.edit(config.messages.createClassSetup.promptMessageDropdown);
+    // 7. Ask for the target role if in L3
+    if (this.responses.subject.schoolYear === SchoolYear.L3) {
+      const response = await this._makeButtonStep(...targetRoleL3);
+      const targetRole = targetRoles[response.customId as keyof typeof targetRoles];
+      this.responses.targetRole = await container.client.configManager.get(targetRole, response.guildId);
+      await response.update({ embeds: [this._embed], components: this._actionRows });
+    }
+
+    // 8. Ask whether the class will be recorded
     const isRecordedInteraction = await this._makeSelectMenuStep(isRecordedMenu);
     this.responses.isRecorded = isRecordedInteraction.values.shift() === 'yes';
   }
 
-  private async _makeSelectMenuStep(
-    component: MessageSelectMenu | MessageSelectMenu[],
-  ): Promise<SelectMenuInteraction> {
-    const components = Array.isArray(component) ? component : [component];
+  private async _makeSelectMenuStep(...components: MessageSelectMenu[]): Promise<SelectMenuInteraction> {
+    await this.botMessagePrompt.edit(config.messages.createClassSetup.promptMessageMenu);
 
     this._actionRows.push(...components.map(comp => new MessageActionRow().addComponents([comp])));
     await this.mainBotMessage.edit({ components: this._actionRows });
 
     const interaction = await this.mainBotMessage.awaitMessageComponent({
       componentType: MessageComponentTypes.SELECT_MENU,
+      time: 2 * 60 * 1000,
+      filter: int => int.user.id === this.message.author.id
+        && components.some(comp => comp.customId === int.customId)
+        && !this.aborted,
+    });
+    this._actionRows.splice(1);
+    return interaction;
+  }
+
+  private async _makeButtonStep(...components: MessageButton[]): Promise<ButtonInteraction> {
+    await this.botMessagePrompt.edit(config.messages.createClassSetup.promptMessageMenu);
+
+    const rows = chunk(components, 5).map(comps => new MessageActionRow().addComponents(comps));
+
+    this._actionRows.push(...rows);
+    await this.mainBotMessage.edit({ components: this._actionRows });
+
+    const interaction = await this.mainBotMessage.awaitMessageComponent({
+      componentType: MessageComponentTypes.BUTTON,
       time: 2 * 60 * 1000,
       filter: int => int.user.id === this.message.author.id
         && components.some(comp => comp.customId === int.customId)
