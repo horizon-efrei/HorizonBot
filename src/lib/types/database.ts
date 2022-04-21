@@ -30,6 +30,9 @@ export enum ConfigEntriesRoles {
   SchoolYearL1 = 'role-l1',
   SchoolYearL2 = 'role-l2',
   SchoolYearL3 = 'role-l3',
+  SchoolYearL3Abroad = 'role-l3-abroad',
+  SchoolYearL3HalfCampus = 'role-l3-half-campus',
+  SchoolYearL3FullCampus = 'role-l3-full-campus',
   Staff = 'role-staff',
 }
 

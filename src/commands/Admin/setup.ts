@@ -89,6 +89,18 @@ const argNames: Array<{ possibilities: string[]; type: 'channel' | 'role'; entry
   possibilities: ['role-l3', 'role-promo-l3'],
   type: 'role',
   entry: ConfigEntriesRoles.SchoolYearL3,
+}, {
+  possibilities: ['role-l3-abroad', 'role-promo-l3-abroad'],
+  type: 'role',
+  entry: ConfigEntriesRoles.SchoolYearL3Abroad,
+}, {
+  possibilities: ['role-l3-full-campus', 'role-promo-l3-full-campus'],
+  type: 'role',
+  entry: ConfigEntriesRoles.SchoolYearL3FullCampus,
+}, {
+  possibilities: ['role-l3-half-campus', 'role-promo-l3-half-campus'],
+  type: 'role',
+  entry: ConfigEntriesRoles.SchoolYearL3HalfCampus,
 }];
 
 const possibilitiesExamples = inlineCodeList(argNames.flatMap(argName => argName.possibilities[0]));
