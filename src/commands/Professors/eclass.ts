@@ -349,17 +349,17 @@ export default class EclassCommand extends HorizonSubCommand {
     const texts = config.messages.showEmbed;
     const embed = new MessageEmbed()
       .setColor(settings.colors.primary)
-      .setTitle(pupa(texts.title, eclass))
-      .addField(texts.subjectName, pupa(texts.subjectValue, eclass), true)
-      .addField(texts.statusName, pupa(texts.statusValue, { ...eclass, status: capitalizedStatus }), true)
+      .setTitle(pupa(texts.title, eclass.toJSON()))
+      .addField(texts.subjectName, pupa(texts.subjectValue, eclass.toJSON()), true)
+      .addField(texts.statusName, pupa(texts.statusValue, { ...eclass.toJSON(), status: capitalizedStatus }), true)
       .addField(texts.dateName, pupa(texts.dateValue, {
-          ...eclass,
+          ...eclass.toJSON(),
           ...eclass.normalizeDates(true),
         }),
         true)
-      .addField(texts.professorName, pupa(texts.professorValue, eclass), true)
-      .addField(texts.recordedName, pupa(texts.recordedValue, { ...eclass, recorded: recordedText }), true)
-      .addField(texts.relatedName, pupa(texts.relatedValue, { ...eclass, messageLink }), true);
+      .addField(texts.professorName, pupa(texts.professorValue, eclass.toJSON()), true)
+      .addField(texts.recordedName, pupa(texts.recordedValue, { ...eclass.toJSON(), recorded: recordedText }), true)
+      .addField(texts.relatedName, pupa(texts.relatedValue, { ...eclass.toJSON(), messageLink }), true);
 
     // Change the URL & confirm
     await message.channel.send({ embeds: [embed] });

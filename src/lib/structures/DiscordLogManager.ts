@@ -92,7 +92,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
   const contentValue: string = this.getContentValue(payload);
 
   const embed = new MessageEmbed()
-    .setAuthor(messages.logs.embedTitle)
+    .setAuthor({ name: messages.logs.embedTitle })
     .setColor(fieldOptions.color)
     .setTitle(messages.logs.readableEvents[payload.type])
     .addField(fieldOptions.contextName, pupa(fieldOptions.contextValue, payload), true)

@@ -60,7 +60,7 @@ export function createAnnouncementEmbed({
     .setTitle(pupa(texts.title, { subject, topic }))
     .setDescription(pupa(texts.description, { subject, classChannel, date }))
     .setThumbnail(subject.emojiImage)
-    .setAuthor(texts.author, classChannel.guild.iconURL())
+    .setAuthor({ name: texts.author, iconURL: classChannel.guild.iconURL() })
     .addField(texts.date, pupa(texts.dateValue, { date, end }), true)
     .addField(texts.duration, dayjs.duration(duration).humanize(), true)
     .addField(texts.professor, professor.toString(), true)
@@ -79,13 +79,13 @@ export function getRoleNameForClass(
 export async function createClass(
   message: GuildMessage,
   {
-    date, subject, topic, duration, professor, isRecorded,
+    date, subject, topic, duration, professor, isRecorded, targetRole,
   }: EclassCreationOptions,
 ): Promise<void> {
   // Prepare the date
   const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
 
-  const targetRole = await container.client.configManager.get(schoolYearRoles[subject.schoolYear], message.guild.id);
+  targetRole ??= await container.client.configManager.get(schoolYearRoles[subject.schoolYear], message.guild.id);
   if (!targetRole) {
     container.logger.warn('[e-class:not-created] A new e-class was planned but no school year role found, unable to create.');
     await message.channel.send(config.messages.unconfiguredRole);
@@ -188,7 +188,7 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
   const embed = new MessageEmbed()
     .setColor(settings.colors.primary)
     .setTitle(pupa(texts.title, { eclass }))
-    .setAuthor(texts.author, announcementChannel.guild.iconURL())
+    .setAuthor({ name: texts.author, iconURL: announcementChannel.guild.iconURL() })
     .setDescription(pupa(texts.baseDescription, {
       eclass,
       isRecorded: eclass.isRecorded ? texts.descriptionIsRecorded : texts.descriptionIsNotRecorded,
