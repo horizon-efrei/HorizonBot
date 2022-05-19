@@ -34,7 +34,7 @@ const calendarMapping = {
 async function updateMessage(
   message: GuildMessage,
   channel: GuildTextBasedChannel,
-  content: MessageOptions,
+  content: Omit<MessageOptions, 'flags'>,
 ): Promise<void> {
   const sendMessage = async (chan: GuildTextBasedChannel): Promise<void> => void await chan.send(content)
     .then(async msg => msg.crosspostable && await msg.crosspost());
