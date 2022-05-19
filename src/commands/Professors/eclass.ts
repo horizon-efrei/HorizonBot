@@ -266,6 +266,7 @@ export default class EclassCommand extends HorizonSubCommand {
 
     // Send messages
     const payload = {
+      ...eclass.toJSON(),
       ...eclass.normalizeDates(true),
       role: message.guild.roles.resolve(eclass.targetRole).name,
       pingRole: message.guild.roles.resolve(eclass.classRole),
