@@ -13,8 +13,10 @@ export default class RoleDeleteListener extends Listener {
     if (affectedReactionRoleConditions.modifiedCount > 0)
       this.container.logger.debug(`[ReactionRoles] Removed condition of role ${role.id} for reaction-roles because the role (@${role.name}) was deleted.`);
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const affectedReactionRoles = await ReactionRole.find({ 'reactionRolePairs.role': role.id });
     await ReactionRole.updateMany(
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       { 'reactionRolePairs.role': role.id },
       { $pull: { reactionRolePairs: { role: role.id } } },
     );

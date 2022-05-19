@@ -39,5 +39,4 @@ ReminderSchema.methods.normalizeDates = function (this: ReminderDocument): { dat
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 export default model<ReminderDocument, ReminderModel>('Reminders', ReminderSchema);

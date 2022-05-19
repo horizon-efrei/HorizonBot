@@ -33,5 +33,4 @@ ReactionRoleSchema.methods.getMessageLink = function (this: ReactionRoleDocument
   return makeMessageLink(this.guildId, this.channelId, this.messageId);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 export default model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);

@@ -99,21 +99,11 @@ EclassSchema.methods.getMessageLink = function (this: EclassDocument): string {
   return makeMessageLink(this.guild, announcementChannel.id, this.announcementMessage);
 };
 
-EclassSchema.methods.formatDates = function (this: EclassDocument): { date: string; end: string; duration: string } {
-  const { date, end, duration } = this.toObject();
-
-  return {
-    date: dayjs(date).format(settings.configuration.dateFormat),
-    end: dayjs(end).format(settings.configuration.dateFormat),
-    duration: dayjs.duration(duration).humanize(),
-  };
-};
-
 EclassSchema.methods.normalizeDates = function (
   this: EclassDocument,
   formatDuration?: boolean,
 ): { date: number; end: number; duration: number | string } {
-  const { date, end, duration } = this.toObject();
+  const { date, end, duration }: { date: number; end: number; duration: number } = this.toObject();
 
   return {
     date: Math.floor(date / 1000),
@@ -128,5 +118,4 @@ EclassSchema.methods.getStatus = function (this: EclassDocument): string {
 
 EclassSchema.plugin(autopopulate);
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 export default model<EclassDocument, EclassModel>('Eclass', EclassSchema);

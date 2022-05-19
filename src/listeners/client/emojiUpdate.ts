@@ -7,6 +7,7 @@ export default class EmojiUpdateListener extends Listener {
     if (oldEmoji.toString() === newEmoji.toString())
       return;
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const affectedReactionRoles = ReactionRole.find({ 'reactionRolePairs.reaction': oldEmoji.toString() });
 
     for await (const reactionRole of affectedReactionRoles) {

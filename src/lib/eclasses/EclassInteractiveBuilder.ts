@@ -78,10 +78,12 @@ const targetRoleL3 = [
 ];
 
 const targetRoles = {
+  /* eslint-disable @typescript-eslint/naming-convention */
   'button-target-role-l3-all': ConfigEntriesRoles.SchoolYearL3,
   'button-target-role-l3-abroad': ConfigEntriesRoles.SchoolYearL3Abroad,
   'button-target-role-l3-half-campus': ConfigEntriesRoles.SchoolYearL3HalfCampus,
   'button-target-role-l3-full-campus': ConfigEntriesRoles.SchoolYearL3FullCampus,
+  /* eslint-enable @typescript-eslint/naming-convention */
 };
 
 const getSubjectMenus = (subjects: SubjectDocument[]): MessageSelectMenu[] => {
