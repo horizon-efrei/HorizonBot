@@ -1,12 +1,14 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessageLimits } from '@sapphire/discord-utilities';
 import type { Args, CommandOptions } from '@sapphire/framework';
+import { Resolvers } from '@sapphire/framework';
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import pupa from 'pupa';
 import { dump as config } from '@/config/commands/admin';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
+import { resolveCompleteEmoji } from '@/resolvers';
 import HorizonCommand from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 import { nullop } from '@/utils';
@@ -42,10 +44,11 @@ function memberFormatterFactory(format: string, dateFormat: string): (member: Gu
 
 const dumpOptions = {
   format: ['format', 'f'],
-  role: ['has-roles', 'r'],
+  allRole: ['has-all-roles', 'a'],
+  role: ['has-roles', 'h'],
+  reacted: ['reacted', 'r'],
   order: ['order', 'o'],
   limit: ['limit', 'l'],
-  allRole: ['has-all-roles', 'a'],
   separator: ['separator', 's'],
   dateFormat: ['dateformat', 'df'],
 };
@@ -89,6 +92,18 @@ export default class DumpCommand extends HorizonCommand {
     const noRoleFilter = args.getFlags(...dumpFlags.noRole);
     if (noRoleFilter)
       members = members.filter(member => member.roles.cache.size === 1);
+
+    // Keeps members who reacted to the message
+    const [reactionResolvable, reactedMessageResolvable] = args.getOption(...dumpOptions.reacted).split('@');
+    if (reactionResolvable && reactedMessageResolvable) {
+      const reaction = resolveCompleteEmoji(reactionResolvable, message.guild);
+      const reactedMessage = await Resolvers.resolveMessage(reactedMessageResolvable, { message });
+      if (reactedMessage.success) {
+        const emojiKey = typeof reaction.value === 'string' ? reaction.value : reaction.value.id;
+        const reactionners = reactedMessage.value.reactions.cache.get(emojiKey).users.cache;
+        members = members.filter(member => reactionners.has(member.id));
+      }
+    }
 
     // Sorts the members as asked (name, id, created_at, joined_at, nick)
     const order = args.getOption(...dumpOptions.order);
