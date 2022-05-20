@@ -94,14 +94,17 @@ export default class DumpCommand extends HorizonCommand {
       members = members.filter(member => member.roles.cache.size === 1);
 
     // Keeps members who reacted to the message
-    const [reactionResolvable, reactedMessageResolvable] = args.getOption(...dumpOptions.reacted).split('@');
-    if (reactionResolvable && reactedMessageResolvable) {
-      const reaction = resolveCompleteEmoji(reactionResolvable, message.guild);
-      const reactedMessage = await Resolvers.resolveMessage(reactedMessageResolvable, { message });
-      if (reactedMessage.success) {
-        const emojiKey = typeof reaction.value === 'string' ? reaction.value : reaction.value.id;
-        const reactionners = reactedMessage.value.reactions.cache.get(emojiKey).users.cache;
-        members = members.filter(member => reactionners.has(member.id));
+    const reactionFilter = args.getOption(...dumpOptions.reacted);
+    if (reactionFilter) {
+      const [reactionResolvable, reactedMessageResolvable] = reactionFilter.split('@');
+      if (reactionResolvable && reactedMessageResolvable) {
+        const reaction = resolveCompleteEmoji(reactionResolvable, message.guild);
+        const reactedMessage = await Resolvers.resolveMessage(reactedMessageResolvable, { message });
+        if (reactedMessage.success) {
+          const emojiKey = typeof reaction.value === 'string' ? reaction.value : reaction.value.id;
+          const reactionners = reactedMessage.value.reactions.cache.get(emojiKey).users.cache;
+          members = members.filter(member => reactionners.has(member.id));
+        }
       }
     }
 
