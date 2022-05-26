@@ -109,7 +109,7 @@ export const dump = {
           :small_blue_diamond: \`--format=<format>\`/\`-f=<format>\` : Formatte les membres en fonction du template donné. Voir "Formattage des membres" pour plus d'informations.
           :small_blue_diamond: \`--has-roles=<rôles>\`/\`-h=<rôles>\` : Affiche les membres qui ont au moins un des rôles donnés. Voir "Liste de rôles" pour plus d'informations.
           :small_blue_diamond: \`--has-all-roles=<rôles>\`/\`-a=<rôles>\` : Affiche les membres qui ont tous les rôles donnés. Voir "Liste de rôles" pour plus d'informations.
-          :small_blue_diamond: \`--reacted=<reaction>:<message>\`/\`-r=<reaction>@<message>\` : Affiche les membres qui ont réagis au message donné
+          :small_blue_diamond: \`--reacted=<reaction>@<message>\`/\`-r=<reaction>@<message>\` : Affiche les membres qui ont réagis au message donné
           :small_blue_diamond: \`--order=<ordre>\`/\`-o=<ordre>\` :  Trie les membres par ordre alphabétique (\`name\` pour les noms d'utilisateur, ou \`nick\` pour les pseudos), ID (\`id\`), date de création du compte (\`created\`) ou date d'arrivée sur ce serveur (\`joined\`).
           :small_blue_diamond: \`--limit=<nombre>\`/\`-l=<nombre>\` : Affiche uniquement le nombre de membres indiqué.
           :small_blue_diamond: \`--separator=<séparateur>\`/\`-s=<séparateur>\` : Change le séparateur entre chaque membre. Par défaut, il s'agit d'une nouvelle ligne.

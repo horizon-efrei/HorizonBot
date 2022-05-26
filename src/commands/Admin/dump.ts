@@ -102,7 +102,7 @@ export default class DumpCommand extends HorizonCommand {
         const reactedMessage = await Resolvers.resolveMessage(reactedMessageResolvable, { message });
         if (reactedMessage.success) {
           const emojiKey = typeof reaction.value === 'string' ? reaction.value : reaction.value.id;
-          const reactionners = reactedMessage.value.reactions.cache.get(emojiKey).users.cache;
+          const reactionners = await reactedMessage.value.reactions.cache.get(emojiKey).users.fetch();
           members = members.filter(member => reactionners.has(member.id));
         }
       }
