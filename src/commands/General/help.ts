@@ -26,7 +26,7 @@ export default class HelpCommand extends HorizonCommand {
       if (command.aliases.length > 1)
         embed.addField(information.aliases, inlineCodeList(command.aliases));
       if (command.examples.length > 0)
-        embed.addField(information.examples, inlineCodeList(command.examples, '\n'));
+        embed.addField(information.examples, inlineCodeList(command.examples, '\n\n'));
     } else {
       const information = config.messages.commandsList;
       const amount = this.container.stores.get('commands').size;
