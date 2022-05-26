@@ -6,7 +6,6 @@ import autopopulate from 'mongoose-autopopulate';
 import { customAlphabet, urlAlphabet } from 'nanoid';
 import slug from 'slug';
 import { eclass as eclassConfig } from '@/config/commands/professors';
-import settings from '@/config/settings';
 import type { EclassDocument, EclassModel } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import { makeMessageLink } from '@/utils';
