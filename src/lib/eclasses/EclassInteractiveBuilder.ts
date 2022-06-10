@@ -1,5 +1,4 @@
 import * as Formatters from '@discordjs/builders';
-import { container } from '@sapphire/framework';
 import { chunk, isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
 import {
@@ -15,7 +14,7 @@ import type {
   MessageComponentInteraction,
   SelectMenuInteraction,
 } from 'discord.js';
-import { MessageButtonStyles, MessageComponentTypes } from 'discord.js/typings/enums';
+import { MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { A } from 'ts-toolbelt';
 import { eclass as config } from '@/config/commands/professors';
@@ -26,7 +25,6 @@ import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
 import type { SubjectDocument } from '@/types/database';
-import { ConfigEntriesRoles } from '@/types/database';
 import { noop } from '@/utils';
 
 const schoolYearMenu = new MessageSelectMenu()
@@ -53,38 +51,6 @@ const isRecordedMenu = new MessageSelectMenu()
     ...config.messages.createClassSetup.isRecordedMenu.options[1],
     value: 'no',
   }]);
-
-const targetRoleL3 = [
-  new MessageButton()
-    .setCustomId('button-target-role-l3-all')
-    .setStyle(MessageButtonStyles.PRIMARY)
-    .setEmoji(config.messages.createClassSetup.targetRoleL3.all.emoji)
-    .setLabel(config.messages.createClassSetup.targetRoleL3.all.label),
-  new MessageButton()
-    .setCustomId('button-target-role-l3-abroad')
-    .setStyle(MessageButtonStyles.SECONDARY)
-    .setEmoji(config.messages.createClassSetup.targetRoleL3.abroad.emoji)
-    .setLabel(config.messages.createClassSetup.targetRoleL3.abroad.label),
-  new MessageButton()
-    .setCustomId('button-target-role-l3-half-campus')
-    .setStyle(MessageButtonStyles.SECONDARY)
-    .setEmoji(config.messages.createClassSetup.targetRoleL3.campusHalfYear.emoji)
-    .setLabel(config.messages.createClassSetup.targetRoleL3.campusHalfYear.label),
-  new MessageButton()
-    .setCustomId('button-target-role-l3-full-campus')
-    .setStyle(MessageButtonStyles.SECONDARY)
-    .setEmoji(config.messages.createClassSetup.targetRoleL3.campusFullYear.emoji)
-    .setLabel(config.messages.createClassSetup.targetRoleL3.campusFullYear.label),
-];
-
-const targetRoles = {
-  /* eslint-disable @typescript-eslint/naming-convention */
-  'button-target-role-l3-all': ConfigEntriesRoles.SchoolYearL3,
-  'button-target-role-l3-abroad': ConfigEntriesRoles.SchoolYearL3Abroad,
-  'button-target-role-l3-half-campus': ConfigEntriesRoles.SchoolYearL3HalfCampus,
-  'button-target-role-l3-full-campus': ConfigEntriesRoles.SchoolYearL3FullCampus,
-  /* eslint-enable @typescript-eslint/naming-convention */
-};
 
 const getSubjectMenus = (subjects: SubjectDocument[]): MessageSelectMenu[] => {
   const menus: MessageSelectMenu[] = [];
@@ -166,7 +132,7 @@ export default class EclassInteractiveBuilder {
       if (this.aborted)
         return;
 
-      // FIXME: Bruh this error management is so disgusting it makes me wanna throw please refactor that ASAP
+      // FIXME: This error management is so disgusting please refactor that ASAP
       if (err instanceof Error && (err.name.includes('INTERACTION_COLLECTOR_ERROR') || err.message === 'TIME OUT')) {
         await this._abort(config.messages.prompts.promptTimeout);
         return;
@@ -231,13 +197,9 @@ export default class EclassInteractiveBuilder {
     this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
     await this._updateStep();
 
-    // 7. Ask for the target role if in L3
-    if (this.responses.subject.schoolYear === SchoolYear.L3) {
-      const response = await this._makeButtonStep(...targetRoleL3);
-      const targetRole = targetRoles[response.customId as keyof typeof targetRoles];
-      this.responses.targetRole = await container.client.configManager.get(targetRole, response.guildId);
-      await response.update({ embeds: [this._embed], components: this._actionRows });
-    }
+    // 7. Ask for the targeted role
+    this.responses.targetRole = await this._makeMessageStep('autoPromptRole', config.messages.prompts.targetRole);
+    await this._updateStep();
 
     // 8. Ask whether the class will be recorded
     const isRecordedInteraction = await this._makeSelectMenuStep(isRecordedMenu);
@@ -341,8 +303,9 @@ export default class EclassInteractiveBuilder {
         ? dayjs.duration(this.responses.duration).humanize()
         : this._emoteForStep(4),
       professor: this.responses.professor ?? this._emoteForStep(5),
+      targetRole: this.responses.targetRole ?? this._emoteForStep(6),
       isRecorded: isNullish(this.responses.isRecorded)
-        ? this._emoteForStep(6)
+        ? this._emoteForStep(7)
         : this.responses.isRecorded
           ? 'Oui :white_check_mark:'
           : 'Non :x:',

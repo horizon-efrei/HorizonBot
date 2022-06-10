@@ -127,7 +127,8 @@ export const eclass = {
         **4.** __Date :__ {date}
         **5.** __Durée :__ {duration}
         **6.** __Professeur :__ {professor}
-        **7.** __Enregistré :__ {isRecorded}
+        **7.** __Rôle visé :__ {targetRole}
+        **8.** __Enregistré :__ {isRecorded}
       `,
       schoolYearMenu: {
         placeholder: 'Aucune année sélectionnée',
@@ -151,24 +152,6 @@ export const eclass = {
           description: 'Le cours ne sera pas enregistré',
           emoji: '❌',
         }] as Array<Omit<MessageSelectOptionData, 'value'>>,
-      },
-      targetRoleL3: {
-        all: {
-          emoji: '👥',
-          label: 'L3 - Toute la promotion',
-        },
-        abroad: {
-          emoji: '✈️',
-          label: 'L3 - Étranger',
-        },
-        campusFullYear: {
-          emoji: '🏫',
-          label: 'L3 - Villejuif (septembre à juin)',
-        },
-        campusHalfYear: {
-          emoji: '<:pantheonassas:957749365940822107>',
-          label: 'L3 - Campus (janvier à juin)',
-        },
       },
       abortMenu: {
         label: 'Abandonner',
@@ -309,6 +292,10 @@ export const eclass = {
       professor: {
         base: 'Entre le professeur qui va donner le cours (mentionne-le ou entre son pseudo ou son ID) :',
         invalid: 'Ce membre est invalide.',
+      },
+      targetRole: {
+        base: 'Entre le rôle de révision visé ("Promo 2025", "Rattrapages Informatique"...) (mentionne-le ou entre son nom ou son ID) :',
+        invalid: 'Ce rôle est invalide.',
       },
       recorded: {
         invalid: 'Cette valeur est invalide.',
