@@ -111,8 +111,8 @@ export const eclass = {
           'Choisis dans le menu déroulant ci-dessous quelle promotion ton cours vise.',
           'Choisis dans le menu déroulant ci-dessous sur quelle matière ton cours porte.',
           'Envoie un message contenant le sujet de ton cours.',
+          'Envoie un message contenant la durée de ton cours.',
           'Envoie un message contenant la date à laquelle ton cours est prévu.',
-          "Envoie un message contenant l'heure à laquelle ton cours est prévu.",
           'Envoie un message contenant le professeur en charge de ton cours.',
           'Envoie un message contenant le rôle visé par ton cours.',
           'Choisis dans le menu déroulant ci-dessous si oui ou non ton cours sera enregistré. Cette option peut être changée plus tard.',
@@ -124,9 +124,9 @@ export const eclass = {
         **1.** __Promotion :__ {schoolYear}
         **2.** __Matière :__ {subject}
         **3.** __Sujet :__ {topic}
-        **4.** __Date :__ {date}
+        **4.** __Professeur :__ {professor}
         **5.** __Durée :__ {duration}
-        **6.** __Professeur :__ {professor}
+        **6.** __Date :__ {date}
         **7.** __Rôle visé :__ {targetRole}
         **8.** __Enregistré :__ {isRecorded}
       `,
@@ -152,6 +152,10 @@ export const eclass = {
           description: 'Le cours ne sera pas enregistré',
           emoji: '❌',
         }] as Array<Omit<MessageSelectOptionData, 'value'>>,
+      },
+      rescheduleButtons: {
+        reschedule: 'Nouvelle date',
+        ignore: 'Ignorer',
       },
       abortMenu: {
         label: 'Abandonner',
@@ -280,6 +284,9 @@ export const eclass = {
       date: {
         base: 'Entre la date du cours que tu souhaites donner (au format "jj/MM HH:mm") :',
         invalid: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
+        professorOverlap: ':warning: **AÏE !** Ce professeur a déjà un cours de prévu à cette date.',
+        schoolYearOverlap: ':warning: **AÏE !** Cette promotion a déjà un cours de prévu à cette date.',
+        chooseAgain: 'Souhaites-tu choisir une nouvelle date ?',
       },
       hour: {
         base: "Entre l'heure de début du cours que tu souhaites donner (au format \"HH:mm\") :",

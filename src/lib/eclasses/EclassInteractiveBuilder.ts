@@ -24,8 +24,10 @@ import Subject from '@/models/subject';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
-import type { SubjectDocument } from '@/types/database';
+import type { EclassPopulatedDocument, SubjectDocument } from '@/types/database';
+import { EclassStatus } from '@/types/database';
 import { noop } from '@/utils';
+import Eclass from '../models/eclass';
 
 const schoolYearMenu = new MessageSelectMenu()
   .setCustomId('select-schoolyear')
@@ -51,6 +53,20 @@ const isRecordedMenu = new MessageSelectMenu()
     ...config.messages.createClassSetup.isRecordedMenu.options[1],
     value: 'no',
   }]);
+
+const rescheduleRow = new MessageActionRow()
+  .addComponents(
+    new MessageButton()
+      .setCustomId('ignore')
+      .setEmoji('💥')
+      .setLabel(config.messages.createClassSetup.rescheduleButtons.ignore)
+      .setStyle(Constants.MessageButtonStyles.SECONDARY),
+    new MessageButton()
+      .setCustomId('reschedule')
+      .setEmoji('✏️')
+      .setLabel(config.messages.createClassSetup.rescheduleButtons.reschedule)
+      .setStyle(Constants.MessageButtonStyles.PRIMARY),
+  );
 
 const getSubjectMenus = (subjects: SubjectDocument[]): MessageSelectMenu[] => {
   const menus: MessageSelectMenu[] = [];
@@ -185,16 +201,16 @@ export default class EclassInteractiveBuilder {
     this.responses.topic = await this._makeMessageStep('autoPromptText', config.messages.prompts.topic);
     await this._updateStep();
 
-    // 4. Ask for the date
-    this.responses.date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, EclassManager.validateDate);
+    // 4. Ask for the professor
+    this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
     await this._updateStep();
 
     // 5. Ask for the duration
     this.responses.duration = await this._makeMessageStep('autoPromptDuration', config.messages.prompts.duration);
     await this._updateStep();
 
-    // 6. Ask for the professor
-    this.responses.professor = await this._makeMessageStep('autoPromptMember', config.messages.prompts.professor);
+    // 6. Ask for the date
+    this.responses.date = await this._askDate();
     await this._updateStep();
 
     // 7. Ask for the targeted role
@@ -269,6 +285,41 @@ export default class EclassInteractiveBuilder {
     return result;
   }
 
+  private async _askDate(): Promise<Date> {
+    let reprompt: boolean;
+    let date: Date;
+
+    do {
+      reprompt = false;
+      date = await this._makeMessageStep('autoPromptDate', config.messages.prompts.date, EclassManager.validateDateSpan);
+
+      const overlaps = await EclassManager.checkOverlaps(date, this.responses.duration, {
+        schoolYear: this.responses.subject.schoolYear,
+        professorId: this.responses.professor.id,
+      });
+
+      if (overlaps.any) {
+        await this.botMessagePrompt.edit({
+          content: `${overlaps.error} ${config.messages.prompts.date.chooseAgain}`,
+          components: [rescheduleRow],
+        });
+
+        const interaction = await this.botMessagePrompt.awaitMessageComponent({
+          componentType: MessageComponentTypes.BUTTON,
+        });
+        if (this.aborted)
+          return;
+
+        if (interaction.customId === 'reschedule')
+          reprompt = true;
+
+        await interaction.update({ components: [] });
+      }
+    } while (reprompt);
+
+    return date;
+  }
+
   private async _updateStep(interaction?: MessageComponentInteraction): Promise<void> {
     this.step++;
     // eslint-disable-next-line unicorn/prefer-ternary
@@ -280,7 +331,7 @@ export default class EclassInteractiveBuilder {
 
   private async _abort(text: string, interaction?: MessageComponentInteraction): Promise<void> {
     this.aborted = true;
-    await this.botMessagePrompt.edit(text);
+    await this.botMessagePrompt.edit({ content: text, components: [] });
 
     // eslint-disable-next-line unicorn/prefer-ternary
     if (interaction)
@@ -294,15 +345,15 @@ export default class EclassInteractiveBuilder {
       schoolYear: this.responses.subject?.schoolYear ?? this._emoteForStep(0),
       subject: this.responses.subject?.name ?? this._emoteForStep(1),
       topic: this.responses.topic ?? this._emoteForStep(2),
-      date: this.responses.date && this.step === 3
-        ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDate)
-        : this.responses.date
-          ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDateTime)
-          : this._emoteForStep(3),
+      professor: this.responses.professor ?? this._emoteForStep(3),
       duration: this.responses.duration
         ? dayjs.duration(this.responses.duration).humanize()
         : this._emoteForStep(4),
-      professor: this.responses.professor ?? this._emoteForStep(5),
+      date: this.responses.date && this.step === 5
+        ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDate)
+        : this.responses.date
+          ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDateTime)
+          : this._emoteForStep(5),
       targetRole: this.responses.targetRole ?? this._emoteForStep(6),
       isRecorded: isNullish(this.responses.isRecorded)
         ? this._emoteForStep(7)

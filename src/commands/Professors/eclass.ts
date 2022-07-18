@@ -120,8 +120,17 @@ export default class EclassCommand extends HorizonSubCommand {
         date.setMonth(newDate.value.getMonth());
         date.setDate(newDate.value.getDate());
 
-        if (!EclassManager.validateDate(date)) {
+        if (!EclassManager.validateDateSpan(date)) {
           await message.channel.send(config.messages.prompts.date.invalid);
+          return;
+        }
+
+        const overlaps = await EclassManager.checkOverlaps(date, eclass.duration, {
+          schoolYear: eclass.subject.schoolYear,
+          professorId: eclass.professor,
+        });
+        if (overlaps.any) {
+          await message.channel.send(overlaps.error);
           return;
         }
 
@@ -151,8 +160,17 @@ export default class EclassCommand extends HorizonSubCommand {
         date.setHours(newHour.value.hour);
         date.setMinutes(newHour.value.minutes);
 
-        if (!EclassManager.validateDate(date)) {
+        if (!EclassManager.validateDateSpan(date)) {
           await message.channel.send(config.messages.prompts.hour.invalid);
+          return;
+        }
+
+        const overlaps = await EclassManager.checkOverlaps(date, eclass.duration, {
+          schoolYear: eclass.subject.schoolYear,
+          professorId: eclass.professor,
+        });
+        if (overlaps.any) {
+          await message.channel.send(overlaps.error);
           return;
         }
 

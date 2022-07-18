@@ -392,6 +392,37 @@ export async function unsubscribeMember(member: GuildMember, eclass: EclassPopul
   container.logger.debug(`[e-class:${eclass.classId}] Unsubscribed member ${member.id} (${member.user.tag}).`);
 }
 
-export function validateDate(date: Date): boolean {
+export function validateDateSpan(date: Date): boolean {
   return dayjs(date).isBetween(dayjs(), dayjs().add(2, 'months'));
+}
+
+export async function checkOverlaps(
+  start: Date,
+  endOrDuration: Date | number,
+  metadata: { schoolYear: SchoolYear; professorId: string },
+): Promise<{ professorOverlap: boolean;schoolYearOverlap: boolean; any: boolean; error: string | null }> {
+  const myStart = start.getTime();
+  const myEnd = typeof endOrDuration === 'number'
+    ? myStart + endOrDuration
+    : endOrDuration.getTime();
+
+  const allOverlapping = await Eclass.find<EclassPopulatedDocument>({
+    status: EclassStatus.Planned,
+    date: { $lte: myEnd },
+    end: { $gte: myStart },
+  });
+
+  const schoolYearOverlap = allOverlapping.some(eclass => eclass.subject.schoolYear === metadata.schoolYear);
+  const professorOverlap = allOverlapping.some(eclass => eclass.professor === metadata.professorId);
+
+  return {
+    professorOverlap,
+    schoolYearOverlap,
+    any: professorOverlap || schoolYearOverlap,
+    error: schoolYearOverlap
+      ? config.messages.prompts.date.schoolYearOverlap
+      : professorOverlap
+      ? config.messages.prompts.date.professorOverlap
+      : null,
+  };
 }
