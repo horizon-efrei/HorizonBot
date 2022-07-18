@@ -110,7 +110,7 @@ export default class EclassCommand extends HorizonSubCommand {
       }
 
       case 'date': {
-        const newDate = await args.pickResult('day');
+        const newDate = await args.restResult('day');
         if (newDate.error) {
           await message.channel.send(config.messages.prompts.date.invalid);
           return;
@@ -141,7 +141,7 @@ export default class EclassCommand extends HorizonSubCommand {
 
       case 'hour':
       case 'heure': {
-        const newHour = await args.pickResult('hour');
+        const newHour = await args.restResult('hour');
         if (newHour.error) {
           await message.channel.send(config.messages.prompts.hour.invalid);
           return;
@@ -173,7 +173,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'duration':
       case 'duree':
       case 'durée': {
-        const duration = await args.pickResult('duration');
+        const duration = await args.restResult('duration');
         if (duration.error) {
           await message.channel.send(config.messages.prompts.duration.invalid);
           return;
@@ -192,7 +192,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'professor':
       case 'professeur':
       case 'prof': {
-        const professor = await args.pickResult('member');
+        const professor = await args.restResult('member');
         if (professor.error) {
           await message.channel.send(config.messages.prompts.professor.invalid);
           return;
@@ -212,7 +212,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'recorded':
       case 'enregistre':
       case 'enregistré': {
-        const isRecorded = await args.pickResult('boolean');
+        const isRecorded = await args.restResult('boolean');
         if (isRecorded.error) {
           await message.channel.send(config.messages.prompts.recorded.invalid);
           return;
