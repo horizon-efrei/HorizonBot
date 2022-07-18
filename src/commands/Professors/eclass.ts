@@ -37,7 +37,7 @@ const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]>
 @ApplyOptions<SubCommandPluginCommandOptions>({
   ...config.options,
   generateDashLessAliases: true,
-  flags: ['ping'],
+  flags: ['ping', 'silent'],
   preconditions: ['GuildOnly'],
   options: Object.values(listOptions).flat(),
   subCommands: generateSubcommands(['create', 'list', 'help'], {
@@ -313,6 +313,8 @@ export default class EclassCommand extends HorizonSubCommand {
   @ValidateEclassArgument()
   @IsEprofOrStaff({ isOriginalEprof: true })
   public async record(message: GuildMessage, args: Args, eclass: EclassPopulatedDocument): Promise<void> {
+    const silent = args.getFlags('silent');
+
     // Parse the URL
     const link = await args.pickResult('url');
     if (link.error) {
@@ -330,7 +332,7 @@ export default class EclassCommand extends HorizonSubCommand {
     }
 
     // Change the URL & confirm
-    await EclassManager.setRecordLink(eclass, link.value.toString());
+    await EclassManager.setRecordLink(eclass, link.value.toString(), silent);
 
     // Edit the global announcement messages (calendar & week upcoming classes)
     await EclassManager.updateGlobalAnnouncements(message.guild.id, eclass.subject.schoolYear);

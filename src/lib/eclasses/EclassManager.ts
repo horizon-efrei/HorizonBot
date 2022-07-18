@@ -268,7 +268,11 @@ export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void
   container.logger.debug(`[e-class:${eclass.classId}] Canceled class.`);
 }
 
-export async function setRecordLink(eclass: EclassPopulatedDocument, recordLink: string): Promise<void> {
+export async function setRecordLink(
+  eclass: EclassPopulatedDocument,
+  recordLink: string,
+  silent = false,
+): Promise<void> {
   // Fetch the announcement message
   const announcementChannel = await container.client.configManager
     .get(eclass.announcementChannel, eclass.guild);
@@ -284,15 +288,17 @@ export async function setRecordLink(eclass: EclassPopulatedDocument, recordLink:
 
   await announcementMessage.edit({ embeds: [announcementEmbed] });
 
-  // Send the link in the corresponding text channel
-  const classChannel = container.client
-    .guilds.resolve(eclass.guild)
-    .channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
-  await classChannel.send(pupa(config.messages.linkAnnouncement, {
-    topic: eclass.topic,
-    date: dayjs(eclass.date).format(settings.configuration.dateFormat),
-    link: recordLink,
-  }));
+  if (!silent) {
+    // Send the link in the corresponding text channel
+    const classChannel = container.client
+      .guilds.resolve(eclass.guild)
+      .channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
+    await classChannel.send(pupa(config.messages.linkAnnouncement, {
+      topic: eclass.topic,
+      date: dayjs(eclass.date).format(settings.configuration.dateFormat),
+      link: recordLink,
+    }));
+  }
 
   // Store the link in the DB
   await Eclass.findByIdAndUpdate(eclass._id, { recordLink });
