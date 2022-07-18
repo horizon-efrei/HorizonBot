@@ -100,11 +100,27 @@ export default class DumpCommand extends HorizonCommand {
     if (reactionFilter) {
       const [reactionResolvable, reactedMessageResolvable] = reactionFilter.split('@');
       if (reactionResolvable && reactedMessageResolvable) {
-        const reaction = resolveCompleteEmoji(reactionResolvable, message.guild);
+        const emoji = resolveCompleteEmoji(reactionResolvable, message.guild);
         const reactedMessage = await Resolvers.resolveMessage(reactedMessageResolvable, { message });
         if (reactedMessage.success) {
-          const emojiKey = typeof reaction.value === 'string' ? reaction.value : reaction.value.id;
-          const reactionners = await reactedMessage.value.reactions.cache.get(emojiKey).users.fetch();
+          const emojiKey = typeof emoji.value === 'string' ? emoji.value : emoji.value.id;
+          const reaction = reactedMessage.value.reactions.cache.get(emojiKey);
+          if (reaction) {
+            const reactionners = await reaction.users.fetch();
+            members = members.filter(member => reactionners.has(member.id));
+          } else {
+            await message.channel.send(config.messages.noMatchFound);
+            return;
+          }
+        }
+      } else if (reactionResolvable && !reactedMessageResolvable) {
+        // In this case, reactionResolvable is actually not a reaction, but a message
+        const reactedMessage = await Resolvers.resolveMessage(reactionResolvable, { message });
+        if (reactedMessage.success) {
+          const usersByReaction = await Promise.all(
+            reactedMessage.value.reactions.cache.mapValues(async reaction => reaction.users.fetch()).values(),
+          );
+          const reactionners = new Set(usersByReaction.flatMap(r => [...r.values()]).map(r => r.id));
           members = members.filter(member => reactionners.has(member.id));
         }
       }

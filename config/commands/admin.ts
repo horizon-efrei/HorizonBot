@@ -109,7 +109,7 @@ export const dump = {
           :small_blue_diamond: \`--format=<format>\`/\`-f=<format>\` : Formatte les membres en fonction du template donné. Voir "Formattage des membres" pour plus d'informations.
           :small_blue_diamond: \`--has-roles=<rôles>\`/\`-h=<rôles>\` : Affiche les membres qui ont au moins un des rôles donnés. Voir "Liste de rôles" pour plus d'informations.
           :small_blue_diamond: \`--has-all-roles=<rôles>\`/\`-a=<rôles>\` : Affiche les membres qui ont tous les rôles donnés. Voir "Liste de rôles" pour plus d'informations.
-          :small_blue_diamond: \`--reacted=<reaction>@<message>\`/\`-r=<reaction>@<message>\` : Affiche les membres qui ont réagis au message donné
+          :small_blue_diamond: \`--reacted=[<reaction>@]<message>\`/\`-r=[<reaction>@]<message>\` : Affiche les membres qui ont réagis au message donné, avec la réaction donnée s'il y en a une.
           :small_blue_diamond: \`--order=<ordre>\`/\`-o=<ordre>\` :  Trie les membres par ordre alphabétique (\`name\` pour les noms d'utilisateur, ou \`nick\` pour les pseudos), ID (\`id\`), date de création du compte (\`created\`) ou date d'arrivée sur ce serveur (\`joined\`).
           :small_blue_diamond: \`--limit=<nombre>\`/\`-l=<nombre>\` : Affiche uniquement le nombre de membres indiqué.
           :small_blue_diamond: \`--separator=<séparateur>\`/\`-s=<séparateur>\` : Change le séparateur entre chaque membre. Par défaut, il s'agit d'une nouvelle ligne.
@@ -142,11 +142,11 @@ export const dump = {
       Exemple : \`--has-roles="Administrateur,Super Modérateur,188341077902753794"\`.
     `,
     enabled: true,
-    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--reacted=<réaction>@<message>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc] [--dm]',
+    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--reacted=[<réaction>@]<message>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc] [--dm]',
     examples: [
       'dump --format="{u} : {n}" --has-roles=188341077902753794 --order=id --enumerate --reacted=👍@https://discord.com/channels/1234/5678/9012',
       'dump --format="{i} (a rejoint le {j})" --has-all-roles="Administrateur,Super Modérateur" --order=nick --desc --limit=5 --dateformat="DD/MM/YYYY [à] HH[h]mm"',
-      'dump --no-roles --separator=, --mp',
+      'dump --no-roles --reacted=https://discord.com/channels/1234/5678/9012 --separator=, --mp',
     ],
   },
   messages: {
