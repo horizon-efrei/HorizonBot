@@ -1,3 +1,7 @@
+- name: 'carl-replacement'
+  description: Issues that allows us to replace CarlBot
+  color: '9C004F'
+
 - name: 'type: question'
   description: Issues that asks a question.
   color: 'D4C5F9'
