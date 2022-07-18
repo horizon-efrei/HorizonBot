@@ -129,6 +129,7 @@ export const dump = {
       Après l'option \`--format=\`, vous devez fournir un modèle d'affichage. Vous devrez utiliser des guillemets autour du texte s'il contient des espaces.
       Vous avez accès aux variables suivantes :
           :small_orange_diamond: \`{​u}\` : Affiche le nom d'utilisateur et le discriminant du membre (ex: \`membre#1234\`). ${/* eslint-disable-line no-irregular-whitespace */ ''}
+          :small_orange_diamond: \`{​m}\` : Mentionne le membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
           :small_orange_diamond: \`{​n}\` : Affiche le pseudo du membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
           :small_orange_diamond: \`{​i}\` : Affiche l'ID du membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
           :small_orange_diamond: \`{​c}\` : Affiche la date de création du compte du membre. Peut être changé via l'option \`--dateformat\`. ${/* eslint-disable-line no-irregular-whitespace */ ''}
@@ -141,7 +142,7 @@ export const dump = {
       Exemple : \`--has-roles="Administrateur,Super Modérateur,188341077902753794"\`.
     `,
     enabled: true,
-    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc] [--dm]',
+    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--reacted=<réaction>@<message>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc] [--dm]',
     examples: [
       'dump --format="{u} : {n}" --has-roles=188341077902753794 --order=id --enumerate --reacted=👍@https://discord.com/channels/1234/5678/9012',
       'dump --format="{i} (a rejoint le {j})" --has-all-roles="Administrateur,Super Modérateur" --order=nick --desc --limit=5 --dateformat="DD/MM/YYYY [à] HH[h]mm"',

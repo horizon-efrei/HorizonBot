@@ -1,3 +1,4 @@
+import { userMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessageLimits } from '@sapphire/discord-utilities';
 import type { Args, CommandOptions } from '@sapphire/framework';
@@ -35,6 +36,7 @@ function memberSorterFactory(order: string): (a: GuildMember, b: GuildMember) =>
 function memberFormatterFactory(format: string, dateFormat: string): (member: GuildMember) => string {
   return (member): string => pupa(format, {
     u: member.user.tag,
+    m: userMention(member.id),
     n: member.displayName,
     i: member.id,
     c: dayjs(member.user.createdAt).format(dateFormat),
