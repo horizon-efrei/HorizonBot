@@ -5,10 +5,11 @@
  * SPDX-License-Identifier: MIT
  */
 
-import type { PaginatedMessageOptions } from '@sapphire/discord.js-utilities';
+import type { PaginatedMessageOptions, PaginatedMessagePage } from '@sapphire/discord.js-utilities';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import type { MessageEmbedOptions } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
+import { MessageComponentTypes } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import type { List, Number } from 'ts-toolbelt';
 import messages from '@/config/messages';
@@ -41,6 +42,17 @@ export default class PaginatedContentMessageEmbed extends PaginatedMessage {
 
   public setTemplate(template: MessageEmbed | MessageEmbedOptions): this {
     this._embedTemplate = template instanceof MessageEmbed ? template : new MessageEmbed(template);
+    return this;
+  }
+
+  public override addPage(page: PaginatedMessagePage): this {
+    if (this.pages.length === 25) {
+      const actions = PaginatedMessage.defaultActions.filter(action =>
+        action.type !== MessageComponentTypes.SELECT_MENU);
+      this.setActions(actions);
+    }
+
+    this.pages.push(page);
     return this;
   }
 
