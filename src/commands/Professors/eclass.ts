@@ -113,7 +113,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'date': {
         const newDate = await args.restResult('day');
         if (newDate.error) {
-          await message.channel.send(config.messages.prompts.date.invalid);
+          await message.channel.send(`${config.messages.prompts.date.invalid} ${config.messages.prompts.date.hint}`);
           return;
         }
 
@@ -153,7 +153,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'heure': {
         const newHour = await args.restResult('hour');
         if (newHour.error) {
-          await message.channel.send(config.messages.prompts.hour.invalid);
+          await message.channel.send(`${config.messages.prompts.hour.invalid} ${config.messages.prompts.hour.hint}`);
           return;
         }
 
@@ -194,7 +194,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'durée': {
         const duration = await args.restResult('duration');
         if (duration.error) {
-          await message.channel.send(config.messages.prompts.duration.invalid);
+          await message.channel.send(`${config.messages.prompts.duration.invalid} ${config.messages.prompts.duration.hint}`);
           return;
         }
 
@@ -213,7 +213,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'prof': {
         const professor = await args.restResult('member');
         if (professor.error) {
-          await message.channel.send(config.messages.prompts.professor.invalid);
+          await message.channel.send(`${config.messages.prompts.professor.invalid} ${config.messages.prompts.professor.hint}`);
           return;
         }
 
@@ -277,7 +277,7 @@ export default class EclassCommand extends HorizonSubCommand {
       case 'enregistré': {
         const isRecorded = await args.restResult('boolean');
         if (isRecorded.error) {
-          await message.channel.send(config.messages.prompts.recorded.invalid);
+          await message.channel.send(`${config.messages.prompts.recorded.invalid} ${config.messages.prompts.recorded.hint}`);
           return;
         }
 

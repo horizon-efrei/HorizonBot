@@ -334,24 +334,29 @@ export const eclass = {
       date: {
         base: 'Entre la date du cours que tu souhaites donner (au format "jj/MM HH:mm") :',
         invalid: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
+        hint: 'Elle doit être au format "jj/MM HH:mm".',
         professorOverlap: ':warning: **AÏE !** Ce professeur a déjà un cours de prévu à cette date.',
         schoolYearOverlap: ':warning: **AÏE !** Cette promotion a déjà un cours de prévu à cette date.',
         chooseAgain: 'Souhaites-tu choisir une nouvelle date ?',
       },
       hour: {
         base: "Entre l'heure de début du cours que tu souhaites donner (au format \"HH:mm\") :",
+        hint: 'Elle doit être au format "HH:mm".',
         invalid: "Cette heure est invalide. Vérifie bien que la date ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
       },
       duration: {
         base: 'Entre une durée pour ton cours (en anglais ou en français).\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
+        hint: 'Elle doit être en anglais ou en français, par exemple `30min` ou `1h30`.',
         invalid: 'Cette durée est invalide.',
       },
       professor: {
         base: 'Entre le professeur qui va donner le cours (mentionne-le ou entre son pseudo ou son ID) :',
+        hint: 'Entre son pseudo, son ID ou mentionne-le.',
         invalid: 'Ce membre est invalide.',
       },
       targetRole: {
         base: 'Entre le rôle de révision visé ("Promo 2025", "Rattrapages Informatique"...) (mentionne-le ou entre son nom ou son ID) :',
+        hint: 'Entre son nom, son ID ou mentionne-le.',
         invalid: 'Ce rôle est invalide.',
       },
       place: {
@@ -375,6 +380,7 @@ export const eclass = {
         invalid: 'Ce lieu est invalide.',
       },
       recorded: {
+        hint: 'Choisis entre "oui" ou "non".',
         invalid: 'Cette valeur est invalide.',
       },
 
