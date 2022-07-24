@@ -21,7 +21,6 @@ export default {
     enableCompilerApi: true,
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
     flagMessageReaction: '🚩',
-    flagNeededAnswer: '📝',
     dateFormat: 'DD/MM [à] HH:mm',
     dayFormat: 'DD/MM/YYYY',
     eclassRoleFormat: 'Cours {subject.classCode}: {topic} ({formattedDate})',

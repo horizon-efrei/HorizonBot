@@ -1,25 +1,14 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
-import pupa from 'pupa';
-import messages from '@/config/messages';
 import settings from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
-import Subject from '@/models/subject';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
-import { TeachingUnit } from '@/types';
 import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
 import { isGuildMessage, noop } from '@/utils';
-
-const teachingUnitEprofMapping = {
-  [TeachingUnit.ComputerScience]: ConfigEntriesRoles.EprofComputerScience,
-  [TeachingUnit.GeneralFormation]: ConfigEntriesRoles.EprofGeneralFormation,
-  [TeachingUnit.Mathematics]: ConfigEntriesRoles.EprofMathematics,
-  [TeachingUnit.PhysicsElectronics]: ConfigEntriesRoles.EprofPhysicsElectronics,
-} as const;
 
 export default class MessageReactionAddListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
@@ -52,9 +41,9 @@ export default class MessageReactionAddListener extends Listener {
     }
 
     // If a moderator is flagging a message
-    const staffRole = await this.container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
+    const role = await this.container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
     if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagMessageReaction
-      && member.roles.cache.has(staffRole.id))
+      && member.roles.cache.has(role.id))
       await this._handleModFlag(reaction, member, message);
 
     // If we are reacting to a reaction role
@@ -65,10 +54,6 @@ export default class MessageReactionAddListener extends Listener {
     if (this.container.client.eclassRolesIds.has(reaction.message.id)
       && reaction.emoji.name === settings.emojis.yes)
       await this._handleEclassRole(reaction, member, message);
-
-    // If we want to flag a question to call a professor
-    if ((reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagNeededAnswer)
-      await this._handleEprofFlag(reaction, member, message);
   }
 
   private async _handleModFlag(
@@ -140,34 +125,5 @@ export default class MessageReactionAddListener extends Listener {
       await reaction.users.remove(member);
     else
       await EclassManager.subscribeMember(member, document);
-  }
-
-  private async _handleEprofFlag(
-    _reaction: MessageReaction,
-    member: GuildMember,
-    message: GuildMessage,
-  ): Promise<void> {
-    const subject = await Subject.findOne({
-      $or: [
-        { textChannel: message.channel.id },
-        { textDocsChannel: message.channel.id },
-      ],
-    });
-    if (!subject)
-      return;
-
-    const eprofRoleIdEntry = teachingUnitEprofMapping[subject.teachingUnit];
-    const eprofRole = await this.container.client.configManager.get(eprofRoleIdEntry, message.guild.id);
-    if (!eprofRole)
-      return;
-
-    const eProf = message.guild.roles.cache
-      .get(eprofRole.id)
-      .members
-      .filter(mbr => mbr.presence.status === 'online')
-      .random();
-
-    await message.channel.send(pupa(messages.miscellaneous.eprofMentionPublic, { eProf }));
-    await eProf.send(pupa(messages.miscellaneous.eprofMentionPrivate, { member, message })).catch(noop);
   }
 }
