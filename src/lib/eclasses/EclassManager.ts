@@ -17,7 +17,12 @@ import type {
 } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
-import { ConfigEntriesChannels, ConfigEntriesRoles, EclassStatus } from '@/types/database';
+import {
+  ConfigEntriesChannels,
+  ConfigEntriesRoles,
+  EclassPlace,
+  EclassStatus,
+} from '@/types/database';
 import {
   massSend,
   noop,
@@ -53,6 +58,8 @@ export function createAnnouncementEmbed({
   professor,
   subject,
   topic,
+  place,
+  placeInformation,
 }: EclassEmbedOptions): MessageEmbed {
   const texts = config.messages.newClassEmbed;
   return new MessageEmbed()
@@ -65,6 +72,7 @@ export function createAnnouncementEmbed({
     .addField(texts.duration, dayjs.duration(duration).humanize(), true)
     .addField(texts.professor, professor.toString(), true)
     .addField(texts.recorded, config.messages.recordedValues[Number(isRecorded)], true)
+    .addField(texts.place, pupa(texts.placeValues[place], { place, placeInformation, subject }), true)
     .setFooter({ text: pupa(texts.footer, { classId }) });
 }
 
@@ -79,7 +87,7 @@ export function getRoleNameForClass(
 export async function createClass(
   message: GuildMessage,
   {
-    date, subject, topic, duration, professor, isRecorded, targetRole,
+    date, subject, topic, duration, professor, isRecorded, targetRole, place, placeInformation,
   }: EclassCreationOptions,
 ): Promise<void> {
   // Prepare the date
@@ -120,9 +128,21 @@ export async function createClass(
     professor,
     subject,
     topic,
+    place,
+    placeInformation,
   });
+
+  const newClassNotificationPlaceAlert = place === EclassPlace.Discord
+    ? ''
+    : pupa(config.messages.newClassNotificationPlaceAlert, {
+        where: config.messages.where({ place, placeInformation, subject }),
+      });
+
   const announcementMessage = await announcementChannel.send({
-    content: pupa(config.messages.newClassNotification, { targetRole }),
+    content: pupa(config.messages.newClassNotification, {
+      targetRole,
+      newClassNotificationPlaceAlert,
+    }),
     embeds: [embed],
   });
   // Add the reaction & cache the message
@@ -146,6 +166,8 @@ export async function createClass(
     professor: professor.id,
     classRole: role.id,
     targetRole: targetRole.id,
+    place,
+    placeInformation,
     announcementMessage: announcementMessage.id,
     announcementChannel: classAnnouncement[subject.schoolYear],
     classId,
@@ -195,6 +217,7 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
       textChannels: pupa(
         eclass.subject.voiceChannel ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
       ),
+      where: config.messages.where(eclass),
     }))
     .setFooter({ text: pupa(texts.footer, eclass) });
 
@@ -316,18 +339,15 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
 
   // Alert the professor
   const professor = await guild.members.fetch({ user: eclass.professor, cache: false }).catch(nullop);
-  const beforeChecklist = [
-    eclass.isRecorded ? config.messages.alertProfessorComplements.startRecord : null,
-    pupa(eclass.subject.voiceChannel
-      ? config.messages.alertProfessorComplements.connectVoiceChannel
-      : config.messages.alertProfessorComplements.announceVoiceChannel, eclass),
-  ].filter(Boolean).join('\n');
 
   await professor?.send(
     pupa(config.messages.alertProfessor, {
       ...eclass.toJSON(),
       ...eclass.normalizeDates(),
-      beforeChecklist,
+      where: config.messages.where(eclass),
+      beforeChecklist: eclass.isRecorded
+        ? config.messages.alertProfessorComplements.startRecord
+        : '',
       afterChecklist: eclass.isRecorded
         ? pupa(config.messages.alertProfessorComplements.registerRecording, eclass)
         : '',
@@ -339,15 +359,16 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
   ).catch(nullop);
 
   // Send the notification to the eclass channel
-  const payload = { ...eclass.toJSON(), ...eclass.normalizeDates() };
+  const payload = {
+    ...eclass.toJSON(),
+    ...eclass.normalizeDates(),
+    where: config.messages.where(eclass),
+  };
   await classChannel.send(pupa(config.messages.remindClassNotification, payload));
 
   // Send the private message to the subscribers
-  const baseReminder = pupa(config.messages.remindClassPrivateNotification, payload);
-  const fullReminder = eclass.subject.voiceChannel
-    ? `${baseReminder} ${pupa(config.messages.remindClassPrivateNotificationVoiceChannel, payload)}`
-    : baseReminder;
-  await massSend(guild, eclass.subscribers, fullReminder);
+  const reminder = pupa(config.messages.remindClassPrivateNotification, payload);
+  await massSend(guild, eclass.subscribers, reminder);
 
   container.logger.debug(`[e-class:${eclass.classId}] Sent reminders.`);
 }

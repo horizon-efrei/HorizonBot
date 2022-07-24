@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 
+import ArgumentPrompter from '@/app/lib/structures/ArgumentPrompter';
 import { eclass as config } from '@/config/commands/professors';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
@@ -18,7 +19,7 @@ import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedField
 import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
 import type { GuildTextBasedChannel } from '@/types';
 import { GuildMessage } from '@/types';
-import { EclassPopulatedDocument, EclassStatus } from '@/types/database';
+import { EclassPlace, EclassPopulatedDocument, EclassStatus } from '@/types/database';
 import { capitalize, generateSubcommands, nullop } from '@/utils';
 
 const listOptions = {
@@ -46,7 +47,7 @@ const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]>
     cancel: { aliases: ['archive'] },
     finish: { aliases: ['end', 'stop'] },
     record: { aliases: ['enregistrement', 'link', 'lien', 'replay', 'recording'] },
-    show: { aliases: ['info', 'infos', 'information', 'informations'] },
+    info: { aliases: ['infos', 'information', 'informations'] },
   }),
 })
 export default class EclassCommand extends HorizonSubCommand {
@@ -226,6 +227,50 @@ export default class EclassCommand extends HorizonSubCommand {
         break;
       }
 
+      case 'lieu':
+      case 'place': {
+        const rawPlace = await args.restResult('string');
+        if (rawPlace.error || !['discord', 'teams', 'campus', 'autre'].includes(rawPlace.value)) {
+          await message.channel.send(`${config.messages.prompts.place.invalid} ${config.messages.prompts.place.hint}`);
+          return;
+        }
+
+        const placeMap = {
+          discord: EclassPlace.Discord,
+          teams: EclassPlace.Teams,
+          campus: EclassPlace.OnSite,
+          autre: EclassPlace.Other,
+        };
+
+        const place = placeMap[rawPlace.value as keyof typeof placeMap];
+
+        const prompter = new ArgumentPrompter(message);
+        let placeInformation: string | null;
+        switch (place) {
+          case EclassPlace.Teams:
+            placeInformation = (await prompter.autoPromptUrl(config.messages.prompts.teamsLink)).toString();
+            break;
+          case EclassPlace.OnSite:
+            placeInformation = await prompter.autoPromptText(config.messages.prompts.room);
+            break;
+          case EclassPlace.Other:
+            placeInformation = await prompter.autoPromptText(config.messages.prompts.customPlace);
+            break;
+          case EclassPlace.Discord:
+            placeInformation = null;
+            break;
+        }
+
+        eclass = await Eclass.findByIdAndUpdate(
+          eclass._id,
+          { place, placeInformation },
+          { new: true },
+        );
+        updateMessage = config.messages.editedPlace;
+        notificationMessage = config.messages.pingEditedPlace;
+        break;
+      }
+
       case 'record':
       case 'recorded':
       case 'enregistre':
@@ -269,6 +314,8 @@ export default class EclassCommand extends HorizonSubCommand {
         classChannel,
         classId: eclass.classId,
         isRecorded: eclass.isRecorded,
+        place: eclass.place,
+        placeInformation: eclass.placeInformation,
       })],
     });
 
@@ -288,6 +335,7 @@ export default class EclassCommand extends HorizonSubCommand {
       ...eclass.normalizeDates(true),
       role: message.guild.roles.resolve(eclass.targetRole).name,
       pingRole: message.guild.roles.resolve(eclass.classRole),
+      where: config.messages.where(eclass),
     };
     await message.channel.send(pupa(updateMessage, payload));
     if (shouldPing)
@@ -359,7 +407,7 @@ export default class EclassCommand extends HorizonSubCommand {
   }
 
   @ValidateEclassArgument()
-  public async show(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
+  public async info(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
     const messageLink = eclass.getMessageLink();
     const capitalizedStatus = capitalize(config.messages.rawStatuses[eclass.status]);
     const recordedText = oneLine`
@@ -374,11 +422,14 @@ export default class EclassCommand extends HorizonSubCommand {
       .addField(texts.subjectName, pupa(texts.subjectValue, eclass.toJSON()), true)
       .addField(texts.statusName, pupa(texts.statusValue, { ...eclass.toJSON(), status: capitalizedStatus }), true)
       .addField(texts.dateName, pupa(texts.dateValue, {
-          ...eclass.toJSON(),
-          ...eclass.normalizeDates(true),
-        }),
-        true)
+        ...eclass.toJSON(),
+        ...eclass.normalizeDates(true),
+      }), true)
       .addField(texts.professorName, pupa(texts.professorValue, eclass.toJSON()), true)
+      .addField(texts.placeName, pupa(texts.placeValue, {
+        ...eclass.toJSON(),
+        where: config.messages.where(eclass),
+      }), true)
       .addField(texts.recordedName, pupa(texts.recordedValue, { ...eclass.toJSON(), recorded: recordedText }), true)
       .addField(texts.relatedName, pupa(texts.relatedValue, { ...eclass.toJSON(), messageLink }), true);
 
@@ -455,6 +506,7 @@ export default class EclassCommand extends HorizonSubCommand {
             ...eclass.toJSON(),
             ...eclass.normalizeDates(true),
             status: capitalize(config.messages.rawStatuses[eclass.status]),
+            where: config.messages.where(eclass),
           };
           return {
             name: pupa(config.messages.listFieldTitle, eclassInfos),

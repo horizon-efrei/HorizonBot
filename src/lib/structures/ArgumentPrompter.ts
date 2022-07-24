@@ -47,6 +47,13 @@ export default class ArgumentPrompter {
     return response;
   }
 
+  public async autoPromptUrl(prompts?: PrompterText, previousIsFailure = false): Promise<URL> {
+    let response = await this.promptUrl(prompts, previousIsFailure);
+    while (!response)
+      response = await this.promptUrl(prompts, true);
+    return response;
+  }
+
   public async autoPromptDay(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {
     let response = await this.promptDay(prompts, previousIsFailure);
     while (!response)
@@ -116,6 +123,11 @@ export default class ArgumentPrompter {
   public async promptText(prompts?: PrompterText, previousIsFailure = false): Promise<string> {
     const response = await this._prompt({ ...messages.prompts.text, ...prompts }, previousIsFailure);
     return Resolvers.resolveString(response.content).value;
+  }
+
+  public async promptUrl(prompts?: PrompterText, previousIsFailure = false): Promise<URL> {
+    const response = await this._prompt({ ...messages.prompts.url, ...prompts }, previousIsFailure);
+    return Resolvers.resolveHyperlink(response.content).value;
   }
 
   public async promptDay(prompts?: PrompterText, previousIsFailure = false): Promise<Date> {

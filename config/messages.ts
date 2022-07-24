@@ -256,6 +256,10 @@ export default {
       base: 'Entre du texte :',
       invalid: 'Ce texte est invalide.',
     },
+    url: {
+      base: 'Entre une URL :',
+      invalid: 'Cette URL est invalide.',
+    },
     day: {
       base: 'Entre une date (au format "jj/MM")  :',
       invalid: 'Cette date est invalide.',

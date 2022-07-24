@@ -8,7 +8,8 @@ import {
 import { stripIndent } from 'common-tags';
 import type { MessageSelectOptionData } from 'discord.js';
 import { SchoolYear } from '@/types';
-import { EclassStatus } from '@/types/database';
+import type { SubjectBase } from '@/types/database';
+import { EclassPlace, EclassStatus } from '@/types/database';
 import { getGraduationYear, timeFormat } from '@/utils';
 
 export const eclass = {
@@ -36,7 +37,7 @@ export const eclass = {
     editUnauthorized: "Tu ne peux pas modifier un cours qui n'est pas à toi !",
     statusIncompatible: 'Tu ne peux pas faire cette action alors que le cours {status}.',
 
-    // Statuses
+    // Readable enums
     statuses: {
       [EclassStatus.Planned]: "n'est pas encore commencé",
       [EclassStatus.InProgress]: 'est en cours',
@@ -50,6 +51,20 @@ export const eclass = {
       [EclassStatus.Canceled]: 'annulé',
     },
     recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
+    where: ({ place, placeInformation, subject }: {
+      place: EclassPlace; placeInformation: string; subject: SubjectBase;
+    }): string => {
+      switch (place) {
+        case EclassPlace.Discord:
+          return `sur Discord (${subject.voiceChannel ? channelMention(subject.voiceChannel) : 'aucun salon vocal défini'})`;
+        case EclassPlace.OnSite:
+          return `sur le campus (salle ${placeInformation})`;
+        case EclassPlace.Teams:
+          return `sur Microsoft Teams (lien de la réunion : ${hideLinkEmbed(placeInformation)})`;
+        case EclassPlace.Other:
+          return `sur "${placeInformation}"`;
+      }
+    },
 
     // Help subcommand
     helpEmbedTitle: 'Aide de la commande de cours',
@@ -57,7 +72,7 @@ export const eclass = {
       { name: 'Créer un cours', value: '`!cours create`' },
       { name: 'Commencer un cours', value: '`!cours start <ID-cours>`' },
       { name: 'Terminer un cours manuellement', value: '`!cours finish <ID-cours>`' },
-      { name: 'Modifier un cours', value: '`!cours edit <ID-cours> <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "enregistré"' },
+      { name: 'Modifier un cours', value: '`!cours edit <ID-cours> <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "lieu" ou "enregistré"' },
       { name: 'Annuler un cours', value: '`!cours cancel <ID-cours>`' },
       { name: 'Liste des cours', value: '`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]`' },
       { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
@@ -78,7 +93,7 @@ export const eclass = {
     listFieldTitle: '{topic} ({subject.name})',
     listFieldDescription: stripIndent`
       Prévu ${timeFormat('{date}', TimestampStyles.RelativeTime)}, dure {duration}, se termine à ${timeFormat('{end}', TimestampStyles.ShortTime)}
-      **Salon :** ${channelMention('{subject.textChannel}')}
+      **Lieu :** {where}
       **Statut :** {status}
       **Identifiant :** \`{classId}\`
     `,
@@ -86,18 +101,26 @@ export const eclass = {
     // Create subcommand
     successfullyCreated: 'Le cours a bien été créé ! Son ID est `{eclass.classId}`.',
     alreadyExists: 'Ce cours (même matière, sujet, heure, jour) a déjà été prévu !',
-    newClassNotification: ':bell: {targetRole}, un nouveau cours a été plannifié ! :arrow_heading_down:',
+    newClassNotification: ':bell: {targetRole}, un nouveau cours a été plannifié ! :arrow_heading_down: {newClassNotificationPlaceAlert}',
+    newClassNotificationPlaceAlert: '\n\n:warning: __**ATTENTION :**__ le cours sera **{where}** !',
 
     recordedLink: '[Lien]({recordLink})',
     newClassEmbed: {
       title: '{subject.name} - {topic}',
       description: `Cours en {classChannel} le **${timeFormat('{date}')}** !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !`,
       author: "Ef'Réussite - Nouveau cours !",
-      date: 'Date et heure',
+      date: '🗓️ Date et heure',
       dateValue: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}`,
-      duration: 'Durée prévue',
-      professor: 'Professeur',
-      recorded: 'Enregistré',
+      duration: '⏳ Durée prévue',
+      professor: '🧑‍🏫 Professeur',
+      recorded: '🎥 Enregistré',
+      place: '📍 Lieu',
+      placeValues: {
+        [EclassPlace.Discord]: `Sur Discord, dans ${channelMention('{subject.voiceChannel}')}`,
+        [EclassPlace.OnSite]: "Au campus de l'EFREI, salle {placeInformation}",
+        [EclassPlace.Teams]: 'Sur [Microsoft Teams (lien de la réunion)]({placeInformation})',
+        [EclassPlace.Other]: '{placeInformation}',
+      },
       footer: 'ID : {classId}',
     },
 
@@ -111,10 +134,11 @@ export const eclass = {
           'Choisis dans le menu déroulant ci-dessous quelle promotion ton cours vise.',
           'Choisis dans le menu déroulant ci-dessous sur quelle matière ton cours porte.',
           'Envoie un message contenant le sujet de ton cours.',
+          'Envoie un message contenant le professeur en charge de ton cours.',
           'Envoie un message contenant la durée de ton cours.',
           'Envoie un message contenant la date à laquelle ton cours est prévu.',
-          'Envoie un message contenant le professeur en charge de ton cours.',
           'Envoie un message contenant le rôle visé par ton cours.',
+          'Choisis dans le menu déroulant ci-dessous où présenter ton cours.',
           'Choisis dans le menu déroulant ci-dessous si oui ou non ton cours sera enregistré. Cette option peut être changée plus tard.',
           'Terminé !',
         ],
@@ -128,7 +152,8 @@ export const eclass = {
         **5.** __Durée :__ {duration}
         **6.** __Date :__ {date}
         **7.** __Rôle visé :__ {targetRole}
-        **8.** __Enregistré :__ {isRecorded}
+        **8.** __Lieu :__ {where}
+        **9.** __Enregistré :__ {isRecorded}
       `,
       schoolYearMenu: {
         placeholder: 'Aucune année sélectionnée',
@@ -141,17 +166,39 @@ export const eclass = {
       subjectMenu: {
         placeholder: 'Aucune matière sélectionnée',
       },
+      placeMenu: {
+        placeholder: 'Aucune valeur sélectionnée',
+        options: [{
+          label: 'Discord',
+          description: 'Le cours se passera sur discord',
+          value: 'discord',
+        }, {
+          label: 'Campus',
+          description: 'Le cours se passera sur le campus, dans la salle définie',
+          value: 'on-site',
+        }, {
+          label: 'Teams',
+          description: 'Le cours se passera sur Microsoft Teams, dans le groupe défini',
+          value: 'teams',
+        }, {
+          label: 'Autre',
+          description: 'Choisis un endroit personnalisé',
+          value: 'other',
+        }] as MessageSelectOptionData[],
+      },
       isRecordedMenu: {
         placeholder: 'Aucune valeur sélectionnée',
         options: [{
           label: 'Oui',
           description: 'Le cours sera enregistré par le professeur ou un élève',
           emoji: '✅',
+          value: 'yes',
         }, {
           label: 'Non',
           description: 'Le cours ne sera pas enregistré',
           emoji: '❌',
-        }] as Array<Omit<MessageSelectOptionData, 'value'>>,
+          value: 'no',
+        }] as MessageSelectOptionData[],
       },
       rescheduleButtons: {
         reschedule: 'Nouvelle date',
@@ -167,7 +214,7 @@ export const eclass = {
     },
 
     // Edit subcommand
-    invalidEditProperty: 'Cette propriété est invalide. Choisis parmi "sujet", "date", "heure", "durée", "professeur" et "rôle".',
+    invalidEditProperty: 'Cette propriété est invalide. Choisis parmi "sujet", "date", "heure", "durée", "professeur", "rôle", "lieu" et "enregistré".',
 
     editedTopic: 'Tu as bien modifié le thème du cours en "{topic}".',
     pingEditedTopic: '{pingRole}, le thème du cours a été changé en "{topic}".',
@@ -187,6 +234,9 @@ export const eclass = {
     editedRole: 'Tu as bien modifié le rôle visé en "{role}".',
     pingEditedRole: '{pingRole}, le rôle visé a été changé au rôle "{role}".',
 
+    editedPlace: 'Tu as bien modifié le lieu du cours, qui sera maintenant {where}.',
+    pingEditedPlace: '{pingRole}, le lieu du cours a été changé, il est maintenant {where}.',
+
     editedRecorded: "Tu as bien modifié le statut d'enregistrement du cours en `{isRecorded}`.",
     pingEditedRecorded: '{pingRole}, le cours a été modifié : ',
     pingEditedRecordedValues: ['il ne sera plus enregistré.', 'il sera maintenant enregistré.'],
@@ -194,20 +244,20 @@ export const eclass = {
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
     startClassNotification: `:bell: ${roleMention('{classRole}')}, le cours commence !`,
-    remindClassNotification: `:bell: ${roleMention('{classRole}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}`,
-    remindClassPrivateNotification: `:bell: Tu t'es inscrit au cours "{topic}". Il commence ${timeFormat('{date}', TimestampStyles.RelativeTime)} ! Tiens-toi prêt :\\)\nIl se passera dans ${channelMention('{subject.textChannel}')}.`,
-    remindClassPrivateNotificationVoiceChannel: `Salon vocal : ${channelMention('{subject.voiceChannel}')}.`,
+    remindClassNotification: `:bell: ${roleMention('{classRole}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}, {where}`,
+    remindClassPrivateNotification: `:bell: Tu t'es inscrit au cours "{topic}". Il commence ${timeFormat('{date}', TimestampStyles.RelativeTime)} ! Tiens-toi prêt :\\)\nIl se passera {where}.`,
     valueInProgress: '[En cours]',
     alertProfessor: stripIndent`
-      Bonjour, ton cours "{topic}" (en {subject.teachingUnit}) va commencer dans environ 15 minutes.
+      Bonjour, ton cours "{topic}" (en {subject.name}) va commencer dans environ 15 minutes.
       Voici quelques conseils et rappels pour le bon déroulement du cours :
 
       **AVANT**
       - Prépare les documents et logiciels dont tu vas te servir pour animer le cours ;
+      - Rend toi {where} ;
       {beforeChecklist}
 
       **PENDANT**
-      - Je lancerai le cours automatiquement autour de l'heure définie (${timeFormat('{date}', TimestampStyles.LongDateTime)}) (ou jusqu'à 2 minutes après), et je mentionnerai toutes les personnes directement intéressées par le cours ;
+      - Je lancerai le cours automatiquement autour de l'heure définie (${timeFormat('{date}', TimestampStyles.LongDateTime)}), et je mentionnerai toutes les personnes directement intéressées par le cours ;
       - Anime ton cours comme tu le souhaites, en essayant d'être le plus clair possible dans tes propos ;
       - N'hésite-pas à demander à des fauteurs de trouble de partir, ou prévient un membre du staff si besoin ;
 
@@ -221,8 +271,6 @@ export const eclass = {
     `,
     alertProfessorComplements: {
       startRecord: "- Lance ton logiciel d'enregistrement pour filmer le cours ;",
-      connectVoiceChannel: `- Connecte-toi au salon vocal défini, en cliquant ici : ${channelMention('{subject.voiceChannel}')} ;`,
-      announceVoiceChannel: `- Annonce le salon vocal que tu vas utiliser dans ${channelMention('{subject.textChannel}')}, car aucun salon vocal n'a été trouvé pour la matière "{subject.name}" ;`,
       registerRecording: `- Télécharge ton enregistrement sur ce lien ${hideLinkEmbed(process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`!ecours record {classId} <ton lien>\` ;`,
       isRecorded: 'soit',
       isNotRecorded: 'ne soit pas',
@@ -231,7 +279,7 @@ export const eclass = {
     startClassEmbed: {
       title: 'Le cours en {eclass.subject.name} va commencer !',
       author: "Ef'Réussite - Un cours commence !",
-      baseDescription: `Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par ${userMention('{eclass.professor}')} commence ! {textChannels}\n{isRecorded}`,
+      baseDescription: `Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par ${userMention('{eclass.professor}')} commence !\n\n:round_pushpin: Il aura lieu {where}\n\n{isRecorded}`,
       descriptionAllChannels: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannel}')}, et le salon vocal est ${channelMention('{eclass.subject.voiceChannel}')}.`,
       descriptionTextChannel: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannel}')}.`,
       descriptionIsRecorded: ':red_circle: Le cours est enregistré !',
@@ -265,6 +313,8 @@ export const eclass = {
       dateValue: `${timeFormat('{date}', TimestampStyles.LongDate)}, ${timeFormat('{date}', TimestampStyles.RelativeTime)}\nDe ${timeFormat('{date}', TimestampStyles.ShortTime)} à ${timeFormat('{end}', TimestampStyles.ShortTime)}, dure {duration}.`,
       professorName: 'Professeur',
       professorValue: userMention('{professor}'),
+      placeName: 'Lieu',
+      placeValue: '{where}',
       recordedName: 'Enregistré',
       recordedValue: '{recorded}',
       relatedName: 'Autres données associées',
@@ -303,6 +353,26 @@ export const eclass = {
       targetRole: {
         base: 'Entre le rôle de révision visé ("Promo 2025", "Rattrapages Informatique"...) (mentionne-le ou entre son nom ou son ID) :',
         invalid: 'Ce rôle est invalide.',
+      },
+      place: {
+        base: 'Entre le lieu du cours ("discord", "teams", "campus", "autre") :',
+        hint: 'Choisis parmi "discord", "teams", "campus" ou "autre".',
+        invalid: 'Ce lieu est invalide.',
+      },
+      teamsLink: {
+        base: "Entre le lien de la réunion ou de l'équipe Microsoft Teams :",
+        hint: '',
+        invalid: 'Ce lien est invalide.',
+      },
+      room: {
+        base: 'Entre la salle de cours (ex: "A304", "Amphi C001") :',
+        hint: '',
+        invalid: 'Cette salle est invalide.',
+      },
+      customPlace: {
+        base: 'Entre le lieu du cours :',
+        hint: '',
+        invalid: 'Ce lieu est invalide.',
       },
       recorded: {
         invalid: 'Cette valeur est invalide.',

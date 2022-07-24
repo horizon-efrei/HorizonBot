@@ -59,12 +59,20 @@ export type ConfigurationModel = Model<ConfigurationDocument>;
 /* ****************************** */
 
 // #region Eclass Database Types
-/** Enum for the "Eclass"'s mongoose schema */
+/** Enum for the eclass's current status */
 export enum EclassStatus {
   Planned,
   InProgress,
   Finished,
   Canceled,
+}
+
+/** Enum for the eclass's place */
+export enum EclassPlace {
+  Discord = 'discord',
+  Teams = 'teams',
+  OnSite = 'on-site',
+  Other = 'other',
 }
 
 /** Interface for the "Eclass"'s mongoose schema */
@@ -79,6 +87,8 @@ export interface EclassBase {
   professor: string;
   classRole: string;
   targetRole: string;
+  place: EclassPlace;
+  placeInformation: string | null;
   announcementChannel: ConfigEntriesChannels;
   announcementMessage: string;
   status: EclassStatus;

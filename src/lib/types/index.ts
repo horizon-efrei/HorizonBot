@@ -9,7 +9,7 @@ import type {
   Role,
 } from 'discord.js';
 import type HorizonClient from '@/structures/HorizonClient';
-import type { SubjectBase } from '@/types/database';
+import type { EclassPlace, SubjectBase } from '@/types/database';
 
 /* ************ */
 /*  Util types  */
@@ -47,6 +47,8 @@ export interface EclassCreationOptions {
   duration: number;
   professor: GuildMember;
   targetRole: Role | null;
+  place: EclassPlace;
+  placeInformation: string | null;
   isRecorded: boolean;
 }
 
@@ -59,6 +61,8 @@ export interface EclassEmbedOptions {
   isRecorded: boolean;
   professor: GuildMember;
   subject: SubjectBase;
+  place: EclassPlace;
+  placeInformation: string | null;
   topic: string;
 }
 

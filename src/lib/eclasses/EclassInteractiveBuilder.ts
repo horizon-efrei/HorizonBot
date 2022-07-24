@@ -24,10 +24,14 @@ import Subject from '@/models/subject';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
 import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
 import { SchoolYear } from '@/types';
-import type { EclassPopulatedDocument, SubjectDocument } from '@/types/database';
-import { EclassStatus } from '@/types/database';
+import type { SubjectDocument } from '@/types/database';
+import { EclassPlace } from '@/types/database';
 import { noop } from '@/utils';
-import Eclass from '../models/eclass';
+
+// DISCLAIMER
+// Look very closely because this is one of the worst code you'll ever see.
+// If someone wants to refactor (= redo from scratch) this mess, please be my guest
+//           ˢᵒʳʳʸ
 
 const schoolYearMenu = new MessageSelectMenu()
   .setCustomId('select-schoolyear')
@@ -46,13 +50,19 @@ const schoolYearMenu = new MessageSelectMenu()
 const isRecordedMenu = new MessageSelectMenu()
   .setCustomId('select-is-recorded')
   .setPlaceholder(config.messages.createClassSetup.isRecordedMenu.placeholder)
-  .addOptions([{
-    ...config.messages.createClassSetup.isRecordedMenu.options[0],
-    value: 'yes',
-  }, {
-    ...config.messages.createClassSetup.isRecordedMenu.options[1],
-    value: 'no',
-  }]);
+  .addOptions(config.messages.createClassSetup.isRecordedMenu.options);
+
+const placeMenu = new MessageSelectMenu()
+  .setCustomId('select-place')
+  .setPlaceholder(config.messages.createClassSetup.placeMenu.placeholder)
+  .addOptions(config.messages.createClassSetup.placeMenu.options);
+
+const placeMap = new Map([
+  ['discord', EclassPlace.Discord],
+  ['on-site', EclassPlace.OnSite],
+  ['teams', EclassPlace.Teams],
+  ['other', EclassPlace.Other],
+]);
 
 const rescheduleRow = new MessageActionRow()
   .addComponents(
@@ -96,6 +106,8 @@ export default class EclassInteractiveBuilder {
     duration: null,
     professor: null,
     targetRole: null,
+    place: null,
+    placeInformation: null,
     isRecorded: null,
   } as EclassCreationOptions;
 
@@ -217,7 +229,28 @@ export default class EclassInteractiveBuilder {
     this.responses.targetRole = await this._makeMessageStep('autoPromptRole', config.messages.prompts.targetRole);
     await this._updateStep();
 
-    // 8. Ask whether the class will be recorded
+    // 8. Ask for the place
+    const placeInteraction = await this._makeSelectMenuStep(placeMenu);
+    this.responses.place = placeMap.get(placeInteraction.values.shift());
+    this.step--; // Don't increase the step just yet, wait for 8.b to be finished
+    await this._updateStep(placeInteraction);
+
+    // 8.b Ask for more informations about the place
+    switch (this.responses.place) {
+      case EclassPlace.Teams:
+        this.responses.placeInformation = (await this._makeMessageStep('autoPromptUrl', config.messages.prompts.teamsLink)).toString();
+        break;
+      case EclassPlace.OnSite:
+        this.responses.placeInformation = await this._makeMessageStep('autoPromptText', config.messages.prompts.room);
+        break;
+      case EclassPlace.Other:
+        this.responses.placeInformation = await this._makeMessageStep('autoPromptText', config.messages.prompts.customPlace);
+        break;
+      default: break;
+    }
+    await this._updateStep();
+
+    // 9. Ask whether the class will be recorded
     const isRecordedInteraction = await this._makeSelectMenuStep(isRecordedMenu);
     this.responses.isRecorded = isRecordedInteraction.values.shift() === 'yes';
   }
@@ -355,11 +388,12 @@ export default class EclassInteractiveBuilder {
           ? Formatters.time(this.responses.date, Formatters.TimestampStyles.LongDateTime)
           : this._emoteForStep(5),
       targetRole: this.responses.targetRole ?? this._emoteForStep(6),
+      where: this.responses.place
+        ? config.messages.where(this.responses)
+        : this._emoteForStep(7),
       isRecorded: isNullish(this.responses.isRecorded)
-        ? this._emoteForStep(7)
-        : this.responses.isRecorded
-          ? 'Oui :white_check_mark:'
-          : 'Non :x:',
+        ? this._emoteForStep(8)
+        : config.messages.recordedValues[Number(this.responses.isRecorded)],
     });
   }
 
