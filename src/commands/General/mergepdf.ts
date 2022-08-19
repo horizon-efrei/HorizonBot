@@ -30,8 +30,6 @@ export default class PDFMergeCommand extends HorizonCommand {
       return;
     }
 
-    const merger = new PDFMerger();
-
     const allFiles = [
       ...message.attachments.values(),
       result.value
@@ -44,9 +42,11 @@ export default class PDFMergeCommand extends HorizonCommand {
       return;
     }
 
+    const merger = new PDFMerger();
+
     for (const file of allFiles) {
       const { data: buffer } = await axios.get(file.url, { responseType: 'arraybuffer' });
-      merger.add(buffer as Buffer);
+      await merger.add(buffer as Buffer);
     }
 
     const pdfBuffer = await merger.saveAsBuffer();
