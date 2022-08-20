@@ -22,8 +22,12 @@ import settings from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
 import Subject from '@/models/subject';
 import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import type { EclassCreationOptions, GuildMessage, PrompterText } from '@/types';
-import { SchoolYear } from '@/types';
+import type {
+  EclassCreationOptions,
+  GuildMessage,
+  PrompterText,
+  SchoolYear,
+} from '@/types';
 import type { SubjectDocument } from '@/types/database';
 import { EclassPlace } from '@/types/database';
 import { noop } from '@/utils';
@@ -36,16 +40,7 @@ import { noop } from '@/utils';
 const schoolYearMenu = new MessageSelectMenu()
   .setCustomId('select-schoolyear')
   .setPlaceholder(config.messages.createClassSetup.schoolYearMenu.placeholder)
-  .addOptions([{
-      ...config.messages.createClassSetup.schoolYearMenu.options[0],
-      value: SchoolYear.L1,
-    }, {
-      ...config.messages.createClassSetup.schoolYearMenu.options[1],
-      value: SchoolYear.L2,
-    }, {
-      ...config.messages.createClassSetup.schoolYearMenu.options[2],
-      value: SchoolYear.L3,
-  }]);
+  .addOptions(config.messages.createClassSetup.schoolYearMenu.options());
 
 const isRecordedMenu = new MessageSelectMenu()
   .setCustomId('select-is-recorded')

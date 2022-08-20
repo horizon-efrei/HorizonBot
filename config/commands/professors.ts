@@ -157,11 +157,11 @@ export const eclass = {
       `,
       schoolYearMenu: {
         placeholder: 'Aucune année sélectionnée',
-        options: [
-          { label: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, emoji: '1⃣' },
-          { label: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, emoji: '2⃣' },
-          { label: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, emoji: '3⃣' },
-        ] as Array<Omit<MessageSelectOptionData, 'value'>>,
+        options: (): MessageSelectOptionData[] => [
+          { label: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, emoji: '1⃣', value: SchoolYear.L1 },
+          { label: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, emoji: '2⃣', value: SchoolYear.L2 },
+          { label: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, emoji: '3⃣', value: SchoolYear.L3 },
+        ],
       },
       subjectMenu: {
         placeholder: 'Aucune matière sélectionnée',
