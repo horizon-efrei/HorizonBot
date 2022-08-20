@@ -57,11 +57,13 @@ export default class UserInfoCommand extends HorizonCommand {
       .setColor(settings.colors.default)
       .setAuthor({ name: pupa(embedConfig.title, { member }) })
       .setThumbnail(member.user.displayAvatarURL())
-      .addField(embedConfig.names.title, namesContent, false)
-      .addField(embedConfig.created.title, createdContent, true)
-      .addField(embedConfig.joined.title, joinedContent, true)
-      .addField(embedConfig.roles.title, rolesContent, false)
-      .addField(embedConfig.presence.title, presenceContent, true);
+      .addFields([
+        { name: embedConfig.names.title, value: namesContent },
+        { name: embedConfig.created.title, value: createdContent, inline: true },
+        { name: embedConfig.joined.title, value: joinedContent, inline: true },
+        { name: embedConfig.roles.title, value: rolesContent },
+        { name: embedConfig.presence.title, value: presenceContent, inline: true },
+      ]);
 
     await message.channel.send({ embeds: [embed] });
   }

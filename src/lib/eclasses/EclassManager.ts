@@ -68,11 +68,13 @@ export function createAnnouncementEmbed({
     .setDescription(pupa(texts.description, { subject, classChannel, date }))
     .setThumbnail(subject.emojiImage)
     .setAuthor({ name: texts.author, iconURL: classChannel.guild.iconURL() })
-    .addField(texts.date, pupa(texts.dateValue, { date, end }), true)
-    .addField(texts.duration, dayjs.duration(duration).humanize(), true)
-    .addField(texts.professor, professor.toString(), true)
-    .addField(texts.recorded, config.messages.recordedValues[Number(isRecorded)], true)
-    .addField(texts.place, pupa(texts.placeValues[place], { place, placeInformation, subject }), true)
+    .addFields([
+      { name: texts.date, value: pupa(texts.dateValue, { date, end }), inline: true },
+      { name: texts.duration, value: dayjs.duration(duration).humanize(), inline: true },
+      { name: texts.professor, value: professor.toString(), inline: true },
+      { name: texts.recorded, value: config.messages.recordedValues[Number(isRecorded)], inline: true },
+      { name: texts.place, value: pupa(texts.placeValues[place], { place, placeInformation, subject }), inline: true },
+    ])
     .setFooter({ text: pupa(texts.footer, { classId }) });
 }
 

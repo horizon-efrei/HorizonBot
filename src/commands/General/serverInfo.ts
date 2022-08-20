@@ -19,22 +19,36 @@ export default class ServerInfoCommand extends HorizonCommand {
       .setColor(settings.colors.primary)
       .setTitle(pupa(texts.title, message.guild))
       .setThumbnail(message.guild.iconURL())
-      .addField(texts.membersTitle, pupa(texts.membersValue, message.guild), true)
-      .addField(texts.channelsTitle, pupa(texts.channelsValue, {
-        ...message.guild,
-        text: message.guild.channels.cache.filter(channel => channel.isText()).size,
-        voice: message.guild.channels.cache.filter(channel => channel.isVoice()).size,
-        categories: message.guild.channels.cache.filter(channel => channel.type === 'GUILD_CATEGORY').size,
-      }), true)
-      .addField(texts.boostsTitle, pupa(texts.boostsValue, {
-        ...message.guild,
-        premiumTier: Constants.PremiumTiers[message.guild.premiumTier],
-      }), true)
-      .addField(texts.rolesTitle, pupa(texts.rolesValue, message.guild), true)
-      .addField(texts.createdAtTitle, pupa(texts.createdAtValue, {
-        ...message.guild,
-        createdTimestamp: Math.round(message.guild.createdTimestamp / 1000),
-      }), true)
+      .addFields([
+        { name: texts.membersTitle, value: pupa(texts.membersValue, message.guild), inline: true },
+        {
+          name: texts.channelsTitle,
+          value: pupa(texts.channelsValue, {
+            ...message.guild,
+            text: message.guild.channels.cache.filter(channel => channel.isText()).size,
+            voice: message.guild.channels.cache.filter(channel => channel.isVoice()).size,
+            categories: message.guild.channels.cache.filter(channel => channel.type === 'GUILD_CATEGORY').size,
+          }),
+          inline: true,
+        },
+        {
+          name: texts.boostsTitle,
+          value: pupa(texts.boostsValue, {
+            ...message.guild,
+            premiumTier: Constants.PremiumTiers[message.guild.premiumTier],
+          }),
+          inline: true,
+        },
+        { name: texts.rolesTitle, value: pupa(texts.rolesValue, message.guild), inline: true },
+        {
+          name: texts.createdAtTitle,
+          value: pupa(texts.createdAtValue, {
+            ...message.guild,
+            createdTimestamp: Math.round(message.guild.createdTimestamp / 1000),
+          }),
+          inline: true,
+        },
+      ])
       .setFooter({ text: pupa(texts.footer, message.guild) });
 
     await message.channel.send({ embeds: [embed] });

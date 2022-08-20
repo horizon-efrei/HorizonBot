@@ -124,11 +124,13 @@ export default class EclassInteractiveBuilder {
       .setColor(settings.colors.default)
       .setTitle(config.messages.createClassSetup.embed.title)
       .setDescription(config.messages.createClassSetup.embed.description)
-      .addField(config.messages.createClassSetup.embed.stepPreviewTitle, this._buildStepsPreview())
-      .addField(
-        pupa(config.messages.createClassSetup.embed.currentStepTitle, { step: this.step + 1 }),
-        config.messages.createClassSetup.embed.currentStepDescription[this.step],
-      );
+      .addFields([
+        { name: config.messages.createClassSetup.embed.stepPreviewTitle, value: this._buildStepsPreview() },
+        {
+          name: pupa(config.messages.createClassSetup.embed.currentStepTitle, { step: this.step + 1 }),
+          value: config.messages.createClassSetup.embed.currentStepDescription[this.step],
+        },
+      ]);
   }
 
   public async start(): Promise<EclassCreationOptions | null> {

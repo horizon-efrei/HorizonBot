@@ -18,18 +18,20 @@ export default class StatisticsCommand extends HorizonCommand {
     const embed = new MessageEmbed()
       .setColor(settings.colors.default)
       .setDescription(pupa(config.messages.embed.description, { prefix: settings.prefix }))
-      .addField(
-        embedMessages.version,
-        pupa(embedMessages.versionContent, {
-          version: pkg.version,
-          commitLink: `[${commitHash.slice(0, 7)}](${pkg.repository.url}/commit/${commitHash})`,
-        }),
-        true,
-      )
-      .addField(embedMessages.memory, `${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)} Mo`, true)
-      .addField(embedMessages.uptime, dayjs.duration(this.container.client.uptime).humanize(), true)
-      .addField(embedMessages.maintainers, settings.maintainers.join('\n'), true)
-      .addField(embedMessages.thanks, settings.thanks.join('\n'), true)
+      .addFields([
+        {
+          name: embedMessages.version,
+          value: pupa(embedMessages.versionContent, {
+            version: pkg.version,
+            commitLink: `[${commitHash.slice(0, 7)}](${pkg.repository.url}/commit/${commitHash})`,
+          }),
+          inline: true,
+        },
+        { name: embedMessages.memory, value: `${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)} Mo`, inline: true },
+        { name: embedMessages.uptime, value: dayjs.duration(this.container.client.uptime).humanize(), inline: true },
+        { name: embedMessages.maintainers, value: settings.maintainers.join('\n'), inline: true },
+        { name: embedMessages.thanks, value: settings.thanks.join('\n'), inline: true },
+      ])
       .setTimestamp();
 
     await message.channel.send({ embeds: [embed] });

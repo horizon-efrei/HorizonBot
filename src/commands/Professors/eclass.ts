@@ -419,19 +419,37 @@ export default class EclassCommand extends HorizonSubCommand {
     const embed = new MessageEmbed()
       .setColor(settings.colors.primary)
       .setTitle(pupa(texts.title, eclass.toJSON()))
-      .addField(texts.subjectName, pupa(texts.subjectValue, eclass.toJSON()), true)
-      .addField(texts.statusName, pupa(texts.statusValue, { ...eclass.toJSON(), status: capitalizedStatus }), true)
-      .addField(texts.dateName, pupa(texts.dateValue, {
-        ...eclass.toJSON(),
-        ...eclass.normalizeDates(true),
-      }), true)
-      .addField(texts.professorName, pupa(texts.professorValue, eclass.toJSON()), true)
-      .addField(texts.placeName, pupa(texts.placeValue, {
-        ...eclass.toJSON(),
-        where: config.messages.where(eclass),
-      }), true)
-      .addField(texts.recordedName, pupa(texts.recordedValue, { ...eclass.toJSON(), recorded: recordedText }), true)
-      .addField(texts.relatedName, pupa(texts.relatedValue, { ...eclass.toJSON(), messageLink }), true);
+      .addFields([
+        { name: texts.subjectName, value: pupa(texts.subjectValue, eclass.toJSON()), inline: true },
+        {
+          name: texts.statusName,
+          value: pupa(texts.statusValue, { ...eclass.toJSON(), status: capitalizedStatus }),
+          inline: true,
+        },
+        {
+          name: texts.dateName,
+          value: pupa(texts.dateValue, {
+            ...eclass.toJSON(),
+            ...eclass.normalizeDates(true),
+          }),
+          inline: true,
+        },
+        { name: texts.professorName, value: pupa(texts.professorValue, eclass.toJSON()), inline: true },
+        {
+          name: texts.placeName,
+          value: pupa(texts.placeValue, {
+            ...eclass.toJSON(),
+            where: config.messages.where(eclass),
+          }),
+          inline: true,
+        },
+        {
+          name: texts.recordedName,
+          value: pupa(texts.recordedValue, { ...eclass.toJSON(), recorded: recordedText }),
+          inline: true,
+        },
+        { name: texts.relatedName, value: pupa(texts.relatedValue, { ...eclass.toJSON(), messageLink }), inline: true },
+      ]);
 
     // Change the URL & confirm
     await message.channel.send({ embeds: [embed] });

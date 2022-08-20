@@ -54,11 +54,13 @@ export default class ContactInteractiveBuilder {
       .setColor(settings.colors.default)
       .setTitle(config.messages.createContactSetup.embed.title)
       .setDescription(config.messages.createContactSetup.embed.description)
-      .addField(config.messages.createContactSetup.embed.stepPreviewTitle, this._buildStepsPreview())
-      .addField(
-        pupa(config.messages.createContactSetup.embed.currentStepTitle, { step: this.step + 1 }),
-        config.messages.createContactSetup.embed.currentStepDescription[this.step],
-      );
+      .addFields([
+        { name: config.messages.createContactSetup.embed.stepPreviewTitle, value: this._buildStepsPreview() },
+        {
+          name: pupa(config.messages.createContactSetup.embed.currentStepTitle, { step: this.step + 1 }),
+          value: config.messages.createContactSetup.embed.currentStepDescription[this.step],
+        },
+      ]);
   }
 
   public async start(): Promise<ContactBase | null> {

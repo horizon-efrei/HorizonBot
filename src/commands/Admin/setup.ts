@@ -191,7 +191,7 @@ export default class SetupCommand extends HorizonSubCommand {
       .setTemplate(
         new MessageEmbed()
           .setTitle(config.messages.listTitle)
-          .addField(config.messages.possibilitiesTitle, possibilitiesExamples),
+          .addFields({ name: config.messages.possibilitiesTitle, value: possibilitiesExamples }),
       )
       .setItems(allEntriesFilled
         .map(([name, entry]) => pupa(

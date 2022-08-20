@@ -94,10 +94,13 @@ export default class LogsCommand extends HorizonCommand {
       .setTemplate(
         new MessageEmbed()
         .setTitle(config.messages.listTitle)
-        .addField(config.messages.possibilitiesTitle, pupa(config.messages.possibilitiesContent, {
-          logs: inlineCodeList(logsPossibilitiesExamples),
-          statuses: inlineCodeList(statusesPossibilitiesExamples),
-        })),
+        .addFields({
+          name: config.messages.possibilitiesTitle,
+          value: pupa(config.messages.possibilitiesContent, {
+            logs: inlineCodeList(logsPossibilitiesExamples),
+            statuses: inlineCodeList(statusesPossibilitiesExamples),
+          }),
+        }),
       )
       .setItems(logs.map(log => pupa(config.messages.lineValue, getLogInfo(log))))
       .setItemsPerPage(10)

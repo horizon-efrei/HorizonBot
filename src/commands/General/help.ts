@@ -21,12 +21,12 @@ export default class HelpCommand extends HorizonCommand {
       const information = config.messages.commandInfo;
       embed.setTitle(pupa(information.title, { command }))
         .setDescription(pupa(command.description, { prefix: settings.prefix }))
-        .addField(information.usage, `\`${settings.prefix}${command.usage}\``);
+        .addFields({ name: information.usage, value: `\`${settings.prefix}${command.usage}\`` });
 
       if (command.aliases.length > 1)
-        embed.addField(information.aliases, inlineCodeList(command.aliases));
+        embed.addFields({ name: information.aliases, value: inlineCodeList(command.aliases) });
       if (command.examples.length > 0)
-        embed.addField(information.examples, inlineCodeList(command.examples, '\n\n'));
+        embed.addFields({ name: information.examples, value: inlineCodeList(command.examples, '\n\n') });
     } else {
       const information = config.messages.commandsList;
       const amount = this.container.stores.get('commands').size;
@@ -37,19 +37,19 @@ export default class HelpCommand extends HorizonCommand {
       const categories = await this._getPossibleCategories(message);
 
       for (const [category, commands] of Object.entries(categories)) {
-        embed.addField(
-          pupa(information.category, { categoryName: category }),
-          inlineCodeList(commands.map(cmd => cmd.name)),
-        );
+        embed.addFields({
+          name: pupa(information.category, { categoryName: category }),
+          value: inlineCodeList(commands.map(cmd => cmd.name)),
+        });
       }
 
       if (isGuildMessage(message)) {
         const tags = this.container.client.tags.filter(tag => tag.guildId === message.guild.id);
         if (tags.size > 0) {
-          embed.addField(
-            pupa(information.category, { categoryName: config.messages.tagsCategory }),
-            inlineCodeList([...tags.map(tag => tag.name)]),
-          );
+          embed.addFields({
+            name: pupa(information.category, { categoryName: config.messages.tagsCategory }),
+            value: inlineCodeList([...tags.map(tag => tag.name)]),
+          });
         }
       }
     }

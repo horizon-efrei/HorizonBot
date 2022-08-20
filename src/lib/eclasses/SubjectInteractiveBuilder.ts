@@ -100,11 +100,13 @@ export default class SubjectInteractiveBuilder {
       .setColor(settings.colors.default)
       .setTitle(config.messages.createSubjectSetup.embed.title)
       .setDescription(config.messages.createSubjectSetup.embed.description)
-      .addField(config.messages.createSubjectSetup.embed.stepPreviewTitle, this._buildStepsPreview())
-      .addField(
-        pupa(config.messages.createSubjectSetup.embed.currentStepTitle, { step: this.step + 1 }),
-        config.messages.createSubjectSetup.embed.currentStepDescription[this.step],
-      );
+      .addFields([
+        { name: config.messages.createSubjectSetup.embed.stepPreviewTitle, value: this._buildStepsPreview() },
+        {
+          name: pupa(config.messages.createSubjectSetup.embed.currentStepTitle, { step: this.step + 1 }),
+          value: config.messages.createSubjectSetup.embed.currentStepDescription[this.step],
+        },
+      ]);
   }
 
   public async start(): Promise<SubjectCreationOptions | null> {
