@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0] - 2022/08/20
+
+### Added
+
+- Add user-mention format to dump command
+- Add small hints to prompts in eclass builder
+- Add place metadata to eclasses (closes #70)
+- Add silent record option to eclasses (closes #63)
+- Add an overlap checker to eclasses (closes #55)
+
+### Improved
+
+- Made reaction optional on "reacted" filter in dump command
+- Bring back ability to choose what role to alert for eclasses
+- Remove eprof flagging
+
+### Fixed
+
+- Lazily compute school years for eclass builder select menu
+- Made last argument of `eclass edit` variadic
+- Show more than 25 pages in paginated embeds if necessary (closes #69)
+
+
 ## [0.11.2] - 2022/05/26
 
 ### Improved
