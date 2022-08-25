@@ -1,148 +1,191 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { CommandOptions } from '@sapphire/framework';
-import { Args } from '@sapphire/framework';
-import type { Message } from 'discord.js';
 import { DMChannel, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
-import PaginatedContentMessageEmbed from '@/app/lib/structures/PaginatedContentMessageEmbed';
-import { commonSubcommands } from '@/app/lib/utils/generateSubcommands';
 import { reminders as config } from '@/config/commands/general';
-import messages from '@/config/messages';
-import settings from '@/config/settings';
 import Reminders from '@/models/reminders';
-import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
+import * as CustomResolvers from '@/resolvers';
+import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEmbed';
+import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 
-enum Subcommand {
-  Create = 'create',
-  List = 'list',
-  Remove = 'remove',
-  Help = 'help',
-  Edit = 'edit',
+enum Options {
+  DateOrDuration = 'date-or-duration',
+  Content = 'content',
+  Id = 'id',
 }
 
-@ApplyOptions<CommandOptions>(config.options)
-export default class RemindersCommand extends HorizonCommand {
-  private static readonly _action = Args.make<Subcommand>((parameter, { argument }) => {
-    const query = parameter.toLowerCase();
-
-    for (const action of Object.values(Subcommand)) {
-      if (query === action || commonSubcommands[action].aliases.includes(query))
-        return Args.ok(action);
-    }
-
-    return Args.error({ argument, parameter });
-  });
-
-  public async messageRun(message: Message, args: Args): Promise<void> {
-    const action = args.finished
-      ? Subcommand.List
-      : await args.pick(RemindersCommand._action).catch(() => Subcommand.Create);
-    await this[action](message, args);
+@ApplyOptions<HorizonSubcommand.Options>({
+  ...config,
+  subcommands: [
+    { name: 'create', chatInputRun: 'create' },
+    { name: 'list', chatInputRun: 'list' },
+    { name: 'edit', chatInputRun: 'edit' },
+    { name: 'remove', chatInputRun: 'remove' },
+  ],
+})
+export default class RemindersCommand extends HorizonSubcommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(true)
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('create')
+            .setDescription(this.descriptions.subcommands.create)
+            .addStringOption(
+              option => option
+                .setName(Options.DateOrDuration)
+                .setDescription(this.descriptions.options.dateOrDuration)
+                .setRequired(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Content)
+                .setDescription(this.descriptions.options.content)
+                .setRequired(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('edit')
+            .setDescription(this.descriptions.subcommands.edit)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.DateOrDuration)
+                .setDescription(this.descriptions.options.dateOrDuration),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Content)
+                .setDescription(this.descriptions.options.content),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('remove')
+            .setDescription(this.descriptions.subcommands.remove)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('list')
+            .setDescription(this.descriptions.subcommands.list),
+        ),
+    );
   }
 
-  public async create(message: Message, args: Args): Promise<void> {
-    let date: number;
-    try {
-      date = await args.pick('duration')
-        .then(duration => Date.now() + duration)
-        .catch(async () => args.pick('date')
-          .then(dat => dat.getTime()));
-    } catch {
-      await message.channel.send(config.messages.invalidTime);
+  public async create(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
+    const dateOrDuration = interaction.options.getString(Options.DateOrDuration, true);
+
+    const date = this._parseTime(dateOrDuration);
+    if (!date) {
+      await interaction.reply({ content: this.messages.invalidTime, ephemeral: true });
       return;
     }
 
     const reminder = await Reminders.create({
       date,
-      description: (await args.restResult('string'))?.value ?? messages.reminders.noDescription,
-      userId: message.author.id,
+      description: interaction.options.getString(Options.Content, true),
+      userId: interaction.user.id,
     });
 
-    const hasDmOpened = (await message.author.createDM()) instanceof DMChannel;
-    await message.channel.send([
-      pupa(config.messages.createdReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
-      hasDmOpened ? '' : config.messages.openDm,
-    ].filter(Boolean).join('\n'));
+    const hasDmOpened = (await interaction.user.createDM()) instanceof DMChannel;
+    await interaction.reply({
+      content: [
+        pupa(this.messages.createdReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
+        hasDmOpened ? '' : this.messages.openDm,
+      ].filter(Boolean).join('\n'),
+      ephemeral: true,
+    });
   }
 
-  public async list(message: Message, _args: Args): Promise<void> {
-    const reminders = this.container.client.reminders.filter(rmd => rmd.userId === message.author.id);
+  public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const reminders = this.container.client.reminders.filter(rmd => rmd.userId === interaction.user.id);
     if (!reminders || reminders.size === 0) {
-      await message.channel.send(config.messages.noReminders);
+      await interaction.reply({ content: this.messages.noReminders, ephemeral: true });
       return;
     }
 
+    await interaction.deferReply({ ephemeral: true });
+
     await new PaginatedContentMessageEmbed()
-      .setTemplate(new MessageEmbed().setTitle(pupa(config.messages.listTitle, { total: reminders.size })))
+      .setTemplate(new MessageEmbed().setTitle(pupa(this.messages.listTitle, { total: reminders.size })))
       .setItems([
-        ...reminders
-          .map(rmd => pupa(config.messages.listLine, { ...rmd.toJSON(), timestamp: Math.round(rmd.date / 1000) })),
+        ...reminders.map(reminder => pupa(this.messages.listLine, {
+          ...reminder.toJSON(),
+          timestamp: Math.round(reminder.date / 1000),
+        })),
       ])
       .setItemsPerPage(10)
       .make()
-      .run(message);
+      .run(interaction);
   }
 
-  public async edit(message: Message, args: Args): Promise<void> {
-    const targetId = (await args.pickResult('string')).value;
-    const reminder = await Reminders.findOne({ reminderId: targetId, userId: message.author.id });
+  public async edit(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const targetId = interaction.options.getString(Options.Id, true);
+    const reminder = await Reminders.findOne({ reminderId: targetId, userId: interaction.user.id });
     if (!reminder) {
-      await message.channel.send(config.messages.invalidReminder);
+      await interaction.reply({ content: this.messages.invalidReminder, ephemeral: true });
       return;
     }
 
-    let updateValue: number | string;
-    let updatedType: 'date' | 'description';
-    args.save();
-    try {
-      updateValue = await this._getTime(args, true);
-      updatedType = 'date';
-    } catch {
-      args.restore();
-      updateValue = (await args.restResult('string'))?.value ?? messages.reminders.noDescription;
-      updatedType = 'description';
+    const dateOrDuration = interaction.options.getString(Options.DateOrDuration);
+    const content = interaction.options.getString(Options.Content);
+    if (!dateOrDuration && !content) {
+      await interaction.reply({ content: this.messages.invalidUsage, ephemeral: true });
+      return;
     }
 
-    if (updatedType === 'date')
-      reminder.date = updateValue as number;
-    else
-      reminder.description = updateValue as string;
+    const date = this._parseTime(dateOrDuration);
+    if (date) {
+      reminder.date = date;
+    } else if (dateOrDuration) {
+      await interaction.reply({ content: this.messages.invalidTime, ephemeral: true });
+      return;
+    }
+
+    if (content)
+      reminder.description = content;
 
     await reminder.save();
-    await message.channel.send(
-      pupa(config.messages.editedReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
-    );
+
+    await interaction.reply({
+      content: pupa(this.messages.editedReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
+      ephemeral: true,
+    });
   }
 
-  public async remove(message: Message, args: Args): Promise<void> {
-    const targetId = (await args.pickResult('string')).value
-      ?? (await new ArgumentPrompter(message).promptText(config.messages.prompts.id)).split(' ').shift();
-
-    const reminder = await Reminders.findOne({ reminderId: targetId, userId: message.author.id });
+  public async remove(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const targetId = interaction.options.getString(Options.Id, true);
+    const reminder = await Reminders.findOne({ reminderId: targetId, userId: interaction.user.id });
     if (!reminder) {
-      await message.channel.send(config.messages.invalidReminder);
+      await interaction.reply({ content: this.messages.invalidReminder, ephemeral: true });
       return;
     }
 
     await reminder.remove();
-    await message.channel.send(config.messages.removedReminder);
+    await interaction.reply({ content: this.messages.removedReminder, ephemeral: true });
   }
 
-  public async help(message: Message, _args: Args): Promise<void> {
-    const embed = new MessageEmbed()
-      .setTitle(config.messages.helpEmbedTitle)
-      .addFields([...config.messages.helpEmbedDescription])
-      .setColor(settings.colors.default);
-
-    await message.channel.send({ embeds: [embed] });
-  }
-
-  private async _getTime(args: Args, rest = false): Promise<number> {
-    const method = rest ? 'rest' : 'pick';
-    return await args[method]('duration')
-      .then(duration => Date.now() + duration)
-      .catch(async () => args[method]('date')
-        .then(dat => dat.getTime()));
+  private _parseTime(dateOrDuration: string): number | null {
+    return CustomResolvers.resolveDuration(dateOrDuration)
+      .mapOr(
+        CustomResolvers.resolveDate(dateOrDuration).mapOr(null, dat => dat.getTime()),
+        duration => Date.now() + duration,
+      );
   }
 }

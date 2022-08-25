@@ -1,5 +1,3 @@
-import type { DurationPart } from '@/types';
-
 const REGEX = /^(?<number>\d+) ?(?<unit>[a-z]+)?$/i;
 
 enum Durations {
@@ -67,7 +65,7 @@ function getDuration(val: string): number {
   let abs: number;
   let total = 0;
   if (val.length > 0 && val.length < 101) {
-    const parts: DurationPart[] = [];
+    const parts: Array<{ number: string; unit: string }> = [];
     const tokens = tokenize(val.toLowerCase());
 
     for (const [i, token] of tokens.entries()) {
@@ -77,7 +75,7 @@ function getDuration(val: string): number {
       const nextUnit = durations.findIndex(([values]) => values.includes(previousUnit)) + 1;
       const newUnit = durations[nextUnit]?.[0][0];
 
-      if (!groups || !groups.number || (!groups.unit && nextUnit === 0))
+      if (!groups?.number || (!groups.unit && nextUnit === 0))
         throw new TypeError('Value is an invalid duration');
 
       parts.push({ number: groups.number, unit: groups.unit ?? newUnit });

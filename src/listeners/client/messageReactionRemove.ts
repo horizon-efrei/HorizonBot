@@ -7,7 +7,7 @@ import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
-import { isGuildMessage, noop, nullop } from '@/utils';
+import { noop, nullop } from '@/utils';
 
 export default class MessageReactionRemoveListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
@@ -15,7 +15,7 @@ export default class MessageReactionRemoveListener extends Listener {
       || user.bot
       || reaction.message.partial
       || reaction.message.channel.partial
-      || !isGuildMessage(reaction.message))
+      || !reaction.message.inGuild())
       return;
 
     const { message } = reaction;

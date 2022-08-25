@@ -6,35 +6,30 @@ import Eclass from '@/models/eclass';
 import LogStatuses from '@/models/logStatuses';
 import ReactionRole from '@/models/reactionRole';
 import Reminders from '@/models/reminders';
-import Tags from '@/models/tags';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import TaskStore from '@/structures/tasks/TaskStore';
-import type { LogStatusesBase, ReminderDocument, TagDocument } from '@/types/database';
+import type { LogStatusesBase, ReminderDocument } from '@/types/database';
 import { DiscordLogType, LogStatuses as LogStatusesEnum } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class HorizonClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
-  reactionRolesIds: Set<string>;
-  eclassRolesIds: Set<string>;
-  intersectionRoles: Set<string>;
-  tags: Set<TagDocument>;
-  reminders: Set<ReminderDocument>;
-  logStatuses: Collection<string, Collection<DiscordLogType, LogStatusesEnum>>;
+
+  reactionRolesIds = new Set<string>();
+  eclassRolesIds = new Set<string>();
+  roleIntersections = new Set<string>();
+  reminders = new Set<ReminderDocument>();
+  logStatuses = new Collection<string, Collection<DiscordLogType, LogStatusesEnum>>();
 
   constructor() {
     super({
-      caseInsensitiveCommands: true,
-      caseInsensitivePrefixes: true,
-      defaultPrefix: settings.prefix,
       logger: {
         level: LogLevel.Debug,
       },
       loadDefaultErrorListeners: true,
-      presence: { status: 'online', activities: [{ type: 'LISTENING', name: `${settings.prefix}help` }] },
       intents: [
-        Intents.FLAGS.GUILD_PRESENCES, // Access to member's presence for !userinfo.
+        Intents.FLAGS.GUILD_PRESENCES, // Access to member's presence for /userinfo.
         Intents.FLAGS.DIRECT_MESSAGES, // Access to Direct Messages.
         Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, // Access to MessageReactionAdd/Remove events in DMs.
         Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, // Access to EmojiDelete events.
@@ -50,12 +45,9 @@ export default class HorizonClient extends SapphireClient {
 
     this.stores.register(new TaskStore());
 
-    this.intersectionRoles = new Set();
-    this.logStatuses = new Collection();
     void this._loadCompilerApiCredits();
     void this.loadReactionRoles();
     void this.loadEclassRoles();
-    void this.loadTags();
     void this.loadReminders();
 
     this.configManager = new ConfigurationManager();
@@ -101,7 +93,7 @@ export default class HorizonClient extends SapphireClient {
   }
 
   public async loadReactionRoles(): Promise<void> {
-    this.reactionRolesIds = new Set();
+    this.reactionRolesIds.clear();
     const reactionRoles = await ReactionRole.find().catch(nullop);
     if (reactionRoles) {
       this.reactionRolesIds.addAll(...reactionRoles
@@ -111,7 +103,7 @@ export default class HorizonClient extends SapphireClient {
   }
 
   public async loadEclassRoles(): Promise<void> {
-    this.eclassRolesIds = new Set();
+    this.eclassRolesIds.clear();
     const eclassRoles = await Eclass.find().catch(nullop);
     if (eclassRoles) {
       this.eclassRolesIds.addAll(...eclassRoles
@@ -120,15 +112,8 @@ export default class HorizonClient extends SapphireClient {
     }
   }
 
-  public async loadTags(): Promise<void> {
-    this.tags = new Set();
-    const tags = await Tags.find().catch(nullop);
-    if (tags)
-      this.tags.addAll(...tags);
-  }
-
   public async loadReminders(): Promise<void> {
-    this.reminders = new Set();
+    this.reminders.clear();
     const reminders = await Reminders.find().catch(nullop);
     if (reminders)
       this.reminders.addAll(...reminders);

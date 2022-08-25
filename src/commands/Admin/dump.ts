@@ -1,34 +1,58 @@
 import { userMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessageLimits } from '@sapphire/discord-utilities';
-import type { Args, CommandOptions } from '@sapphire/framework';
 import { Resolvers } from '@sapphire/framework';
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
+import { Permissions } from 'discord.js';
 import pupa from 'pupa';
 import { dump as config } from '@/config/commands/admin';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 import { resolveCompleteEmoji } from '@/resolvers';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
-import { nullop } from '@/utils';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
-function memberSorterFactory(order: string): (a: GuildMember, b: GuildMember) => number {
+enum Options {
+  Format = 'format',
+  HasAllRoles = 'has-all-roles',
+  HasRoles = 'has-roles',
+  Reacted = 'reacted',
+  Order = 'order',
+  Limit = 'limit',
+  Separator = 'separator',
+  DateFormat = 'date-format',
+  Sort = 'sort',
+  NoRoles = 'no-roles',
+  Enumerate = 'enumerate',
+  Dm = 'dm',
+}
+
+enum OptionOrderChoices {
+  Name = 'name',
+  Id = 'id',
+  Created = 'created',
+  Joined = 'joined',
+  Nick = 'nick',
+}
+
+enum OptionSortChoices {
+  Asc = 'asc',
+  Desc = 'desc',
+}
+
+function memberSorterFactory(order: OptionOrderChoices): (a: GuildMember, b: GuildMember) => number {
   return (a, b): number => {
     switch (order) {
-      case 'name':
+      case OptionOrderChoices.Name:
         return a.user.username.localeCompare(b.user.username);
-      case 'id':
+      case OptionOrderChoices.Id:
         return a.id.localeCompare(b.id);
-      case 'created':
+      case OptionOrderChoices.Created:
         return a.user.createdTimestamp - b.user.createdTimestamp;
-      case 'joined':
+      case OptionOrderChoices.Joined:
         return a.joinedTimestamp - b.joinedTimestamp;
-      case 'nick':
+      case OptionOrderChoices.Nick:
         return a.nickname?.localeCompare(b.nickname) ?? 0;
-      default:
-        return 0;
     }
   };
 }
@@ -44,81 +68,145 @@ function memberFormatterFactory(format: string, dateFormat: string): (member: Gu
   });
 }
 
-const dumpOptions = {
-  format: ['format', 'f'],
-  allRole: ['has-all-roles', 'a'],
-  role: ['has-roles', 'h'],
-  reacted: ['reacted', 'r'],
-  order: ['order', 'o'],
-  limit: ['limit', 'l'],
-  separator: ['separator', 's'],
-  dateFormat: ['dateformat', 'df'],
-};
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class DumpCommand extends HorizonCommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(false)
+        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .addStringOption(
+          option => option
+            .setName(Options.Format)
+            .setDescription(this.descriptions.options.format),
+        )
+        .addRoleOption(
+          option => option
+            .setName(Options.HasAllRoles)
+            .setDescription(this.descriptions.options.hasAllRoles),
+        )
+        .addRoleOption(
+          option => option
+            .setName(Options.HasRoles)
+            .setDescription(this.descriptions.options.hasRoles),
+        )
+        .addStringOption(
+          option => option
+            .setName(Options.Reacted)
+            .setDescription(this.descriptions.options.reacted),
+        )
+        .addStringOption(
+          option => option
+            .setName(Options.Order)
+            .setDescription(this.descriptions.options.order)
+            .setChoices(
+              { name: "nom d'utilisateur", value: OptionOrderChoices.Name },
+              { name: 'identifiant', value: OptionOrderChoices.Id },
+              { name: 'date de création du compte', value: OptionOrderChoices.Created },
+              { name: "date d'arrivée sur le serveur", value: OptionOrderChoices.Joined },
+              { name: 'pseudo', value: OptionOrderChoices.Nick },
+            ),
+        )
+        .addIntegerOption(
+          option => option
+            .setName(Options.Limit)
+            .setDescription(this.descriptions.options.limit).setMinValue(1),
+        )
+        .addStringOption(
+          option => option
+            .setName(Options.Separator)
+            .setDescription(this.descriptions.options.separator),
+        )
+        .addStringOption(
+          option => option
+            .setName(Options.DateFormat)
+            .setDescription(this.descriptions.options.dateFormat),
+        )
+        .addStringOption(
+          option => option
+            .setName(Options.Sort)
+            .setDescription(this.descriptions.options.sort)
+            .setChoices(
+              { name: 'ascendant', value: OptionSortChoices.Asc },
+              { name: 'descendant', value: OptionSortChoices.Desc },
+            ),
+        )
+        .addBooleanOption(
+          option => option
+            .setName(Options.NoRoles)
+            .setDescription(this.descriptions.options.noRoles),
+        )
+        .addBooleanOption(
+          option => option
+            .setName(Options.Enumerate)
+            .setDescription(this.descriptions.options.enumerate),
+        )
+        .addBooleanOption(
+          option => option
+            .setName(Options.Dm)
+            .setDescription(this.descriptions.options.dm),
+        ),
+    );
+  }
 
-const dumpFlags = {
-  descending: ['desc', 'd'],
-  noRole: ['no-roles', 'n'],
-  enumerate: ['enumerate', 'e'],
-  dm: ['dm', 'mp'],
-};
-
-@ApplyOptions<CommandOptions>({
-  ...config.options,
-  flags: Object.values(dumpFlags).flat(),
-  options: Object.values(dumpOptions).flat(),
-  preconditions: ['GuildOnly', 'StaffOnly'],
-})
-export default class DumpCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
-    let members = await message.guild.members.fetch();
+  public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
+    let members = await interaction.guild.members.fetch();
 
     // Keeps members who have at least one of the specified roles
-    const roleFilter = args.getOption(...dumpOptions.role)?.split(',');
-    if (roleFilter?.length > 0) {
-      members = members.filter(
-        member => member.roles.cache.some(role => roleFilter.includes(role.id) || roleFilter.includes(role.name)),
-      );
-    }
+    // TODO: support multiple roles (perform an "OR")
+    const roleFilter = interaction.options.getRole(Options.HasRoles);
+    if (roleFilter)
+      members = members.filter(member => member.roles.cache.has(roleFilter.id));
 
     // Keeps members who have all of the specified roles
-    const allRoleFilter = args.getOption(...dumpOptions.allRole)?.split(',');
-    if (allRoleFilter?.length > 0) {
+    // TODO: support multiple roles (perform an "AND")
+    const allRoleFilter = interaction.options.getRole(Options.HasAllRoles);
+    if (allRoleFilter) {
       members = members.filter(
-        member => allRoleFilter.every(
-          queriedRole => member.roles.cache.has(queriedRole) || member.roles.cache.find(r => r.name === queriedRole),
-        ),
+        member => [allRoleFilter].every(role => member.roles.cache.has(role.id)),
       );
     }
 
     // Keeps members who don't have any roles at all (except for @everyone)
-    const noRoleFilter = args.getFlags(...dumpFlags.noRole);
+    const noRoleFilter = interaction.options.getBoolean(Options.NoRoles);
     if (noRoleFilter)
       members = members.filter(member => member.roles.cache.size === 1);
 
     // Keeps members who reacted to the message
-    const reactionFilter = args.getOption(...dumpOptions.reacted);
+    const reactionFilter = interaction.options.getString(Options.Reacted);
     if (reactionFilter) {
       const [reactionResolvable, reactedMessageResolvable] = reactionFilter.split('@');
       if (reactionResolvable && reactedMessageResolvable) {
-        const emoji = resolveCompleteEmoji(reactionResolvable, message.guild);
-        const reactedMessage = await Resolvers.resolveMessage(reactedMessageResolvable, { message });
-        if (reactedMessage.success) {
-          const emojiKey = typeof emoji.value === 'string' ? emoji.value : emoji.value.id;
-          const reaction = reactedMessage.value.reactions.cache.get(emojiKey);
+        const emoji = resolveCompleteEmoji(reactionResolvable, interaction.guild);
+        const reactedMessage = await Resolvers.resolveMessage(
+          reactedMessageResolvable,
+          { messageOrInteraction: interaction },
+        );
+
+        if (reactedMessage.isOk() && emoji.isOk()) {
+          const emojiKey = emoji.map(value => (typeof value === 'string' ? value : value.id)).unwrap();
+          const reaction = reactedMessage.unwrap().reactions.cache.get(emojiKey);
+
           if (reaction) {
             const reactionners = await reaction.users.fetch();
             members = members.filter(member => reactionners.has(member.id));
           } else {
-            await message.channel.send(config.messages.noMatchFound);
+            await interaction.reply({ content: this.messages.noMatchFound, ephemeral: true });
             return;
           }
         }
       } else if (reactionResolvable && !reactedMessageResolvable) {
         // In this case, reactionResolvable is actually not a reaction, but a message
-        const reactedMessage = await Resolvers.resolveMessage(reactionResolvable, { message });
-        if (reactedMessage.success) {
+        const reactedMessage = await Resolvers.resolveMessage(
+          reactionResolvable,
+          { messageOrInteraction: interaction },
+        );
+
+        if (reactedMessage.isOk()) {
           const usersByReaction = await Promise.all(
-            reactedMessage.value.reactions.cache.mapValues(async reaction => reaction.users.fetch()).values(),
+            reactedMessage.unwrap().reactions.cache.mapValues(async reaction => reaction.users.fetch()).values(),
           );
           const reactionners = new Set(usersByReaction.flatMap(r => [...r.values()]).map(r => r.id));
           members = members.filter(member => reactionners.has(member.id));
@@ -127,14 +215,14 @@ export default class DumpCommand extends HorizonCommand {
     }
 
     // Sorts the members as asked (name, id, created_at, joined_at, nick)
-    const order = args.getOption(...dumpOptions.order);
+    const order = interaction.options.getString(Options.Order) as OptionOrderChoices;
     if (order) {
       const sorter = memberSorterFactory(order);
       members.sort(sorter);
     }
 
     // Keeps only the specified number of members
-    const limitRaw = args.getOption(...dumpOptions.limit);
+    const limitRaw = interaction.options.getInteger(Options.Limit);
     const limit = Number(limitRaw);
     if (limit && !Number.isNaN(limit)) {
       let i = 0;
@@ -142,42 +230,43 @@ export default class DumpCommand extends HorizonCommand {
     }
 
     // Formats the members as asked
-    const format = args.getOption(...dumpOptions.format);
-    const dateFormat = args.getOption(...dumpOptions.dateFormat) ?? settings.configuration.dateFormat;
+    const format = interaction.options.getString(Options.Format);
+    const dateFormat = interaction.options.getString(Options.DateFormat) ?? settings.configuration.dateFormat;
     const formatter = memberFormatterFactory(format ?? '{u} ({i})', dateFormat);
     let formattedMembers = members.map(formatter);
 
     // Reverse the order if asked
-    const desc = args.getFlags(...dumpFlags.descending);
+    const desc = interaction.options.getString(Options.Sort) as OptionSortChoices === OptionSortChoices.Desc;
     if (desc)
       formattedMembers.reverse();
 
     // Enumerates the members if asked
-    const enumerate = args.getFlags(...dumpFlags.enumerate);
+    const enumerate = interaction.options.getBoolean(Options.Enumerate);
     if (enumerate)
       formattedMembers = formattedMembers.map((member, i) => `${i + 1}. ${member}`);
 
-    // Joins the members together with the specified separator
-    const separator = args.getOption(...dumpOptions.separator) ?? '\n';
     if (formattedMembers.length === 0) {
-      await message.channel.send(config.messages.noMatchFound);
+      await interaction.reply({ content: this.messages.noMatchFound, ephemeral: true });
       return;
     }
+
+    // Joins the members together with the specified separator
+    const separator = interaction.options.getString(Options.Separator) ?? '\n';
 
     const output = formattedMembers.join(separator);
     const payload = output.length > MessageLimits.MaximumLength
       ? { files: [{ attachment: Buffer.from(output), name: 'dump.txt' }] }
       : output;
 
-    if (args.getFlags(...dumpFlags.dm)) {
+    if (interaction.options.getBoolean(Options.Dm)) {
       try {
-        await message.member.send(payload);
-        await message.react(settings.emojis.yes).catch(nullop);
+        await interaction.member.send(payload);
+        await interaction.reply({ content: this.messages.dmSuccess, ephemeral: true });
       } catch {
-        await message.channel.send(messages.global.dmFailed);
+        await interaction.reply({ content: messages.global.dmFailed, ephemeral: true });
       }
     } else {
-      await message.channel.send(payload);
+      await interaction.reply(payload);
     }
   }
 }

@@ -8,7 +8,7 @@ import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
 import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
-import { isGuildMessage, noop } from '@/utils';
+import { noop } from '@/utils';
 
 export default class MessageReactionAddListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
@@ -16,7 +16,7 @@ export default class MessageReactionAddListener extends Listener {
       || user.bot
       || reaction.message.partial
       || reaction.message.channel.partial
-      || !isGuildMessage(reaction.message))
+      || !reaction.message.inGuild())
       return;
 
     const { message } = reaction;

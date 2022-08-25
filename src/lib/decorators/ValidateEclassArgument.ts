@@ -1,9 +1,8 @@
-import type { Args } from '@sapphire/framework';
+import type { Command } from '@sapphire/framework';
 import { container } from '@sapphire/framework';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import Eclass from '@/models/eclass';
-import type { GuildMessage } from '@/types';
 import type { EclassStatus } from '@/types/database';
 import { ConfigEntriesRoles } from '@/types/database';
 
@@ -15,37 +14,33 @@ export default function ValidateEclassArgument(options?: ValidationOptions): Met
   return (_target, _key, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (message: GuildMessage, args: Args): Promise<void> {
+    descriptor.value = async function (interaction: Command.ChatInputInteraction<'cached'>): Promise<void> {
       // Get the class ID
-      const classId = await args.pickResult('string');
-      if (classId.error) {
-        await message.channel.send(config.messages.invalidClassId);
-        return;
-      }
+      const classId = interaction.options.getString('id');
 
       // Fetch the class document from the database
-      const eclass = await Eclass.findOne({ classId: classId.value });
+      const eclass = await Eclass.findOne({ classId });
       if (!eclass) {
-        await message.channel.send(config.messages.invalidClassId);
+        await interaction.reply({ content: config.messages.invalidClassId, ephemeral: true });
         return;
       }
 
       // Check if the professor is the right one
-      const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
-      if (message.member.id !== eclass.professor && !message.member.roles.cache.has(staffRole.id)) {
-        await message.channel.send(config.messages.editUnauthorized);
+      const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
+      if (interaction.member.id !== eclass.professor && !interaction.member.roles.cache.has(staffRole.id)) {
+        await interaction.reply({ content: config.messages.editUnauthorized, ephemeral: true });
         return;
       }
 
       if (options?.statusIn.length > 0 && !options.statusIn.includes(eclass.status)) {
-        await message.channel.send(
-          pupa(config.messages.statusIncompatible, { status: eclass.getStatus() }),
-        );
+        await interaction.reply({
+          content: pupa(config.messages.statusIncompatible, { status: eclass.getStatus() }),
+          ephemeral: true,
+        });
         return;
       }
 
-
-      Reflect.apply(originalMethod, this, [message, args, eclass]);
+      Reflect.apply(originalMethod, this, [interaction, eclass]);
     };
 
     return descriptor;

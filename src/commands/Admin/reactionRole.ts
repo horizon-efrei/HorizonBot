@@ -1,109 +1,355 @@
+/* eslint-disable max-lines */
+import type { SlashCommandRoleOption, SlashCommandStringOption } from '@discordjs/builders';
 import { roleMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { EmbedLimits } from '@sapphire/discord-utilities';
-import type { IMessagePrompterExplicitConfirmReturn } from '@sapphire/discord.js-utilities';
-import { MessagePrompter } from '@sapphire/discord.js-utilities';
-import { Args, Resolvers } from '@sapphire/framework';
-import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
-import type { MessageOptions } from 'discord.js';
-import { MessageEmbed, Role } from 'discord.js';
-import difference from 'lodash.difference';
+import { Resolvers, Result } from '@sapphire/framework';
+import { isNullish } from '@sapphire/utilities';
+import { ChannelType } from 'discord-api-types/v10';
+import type {
+  InteractionReplyOptions,
+  NewsChannel,
+  Role,
+  TextChannel,
+} from 'discord.js';
+import {
+  MessageActionRow,
+  MessageEmbed,
+  Modal,
+  Permissions,
+  TextInputComponent,
+} from 'discord.js';
+import { TextInputStyles } from 'discord.js/typings/enums';
 import pupa from 'pupa';
-import PaginatedMessageEmbedFields from '@/app/lib/structures/PaginatedMessageEmbedFields';
 import { reactionRole as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
-import { ResolveReactionRoleArgument } from '@/decorators';
 import ReactionRole from '@/models/reactionRole';
 import * as CustomResolvers from '@/resolvers';
-import ArgumentPrompter from '@/structures/ArgumentPrompter';
-import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
-import { GuildMessage } from '@/types';
-import type { GuildTextBasedChannel, ReactionRolePair, ReactionRoleReturnPayload } from '@/types';
+import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
+import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
+import type { GuildMessage, GuildTextBasedChannel } from '@/types';
 import type { ReactionRoleDocument } from '@/types/database';
-import {
-  firstAndRest,
-  generateSubcommands,
-  nullop,
-  trimText,
-} from '@/utils';
+import { nullop, trimText } from '@/utils';
 
-interface ExtraContext {
-  document?: ReactionRoleDocument;
-  rrMessage: GuildMessage;
+enum Options {
+  Channel = 'channel',
+  Unique = 'unique',
+  RoleCondition = 'role-condition',
+  Emoji = 'emoji',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  Role = 'role',
+  MessageUrl = 'message-url',
+  Choice = 'choice',
+  Emoji1 = 'emoji1',
+  Role1 = 'role1',
+  Emoji2 = 'emoji2',
+  Role2 = 'role2',
+  Emoji3 = 'emoji3',
+  Role3 = 'role3',
+  Emoji4 = 'emoji4',
+  Role4 = 'role4',
+  Emoji5 = 'emoji5',
+  Role5 = 'role5',
 }
 
-const uniqueFlags = ['unique', 'u'];
+enum OptionEditChoiceChoices {
+  Title = 'title',
+  Description = 'description',
+  TitleAndDescription = 'title-and-description',
+}
 
-@ApplyOptions<SubCommandPluginCommandOptions>({
-  ...config.options,
-  generateDashLessAliases: true,
-  preconditions: ['GuildOnly', 'StaffOnly'],
-  flags: [...uniqueFlags],
-  subCommands: generateSubcommands(['create', 'edit', 'help', 'list', 'remove'], {
-    addPair: { aliases: ['add-pair', 'new-pair'] },
-    removePair: { aliases: ['remove-pair', 'delete-pair', 'rm-pair', 'del-pair'] },
-    unique: { aliases: ['unique-role', 'uniquify'] },
-    roleCondition: { aliases: ['role-condition', 'condition', 'pre-condition'] },
-  }),
+enum OptionRoleConditionChoiceChoices {
+  Add = 'add',
+  Clear = 'clear',
+  Show = 'show',
+}
+
+const titleInput = new TextInputComponent()
+  .setStyle(TextInputStyles.SHORT)
+  .setCustomId('title')
+  .setLabel(config.messages.modals.titleLabel)
+  .setMinLength(1)
+  .setMaxLength(EmbedLimits.MaximumTitleLength)
+  .setPlaceholder(config.messages.modals.titlePlaceholder);
+
+const descriptionInput = new TextInputComponent()
+  .setStyle(TextInputStyles.PARAGRAPH)
+  .setCustomId('description')
+  .setLabel(config.messages.modals.descriptionLabel)
+  .setPlaceholder(config.messages.modals.descriptionPlaceholder);
+
+const isUnique = (unique: boolean): string => config.messages[unique ? 'uniqueEnabled' : 'uniqueDisabled'];
+
+const getEmbed = (content: string): InteractionReplyOptions => ({
+  embeds: [new MessageEmbed().setColor(settings.colors.transparent).setDescription(content)],
+});
+
+const optionPairs = [
+  [Options.Emoji1, Options.Role1],
+  [Options.Emoji2, Options.Role2],
+  [Options.Emoji3, Options.Role3],
+  [Options.Emoji4, Options.Role4],
+  [Options.Emoji5, Options.Role5],
+] as const;
+
+type EmojiOptionCallback = (option: SlashCommandStringOption) => SlashCommandStringOption;
+type RoleOptionCallback = (option: SlashCommandRoleOption) => SlashCommandRoleOption;
+
+function * emojiGenerator(this: void): Generator<EmojiOptionCallback, EmojiOptionCallback> {
+  for (const [emoji] of optionPairs) {
+    yield (option): SlashCommandStringOption => option
+      .setName(emoji)
+      .setDescription(config.descriptions.options.emoji)
+      .setAutocomplete(true)
+      .setRequired(emoji === Options.Emoji1);
+  }
+  return null;
+}
+
+function * roleGenerator(this: void): Generator<RoleOptionCallback, RoleOptionCallback> {
+  for (const [, role] of optionPairs) {
+    yield (option): SlashCommandRoleOption => option
+      .setName(role)
+      .setDescription(config.descriptions.options.role)
+      .setRequired(role === Options.Role1);
+  }
+  return null;
+}
+
+@ApplyOptions<HorizonSubcommand.Options>({
+  ...config,
+  subcommands: [
+    { name: 'create', chatInputRun: 'create' },
+    { name: 'list', chatInputRun: 'list', default: true },
+    { name: 'edit', chatInputRun: 'edit' },
+    { name: 'remove', chatInputRun: 'remove' },
+    { name: 'add-pair', chatInputRun: 'addPair' },
+    { name: 'remove-pair', chatInputRun: 'removePair' },
+    { name: 'unique', chatInputRun: 'unique' },
+    { name: 'role-condition', chatInputRun: 'roleCondition' },
+  ],
 })
-export default class ReactionRoleCommand extends HorizonSubCommand {
-  public async create(message: GuildMessage, args: Args): Promise<void> {
-    const uniqueRole = args.getFlags(...uniqueFlags);
-    let channel: GuildTextBasedChannel = (await args.pickResult('guildTextBasedChannel')).value;
-    let title: string;
-    let description: string;
-    let roles: ReactionRolePair[];
+export default class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
+    const multipleEmojiOptions = emojiGenerator();
+    const multipleRoleOptions = roleGenerator();
 
-    // 1. Ask all the necessary questions
-    try {
-      if (!channel)
-        channel = await new ArgumentPrompter(message).promptTextChannel();
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(false)
+        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('create')
+            .setDescription(this.descriptions.subcommands.create)
+            .addChannelOption(
+              option => option
+                .setName(Options.Channel)
+                .setDescription(this.descriptions.options.channel)
+                .addChannelTypes(ChannelType.GuildNews, ChannelType.GuildText)
+                .setRequired(true),
+            )
+            .addStringOption(multipleEmojiOptions.next().value)
+            .addRoleOption(multipleRoleOptions.next().value)
+            .addStringOption(multipleEmojiOptions.next().value)
+            .addRoleOption(multipleRoleOptions.next().value)
+            .addStringOption(multipleEmojiOptions.next().value)
+            .addRoleOption(multipleRoleOptions.next().value)
+            .addStringOption(multipleEmojiOptions.next().value)
+            .addRoleOption(multipleRoleOptions.next().value)
+            .addStringOption(multipleEmojiOptions.next().value)
+            .addRoleOption(multipleRoleOptions.next().value)
+            .addBooleanOption(
+              option => option
+                .setName(Options.Unique)
+                .setDescription(this.descriptions.options.unique),
+            )
+            .addRoleOption(
+              option => option
+                .setName(Options.RoleCondition)
+                .setDescription(this.descriptions.options.roleCondition),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('list')
+            .setDescription(this.descriptions.subcommands.list),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('edit')
+            .setDescription(this.descriptions.subcommands.edit)
+            .addStringOption(
+              option => option
+                .setName(Options.MessageUrl)
+                .setDescription(this.descriptions.options.messageUrl)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Choice)
+                .setDescription(this.descriptions.options.choice)
+                .setChoices(
+                  { name: 'Modifier le titre', value: OptionEditChoiceChoices.Title },
+                  { name: 'Modifier la description', value: OptionEditChoiceChoices.Description },
+                  { name: 'Modifier le titre et la description', value: OptionEditChoiceChoices.TitleAndDescription },
+                ),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('remove')
+            .setDescription(this.descriptions.subcommands.remove)
+            .addStringOption(
+              option => option
+                .setName(Options.MessageUrl)
+                .setDescription(this.descriptions.options.messageUrl)
+                .setRequired(true)
+                .setAutocomplete(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('add-pair')
+            .setDescription(this.descriptions.subcommands.addPair)
+            .addStringOption(
+              option => option
+                .setName(Options.MessageUrl)
+                .setDescription(this.descriptions.options.messageUrl)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Emoji)
+                .setDescription(this.descriptions.options.emoji)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addRoleOption(
+              option => option
+                .setName(Options.Role)
+                .setDescription(this.descriptions.options.role)
+                .setRequired(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('remove-pair')
+            .setDescription(this.descriptions.subcommands.removePair)
+            .addStringOption(
+              option => option
+                .setName(Options.MessageUrl)
+                .setDescription(this.descriptions.options.messageUrl)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addRoleOption(
+              option => option
+                .setName(Options.Role)
+                .setDescription(this.descriptions.options.role)
+                .setRequired(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('unique')
+            .setDescription(this.descriptions.subcommands.unique)
+            .addStringOption(
+              option => option
+                .setName(Options.MessageUrl)
+                .setDescription(this.descriptions.options.messageUrl)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addBooleanOption(
+              option => option
+                .setName(Options.Unique)
+                .setDescription(this.descriptions.options.unique),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('role-condition')
+            .setDescription(this.descriptions.subcommands.roleCondition)
+            .addStringOption(
+              option => option
+                .setName(Options.MessageUrl)
+                .setDescription(this.descriptions.options.messageUrl)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Choice)
+                .setDescription(this.descriptions.options.choice)
+                .setChoices(
+                  { name: 'Définir le rôle pré-requis', value: OptionRoleConditionChoiceChoices.Add },
+                  { name: 'Supprimer le rôle pré-requis', value: OptionRoleConditionChoiceChoices.Clear },
+                ),
+            )
+            .addRoleOption(
+              option => option
+                .setName(Options.Role)
+                .setDescription(this.descriptions.options.role),
+            ),
+        ),
+    );
+  }
 
-      [title, description] = await this._promptTitle(message);
+  public async create(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
+    const uniqueRole = interaction.options.getBoolean(Options.Unique) ?? false;
+    const channel = interaction.options.getChannel(Options.Channel, true) as NewsChannel | TextChannel;
 
-      roles = await this._promptReactionRolesSafe(message);
-    } catch (error: unknown) {
-      if ((error as Error).message === 'STOP') {
-        await message.channel.send(config.messages.stoppedPrompting);
-        return;
-      }
-      throw error;
+    const pairs: Array<{ reaction: string; role: Role }> = [];
+
+    for (const [emojiOption, roleOption] of optionPairs) {
+      const emoji = interaction.options.getString(emojiOption);
+      const role = interaction.options.getRole(roleOption);
+
+      const reaction = CustomResolvers.resolveEmoji(emoji, interaction.guild);
+
+      if (reaction.isOk() && role
+        && !pairs.map(r => r.reaction).includes(reaction.unwrap())
+        && !pairs.map(r => r.role).includes(role))
+        pairs.push({ reaction: reaction.unwrap(), role });
     }
 
-    // 2. Send the confirmation embed
-    const confirmationEmbed = new MessageEmbed()
-      .setTitle(config.messages.confirmationTitle)
-      .setDescription(
-        pupa(config.messages.confirmationContent, {
-          rolesList: roles.map(rr => pupa(config.messages.rolesListItem, rr)).join('\n'),
-          channel,
-          title,
-          description: description || config.messages.noDescription,
-        }),
-      );
-    const handler = new MessagePrompter({ embeds: [confirmationEmbed] }, 'confirm', {
-      confirmEmoji: settings.emojis.yes,
-      cancelEmoji: settings.emojis.no,
-      timeout: 2 * 60 * 1000,
-      explicitReturn: true,
-    });
-    const { confirmed, appliedMessage: prompterMessage } = await handler.run(message.channel, message.author)
-      .catch(nullop) as IMessagePrompterExplicitConfirmReturn;
-
-    await prompterMessage.reactions.removeAll();
-    if (!confirmed) {
-      await message.channel.send(config.messages.stoppedPrompting);
-      await prompterMessage.edit({ embeds: [prompterMessage.embeds[0].setColor(settings.colors.red)] });
+    if (pairs.length === 0) {
+      await interaction.reply({ content: this.messages.invalidEntries, ephemeral: true });
       return;
     }
 
-    // 3. Send the menu, and add it to the database
+    const createMenuModal = new Modal()
+      .setTitle(this.messages.modals.createTitle)
+      .setComponents(
+        new MessageActionRow<TextInputComponent>().addComponents(titleInput.setRequired(true)),
+        new MessageActionRow<TextInputComponent>().addComponents(descriptionInput),
+      )
+      .setCustomId('create-rr-modal');
+
+    await interaction.showModal(createMenuModal);
+
+    const submit = await interaction.awaitModalSubmit({
+      filter: int => int.isModalSubmit()
+        && int.inCachedGuild()
+        && int.customId === 'create-rr-modal'
+        && int.member.id === interaction.member.id,
+      time: 900_000, // 15 minutes
+    });
+
+    const title = submit.fields.getTextInputValue('title');
+    const description = submit.fields.getTextInputValue('description');
+
     const embed = new MessageEmbed()
       .setTitle(title)
       .setDescription(description);
     const reactionRoleMessage = await channel.send({ embeds: [embed] });
 
-    for (const rr of roles)
+    for (const rr of pairs)
       await reactionRoleMessage.react(rr.reaction);
 
     this.container.client.reactionRolesIds.add(reactionRoleMessage.id);
@@ -111,17 +357,17 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       messageId: reactionRoleMessage.id,
       channelId: reactionRoleMessage.channel.id,
       guildId: reactionRoleMessage.guild.id,
-      reactionRolePairs: roles.map(({ reaction, role }) => ({ reaction, role: role.id })),
+      reactionRolePairs: pairs.map(({ reaction, role }) => ({ reaction, role: role.id })),
       uniqueRole,
     });
 
-    await prompterMessage.edit({ embeds: [prompterMessage.embeds[0].setColor(settings.colors.green)] });
+    await submit.reply(pupa(this.messages.createdMenu, { title }));
   }
 
-  public async list(message: GuildMessage, _args: Args): Promise<void> {
-    const reactionRoles = await ReactionRole.find({ guildId: message.guild.id });
+  public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const reactionRoles = await ReactionRole.find({ guildId: interaction.guild.id });
     if (!reactionRoles || reactionRoles.length === 0) {
-      await message.channel.send(config.messages.noMenus);
+      await interaction.reply(this.messages.noMenus);
       return;
     }
 
@@ -133,7 +379,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       url: string;
     }> = [];
     for (const rr of reactionRoles) {
-      const rrChannel = message.guild.channels.resolve(rr.channelId) as GuildTextBasedChannel;
+      const rrChannel = interaction.guild.channels.resolve(rr.channelId) as GuildTextBasedChannel;
       const rrMessage = await rrChannel?.messages.fetch(rr.messageId).catch(nullop);
       if (!rrMessage)
         continue;
@@ -148,7 +394,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
     }
 
     const baseEmbed = new MessageEmbed()
-      .setTitle(pupa(config.messages.listTitle, { total: reactionRoles.length }))
+      .setTitle(pupa(this.messages.listTitle, { total: reactionRoles.length }))
       .setColor(settings.colors.default);
 
     await new PaginatedMessageEmbedFields()
@@ -156,7 +402,7 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       .setItems(
         items.map(rr => ({
           name: trimText(rr.title, EmbedLimits.MaximumFieldNameLength),
-          value: pupa(config.messages.listFieldDescription, {
+          value: pupa(this.messages.listFieldDescription, {
             ...rr,
             unique: rr.unique ? settings.emojis.yes : settings.emojis.no,
             condition: rr.condition ? roleMention(rr.condition) : settings.emojis.no,
@@ -165,70 +411,118 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
       )
       .setItemsPerPage(5)
       .make()
-      .run(message);
+      .run(interaction);
   }
 
-  @ResolveReactionRoleArgument()
-  public async remove(message: GuildMessage, _args: Args, { rrMessage }: ExtraContext): Promise<void> {
+  public async remove(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const metadata = await this._resolveMenuMetadata(interaction);
+    if (metadata.isErr()) {
+      await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
+      return;
+    }
+
+    const { rrMessage } = metadata.unwrap();
+
     // We delete it, and the "messageDelete" listener will take care of the rest.
     await rrMessage.delete();
-    await message.channel.send(config.messages.removedMenu);
+    await interaction.reply(this.messages.removedMenu);
   }
 
-  @ResolveReactionRoleArgument()
-  public async edit(message: GuildMessage, _args: Args, { rrMessage }: ExtraContext): Promise<void> {
-    const [title, description] = await this._promptTitle(message);
+  public async edit(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
+    const metadata = await this._resolveMenuMetadata(interaction);
+    if (metadata.isErr()) {
+      await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
+      return;
+    }
+
+    const { rrMessage } = metadata.unwrap();
+
+    const choice = (
+      interaction.options.getString(Options.Choice) ?? OptionEditChoiceChoices.TitleAndDescription
+    ) as OptionEditChoiceChoices;
+
+    const components: Array<MessageActionRow<TextInputComponent>> = [];
+    if (choice === OptionEditChoiceChoices.Title || choice === OptionEditChoiceChoices.TitleAndDescription)
+      components.push(new MessageActionRow<TextInputComponent>().addComponents(titleInput.setRequired(true)));
+    if (choice === OptionEditChoiceChoices.Description || choice === OptionEditChoiceChoices.TitleAndDescription)
+      components.push(new MessageActionRow<TextInputComponent>().addComponents(descriptionInput.setRequired(true)));
+
+    const editMenuModal = new Modal()
+      .setTitle(this.messages.modals.createTitle)
+      .setComponents(...components)
+      .setCustomId('edit-rr-modal');
+
+    await interaction.showModal(editMenuModal);
+
+    const submit = await interaction.awaitModalSubmit({
+      filter: int => int.isModalSubmit()
+        && int.inCachedGuild()
+        && int.customId === 'edit-rr-modal'
+        && int.member.id === interaction.member.id,
+      time: 900_000, // 15 minutes
+    });
 
     const embed = rrMessage.embeds[0];
-    embed.setTitle(title);
-    embed.setDescription(description);
-    await rrMessage.edit({ embeds: [embed] });
+    try {
+      embed.setTitle(submit.fields.getTextInputValue('title'));
+    } catch { /* Ignored */ }
+    try {
+      embed.setDescription(submit.fields.getTextInputValue('description'));
+    } catch { /* Ignored */ }
 
-    await message.channel.send(config.messages.editedMenu);
+    await rrMessage.edit({ embeds: [embed] });
+    await submit.reply(this.messages.editedMenu);
   }
 
-  @ResolveReactionRoleArgument({ getDocument: true })
-  public async addPair(message: GuildMessage, args: Args, { document, rrMessage }: ExtraContext): Promise<void> {
-    const emojiQuery = (await args.pickResult('string'))?.value;
-    const reaction = CustomResolvers.resolveEmoji(emojiQuery, message.guild);
-    if (reaction.error) {
-      await message.channel.send(config.messages.invalidReaction);
-      return;
-    }
-    if (document.reactionRolePairs.some(pair => pair.reaction === reaction.value)) {
-      await message.channel.send(config.messages.reactionAlreadyUsed);
+  public async addPair(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const metadata = await this._resolveMenuMetadata(interaction);
+    if (metadata.isErr()) {
+      await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
       return;
     }
 
-    const role = (await args.pickResult('role'))?.value;
-    if (!role) {
-      await message.channel.send(config.messages.invalidRole);
+    const { rrMessage, document } = metadata.unwrap();
+
+    const emojiQuery = interaction.options.getString('emoji', true);
+    const resultReaction = CustomResolvers.resolveEmoji(emojiQuery, interaction.guild);
+    if (resultReaction.isErr()) {
+      await interaction.reply({ content: this.messages.invalidReaction, ephemeral: true });
       return;
     }
+
+    const reaction = resultReaction.unwrap();
+    if (document.reactionRolePairs.some(pair => pair.reaction === reaction)) {
+      await interaction.reply({ content: this.messages.reactionAlreadyUsed, ephemeral: true });
+      return;
+    }
+
+    const role = interaction.options.getRole('role', true);
     if (document.reactionRolePairs.some(pair => pair.role === role.id)) {
-      await message.channel.send(config.messages.roleAlreadyUsed);
+      await interaction.reply({ content: this.messages.roleAlreadyUsed, ephemeral: true });
       return;
     }
 
     await rrMessage.react(emojiQuery);
 
-    document.reactionRolePairs.push({ reaction: reaction.value, role: role.id });
+    document.reactionRolePairs.push({ reaction, role: role.id });
     await document.save();
-    await message.channel.send(
-      pupa(config.messages.addedPairSuccessfuly, { reaction: reaction.value, role, rrMessage }),
-    );
+
+    await interaction.reply(pupa(this.messages.addedPairSuccessfuly, { reaction, role, rrMessage }));
   }
 
-  @ResolveReactionRoleArgument({ getDocument: true })
-  public async removePair(message: GuildMessage, args: Args, { document, rrMessage }: ExtraContext): Promise<void> {
-    const role = (await args.pickResult('role'))?.value;
-    if (!role) {
-      await message.channel.send(config.messages.invalidRole);
+  public async removePair(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const metadata = await this._resolveMenuMetadata(interaction);
+    if (metadata.isErr()) {
+      await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
       return;
     }
+
+    const { rrMessage, document } = metadata.unwrap();
+
+    const role = interaction.options.getRole('role', true);
     const pair = document.reactionRolePairs.find(rrp => rrp.role === role.id);
     if (!pair) {
-      await message.channel.send(config.messages.roleNotUsed);
+      await interaction.reply({ content: this.messages.roleNotUsed, ephemeral: true });
       return;
     }
 
@@ -236,147 +530,92 @@ export default class ReactionRoleCommand extends HorizonSubCommand {
 
     document.reactionRolePairs.pull(pair);
     await document.save();
-    await message.channel.send(pupa(config.messages.removedPairSuccessfuly, { rrMessage }));
+    await interaction.reply(pupa(this.messages.removedPairSuccessfuly, { rrMessage }));
   }
 
-  @ResolveReactionRoleArgument({ getDocument: true })
-  public async unique(message: GuildMessage, args: Args, { document }: ExtraContext): Promise<void> {
-    const uniqueRole = await args.pickResult('boolean');
-
-    const isUnique = (unique: boolean): string => config.messages[unique ? 'uniqueEnabled' : 'uniqueDisabled'];
-
-    if (uniqueRole.error) {
-      await message.channel.send(pupa(config.messages.uniqueMode, { uniqueMode: isUnique(document.uniqueRole) }));
+  public async unique(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const metadata = await this._resolveMenuMetadata(interaction);
+    if (metadata.isErr()) {
+      await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
       return;
     }
 
-    document.uniqueRole = uniqueRole.value;
+    const { document } = metadata.unwrap();
+
+    const uniqueRole = interaction.options.getBoolean('unique');
+    if (isNullish(uniqueRole)) {
+      await interaction.reply(pupa(this.messages.uniqueMode, { uniqueMode: isUnique(document.uniqueRole) }));
+      return;
+    }
+
+    document.uniqueRole = uniqueRole;
     await document.save();
-    await message.channel.send(pupa(config.messages.changedUniqueMode, { uniqueMode: isUnique(document.uniqueRole) }));
+    await interaction.reply(pupa(this.messages.changedUniqueMode, { uniqueMode: isUnique(document.uniqueRole) }));
   }
 
-  @ResolveReactionRoleArgument({ getDocument: true })
-  public async roleCondition(message: GuildMessage, args: Args, { document }: ExtraContext): Promise<void> {
-    const askedRole = await args.pick('role').catch(async () => await args.pick('string').catch(nullop));
-
-    const showText = (role: Role | string, contentNoRole: string, contentRole: string): MessageOptions => (
-      role instanceof Role
-        ? { embeds: [new MessageEmbed().setColor(settings.colors.default).setDescription(pupa(contentRole, { role }))] }
-        : { content: contentNoRole }
-    );
-
-    const shouldRemoveCondition = askedRole === 'clear';
-    if (shouldRemoveCondition || askedRole instanceof Role) {
-      document.roleCondition = shouldRemoveCondition ? null : askedRole.id;
-      await document.save();
-      await message.channel.send(
-        showText(askedRole, config.messages.removedRoleCondition, config.messages.changedRoleCondition),
-      );
+  public async roleCondition(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const metadata = await this._resolveMenuMetadata(interaction);
+    if (metadata.isErr()) {
+      await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
       return;
     }
 
-    const condition = document.roleCondition ? message.guild.roles.cache.get(document.roleCondition) : null;
-    await message.channel.send(showText(condition, config.messages.noRoleCondition, config.messages.roleCondition));
-  }
+    const { document } = metadata.unwrap();
 
-  public async help(message: GuildMessage, _args: Args): Promise<void> {
-    const embed = new MessageEmbed()
-      .setTitle(config.messages.helpEmbedTitle)
-      .addFields([...config.messages.helpEmbedDescription])
-      .setColor(settings.colors.default);
+    const choice = (
+      interaction.options.getString(Options.Choice) ?? OptionRoleConditionChoiceChoices.Show
+    ) as OptionRoleConditionChoiceChoices;
 
-    await message.channel.send({ embeds: [embed] });
-  }
-
-  private async _promptTitle(message: GuildMessage): Promise<[title: string, description: string]> {
-    const handler = new MessagePrompter(
-      config.messages.titlePrompt,
-      'message',
-      { timeout: 2 * 60 * 1000 },
-    );
-    const result = await handler.run(message.channel, message.author) as GuildMessage;
-    if (settings.configuration.stop.has(result.content))
-      throw new Error('STOP');
-
-    return firstAndRest(result.content, '\n');
-  }
-
-  private async _promptReactionRolesSafe(message: GuildMessage): Promise<ReactionRolePair[]> {
-    let roles: ReactionRoleReturnPayload;
-
-    do {
-      roles = await this._promptReactionRoles(message);
-
-      if (roles.isError) {
-        const listAnd = (items: string[]): string => new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' }).format(new Set(items));
-        if (roles.errorPayload?.reactions?.length > 0) {
-          await message.channel.send(
-            pupa(config.messages.duplicatedEmojis, { duplicatedEmojis: listAnd(roles.errorPayload.reactions) }),
-          );
-        } else if (roles.errorPayload?.roles?.length > 0) {
-          await message.channel.send(
-            pupa(config.messages.duplicatedRoles, { duplicatedRoles: listAnd(roles.errorPayload.roles) }),
-          );
+    switch (choice) {
+      case OptionRoleConditionChoiceChoices.Show:
+        await interaction.reply(
+          document.roleCondition
+            ? getEmbed(pupa(this.messages.roleCondition, { role: roleMention(document.roleCondition) }))
+            : this.messages.noRoleCondition,
+        );
+        break;
+      case OptionRoleConditionChoiceChoices.Clear:
+        document.roleCondition = null;
+        await document.save();
+        await interaction.reply(this.messages.removedRoleCondition);
+        break;
+      case OptionRoleConditionChoiceChoices.Add: {
+        const askedRole = interaction.options.getRole('role');
+        if (!askedRole) {
+          await interaction.reply({ content: this.messages.noRoleProvided, ephemeral: true });
+          return;
         }
-      } else if (roles.reactionRoles.length === 0) {
-        await message.channel.send(config.messages.invalidEntries);
-      }
-    } while (roles.isError || roles.reactionRoles.length === 0);
 
-    return roles.reactionRoles;
+        document.roleCondition = askedRole.id;
+        await document.save();
+
+        await interaction.reply(getEmbed(pupa(this.messages.changedRoleCondition, { role: askedRole })));
+        break;
+      }
+    }
   }
 
-  private async _promptReactionRoles(message: GuildMessage): Promise<ReactionRoleReturnPayload> {
-    const handler = new MessagePrompter(
-      config.messages.rolesPrompt,
-      'message',
-      { timeout: 2 * 60 * 1000 },
+  private async _resolveMenuMetadata(
+    interaction: HorizonSubcommand.ChatInputInteraction,
+  ): Promise<Result<{ document: ReactionRoleDocument; rrMessage: GuildMessage }, string>> {
+    const resultMessage = await Resolvers.resolveMessage(
+      interaction.options.getString(Options.MessageUrl),
+      { messageOrInteraction: interaction },
     );
-    const result = await handler.run(message.channel, message.author) as GuildMessage;
-    if (settings.configuration.stop.has(result.content))
-      throw new Error('STOP');
 
-    const lines = result.content.split('\n').filter(Boolean).slice(0, 20);
-    const payload: ReactionRoleReturnPayload = { isError: false, errorPayload: {}, reactionRoles: [] };
+    if (resultMessage.isErr())
+      return Result.err(this.messages.notAMenu);
 
-    // Parse each line as "reaction role_resolvable"
-    for (const line of lines) {
-      const [emojiQuery, roleQuery] = firstAndRest(line, ' ');
+    const rrMessage = resultMessage.unwrap();
+    if (!rrMessage.inGuild())
+      return Result.err(this.messages.notAMenu);
 
-      // Resolve the emoji, either from a standard emoji, or from a custom guild emoji.
-      const emoji = CustomResolvers.resolveEmoji(emojiQuery, result.guild);
-      if (emoji.error) {
-        this.container.logger.warn(`[Reaction Roles] Emoji ${emojiQuery} not found (resolve to base emoji/guild emote's cache) (guild: ${message.guild.id}).`);
-        continue;
-      }
+    const isRrMenu = this.container.client.reactionRolesIds.has(rrMessage.id);
+    if (!isRrMenu)
+      return Result.err(this.messages.notAMenu);
 
-      const role = await Resolvers.resolveRole(roleQuery, result.guild);
-      if (role.error) {
-        this.container.logger.warn(`[Reaction Roles] Role ${roleQuery} not found in guild's cache (guild: ${message.guild.id}).`);
-        continue;
-      }
+    const document = await ReactionRole.findOne({ messageId: rrMessage.id });
 
-      payload.reactionRoles.push({ reaction: emoji.value, role: role.value });
-    }
-
-    // Remove all duplicates by field "role"
-    const strippedRoles = payload.reactionRoles.uniqueBy(value => value.role);
-    // If we actually removed elements, there was duplicates. We return an error
-    if (strippedRoles.length !== payload.reactionRoles.length) {
-      const multiples = difference(payload.reactionRoles, strippedRoles).map(rr => rr.role.name);
-      payload.isError = true;
-      payload.errorPayload.roles = multiples;
-    }
-
-    // Remove all duplicates by field "reaction"
-    const strippedEmojis = payload.reactionRoles.uniqueBy(value => value.reaction);
-    // If we actually removed elements, there was duplicates. We return an error
-    if (strippedEmojis.length !== payload.reactionRoles.length) {
-      const multiples = difference(payload.reactionRoles, strippedEmojis).map(rr => rr.reaction);
-      payload.isError = true;
-      payload.errorPayload.reactions = multiples;
-    }
-
-    return payload;
+    return Result.ok({ document, rrMessage });
   }
 }

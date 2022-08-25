@@ -1,20 +1,14 @@
 import { EmbedLimits, RoleLimits } from '@sapphire/discord-utilities';
-import { container } from '@sapphire/pieces';
+import { container } from '@sapphire/framework';
 import dayjs from 'dayjs';
-import type { GuildMember } from 'discord.js';
+import type { CommandInteraction, GuildMember, ModalSubmitInteraction } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
 import Eclass from '@/models/eclass';
-import type {
-  AnnouncementSchoolYear,
-  EclassCreationOptions,
-  EclassEmbedOptions,
-  GuildMessage,
-  GuildTextBasedChannel,
-} from '@/types';
+import type { EclassCreationOptions, EclassEmbedOptions, GuildTextBasedChannel } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import {
@@ -30,11 +24,10 @@ import {
   trimText,
 } from '@/utils';
 
-const classAnnouncement: Record<AnnouncementSchoolYear, ConfigEntriesChannels> = {
+const classAnnouncement: Record<SchoolYear, ConfigEntriesChannels> = {
   [SchoolYear.L1]: ConfigEntriesChannels.ClassAnnouncementL1,
   [SchoolYear.L2]: ConfigEntriesChannels.ClassAnnouncementL2,
   [SchoolYear.L3]: ConfigEntriesChannels.ClassAnnouncementL3,
-  general: ConfigEntriesChannels.ClassAnnouncementGeneral,
 };
 
 const schoolYearRoles: Record<SchoolYear, ConfigEntriesRoles> = {
@@ -79,7 +72,7 @@ export function createAnnouncementEmbed({
 }
 
 export function getRoleNameForClass(
-  { formattedDate, subject, topic }: Pick<EclassCreationOptions, 'subject' | 'topic'> & { formattedDate: string },
+  { formattedDate, subject, topic }: Pick<EclassPopulatedDocument, 'subject' | 'topic'> & { formattedDate: string },
 ): string {
   const baseRoleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic: '{topic}', formattedDate });
   const remainingLength = RoleLimits.MaximumNameLength - baseRoleName.length + '{topic}'.length;
@@ -87,7 +80,7 @@ export function getRoleNameForClass(
 }
 
 export async function createClass(
-  message: GuildMessage,
+  interaction: CommandInteraction | ModalSubmitInteraction,
   {
     date, subject, topic, duration, professor, isRecorded, targetRole, place, placeInformation,
   }: EclassCreationOptions,
@@ -95,29 +88,29 @@ export async function createClass(
   // Prepare the date
   const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
 
-  targetRole ??= await container.client.configManager.get(schoolYearRoles[subject.schoolYear], message.guild.id);
+  targetRole ??= await container.client.configManager.get(schoolYearRoles[subject.schoolYear], interaction.guildId);
   if (!targetRole) {
     container.logger.warn('[e-class:not-created] A new e-class was planned but no school year role found, unable to create.');
-    await message.channel.send(config.messages.unconfiguredRole);
+    await interaction.reply({ content: config.messages.unconfiguredRole, ephemeral: true });
     return;
   }
 
   const roleName = getRoleNameForClass({ formattedDate, subject, topic });
-  if (message.guild.roles.cache.some(r => r.name === roleName)) {
-    await message.channel.send(config.messages.alreadyExists);
+  if (interaction.guild.roles.cache.some(r => r.name === roleName)) {
+    await interaction.reply({ content: config.messages.alreadyExists, ephemeral: true });
     return;
   }
 
   // Get the corresponding channels
   const announcementChannel = await container.client.configManager
-    .get(classAnnouncement[subject.schoolYear], message.guild.id);
+    .get(classAnnouncement[subject.schoolYear], interaction.guild.id);
   if (!announcementChannel) {
     container.logger.warn('[e-class:not-created] A new e-class was planned but no announcement channel was found, unable to create.');
-    await message.channel.send(config.messages.unconfiguredChannel);
+    await interaction.reply({ content: config.messages.unconfiguredChannel, ephemeral: true });
     return;
   }
 
-  const classChannel = await message.guild.channels.fetch(subject.textChannel) as GuildTextBasedChannel;
+  const classChannel = await interaction.guild.channels.fetch(subject.textChannel) as GuildTextBasedChannel;
 
   // Create & send the announcement embed
   const embed = createAnnouncementEmbed({
@@ -147,6 +140,7 @@ export async function createClass(
     }),
     embeds: [embed],
   });
+
   // Add the reaction & cache the message
   await announcementMessage.react(settings.emojis.yes);
   if (announcementMessage.crosspostable)
@@ -154,7 +148,11 @@ export async function createClass(
   container.client.eclassRolesIds.add(announcementMessage.id);
 
   // Create the role
-  const role = await message.guild.roles.create({ name: roleName, color: settings.colors.white, mentionable: true });
+  const role = await interaction.guild.roles.create({
+    name: roleName,
+    color: settings.colors.white,
+    mentionable: true,
+  });
 
   // Add the class to the database
   const classId = Eclass.generateId(professor, date);
@@ -185,7 +183,7 @@ export async function createClass(
   await updateGlobalAnnouncements(eclass.guild, subject.schoolYear);
 
   // Send confirmation message
-  await message.channel.send(pupa(config.messages.successfullyCreated, { eclass }));
+  await interaction.reply(pupa(config.messages.successfullyCreated, { eclass }));
 
   container.logger.debug(`[e-class:${classId}] Created eclass.`);
 }
@@ -299,8 +297,7 @@ export async function setRecordLink(
   silent = false,
 ): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager
-    .get(eclass.announcementChannel, eclass.guild);
+  const announcementChannel = await container.client.configManager.get(eclass.announcementChannel, eclass.guild);
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
 
   // Update its embed
@@ -329,6 +326,23 @@ export async function setRecordLink(
   await Eclass.findByIdAndUpdate(eclass._id, { recordLink });
 
   container.logger.debug(`[e-class:${eclass.classId}] Added record link.`);
+}
+
+export async function clearRecordLink(eclass: EclassPopulatedDocument): Promise<void> {
+  // Fetch the announcement message
+  const announcementChannel = await container.client.configManager.get(eclass.announcementChannel, eclass.guild);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+
+  // Update its embed
+  const announcementEmbed = announcementMessage.embeds[0];
+  const recordField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
+  recordField.value = config.messages.recordedValues[Number(eclass.isRecorded)];
+  await announcementMessage.edit({ embeds: [announcementEmbed] });
+
+  // Store the link in the DB
+  await Eclass.findByIdAndUpdate(eclass._id, { recordLink: null });
+
+  container.logger.debug(`[e-class:${eclass.classId}] Removed record link.`);
 }
 
 export async function remindClass(eclass: EclassPopulatedDocument): Promise<void> {
@@ -419,33 +433,31 @@ export function validateDateSpan(date: Date): boolean {
   return dayjs(date).isBetween(dayjs(), dayjs().add(2, 'months'));
 }
 
+// TODO: Use Result/Some
 export async function checkOverlaps(
-  start: Date,
-  endOrDuration: Date | number,
-  metadata: { schoolYear: SchoolYear; professorId: string },
-): Promise<{ professorOverlap: boolean;schoolYearOverlap: boolean; any: boolean; error: string | null }> {
-  const myStart = start.getTime();
-  const myEnd = typeof endOrDuration === 'number'
-    ? myStart + endOrDuration
-    : endOrDuration.getTime();
+  data: Partial<Pick<EclassPopulatedDocument, 'classId'>> & Pick<EclassPopulatedDocument, 'date' | 'duration' | 'professor' | 'subject'>,
+): Promise<{ professorOverlap: boolean; schoolYearOverlap: boolean; any: boolean; error: string | null }> {
+  const myStart = data.date;
+  const myEnd = myStart + data.duration;
 
   const allOverlapping = await Eclass.find<EclassPopulatedDocument>({
+    classId: { $ne: data.classId },
     status: EclassStatus.Planned,
     date: { $lte: myEnd },
     end: { $gte: myStart },
   });
 
-  const schoolYearOverlap = allOverlapping.some(eclass => eclass.subject.schoolYear === metadata.schoolYear);
-  const professorOverlap = allOverlapping.some(eclass => eclass.professor === metadata.professorId);
+  const schoolYearOverlap = allOverlapping.some(eclass => eclass.subject.schoolYear === data.subject.schoolYear);
+  const professorOverlap = allOverlapping.some(eclass => eclass.professor === data.professor);
 
   return {
     professorOverlap,
     schoolYearOverlap,
     any: professorOverlap || schoolYearOverlap,
     error: schoolYearOverlap
-      ? config.messages.prompts.date.schoolYearOverlap
+      ? config.messages.schoolYearOverlap
       : professorOverlap
-      ? config.messages.prompts.date.professorOverlap
-      : null,
+        ? config.messages.professorOverlap
+        : null,
   };
 }

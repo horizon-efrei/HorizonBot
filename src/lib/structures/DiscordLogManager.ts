@@ -1,4 +1,4 @@
-import { container } from '@sapphire/pieces';
+import { container } from '@sapphire/framework';
 import { Formatters, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import messages from '@/config/messages';
@@ -59,7 +59,7 @@ export function getContentValue(payload: DiscordLogBase): string {
     case DiscordLogType.ReactionRemove:
       return pupa(fieldTexts.contentValue, {
         ...payload,
-        content: CustomResolvers.resolveEmoji(payload.content, guild).value ?? payload.content,
+        content: CustomResolvers.resolveEmoji(payload.content, guild).unwrapOr(payload.content),
         url: getMessageUrl(payload),
       });
     case DiscordLogType.ChangeNickname:

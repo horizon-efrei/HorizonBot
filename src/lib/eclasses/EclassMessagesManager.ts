@@ -1,14 +1,12 @@
 import { time, TimestampStyles } from '@discordjs/builders';
 import { EmbedLimits, MessageLimits } from '@sapphire/discord-utilities';
-import { container } from '@sapphire/pieces';
+import { container } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import { oneLine } from 'common-tags';
 import dayjs from 'dayjs';
-import type { MessageOptions } from 'discord.js';
+import type { MessageOptions, TextBasedChannel } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
-import drop from 'lodash.drop';
 import groupBy from 'lodash.groupby';
-import take from 'lodash.take';
 import pupa from 'pupa';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
@@ -36,7 +34,7 @@ async function updateMessage(
   channel: GuildTextBasedChannel,
   content: Omit<MessageOptions, 'flags'>,
 ): Promise<void> {
-  const sendMessage = async (chan: GuildTextBasedChannel): Promise<void> => void await chan.send(content)
+  const sendMessage = async (chan: TextBasedChannel): Promise<void> => void await chan.send(content)
     .then(async msg => msg.crosspostable && await msg.crosspost());
   if (!message) {
     await sendMessage(channel);
@@ -90,10 +88,9 @@ function getCalendarClassContentForSubject(
     ${eclass.recordLink ? pupa(messages.classesCalendar.recordLink, eclass) : ''}
   `;
 
-  const finishedClasses = drop(
-    allClasses.filter(eclass => [EclassStatus.Canceled, EclassStatus.Finished].includes(eclass.status)),
-    dropOffset,
-  );
+  const finishedClasses = allClasses
+      .filter(eclass => [EclassStatus.Canceled, EclassStatus.Finished].includes(eclass.status))
+      .slice(dropOffset);
   const plannedClasses = allClasses
     .filter(eclass => [EclassStatus.Planned, EclassStatus.InProgress].includes(eclass.status));
 
@@ -117,7 +114,7 @@ function getCalendarClassContentForSubject(
 function generateCalendarEmbeds(allClasses: EclassPopulatedDocument[], subjects: SubjectDocument[]): MessageEmbed[] {
   const embeds: MessageEmbed[] = [];
 
-  for (const subject of take(subjects, 25)) {
+  for (const subject of subjects.slice(0, EmbedLimits.MaximumFields)) {
     const embed = new MessageEmbed()
       .setColor(settings.colors.default)
       .setTitle(subject.name)
@@ -128,7 +125,7 @@ function generateCalendarEmbeds(allClasses: EclassPopulatedDocument[], subjects:
     let dropOffset = 0;
     do
       content = getCalendarClassContentForSubject(subjectUpcomingClasses, subject, dropOffset++);
-     while (content.length > EmbedLimits.MaximumTotalCharacters - 50);
+    while (content.length > EmbedLimits.MaximumTotalCharacters - 50);
 
     embed.setDescription(content);
 
@@ -192,7 +189,7 @@ async function updateClassesCalendarForSchoolYear(
   //     - field name max 256 chars
   //     - field value max 1024 chars
   const embeds = generateCalendarEmbeds(yearClasses, subjects);
-  await updateMessage(firstMessage, channel, { embeds: take(embeds, MessageLimits.MaximumEmbeds) });
+  await updateMessage(firstMessage, channel, { embeds: embeds.slice(0, MessageLimits.MaximumEmbeds) });
 
   for (const msg of allBotMessages)
     await msg.delete();
@@ -226,7 +223,7 @@ export async function updateClassesCalendarForGuildAndSchoolYear(
 ): Promise<void> {
   const channel = await container.client.configManager.get(calendarMapping[schoolYear], guildId);
   if (!channel) {
-    container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Setup an calendar channel with "${settings.prefix}setup calendar-${schoolYear}"`);
+    container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Setup an calendar channel with "/setup set-channel name:calendar-${schoolYear} channel:<channel>"`);
     return;
   }
 
@@ -244,7 +241,7 @@ export async function updateUpcomingClassesForGuild(
 ): Promise<void> {
   const channel = await container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
   if (!channel) {
-    container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "${settings.prefix}setup week-class"`);
+    container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "/setup set-channel name:week-class channel:<channel>"`);
     return;
   }
 

@@ -1,110 +1,105 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions } from '@sapphire/framework';
-import { isNullish } from '@sapphire/utilities';
-import { Collection, MessageEmbed } from 'discord.js';
+import { MessageEmbed, Permissions } from 'discord.js';
 import pupa from 'pupa';
-import PaginatedContentMessageEmbed from '@/app/lib/structures/PaginatedContentMessageEmbed';
 import { logs as config } from '@/config/commands/admin';
 import messages from '@/config/messages';
 import LogStatuses from '@/models/logStatuses';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
-import { DiscordLogType, LogStatuses as LogStatusesEnum } from '@/types/database';
-import { inlineCodeList, nullop } from '@/utils';
+import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEmbed';
+import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
+import type { LogStatuses as LogStatusesEnum } from '@/types/database';
+import { DiscordLogType } from '@/types/database';
 
-const logNames = new Collection<DiscordLogType, string[]>([
-  [DiscordLogType.ChangeNickname, ['change-nickname', 'changenickname', 'nickname-change', 'nicknamechange']],
-  [DiscordLogType.ChangeUsername, ['change-username', 'changeusername', 'username-change', 'usernamechange']],
-  [DiscordLogType.GuildJoin, ['guild-join', 'guildjoin', 'join-guild', 'joinguild']],
-  [DiscordLogType.GuildLeave, ['guild-leave', 'guildleave', 'leave-guild', 'leaveguild']],
-  [DiscordLogType.InvitePost, ['invite-post', 'invitepost', 'post-invite', 'postinvite']],
-  [DiscordLogType.MessageEdit, ['message-edit', 'messageedit', 'edit-message', 'editmessage']],
-  [DiscordLogType.MessagePost, ['message-post', 'messagepost', 'post-message', 'postmessage']],
-  [DiscordLogType.MessageRemove, ['message-remove', 'messageremove', 'remove-message', 'removemessage']],
-  [DiscordLogType.ReactionAdd, ['reaction-add', 'reactionadd', 'add-reaction', 'addreaction']],
-  [DiscordLogType.ReactionRemove, ['reaction-remove', 'reactionremove', 'remove-reaction', 'removereaction']],
-  [DiscordLogType.RoleAdd, ['role-add', 'roleadd', 'add-role', 'addrole']],
-  [DiscordLogType.RoleRemove, ['role-remove', 'roleremove', 'remove-role', 'removerole']],
-  [DiscordLogType.VoiceJoin, ['voice-join', 'voicejoin', 'join-voice', 'joinvoice']],
-  [DiscordLogType.VoiceLeave, ['voice-leave', 'voiceleave', 'leave-voice', 'leavevoice']],
-]);
+const logNameChoices = Object.entries(messages.logs.simplifiedReadableEvents)
+  .map(([value, name]) => ({ name, value: Number(value) }));
+const logStatusChoices = Object.entries(messages.logs.readableStatuses)
+  .map(([value, name]) => ({ name, value: Number(value) }));
 
-const logStatuses = new Collection<LogStatusesEnum, string[]>([
-  [LogStatusesEnum.Disabled, ['disabled', 'disable', 'off', 'stop', '0']],
-  [LogStatusesEnum.Silent, ['silent', 'quiet', '1']],
-  [LogStatusesEnum.Console, ['console', '2']],
-  [LogStatusesEnum.Discord, ['discord', 'all', 'everywhere', '3']],
-]);
+enum Options {
+  LogType = 'log-type',
+  LogStatus = 'log-status',
+}
 
-const logsPossibilitiesExamples = [...logNames.values()].map(v => v[0]);
-const statusesPossibilitiesExamples = [...logStatuses.values()].map(v => v[0]);
-
-const getLogInfo = (
-  { type, status }: { type: DiscordLogType; status: LogStatusesEnum },
-): { type: string; status: string } => ({
-  type: messages.logs.simplifiedReadableEvents[type],
-  status: config.messages.statuses[status],
-});
-
-@ApplyOptions<CommandOptions>({
-  ...config.options,
-  preconditions: ['GuildOnly', 'StaffOnly'],
+@ApplyOptions<HorizonSubcommand.Options>({
+  ...config,
+  subcommands: [
+    { name: 'edit', chatInputRun: 'edit' },
+    { name: 'list', chatInputRun: 'list' },
+  ],
 })
-export default class LogsCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
-    const askedLog = await args.pickResult('string').catch(nullop);
-    const logType = askedLog.value === 'all' ? 'all' : logNames.findKey(names => names.includes(askedLog.value));
+export default class LogsCommand extends HorizonSubcommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDMPermission(false)
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('edit')
+            .setDescription(this.descriptions.subcommands.edit)
+            .addIntegerOption(
+              option => option
+                .setName(Options.LogType)
+                .setDescription(this.descriptions.options.logName)
+                .setChoices(...logNameChoices, { name: 'Tous', value: -1 })
+                .setRequired(true),
+            )
+            .addIntegerOption(
+              option => option
+                .setName(Options.LogStatus)
+                .setDescription(this.descriptions.options.logStatus)
+                .setChoices(...logStatusChoices)
+                .setRequired(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('list')
+            .setDescription(this.descriptions.subcommands.list),
+        ),
+    );
+  }
 
-    if (isNullish(logType)) {
-      await this._displayList(message);
+  public async edit(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const logType = interaction.options.getInteger(Options.LogType, true) as DiscordLogType | -1;
+    const logStatus = interaction.options.getInteger(Options.LogStatus, true) as LogStatusesEnum;
+
+    const guildId = interaction.guild.id;
+
+    if (logType === -1) {
+      await LogStatuses.updateMany({ guildId }, { status: logStatus });
+      for (const type of Object.values(DiscordLogType).filter(Number.isInteger))
+        this.container.client.logStatuses.get(guildId).set(type as DiscordLogType, logStatus);
+
+      await interaction.reply(
+        pupa(this.messages.updatedAllLog, { status: messages.logs.readableStatuses[logStatus] }),
+      );
       return;
     }
 
-    const askedStatus = await args.pickResult('string').catch(nullop);
-    const logStatus = logStatuses.findKey(statuses => statuses.includes(askedStatus.value));
-    const guildId = message.guild.id;
+    await LogStatuses.updateOne({ type: logType, guildId }, { status: logStatus });
+    this.container.client.logStatuses.get(guildId).set(logType, logStatus);
 
-    if (Number.isInteger(logStatus)) {
-      if (logType === 'all') {
-        await LogStatuses.updateMany({ guildId }, { status: logStatus });
-        for (const type of Object.values(DiscordLogType).filter(Number.isInteger))
-          this.container.client.logStatuses.get(guildId).set(type as DiscordLogType, logStatus);
-        await message.channel.send(
-          pupa(config.messages.updatedAllLog, { status: config.messages.statuses[logStatus] }),
-        );
-      } else {
-        await LogStatuses.updateOne({ type: logType, guildId }, { status: logStatus });
-        this.container.client.logStatuses.get(guildId).set(logType, logStatus);
-        await message.channel.send(
-          pupa(config.messages.updatedLog, getLogInfo({ type: logType, status: logStatus })),
-        );
-      }
-    } else if (logType === 'all') {
-      await this._displayList(message);
-    } else {
-      const log = await LogStatuses.findOne({ type: logType, guildId });
-      await message.channel.send(pupa(config.messages.currentLogStatus, getLogInfo(log)));
-    }
+    await interaction.reply(
+      pupa(this.messages.updatedLog, {
+        type: messages.logs.simplifiedReadableEvents[logType],
+        status: this.messages.statuses[logStatus],
+      }),
+    );
   }
 
-  private async _displayList(message: GuildMessage): Promise<void> {
-    const logs = await LogStatuses.find({ guildId: message.guild.id });
+  public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const logs = await LogStatuses.find({ guildId: interaction.guild.id });
 
     await new PaginatedContentMessageEmbed()
-      .setTemplate(
-        new MessageEmbed()
-        .setTitle(config.messages.listTitle)
-        .addFields({
-          name: config.messages.possibilitiesTitle,
-          value: pupa(config.messages.possibilitiesContent, {
-            logs: inlineCodeList(logsPossibilitiesExamples),
-            statuses: inlineCodeList(statusesPossibilitiesExamples),
-          }),
-        }),
-      )
-      .setItems(logs.map(log => pupa(config.messages.lineValue, getLogInfo(log))))
+      .setTemplate(new MessageEmbed().setTitle(this.messages.listTitle))
+      .setItems(logs.map(log => pupa(this.messages.lineValue, {
+        type: messages.logs.simplifiedReadableEvents[log.type],
+        status: this.messages.statuses[log.status],
+      })))
       .setItemsPerPage(10)
       .make()
-      .run(message);
+      .run(interaction);
   }
 }

@@ -1,10 +1,10 @@
 import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
+import messages from '@/config/messages';
 import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
-import { isGuildMessage } from '@/utils';
 
 const discordInviteLinkRegex = /(?:https?:\/\/)?(?:www\.)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)(?<code>[\w\d-]{2,})/gimu;
 
@@ -13,17 +13,26 @@ export default class MessageListener extends Listener {
     if (message.author.bot
       || message.partial
       || message.channel.partial
-      || message.system
-      || !isGuildMessage(message))
+      || message.system)
       return;
 
-    await DiscordLogManager.logAction({
-      type: DiscordLogType.MessagePost,
-      context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
-      content: message.content,
-      guildId: message.guild.id,
-      severity: 1,
-    });
+    if (message.inGuild()) {
+      await DiscordLogManager.logAction({
+        type: DiscordLogType.MessagePost,
+        context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
+        content: message.content,
+        guildId: message.guild.id,
+        severity: 1,
+      });
+    }
+
+    if (message.content.startsWith('!')) {
+      await message.reply(messages.global.onlySlashCommands);
+      return;
+    }
+
+    if (!message.inGuild())
+      return;
 
     const invites = message.content.matchAll(discordInviteLinkRegex);
     const foreignInvites = [...invites]
@@ -41,7 +50,7 @@ export default class MessageListener extends Listener {
       });
     }
 
-    const mentionnedTempIntersectionRoles = this.container.client.intersectionRoles
+    const mentionnedTempIntersectionRoles = this.container.client.roleIntersections
       .filter(r => message.mentions.roles.has(r))
       .map(roleId => message.guild.roles.resolve(roleId));
     if (mentionnedTempIntersectionRoles.size > 0) {

@@ -1,4 +1,4 @@
-import { container } from '@sapphire/pieces';
+import { container } from '@sapphire/framework';
 import type { Guild } from 'discord.js';
 import { Collection, GuildChannel, Role } from 'discord.js';
 import Configuration from '@/models/configuration';

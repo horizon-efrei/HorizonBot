@@ -1,8 +1,7 @@
-import { container } from '@sapphire/pieces';
+import { container } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 import pupa from 'pupa';
 import messages from '@/config/messages';
-import settings from '@/config/settings';
 import FlaggedMessageDB from '@/models/flaggedMessage';
 import type { GuildMessage, GuildTextBasedChannel } from '@/types';
 import type { FlaggedMessageDocument } from '@/types/database';
@@ -84,7 +83,7 @@ export default class FlaggedMessage {
         pupa(messages.antiSwear.swearModeratorAlert, { ...payload, preview: trimText(this.message.content, 200) }),
       );
     } else {
-      container.logger.warn(`[Anti Swear] A swear was detected but no log channel was found, unable to report. Setup a log channel with "${settings.prefix}setup mod"`);
+      container.logger.warn('[Anti Swear] A swear was detected but no log channel was found, unable to report. Setup a log channel with "/setup set-channel name:mod channel:<channel>"');
     }
   }
 }

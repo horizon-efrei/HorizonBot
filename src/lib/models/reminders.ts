@@ -1,4 +1,4 @@
-import { container } from '@sapphire/pieces';
+import { container } from '@sapphire/framework';
 import { model, Schema } from 'mongoose';
 import { nanoid } from 'nanoid';
 import type { ReminderDocument, ReminderModel } from '@/types/database';

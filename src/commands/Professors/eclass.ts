@@ -1,308 +1,546 @@
+/* eslint-disable max-lines */
 import { ApplyOptions } from '@sapphire/decorators';
-import { MessagePrompter } from '@sapphire/discord.js-utilities';
-import { Args, Resolvers } from '@sapphire/framework';
-import type { SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import { Resolvers } from '@sapphire/framework';
+import { isNullish } from '@sapphire/utilities';
 import { oneLine } from 'common-tags';
 import dayjs from 'dayjs';
-import { MessageEmbed } from 'discord.js';
+import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
+import {
+  MessageActionRow,
+  MessageEmbed,
+  Modal,
+  TextInputComponent,
+} from 'discord.js';
+import { TextInputStyles } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 
-import ArgumentPrompter from '@/app/lib/structures/ArgumentPrompter';
 import { eclass as config } from '@/config/commands/professors';
-import messages from '@/config/messages';
 import settings from '@/config/settings';
 import { IsEprofOrStaff, ValidateEclassArgument } from '@/decorators';
-import EclassInteractiveBuilder from '@/eclasses/EclassInteractiveBuilder';
 import * as EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
+import Subject from '@/models/subject';
+import * as CustomResolvers from '@/resolvers';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
-import HorizonSubCommand from '@/structures/commands/HorizonSubCommand';
-import type { GuildTextBasedChannel } from '@/types';
-import { GuildMessage } from '@/types';
+import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
+import type { GuildTextBasedChannel, SchoolYear } from '@/types';
 import { EclassPlace, EclassPopulatedDocument, EclassStatus } from '@/types/database';
-import { capitalize, generateSubcommands, nullop } from '@/utils';
+import { capitalize, confirm } from '@/utils';
 
-const listOptions = {
-  status: ['status', 'statut', 's'],
-  professor: ['professor', 'professeur', 'prof', 'p'],
-  subject: ['subject', 'matière', 'matiere', 'm'],
-  role: ['role', 'rôle', 'r'],
-};
-const statusOptionValues: Array<[possibilities: string[], status: EclassStatus]> = [
-  [['planned', 'plan', 'p', 'prévu', 'prevu'], EclassStatus.Planned],
-  [['inprogress', 'progress', 'r', 'encours', 'e'], EclassStatus.InProgress],
-  [['finished', 'f', 'terminé', 'terminer', 'termine', 't'], EclassStatus.Finished],
-  [['canceled', 'c', 'annulé', 'annuler', 'annule', 'a'], EclassStatus.Canceled],
-];
+const placeInformationModal = (place: Exclude<EclassPlace, EclassPlace.Discord>): Modal => new Modal()
+  .setTitle(config.messages.placeInformationModal.title)
+  .setCustomId('place-information-modal')
+  .addComponents(
+    new MessageActionRow<TextInputComponent>().addComponents(
+      new TextInputComponent()
+        .setLabel(config.messages.placeInformationModal.label[place])
+        .setPlaceholder(config.messages.placeInformationModal.placeholder[place])
+        .setStyle(TextInputStyles.PARAGRAPH)
+        .setCustomId('place-information')
+        .setRequired(true),
+    ),
+  );
 
-@ApplyOptions<SubCommandPluginCommandOptions>({
-  ...config.options,
-  generateDashLessAliases: true,
-  flags: ['ping', 'silent'],
-  preconditions: ['GuildOnly'],
-  options: Object.values(listOptions).flat(),
-  subCommands: generateSubcommands(['create', 'list', 'help'], {
-    start: { aliases: ['begin'] },
-    edit: { aliases: ['change', 'modify'] },
-    cancel: { aliases: ['archive'] },
-    finish: { aliases: ['end', 'stop'] },
-    record: { aliases: ['enregistrement', 'link', 'lien', 'replay', 'recording'] },
-    info: { aliases: ['infos', 'information', 'informations'] },
-  }),
+const statusOptions = {
+  [EclassStatus.Planned]: 'Prévu',
+  [EclassStatus.InProgress]: 'En cours',
+  [EclassStatus.Finished]: 'Terminé',
+  [EclassStatus.Canceled]: 'Annulé',
+} as const;
+
+const statusChoices = Object.entries(statusOptions).map(([value, name]) => ({ name, value: Number(value) }));
+
+enum OptionRecordChoiceChoices {
+  Add = 'add',
+  Clear = 'clear',
+  Show = 'show',
+}
+
+enum Options {
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  SchoolYear = 'school-year',
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  Subject = 'subject',
+  Topic = 'topic',
+  Professor = 'professor',
+  Duration = 'duration',
+  Date = 'date',
+  TargetRole = 'target-role',
+  Place = 'place',
+  PlaceInformation = 'place-information',
+  IsRecorded = 'is-recorded',
+  Status = 'status',
+  Id = 'id',
+  ShouldPing = 'should-ping',
+  Choice = 'choice',
+  Silent = 'silent',
+  Link = 'link',
+}
+
+type Interaction = HorizonSubcommand.ChatInputInteraction<'cached'>;
+
+@ApplyOptions<HorizonSubcommand.Options>({
+  ...config,
+  subcommands: [
+    { name: 'create', chatInputRun: 'create' },
+    { name: 'list', chatInputRun: 'list' },
+    { name: 'start', chatInputRun: 'start' },
+    { name: 'finish', chatInputRun: 'finish' },
+    { name: 'edit', chatInputRun: 'edit' },
+    { name: 'cancel', chatInputRun: 'cancel' },
+    { name: 'record', chatInputRun: 'record' },
+    { name: 'info', chatInputRun: 'info' },
+  ],
 })
-export default class EclassCommand extends HorizonSubCommand {
+export default class EclassCommand extends HorizonSubcommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('create')
+            .setDescription(this.descriptions.subcommands.create)
+            .addStringOption(
+              option => option
+                .setName(Options.SchoolYear)
+                .setDescription(this.descriptions.options.schoolYear)
+                .setRequired(true)
+                .setChoices(...this.messages.schoolYearChoices()),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Subject)
+                .setDescription(this.descriptions.options.subject)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Topic)
+                .setDescription(this.descriptions.options.topic)
+                .setRequired(true),
+            )
+            .addUserOption(
+              option => option
+                .setName(Options.Professor)
+                .setDescription(this.descriptions.options.professor)
+                .setRequired(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Duration)
+                .setDescription(this.descriptions.options.duration)
+                .setRequired(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Date)
+                .setDescription(this.descriptions.options.date)
+                .setRequired(true),
+            )
+            .addRoleOption(
+              option => option
+                .setName(Options.TargetRole)
+                .setDescription(this.descriptions.options.targetRole)
+                .setRequired(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Place)
+                .setDescription(this.descriptions.options.place)
+                .setRequired(true)
+                .setChoices(...this.messages.placeChoices),
+            )
+            .addBooleanOption(
+              option => option
+                .setName(Options.IsRecorded)
+                .setDescription(this.descriptions.options.isRecorded)
+                .setRequired(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('list')
+            .setDescription(this.descriptions.subcommands.list)
+            .addStringOption(
+              option => option
+                .setName(Options.SchoolYear)
+                .setDescription(this.descriptions.options.schoolYear)
+                .setChoices(...this.messages.schoolYearChoices()),
+            )
+            .addIntegerOption(
+              option => option
+                .setName(Options.Status)
+                .setDescription(this.descriptions.options.status)
+                .setChoices(...statusChoices),
+            )
+            .addUserOption(
+              option => option
+                .setName(Options.Professor)
+                .setDescription(this.descriptions.options.professor),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Subject)
+                .setDescription(this.descriptions.options.subject)
+                .setAutocomplete(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('start')
+            .setDescription(this.descriptions.subcommands.start)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('finish')
+            .setDescription(this.descriptions.subcommands.finish)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('edit')
+            .setDescription(this.descriptions.subcommands.edit)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Topic)
+                .setDescription(this.descriptions.options.topic),
+            )
+            .addUserOption(
+              option => option
+                .setName(Options.Professor)
+                .setDescription(this.descriptions.options.professor),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Duration)
+                .setDescription(this.descriptions.options.duration),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Date)
+                .setDescription(this.descriptions.options.date),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Place)
+                .setDescription(this.descriptions.options.place)
+                .setChoices(...this.messages.placeChoices),
+            )
+            .addBooleanOption(
+              option => option
+                .setName(Options.IsRecorded)
+                .setDescription(this.descriptions.options.isRecorded),
+            )
+            .addBooleanOption(
+              option => option
+                .setName(Options.ShouldPing)
+                .setDescription(this.descriptions.options.shouldPing),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('cancel')
+            .setDescription(this.descriptions.subcommands.cancel)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('record')
+            .setDescription(this.descriptions.subcommands.record)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Choice)
+                .setDescription(this.descriptions.options.choice)
+                .setRequired(true)
+                .setChoices(
+                  { name: 'Définir le lien', value: OptionRecordChoiceChoices.Add },
+                  { name: 'Supprimer le lien', value: OptionRecordChoiceChoices.Clear },
+                  { name: 'Voir le lien', value: OptionRecordChoiceChoices.Show },
+                ),
+            )
+            .addBooleanOption(
+              option => option
+                .setName(Options.Silent)
+                .setDescription(this.descriptions.options.silent),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Link)
+                .setDescription(this.descriptions.options.link),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('info')
+            .setDescription(this.descriptions.subcommands.info)
+            .addStringOption(
+              option => option
+                .setName(Options.Id)
+                .setDescription(this.descriptions.options.id)
+                .setRequired(true)
+                .setAutocomplete(true),
+            ),
+        ),
+      { guildIds: settings.mainGuildIds },
+      );
+  }
+
   @IsEprofOrStaff()
-  public async create(message: GuildMessage): Promise<void> {
-    const responses = await new EclassInteractiveBuilder(message).start();
-    if (!responses)
+  public async create(interaction: Interaction): Promise<void> {
+    const rawSubject = interaction.options.getString(Options.Subject, true);
+    const topic = interaction.options.getString(Options.Topic, true);
+    const professor = interaction.options.getMember(Options.Professor, true);
+    const rawDuration = interaction.options.getString(Options.Duration, true);
+    const rawDate = interaction.options.getString(Options.Date, true);
+    const targetRole = interaction.options.getRole(Options.TargetRole, true);
+    const place = interaction.options.getString(Options.Place, true) as EclassPlace;
+    const isRecorded = interaction.options.getBoolean(Options.IsRecorded, true);
+
+    const subject = await Subject.findOne({ classCode: rawSubject });
+    if (!subject) {
+      await interaction.reply({ content: this.messages.invalidSubject, ephemeral: true });
       return;
-    await EclassManager.createClass(message, responses);
+    }
+
+    const duration = CustomResolvers.resolveDuration(rawDuration);
+    if (duration.isErr()) {
+      await interaction.reply({ content: this.messages.invalidDuration, ephemeral: true });
+      return;
+    }
+
+    const date = CustomResolvers.resolveDate(rawDate);
+    if (date.isErr()) {
+      await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
+      return;
+    }
+
+    if (!EclassManager.validateDateSpan(date.unwrap())) {
+      await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
+      return;
+    }
+
+    const overlaps = await EclassManager.checkOverlaps({
+      date: date.unwrap().getTime(),
+      duration: duration.unwrap(),
+      professor: professor.id,
+      subject,
+    });
+    if (overlaps.any) {
+      await interaction.reply({ content: overlaps.error, ephemeral: true });
+      return;
+    }
+
+    let answerTo: CommandInteraction<'cached'> | ModalSubmitInteraction<'cached'> = interaction;
+    let placeInformation: string | null = null;
+    if (place !== EclassPlace.Discord) {
+      await answerTo.showModal(placeInformationModal(place));
+      const submit = await answerTo.awaitModalSubmit({
+        filter: int => int.isModalSubmit()
+          && int.inCachedGuild()
+          && int.customId === 'place-information-modal'
+          && int.member.id === answerTo.member.id,
+        time: 900_000, // 15 minutes
+      });
+
+      answerTo = submit;
+      placeInformation = submit.fields.getTextInputValue('place-information');
+
+      if (place === EclassPlace.Teams) {
+        const url = Resolvers.resolveHyperlink(placeInformation);
+        if (url.isErr()) {
+          await answerTo.reply({ content: this.messages.invalidTeamsUrl, ephemeral: true });
+          return;
+        }
+        placeInformation = url.unwrap().toString();
+      }
+    }
+
+    await EclassManager.createClass(answerTo, {
+      subject,
+      topic,
+      professor,
+      duration: duration.unwrap(),
+      date: date.unwrap(),
+      targetRole,
+      place,
+      placeInformation,
+      isRecorded,
+    });
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async start(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
-    // Fetch the member
-    const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
-    if (!professor) {
-      await message.channel.send(config.messages.unresolvedProfessor);
-      return;
-    }
-
+  public async start(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
     // Start the class & confirm.
     await EclassManager.startClass(eclass);
-    await message.channel.send(config.messages.successfullyStarted);
+    await interaction.reply(this.messages.successfullyStarted);
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  // eslint-disable-next-line complexity
-  public async edit(message: GuildMessage, args: Args, eclass: EclassPopulatedDocument): Promise<void> {
-    // Resolve the given arguments & validate them
-    const shouldPing = args.getFlags('ping');
-    const property = await args.pickResult('string');
-    if (property.error) {
-      await message.channel.send(config.messages.invalidEditProperty);
-      return;
-    }
+  public async edit(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+    const shouldPing = interaction.options.getBoolean(Options.ShouldPing) ?? false;
 
-    let updateMessage: string;
-    let notificationMessage: string;
+    const topic = interaction.options.getString(Options.Topic);
+    const professor = interaction.options.getMember(Options.Professor);
+    const rawDuration = interaction.options.getString(Options.Duration);
+    const rawDate = interaction.options.getString(Options.Date);
+    const place = interaction.options.getString(Options.Place) as EclassPlace | null;
+    const isRecorded = interaction.options.getBoolean(Options.IsRecorded);
 
-    switch (property.value) {
-      case 'topic':
-      case 'thème':
-      case 'theme':
-      case 'sujet': {
-        const topic = await args.restResult('string');
-        if (topic.error) {
-          await message.channel.send(config.messages.prompts.topic.invalid);
-          return;
-        }
+    let duration: number | null = null;
+    let date: number | null = null;
 
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { topic: topic.value },
-          { new: true },
-        );
-        updateMessage = config.messages.editedTopic;
-        notificationMessage = config.messages.pingEditedTopic;
-        break;
-      }
-
-      case 'date': {
-        const newDate = await args.restResult('day');
-        if (newDate.error) {
-          await message.channel.send(`${config.messages.prompts.date.invalid} ${config.messages.prompts.date.hint}`);
-          return;
-        }
-
-        const date = new Date(eclass.date);
-        date.setMonth(newDate.value.getMonth());
-        date.setDate(newDate.value.getDate());
-
-        if (!EclassManager.validateDateSpan(date)) {
-          await message.channel.send(config.messages.prompts.date.invalid);
-          return;
-        }
-
-        const overlaps = await EclassManager.checkOverlaps(date, eclass.duration, {
-          schoolYear: eclass.subject.schoolYear,
-          professorId: eclass.professor,
-        });
-        if (overlaps.any) {
-          await message.channel.send(overlaps.error);
-          return;
-        }
-
-        let { reminded } = eclass;
-        if (reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
-          reminded = false;
-
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { date: date.getTime(), end: date.getTime() + eclass.duration, reminded },
-          { new: true },
-        );
-        updateMessage = config.messages.editedDate;
-        notificationMessage = config.messages.pingEditedDate;
-        break;
-      }
-
-      case 'hour':
-      case 'heure': {
-        const newHour = await args.restResult('hour');
-        if (newHour.error) {
-          await message.channel.send(`${config.messages.prompts.hour.invalid} ${config.messages.prompts.hour.hint}`);
-          return;
-        }
-
-        const date = new Date(eclass.date);
-        date.setHours(newHour.value.hour);
-        date.setMinutes(newHour.value.minutes);
-
-        if (!EclassManager.validateDateSpan(date)) {
-          await message.channel.send(config.messages.prompts.hour.invalid);
-          return;
-        }
-
-        const overlaps = await EclassManager.checkOverlaps(date, eclass.duration, {
-          schoolYear: eclass.subject.schoolYear,
-          professorId: eclass.professor,
-        });
-        if (overlaps.any) {
-          await message.channel.send(overlaps.error);
-          return;
-        }
-
-        let { reminded } = eclass;
-        if (reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
-          reminded = false;
-
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { date: date.getTime(), end: date.getTime() + eclass.duration, reminded },
-          { new: true },
-        );
-        updateMessage = config.messages.editedHour;
-        notificationMessage = config.messages.pingEditedHour;
-        break;
-      }
-
-      case 'duration':
-      case 'duree':
-      case 'durée': {
-        const duration = await args.restResult('duration');
-        if (duration.error) {
-          await message.channel.send(`${config.messages.prompts.duration.invalid} ${config.messages.prompts.duration.hint}`);
-          return;
-        }
-
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { duration: duration.value, end: eclass.date + duration.value },
-          { new: true },
-        );
-        updateMessage = config.messages.editedDuration;
-        notificationMessage = config.messages.pingEditedDuration;
-        break;
-      }
-
-      case 'professor':
-      case 'professeur':
-      case 'prof': {
-        const professor = await args.restResult('member');
-        if (professor.error) {
-          await message.channel.send(`${config.messages.prompts.professor.invalid} ${config.messages.prompts.professor.hint}`);
-          return;
-        }
-
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { professor: professor.value.id },
-          { new: true },
-        );
-        updateMessage = config.messages.editedProfessor;
-        notificationMessage = config.messages.pingEditedProfessor;
-        break;
-      }
-
-      case 'lieu':
-      case 'place': {
-        const rawPlace = await args.restResult('string');
-        if (rawPlace.error || !['discord', 'teams', 'campus', 'autre'].includes(rawPlace.value)) {
-          await message.channel.send(`${config.messages.prompts.place.invalid} ${config.messages.prompts.place.hint}`);
-          return;
-        }
-
-        const placeMap = {
-          discord: EclassPlace.Discord,
-          teams: EclassPlace.Teams,
-          campus: EclassPlace.OnSite,
-          autre: EclassPlace.Other,
-        };
-
-        const place = placeMap[rawPlace.value as keyof typeof placeMap];
-
-        const prompter = new ArgumentPrompter(message);
-        let placeInformation: string | null;
-        switch (place) {
-          case EclassPlace.Teams:
-            placeInformation = (await prompter.autoPromptUrl(config.messages.prompts.teamsLink)).toString();
-            break;
-          case EclassPlace.OnSite:
-            placeInformation = await prompter.autoPromptText(config.messages.prompts.room);
-            break;
-          case EclassPlace.Other:
-            placeInformation = await prompter.autoPromptText(config.messages.prompts.customPlace);
-            break;
-          case EclassPlace.Discord:
-            placeInformation = null;
-            break;
-        }
-
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { place, placeInformation },
-          { new: true },
-        );
-        updateMessage = config.messages.editedPlace;
-        notificationMessage = config.messages.pingEditedPlace;
-        break;
-      }
-
-      case 'record':
-      case 'recorded':
-      case 'enregistre':
-      case 'enregistré': {
-        const isRecorded = await args.restResult('boolean');
-        if (isRecorded.error) {
-          await message.channel.send(`${config.messages.prompts.recorded.invalid} ${config.messages.prompts.recorded.hint}`);
-          return;
-        }
-
-        eclass = await Eclass.findByIdAndUpdate(
-          eclass._id,
-          { isRecorded: isRecorded.value },
-          { new: true },
-        );
-        updateMessage = config.messages.editedRecorded;
-        notificationMessage = `${config.messages.pingEditedRecorded}${config.messages.pingEditedRecordedValues[Number(isRecorded.value)]}`;
-        break;
-      }
-
-      default:
-        await message.channel.send(config.messages.invalidEditProperty);
+    if (rawDuration) {
+      const durationResult = CustomResolvers.resolveDuration(rawDuration);
+      if (durationResult.isErr()) {
+        await interaction.reply({ content: this.messages.invalidDuration, ephemeral: true });
         return;
+      }
+      duration = durationResult.unwrap();
     }
+
+    if (rawDate) {
+      const dateResult = CustomResolvers.resolveDate(rawDate);
+      if (dateResult.isErr()) {
+        await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
+        return;
+      }
+      date = dateResult.unwrap().getTime();
+    }
+
+    const updateMessages: string[] = [];
+    const notificationMessages: string[] = [];
+    let answerTo: CommandInteraction<'cached'> | ModalSubmitInteraction<'cached'> = interaction;
+
+    if (topic) {
+      eclass.topic = topic;
+      updateMessages.push(this.messages.editedTopic);
+      notificationMessages.push(this.messages.pingEditedTopic);
+    }
+
+    if (professor) {
+      eclass.professor = professor.id;
+      updateMessages.push(this.messages.editedProfessor);
+      notificationMessages.push(this.messages.pingEditedProfessor);
+    }
+
+    if (duration) {
+      eclass.duration = duration;
+      updateMessages.push(this.messages.editedDuration);
+      notificationMessages.push(this.messages.pingEditedDuration);
+    }
+
+    if (date) {
+      eclass.date = date;
+      updateMessages.push(this.messages.editedDate);
+      notificationMessages.push(this.messages.pingEditedDate);
+    }
+
+    if (duration || date) {
+      const chosenDate = new Date(eclass.date);
+      if (!EclassManager.validateDateSpan(chosenDate)) {
+        await answerTo.reply({ content: this.messages.invalidDate, ephemeral: true });
+        return;
+      }
+
+      const overlaps = await EclassManager.checkOverlaps(eclass);
+      if (overlaps.any) {
+        await interaction.reply({ content: overlaps.error, ephemeral: true });
+        return;
+      }
+
+      if (eclass.reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
+        eclass.reminded = false;
+    }
+
+    if (place) {
+      eclass.place = place;
+      updateMessages.push(this.messages.editedPlace);
+      notificationMessages.push(this.messages.pingEditedPlace);
+
+      if (place === EclassPlace.Discord) {
+        eclass.placeInformation = null;
+      } else {
+        await answerTo.showModal(placeInformationModal(place));
+        const submit = await answerTo.awaitModalSubmit({
+          filter: int => int.isModalSubmit()
+            && int.inCachedGuild()
+            && int.customId === 'place-information-modal'
+            && int.member.id === answerTo.member.id,
+          time: 900_000, // 15 minutes
+        });
+
+        answerTo = submit;
+        const placeInformation = submit.fields.getTextInputValue('place-information');
+
+        if (place === EclassPlace.Teams) {
+          const url = Resolvers.resolveHyperlink(placeInformation);
+          if (url.isErr()) {
+            await answerTo.reply({ content: this.messages.invalidTeamsUrl, ephemeral: true });
+            return;
+          }
+          eclass.placeInformation = url.unwrap().toString();
+        } else {
+          eclass.placeInformation = placeInformation;
+        }
+      }
+    }
+
+    if (!isNullish(isRecorded)) {
+      eclass.isRecorded = isRecorded;
+      updateMessages.push(this.messages.editedIsRecorded);
+      notificationMessages.push(this.messages.pingEditedIsRecorded[Number(isRecorded)]);
+    }
+
+    await answerTo.deferReply();
+
+    await eclass.save();
+    const { guild } = answerTo;
 
     // Fetch the announcement message
-    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannel, message.guild.id);
+    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannel, guild.id);
     const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessage);
 
     // Edit the announcement embed
     const formattedDate = dayjs(eclass.date).format(settings.configuration.dateFormat);
-    const classChannel = message.guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
+    const classChannel = answerTo.guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
     await originalMessage.edit({
       content: originalMessage.content,
       embeds: [EclassManager.createAnnouncementEmbed({
@@ -310,7 +548,7 @@ export default class EclassCommand extends HorizonSubCommand {
         subject: eclass.subject,
         topic: eclass.topic,
         duration: eclass.duration,
-        professor: await message.guild.members.fetch(eclass.professor),
+        professor: await guild.members.fetch(eclass.professor),
         classChannel,
         classId: eclass.classId,
         isRecorded: eclass.isRecorded,
@@ -320,12 +558,15 @@ export default class EclassCommand extends HorizonSubCommand {
     });
 
     // Edit the global announcement messages (calendar & week upcoming classes)
-    await EclassManager.updateGlobalAnnouncements(message.guild.id, eclass.subject.schoolYear);
+    await EclassManager.updateGlobalAnnouncements(guild.id, eclass.subject.schoolYear);
 
     // Edit the role
-    const { subject, topic } = eclass;
-    const originalRole = message.guild.roles.resolve(eclass.classRole);
-    const newRoleName = EclassManager.getRoleNameForClass({ formattedDate, subject, topic });
+    const originalRole = guild.roles.resolve(eclass.classRole);
+    const newRoleName = EclassManager.getRoleNameForClass({
+      formattedDate,
+      subject: eclass.subject,
+      topic: eclass.topic,
+    });
     if (originalRole.name !== newRoleName)
       await originalRole.setName(newRoleName);
 
@@ -333,216 +574,196 @@ export default class EclassCommand extends HorizonSubCommand {
     const payload = {
       ...eclass.toJSON(),
       ...eclass.normalizeDates(true),
-      role: message.guild.roles.resolve(eclass.targetRole).name,
-      pingRole: message.guild.roles.resolve(eclass.classRole),
-      where: config.messages.where(eclass),
+      role: guild.roles.resolve(eclass.targetRole).name,
+      pingRole: guild.roles.resolve(eclass.classRole),
+      where: this.messages.where(eclass),
     };
-    await message.channel.send(pupa(updateMessage, payload));
+    await answerTo.followUp(pupa(`${this.messages.headerEdited}${updateMessages.join('\n')}`, payload));
     if (shouldPing)
-      await classChannel.send(pupa(notificationMessage, payload));
+      await classChannel.send(pupa(`${this.messages.headerPingEdited}${notificationMessages.join('\n')}`, payload));
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned, EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async cancel(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
-    const handler = new MessagePrompter(config.messages.confirmCancel, 'confirm', {
-      confirmEmoji: settings.emojis.yes,
-      cancelEmoji: settings.emojis.no,
-      timeout: 2 * 60 * 1000,
-    });
-    const isConfirmed = await handler.run(message.channel, message.author).catch(nullop);
+  public async cancel(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+    const { buttonInteraction, isConfirmed } = await confirm(interaction, this.messages.confirmCancel);
     if (!isConfirmed) {
-      await message.channel.send(messages.prompts.stoppedPrompting);
+      await buttonInteraction.update(this.messages.canceledCancel);
       return;
     }
 
     // Cancel the class & confirm.
     await EclassManager.cancelClass(eclass);
-    await message.channel.send(config.messages.successfullyCanceled);
+    await buttonInteraction.update(this.messages.successfullyCanceled);
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async finish(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
-    // Fetch the member
-    const professor = await message.guild.members.fetch(eclass.professor).catch(nullop);
-    if (!professor) {
-      await message.channel.send(config.messages.unresolvedProfessor);
-      return;
-    }
-
+  public async finish(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
     // Finish the class & confirm.
     await EclassManager.finishClass(eclass);
-    await message.channel.send(config.messages.successfullyFinished);
+    await interaction.reply(this.messages.successfullyFinished);
   }
 
   @ValidateEclassArgument()
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async record(message: GuildMessage, args: Args, eclass: EclassPopulatedDocument): Promise<void> {
-    const silent = args.getFlags('silent');
+  public async record(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+    const action = interaction.options.getString(Options.Choice, true) as OptionRecordChoiceChoices;
 
-    // Parse the URL
-    const link = await args.pickResult('url');
-    if (link.error) {
-      // Show the current URL if any
-      await message.channel.send(eclass.recordLink
-        ? pupa(config.messages.recordLink, { link: eclass.recordLink })
-        : config.messages.noRecordLink);
-      return;
+    switch (action) {
+      case OptionRecordChoiceChoices.Add: {
+        // Check the status before setting a URL
+        if (eclass.status !== EclassStatus.Finished) {
+          await interaction.reply({
+            content: pupa(this.messages.statusIncompatible, { status: eclass.getStatus() }),
+            ephemeral: true,
+          });
+          return;
+        }
+
+        const silent = interaction.options.getBoolean(Options.Silent) ?? false;
+        const rawLink = interaction.options.getString(Options.Link);
+        if (!rawLink) {
+          await interaction.reply({ content: this.messages.noRecordLinkProvided, ephemeral: true });
+          return;
+        }
+
+        const link = Resolvers.resolveHyperlink(rawLink);
+        if (link.isErr()) {
+          await interaction.reply({ content: this.messages.invalidRecordLink, ephemeral: true });
+          return;
+        }
+
+        // Change the URL & confirm
+        await EclassManager.setRecordLink(eclass, link.unwrap().toString(), silent);
+        await interaction.reply(this.messages.successfullyAddedLink);
+        break;
+      }
+      case OptionRecordChoiceChoices.Clear:
+        // Check the status before setting a URL
+        if (eclass.status !== EclassStatus.Finished) {
+          await interaction.reply({
+            content: pupa(this.messages.statusIncompatible, { status: eclass.getStatus() }),
+            ephemeral: true,
+          });
+          return;
+        }
+
+        // Change the URL & confirm
+        await EclassManager.clearRecordLink(eclass);
+        await interaction.reply(this.messages.successfullyRemovedLink);
+        break;
+      case OptionRecordChoiceChoices.Show:
+        // Show the current URL if any
+        await interaction.reply(eclass.recordLink
+          ? pupa(this.messages.recordLink, { link: eclass.recordLink })
+          : this.messages.noRecordLink);
+        break;
     }
-
-    // Check the status before setting a URL
-    if (eclass.status !== EclassStatus.Finished) {
-      await message.channel.send(pupa(config.messages.statusIncompatible, { status: eclass.getStatus() }));
-      return;
-    }
-
-    // Change the URL & confirm
-    await EclassManager.setRecordLink(eclass, link.value.toString(), silent);
-
-    // Edit the global announcement messages (calendar & week upcoming classes)
-    await EclassManager.updateGlobalAnnouncements(message.guild.id, eclass.subject.schoolYear);
-
-    await message.channel.send(config.messages.successfullyAddedLink);
   }
 
   @ValidateEclassArgument()
-  public async info(message: GuildMessage, _args: Args, eclass: EclassPopulatedDocument): Promise<void> {
-    const messageLink = eclass.getMessageLink();
-    const capitalizedStatus = capitalize(config.messages.rawStatuses[eclass.status]);
-    const recordedText = oneLine`
-      ${config.messages.recordedValues[Number(eclass.isRecorded)]}
-      ${eclass.recordLink ? pupa(config.messages.recordedLink, eclass) : ''}
-    `;
+  public async info(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+    const payload = {
+      ...eclass.toJSON(),
+      ...eclass.normalizeDates(true),
+      status: capitalize(this.messages.rawStatuses[eclass.status]),
+      where: this.messages.where(eclass),
+      recorded: oneLine`
+        ${this.messages.recordedValues[Number(eclass.isRecorded)]}
+        ${eclass.recordLink ? pupa(this.messages.recordedLink, eclass) : ''}
+      `,
+      messageLink: eclass.getMessageLink(),
+    };
 
-    const texts = config.messages.showEmbed;
+    const texts = this.messages.showEmbed;
     const embed = new MessageEmbed()
       .setColor(settings.colors.primary)
       .setTitle(pupa(texts.title, eclass.toJSON()))
-      .addFields([
-        { name: texts.subjectName, value: pupa(texts.subjectValue, eclass.toJSON()), inline: true },
-        {
-          name: texts.statusName,
-          value: pupa(texts.statusValue, { ...eclass.toJSON(), status: capitalizedStatus }),
-          inline: true,
-        },
-        {
-          name: texts.dateName,
-          value: pupa(texts.dateValue, {
-            ...eclass.toJSON(),
-            ...eclass.normalizeDates(true),
-          }),
-          inline: true,
-        },
-        { name: texts.professorName, value: pupa(texts.professorValue, eclass.toJSON()), inline: true },
-        {
-          name: texts.placeName,
-          value: pupa(texts.placeValue, {
-            ...eclass.toJSON(),
-            where: config.messages.where(eclass),
-          }),
-          inline: true,
-        },
-        {
-          name: texts.recordedName,
-          value: pupa(texts.recordedValue, { ...eclass.toJSON(), recorded: recordedText }),
-          inline: true,
-        },
-        { name: texts.relatedName, value: pupa(texts.relatedValue, { ...eclass.toJSON(), messageLink }), inline: true },
-      ]);
+      .addFields(
+        { name: texts.subjectName, value: pupa(texts.subjectValue, payload), inline: true },
+        { name: texts.statusName, value: pupa(texts.statusValue, payload), inline: true },
+        { name: texts.dateName, value: pupa(texts.dateValue, payload), inline: true },
+        { name: texts.professorName, value: pupa(texts.professorValue, payload), inline: true },
+        { name: texts.placeName, value: pupa(texts.placeValue, payload), inline: true },
+        { name: texts.recordedName, value: pupa(texts.recordedValue, payload), inline: true },
+        { name: texts.relatedName, value: pupa(texts.relatedValue, payload), inline: true },
+      );
 
     // Change the URL & confirm
-    await message.channel.send({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 
-  public async list(message: GuildMessage, args: Args): Promise<void> {
+  public async list(interaction: Interaction): Promise<void> {
     // TODO: Add filter by date (before/after)
     // TODO: Add ability to combine same filters with each-other
-    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: message.guild.id });
+    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: interaction.guild.id });
 
     const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [];
     const filterDescriptions: string[] = [];
 
-    const statusQuery = args.getOption(...listOptions.status);
-    if (statusQuery) {
-      const value = statusOptionValues.find(([keys]) => keys.includes(statusQuery))?.[1];
-      if (typeof value !== 'undefined') {
-        filters.push(eclass => eclass.status === value);
-        filterDescriptions.push(pupa(config.messages.statusFilter, { value: config.messages.rawStatuses[value] }));
-      }
+    const schoolYear = interaction.options.getString(Options.SchoolYear) as SchoolYear | null;
+    if (schoolYear) {
+      filters.push(eclass => eclass.subject.schoolYear === schoolYear);
+      filterDescriptions.push(pupa(this.messages.statusFilter, {
+        value: this.messages.schoolYearChoices().find(({ value }) => value === schoolYear),
+      }));
     }
 
-    const professorQuery = args.getOption(...listOptions.professor);
-    if (professorQuery) {
-      const resolvedMember = await Resolvers.resolveMember(professorQuery, message.guild);
-      const value = resolvedMember?.value;
-      if (value) {
-        filters.push(eclass => eclass.professor === value.id);
-        filterDescriptions.push(pupa(config.messages.professorFilter, { value }));
-      }
+    const status = interaction.options.getInteger(Options.Status) as EclassStatus | null;
+    if (!isNullish(status)) {
+      filters.push(eclass => eclass.status === status);
+      filterDescriptions.push(pupa(this.messages.statusFilter, { value: this.messages.rawStatuses[status] }));
     }
 
-    const roleQuery = args.getOption(...listOptions.role);
-    if (roleQuery) {
-      const resolvedRole = await Resolvers.resolveRole(roleQuery, message.guild);
-      const value = resolvedRole?.value;
-      if (value) {
-        filters.push(eclass => eclass.targetRole === value.id);
-        filterDescriptions.push(pupa(config.messages.roleFilter, { value }));
-      }
+    const professor = interaction.options.getMember(Options.Professor);
+    if (professor) {
+      filters.push(eclass => eclass.professor === professor.id);
+      filterDescriptions.push(pupa(this.messages.professorFilter, { value: professor }));
     }
 
-    const subjectQuery = args.getOption(...listOptions.subject);
-    if (subjectQuery) {
-      filters.push(eclass => eclass.subject.classCode === subjectQuery || eclass.subject.name === subjectQuery);
-      filterDescriptions.push(pupa(config.messages.subjectFilter, { value: subjectQuery }));
+    const subject = interaction.options.getString(Options.Subject);
+    if (subject) {
+      filters.push(eclass => eclass.subject.classCode === subject);
+      filterDescriptions.push(pupa(this.messages.subjectFilter, { value: subject }));
     }
 
     const filterDescription = filterDescriptions.length > 0
-      ? pupa(config.messages.filterTitle, { filters: filterDescriptions.join('\n') })
-      : config.messages.noFilter;
+      ? pupa(this.messages.filterTitle, { filters: filterDescriptions.join('\n') })
+      : this.messages.noFilter;
 
     // Change the ".every" to ".some" to have a "OR" between the filters, rather than "AND".
     const filteredClasses = eclasses.filter(eclass => filters.every(filt => filt(eclass)));
 
     const baseEmbed = new MessageEmbed()
-      .setTitle(config.messages.listTitle)
+      .setTitle(this.messages.listTitle)
       .setColor(settings.colors.default);
 
     if (filteredClasses.length === 0) {
-      await message.channel.send({ embeds: [baseEmbed.setDescription(`${filterDescription}${config.messages.noClassesFound}`)] });
+      await interaction.reply({ embeds: [baseEmbed.setDescription(`${filterDescription}${this.messages.noClassesFound}`)] });
       return;
     }
 
     await new PaginatedMessageEmbedFields()
       .setTemplate(
-        baseEmbed.setDescription(`${filterDescription}${config.messages.someClassesFound(filteredClasses.length)}`),
+        baseEmbed.setDescription(`${filterDescription}${this.messages.someClassesFound(filteredClasses.length)}`),
       )
       .setItems(
         filteredClasses.map((eclass) => {
           const eclassInfos = {
             ...eclass.toJSON(),
             ...eclass.normalizeDates(true),
-            status: capitalize(config.messages.rawStatuses[eclass.status]),
-            where: config.messages.where(eclass),
+            status: capitalize(this.messages.rawStatuses[eclass.status]),
+            where: this.messages.where(eclass),
           };
           return {
-            name: pupa(config.messages.listFieldTitle, eclassInfos),
-            value: pupa(config.messages.listFieldDescription, eclassInfos),
+            name: pupa(this.messages.listFieldTitle, eclassInfos),
+            value: pupa(this.messages.listFieldDescription, eclassInfos),
           };
         }),
       )
       .setItemsPerPage(3)
       .make()
-      .run(message, message.author);
-  }
-
-  public async help(message: GuildMessage, _args: Args): Promise<void> {
-    const embed = new MessageEmbed()
-      .setTitle(config.messages.helpEmbedTitle)
-      .addFields([...config.messages.helpEmbedDescription])
-      .setColor(settings.colors.default);
-
-    await message.channel.send({ embeds: [embed] });
+      .run(interaction);
   }
 }

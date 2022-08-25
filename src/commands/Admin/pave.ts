@@ -1,12 +1,11 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { CommandOptions } from '@sapphire/framework';
 import { stripIndent } from 'common-tags';
+import { Permissions } from 'discord.js';
 import pupa from 'pupa';
 import { pave as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import { EclassStatus } from '@/types/database';
 import { firstSemesterDay } from '@/utils';
 
@@ -15,14 +14,21 @@ interface AggregatedEclass {
   time: number;
 }
 
-@ApplyOptions<CommandOptions>({
-  ...config.options,
-  preconditions: ['GuildOnly', 'AdminOnly'],
-})
-export default class PaveCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage): Promise<void> {
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class PaveCommand extends HorizonCommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD),
+      { guildIds: settings.mainGuildIds },
+    );
+  }
+
+  public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
     const firstDate = firstSemesterDay();
-    const result: AggregatedEclass[] = await Eclass.aggregate([
+    const result = await Eclass.aggregate<AggregatedEclass>([
       {
         $match: {
           date: { $gte: firstDate.unix() * 1000 },
@@ -41,13 +47,13 @@ export default class PaveCommand extends HorizonCommand {
     const firstDay = firstDate.format(settings.configuration.dayFormat);
 
     if (result.length === 0) {
-      await message.channel.send(pupa(config.messages.noEclasses, { firstDay }));
+      await interaction.reply(pupa(this.messages.noEclasses, { firstDay }));
       return;
     }
 
-    await message.channel.send(stripIndent`
-      ${pupa(config.messages.summary, { firstDay })}
-      ${result.map(({ _id, time }) => pupa(config.messages.summaryLine, { prof: _id, time: time.toFixed(1) }))}
+    await interaction.reply(stripIndent`
+      ${pupa(this.messages.summary, { firstDay })}
+      ${result.map(({ _id, time }) => pupa(this.messages.summaryLine, { prof: _id, time: time.toFixed(1) }))}
     `);
   }
 }

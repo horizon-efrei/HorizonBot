@@ -7,15 +7,16 @@
 
 import { inspect } from 'node:util';
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions } from '@sapphire/framework';
 import { Stopwatch } from '@sapphire/stopwatch';
 import Type from '@sapphire/type';
 import { codeBlock, isThenable } from '@sapphire/utilities';
+import { ApplicationCommandType } from 'discord-api-types/v10';
+import { Permissions } from 'discord.js';
 import pupa from 'pupa';
-import { sleep, trimText } from '@/app/lib/utils';
 import { evaluate as config } from '@/config/commands/admin';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
+import { extractCodeBlocks, sleep, trimText } from '@/utils';
 
 interface EvalReturnType {
   type: Type;
@@ -23,41 +24,36 @@ interface EvalReturnType {
   result: Error | string;
 }
 
-interface EvalOptions {
-  isAsync: boolean;
-  isJson: boolean;
-  showHidden: boolean;
-  depth: number;
-}
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class EvalCommand extends HorizonCommand<typeof config> {
+  private readonly _maxRunTime = 60_000;
 
-@ApplyOptions<CommandOptions>({
-  ...config.options,
-  flags: ['async', 'showHidden', 'hidden', 'json'],
-  options: ['depth'],
-  preconditions: ['GuildOnly', 'AdminOnly'],
-})
-export default class EvalCommand extends HorizonCommand {
-  maxRunTime = 60_000;
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerContextMenuCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setType(ApplicationCommandType.Message)
+        .setDefaultMemberPermissions(Permissions.FLAGS.ADMINISTRATOR)
+        .setDMPermission(false),
+    );
+  }
 
-  public async messageRun(message: GuildMessage, args: Args): Promise<void> {
-    const code = await args.restResult('code');
-    if (code.error) {
-      await message.channel.send(config.messages.noCode);
+  public override async contextMenuRun(interaction: HorizonCommand.ContextMenuInteraction): Promise<void> {
+    const message = await interaction.channel.messages.fetch(interaction.targetId) as GuildMessage;
+    if (!message) {
+      await interaction.reply({ content: this.messages.messageNotFound, ephemeral: true });
       return;
     }
 
-    const options = {
-      isAsync: args.getFlags('async'),
-      isJson: args.getFlags('json'),
-      showHidden: args.getFlags('showHidden', 'hidden'),
-      depth: Number(args.getOption('depth') ?? 0) || 0,
-    };
+    const codes = extractCodeBlocks(message.content);
+    const codeToRun = codes[0]?.text ?? message.content;
+
     let output: EvalReturnType;
     try {
-      output = await this._timedEval(message, options, code.value);
+      output = await this._timedEval(message, codeToRun);
     } catch (error: unknown) {
       if (error instanceof Error && error.message === 'Timeout') {
-        await message.channel.send(config.messages.evalTimeout);
+        await interaction.reply(config.messages.evalTimeout);
         return;
       }
       throw error;
@@ -66,24 +62,23 @@ export default class EvalCommand extends HorizonCommand {
     const result = (output.result || String.fromCodePoint(8203)) as string;
     const messageWithoutResult = pupa(config.messages.output, {
       output: '{output}',
-      type: codeBlock('ts', options.isJson ? 'JSON' : output.type),
+      type: codeBlock('ts', output.type),
       time: output.time,
     });
     const showedResult = trimText(result, 1900 - messageWithoutResult.length);
-    const resultOutput = codeBlock(options.isJson ? 'json' : 'ts', showedResult);
+    const resultOutput = codeBlock('ts', showedResult);
 
-    await message.channel.send(pupa(messageWithoutResult, { output: resultOutput }));
+    await interaction.reply(pupa(messageWithoutResult, { output: resultOutput }));
   }
 
-  private async _timedEval(message: GuildMessage, options: EvalOptions, code: string): Promise<EvalReturnType> {
+  private async _timedEval(message: GuildMessage, code: string): Promise<EvalReturnType> {
     return await Promise.race([
-      sleep(this.maxRunTime).then(() => { throw new Error('Timeout'); }),
-      this._eval(message, options, code),
+      sleep(this._maxRunTime).then(() => { throw new Error('Timeout'); }),
+      this._eval(message, code),
     ]);
   }
 
-  // Eval the input
-  private async _eval(message: GuildMessage, options: EvalOptions, code: string): Promise<EvalReturnType> {
+  private async _eval(message: GuildMessage, code: string): Promise<EvalReturnType> {
     const stopwatch = new Stopwatch();
     let syncTime = '';
     let asyncTime = '';
@@ -92,8 +87,7 @@ export default class EvalCommand extends HorizonCommand {
     let type: Type;
 
     try {
-      if (options.isAsync)
-        code = `;(async () => {\n${code}\n})();`;
+      code = `;(async () => {\n${code}\n})();`;
 
       // Make "message" accessible via the "msg" alias.
       const msg = message; // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -119,12 +113,7 @@ export default class EvalCommand extends HorizonCommand {
     if (typeof result !== 'string') {
       result = result instanceof Error
         ? result.stack.replace(new RegExp(process.cwd(), 'gi'), '.')
-        : options.isJson
-        ? JSON.stringify(result, null, 4)
-        : inspect(result, {
-          depth: options.depth,
-          showHidden: options.showHidden,
-        });
+        : inspect(result, { depth: 3, showHidden: true });
     }
 
     return {

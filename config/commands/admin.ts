@@ -1,181 +1,47 @@
 import { hideLinkEmbed, userMention } from '@discordjs/builders';
-import { stripIndent, stripIndents } from 'common-tags';
+import { stripIndent } from 'common-tags';
 import { LogStatuses } from '@/types/database';
 
-export const contact = {
-  options: {
-    aliases: ['contact', 'contacts'],
-    description: 'contact',
-    enabled: true,
-    usage: 'contact',
-    examples: ['contact'],
-  },
-  messages: {
-    // Global
-    invalidContact: 'Impossible de trouver le contact demandé.',
-
-    // Create a contact
-    createdContact: 'Ce contact a bien été créé !',
-    createContactSetup: {
-      embed: {
-        title: "Création d'un contact",
-        description: "Bienvenue dans l'assistant de création de contacts ! Suis les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il te sera demandé. Tu peux, à tout moment, abandonner la création du contact en cliquant sur \"Abandonner\".",
-        stepPreviewTitle: 'Aperçu des étapes',
-        currentStepTitle: 'Étape actuelle : {step}',
-        currentStepDescription: [
-          'Envoie un message contenant le nom de la personne.',
-          'Envoie un message contenant le moyen de contact de la personne (probablement son e-mail).',
-          'Choisis dans le menu déroulant OU envoie un message contenant le nom du service associé à la personne.',
-          'Envoie un message contenant une description de la personne (son rôle par exemple).',
-          'Terminé !',
-        ],
-      },
-      promptMessageDropdown: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
-      promptMessageDropdownOrSendMessage: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ou envoie un message',
-      stepPreview: stripIndent`
-        **1.** __Nom :__ {name}
-        **2.** __Contact :__ {contact}
-        **3.** __Service :__ {team}
-        **4.** __Description :__ {description}
-      `,
-      teamMenu: {
-        placeholder: 'Aucune équipe sélectionnée',
-      },
-      abortMenu: {
-        label: 'Abandonner',
-      },
-      error: 'Oups, une erreur est survenue lors de cette action :confused:\n> {details}',
-    },
-
-    // List the contacts
-    noContacts: "Je n'ai trouvé aucun contacts dans la base de données !",
-    listLine: '**__{contact}__**\n*{description}*',
-    pageTitle: 'Contact {teamName}',
-    selectMenuItemDescription: 'Page {pageIndex}',
-    selectMenuItemEmoji: '🏷',
-
-    // Edit contact
-    invalidField: 'Le champs à modifier doit-être "nom", "contact", "service" ou "description"',
-    editedContact: 'Le contact a bien été modifié !',
-
-    // Remove contact
-    removedContact: 'Le contact a bien été supprimé !',
-
-    // Help page
-    helpEmbedTitle: 'Aide des Contacts',
-    helpEmbedDescription: [
-      { name: 'Créer un contact', value: '`contact create`' },
-      { name: 'Liste des contacts', value: '`contact list`' },
-      { name: 'Modifier un contact', value: "`contact edit <nom> <'nom' | 'contact' | 'service' | 'description'> <nouveau nom/contact/service/description>`" },
-      { name: 'Supprimer un contact', value: '`contact remove <nom>`' },
-      { name: "Page d'aide", value: '`contact help`' },
-    ],
-
-    // Prompts
-    prompts: {
-      name: {
-        base: 'Entre le nom de la personne :',
-        invalid: 'Ce nom est invalide.',
-      },
-      contact: {
-        base: 'Entre le moyen de contact de la personne, probablement son e-mail :',
-        invalid: 'Ce moyen de contact est invalide.',
-      },
-      team: {
-        base: 'Entre le nom du service associé à la personne :',
-        invalid: 'Ce service est invalide.',
-      },
-      description: {
-        base: 'Entre une description de la personne, son rôle par exemple.',
-        invalid: 'Cette description est invalide.',
-      },
-
-      stoppedPrompting: "Tu as bien abandonné la commande ! Aucun contact n'a été créé.",
-      promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucun contact n'a été créé.",
-    },
-  },
-} as const;
-
 export const dump = {
-  options: {
-    aliases: ['dump'],
-    description: stripIndent`
-      Permet de consulter le liste des membres du serveur actuel qui répond (ou non) à certains critères.
-      Les critères sont exprimés sous forme d'options et de drapeaux.
-
-
-      :blue_book: **__OPTIONS__**
-
-          :small_blue_diamond: \`--format=<format>\`/\`-f=<format>\` : Formatte les membres en fonction du template donné. Voir "Formattage des membres" pour plus d'informations.
-          :small_blue_diamond: \`--has-roles=<rôles>\`/\`-h=<rôles>\` : Affiche les membres qui ont au moins un des rôles donnés. Voir "Liste de rôles" pour plus d'informations.
-          :small_blue_diamond: \`--has-all-roles=<rôles>\`/\`-a=<rôles>\` : Affiche les membres qui ont tous les rôles donnés. Voir "Liste de rôles" pour plus d'informations.
-          :small_blue_diamond: \`--reacted=[<reaction>@]<message>\`/\`-r=[<reaction>@]<message>\` : Affiche les membres qui ont réagis au message donné, avec la réaction donnée s'il y en a une.
-          :small_blue_diamond: \`--order=<ordre>\`/\`-o=<ordre>\` :  Trie les membres par ordre alphabétique (\`name\` pour les noms d'utilisateur, ou \`nick\` pour les pseudos), ID (\`id\`), date de création du compte (\`created\`) ou date d'arrivée sur ce serveur (\`joined\`).
-          :small_blue_diamond: \`--limit=<nombre>\`/\`-l=<nombre>\` : Affiche uniquement le nombre de membres indiqué.
-          :small_blue_diamond: \`--separator=<séparateur>\`/\`-s=<séparateur>\` : Change le séparateur entre chaque membre. Par défaut, il s'agit d'une nouvelle ligne.
-          :small_blue_diamond: \`--dateformat=<format>\`/\`-df=<format>\` : Change la manière dont les dates sont représentées. Voir ["Formattage des dates"](https://day.js.org/docs/en/display/format) pour plus d'informations.
-
-
-      :closed_book: **__DRAPEAUX__**
-
-          :small_blue_diamond: \`--no-roles\`/\`-n\` : Affiche les membres sans rôles.
-          :small_blue_diamond: \`--enumerate\`/\`-e\` : Affiche des numéros devant chaque membre.
-          :small_blue_diamond: \`--desc\`/\`-d\` : Trie les membres par ordre décroissant.
-          :small_blue_diamond: \`--dm\`/\`--mp\` : Envoie le résultat en message privé.
-
-
-      :orange_book: **__FORMATTAGE DES MEMBRES__**
-
-      Après l'option \`--format=\`, vous devez fournir un modèle d'affichage. Vous devrez utiliser des guillemets autour du texte s'il contient des espaces.
-      Vous avez accès aux variables suivantes :
-          :small_orange_diamond: \`{​u}\` : Affiche le nom d'utilisateur et le discriminant du membre (ex: \`membre#1234\`). ${/* eslint-disable-line no-irregular-whitespace */ ''}
-          :small_orange_diamond: \`{​m}\` : Mentionne le membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
-          :small_orange_diamond: \`{​n}\` : Affiche le pseudo du membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
-          :small_orange_diamond: \`{​i}\` : Affiche l'ID du membre. ${/* eslint-disable-line no-irregular-whitespace */ ''}
-          :small_orange_diamond: \`{​c}\` : Affiche la date de création du compte du membre. Peut être changé via l'option \`--dateformat\`. ${/* eslint-disable-line no-irregular-whitespace */ ''}
-          :small_orange_diamond: \`{​j}\` : Affiche la date d'arrivée sur le serveur du membre. Peut être changé via l'option \`--dateformat\`. ${/* eslint-disable-line no-irregular-whitespace */ ''}
-
-
-      :green_book: **__LISTE DE RÔLES__**
-
-      Pour fournir une liste de rôles pour les options \`--has-roles=\` et \`--has-all-roles=\`, les rôles doivent être séparés par une virgule, sans aucun espace. Vous pouvez utiliser le nom du rôle ou son id. Utilisez des guillemets autour de toute la liste si un des noms des rôles contient un espace.
-      Exemple : \`--has-roles="Administrateur,Super Modérateur,188341077902753794"\`.
-    `,
-    enabled: true,
-    usage: 'dump [--format=<format>] [--has-roles=<rôles>] [--has-all-roles=<rôles>] [--reacted=[<réaction>@]<message>] [--order=<ordre>] [--limit=<nombre>] [--separator=<séparateur>] [--dateformat=<format>] [--no-roles] [--enumerate] [--desc] [--dm]',
-    examples: [
-      'dump --format="{u} : {n}" --has-roles=188341077902753794 --order=id --enumerate --reacted=👍@https://discord.com/channels/1234/5678/9012',
-      'dump --format="{i} (a rejoint le {j})" --has-all-roles="Administrateur,Super Modérateur" --order=nick --desc --limit=5 --dateformat="DD/MM/YYYY [à] HH[h]mm"',
-      'dump --no-roles --reacted=https://discord.com/channels/1234/5678/9012 --separator=, --mp',
-    ],
+  descriptions: {
+    name: 'dump',
+    command: 'Consulter le liste des membres du serveur actuel qui répond (ou non) à certains critères.',
+    options: {
+      format: 'Formatte les membres en fonction du template donné.',
+      hasAllRoles: 'Affiche les membres qui ont tous les rôles indiqués.',
+      hasRoles: 'Affiche les membres qui ont au moins un des rôles indiqués.',
+      reacted: 'Affiche les membres qui ont reagi à un message.',
+      order: 'Trie les membres par ordre alphabétique.',
+      limit: 'Affiche uniquement le nombre de membres indiqué.',
+      separator: "Change le séparateur entre chaque membre. Par défaut, il s'agit d'une nouvelle ligne.",
+      dateFormat: 'Change la manière dont les dates sont représentées.',
+      sort: 'Trie les lignes par ordre croissant/décroissant.',
+      noRoles: 'Affiche les membres sans rôles.',
+      enumerate: 'Affiche des numéros devant chaque membre.',
+      dm: 'Envoie le résultat en message privé.',
+    },
   },
   messages: {
     noMatchFound: "Aucun membre correspondant à ces critères n'a été trouvé.",
+    dmSuccess: 'Le résultat a été envoyé en message privé.',
   },
 } as const;
 
 export const evaluate = {
-  options: {
-    aliases: ['eval', 'evaluate', 'ev'],
-    description: "Permet d'éxécuter du code directement dans le bot, avec le contexte actuel.\nUtilise l'option `--depth=<number>` pour controler la profondeur des propriétés affichés.\nUtilise le drapeau `--async` pour imbriquer ton code dans une IIFE async. Cela veut dire qu'il faut retourner ton résultat pour qu'il soit affiché.\n\nUtilise le drapeau `--showHidden` pour afficher les propriétés cachées\nUtilise le drapeau `--json` pour afficher le résultat comme si c'était du JSON.",
-    enabled: true,
-    usage: 'eval',
-    examples: ['limits'],
+  descriptions: {
+    name: 'Éval du code via le bot',
   },
   messages: {
-    noCode: "Tu as oublié d'ajouter du code à exécuter !",
     evalTimeout: "Le code a pris plus de 1min pour s'éxecuter...",
     output: '**Résultat**\n{output}\n**Type**\n{type}\n:stopwatch: {time}',
+    messageNotFound: "Le message n'a pas été trouvé.",
   },
 } as const;
 
 export const limits = {
-  options: {
-    aliases: ['limit', 'limits', 'limite', 'limites'],
-    description: 'Permet de consulter le nombre de salons et de rôles actuel, par rapport aux limites imposées par Discord ; à savoir 500 salons maximum et 250 rôles maximum.',
-    enabled: true,
-    usage: 'limits',
-    examples: ['limits'],
+  descriptions: {
+    name: 'limits',
+    command: 'Consulter le nombre de salons et de rôles actuel, par rapport aux limites imposées par Discord.',
   },
   messages: {
     limits: 'Salons : {channels}/500 (reste {channelsLeft})\nRôles : {roles}/250 (reste {rolesLeft})',
@@ -183,21 +49,23 @@ export const limits = {
 } as const;
 
 export const logs = {
-  options: {
-    aliases: ['logs', 'log', 'logging', 'logger'],
-    description: 'Permet de gérer comment les logs sont traités.',
-    enabled: true,
-    usage: 'logs',
-    examples: ['logs', 'logs change-nickname', 'logs change-nickname 2'],
+  descriptions: {
+    name: 'logs',
+    command: 'Gérer comment les logs sont traités.',
+    subcommands: {
+      edit: 'Gérer comment un log est traité.',
+      list: 'Affiche la liste des logs actuellement configurés.',
+    },
+    options: {
+      logName: 'Nom du log à modifier.',
+      logStatus: 'Nouveau statut du log.',
+    },
   },
   messages: {
     updatedLog: 'Le statut du log **{type}** a bien été changé en **{status}** !',
     updatedAllLog: 'Le statut de **tous les logs** de ce serveur a bien été changé en **{status}** !',
     listTitle: 'Liste des statuts des logs',
     lineValue: '**{type}** : {status}',
-    possibilitiesTitle: 'Liste des valeurs possibles',
-    possibilitiesContent: 'Pour les logs : {logs}\nPour les statuts : {statuses}',
-    currentLogStatus: 'Le statut actuel du log **{type}** est : **{status}**`',
     statuses: {
       [LogStatuses.Disabled]: ':no_entry_sign: désactivé',
       [LogStatuses.Silent]: ':no_bell: silencieux',
@@ -207,13 +75,90 @@ export const logs = {
   },
 } as const;
 
+export const manageContacts = {
+  descriptions: {
+    name: 'manage-contacts',
+    command: "Gérer la liste des contacts utiles des membres de l'administration de l'école.",
+    subcommands: {
+      create: 'Créer un nouveau contact.',
+      edit: 'Modifier un contact existant.',
+      remove: 'Supprimer un contact existant.',
+    },
+    options: {
+      name: 'Nom du contact.',
+      contact: 'Moyen de contact du contact (mail, téléphone...).',
+      team: 'Service auquelle le contact est associé.',
+      description: 'Description du contact.',
+      field: 'Champ à modifier.',
+      value: 'Nouvelle valeur du champ.',
+    },
+  },
+  messages: {
+    // Global
+    invalidContact: 'Impossible de trouver le contact demandé.',
+
+    // Create a contact
+    createdContact: 'Ce contact a bien été créé !',
+
+    // Edit contact
+    editedContact: 'Le contact a bien été modifié !',
+
+    // Remove contact
+    removedContact: 'Le contact a bien été supprimé !',
+  },
+} as const;
+
+export const manageTags = {
+  descriptions: {
+    name: 'manage-tags',
+    command: 'Gérer les "tags" (messages dynamiques, entièrement configurable directement via discord).',
+    subcommands: {
+      create: 'Créer un nouveau tag.',
+      edit: 'Modifier un tag.',
+      remove: 'Supprimer un tag.',
+      rename: 'Renommer un tag.',
+      inEmbed: "Choisir si le tag s'affiche dans un embed ou non.",
+    },
+    options: {
+      name: 'Nom du tag.',
+      inEmbed: "Si le tag s'affiche dans un embed ou non.",
+      newName: 'Nouveau nom du tag.',
+    },
+  },
+  messages: {
+    // Global
+    invalidTag: "Ce nom de tag n'est pas valide.",
+    modals: {
+      contentLabel: 'Contenu du tag',
+      contentPlaceholder: 'Entrez le contenu du tag ici.',
+      createTitle: 'Créer un tag',
+      editTitle: 'Modifier le tag {name}',
+    },
+
+    // Create tag
+    createdTag: 'Ce tag a bien été créé !',
+
+    // Edit tag
+    editedTag: 'Ce tag a bien été modifié !',
+
+    // Remove tag
+    removedTag: 'Ce tag a bien été supprimé !',
+
+    // Rename tag
+    renamedTag: 'Ce tag a bien été renommé !',
+    invalidNewName: "Ce nouveau nom de tag n'est pas valide.",
+
+    // Set in an embed (or not)
+    editedTagEmbed: 'Ce tag sera maintenant affiché {inOrWithout} embed !',
+    inEmbed: 'dans un',
+    withoutEmbed: 'sans',
+  },
+} as const;
+
 export const pave = {
-  options: {
-    aliases: ['pave'],
-    description: "Permet d'obtenir la liste des heures de cours données par les eProfs durant le semestre actuel, afin de pouvoir leur attribuer les points PAVE correspondants.",
-    enabled: true,
-    usage: 'pave',
-    examples: ['pave'],
+  descriptions: {
+    name: 'pave',
+    command: 'Obtenir la liste des heures de cours données par les eProfs durant le semestre actuel.',
   },
   messages: {
     summary: 'Liste des heures de cours données par les eProfs durant le semestre actuel (depuis le {firstDay}) :',
@@ -222,60 +167,49 @@ export const pave = {
   },
 } as const;
 
-export const pingRoleIntersection = {
-  options: {
-    aliases: ['ping-role-intersection', 'intersects', 'intersect', 'inter'],
-    description: "Permet de créer un rôle temporaire qui est l'intersection de tous les rôles entrés. Il sera donc ajouté à tous les membres ayant *tous les rôles donnés à la fois*, et sera supprimé automatiquement 2 jours après son utilisation, sauf si tu utilises le drapeau `--keep`.",
-    enabled: true,
-    usage: 'intersect <@mention role | ID role | nom role (entre guillement si plusieurs mots)>',
-    examples: ['inter @Role 1 @Role 2 188341077902753794 "Role 4" Role5'],
-  },
-  messages: {
-    roleDoesntExist: "Es-tu sûr que ce rôle existe ? Je n'ai pas pu le trouver...",
-    notEnoughRoles: "Tu n'as pas entré assez de rôles ! Il en faut au moins 2.",
-    noTargetedUsers: "Personne n'a ces {num} rôles à la fois dans ce serveur, il n'a donc pas été créé.",
-    successTemporary: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s). Il sera supprimé 2 jours après sa première utilisation.',
-    successPersistent: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s).',
-  },
-} as const;
-
 export const reactionRole = {
-  options: {
-    aliases: ['reactionrole', 'rr', 'autorole', 'ar'],
-    description: "Permet de créer des menus de réactions, grâce auxquels les utilisateurs peuvent utiliser les réactions pour s'ajouter des rôles. Tu peux ajouter le flag `--unique` lors de la création du menu, qui permet de définir si on ne peut récupérer qu'un seul rôle à la fois. Tu peux changer ce mode plus tard avec `!rr unique`. Tu peux également choisir une condition de rôle préalable pour pouvoir réagir, avec `!rr condition`.",
-    enabled: true,
-    usage: 'reactionrole <create | list | remove | edit | add-pair | remove-pair | unique | condition | help>',
-    examples: ['reactionrole create', 'rr create #salon-annonces', 'autorole list', 'ar remove 188341077902753794', 'rr help'],
+  descriptions: {
+    name: 'reaction-role',
+    command: "Créer des menus de réactions, grâce auxquels les utilisateurs peuvent s'ajouter des rôles.",
+    subcommands: {
+      create: 'Créer un menu de réaction.',
+      list: 'Affiche la liste des menus de réaction actifs.',
+      edit: 'Modifier un menu de réaction.',
+      remove: 'Supprimer un menu de réaction.',
+      addPair: 'Ajouter une paire de réaction/rôle à un menu existant.',
+      removePair: "Supprimer une paire de réaction/rôle d'un menu existant.",
+      unique: "Choisir si l'on peut prendre qu'un rôle par utilisateur.",
+      roleCondition: 'Choisir le rôle pré-requis pour utiliser le menu.',
+    },
+    options: {
+      messageUrl: 'URL du menu de réaction.',
+      channel: 'Salon où envoyer le menu.',
+      unique: "Si l'on peut prendre qu'un rôle par utilisateur.",
+      roleCondition: 'Rôle pré-requis pour utiliser le menu.',
+      emoji: 'Émoji de la réaction.',
+      role: 'Rôle à donner.',
+      choice: 'Choix à donner.',
+    },
   },
   messages: {
     // Global
     notAMenu: "Ce message n'est pas un menu de réaction.",
-    rrMessagePrompt: "Entre l'identifiant (ID) ou le lien du message qui contient le menu que souhaité.",
     invalidReaction: "Cette réaction n'est pas valide.",
-    invalidRole: "Ce rôle n'est pas valide.",
+    noRoleProvided: 'Il faut choisir quel rôle utiliser !',
 
-    // Create the menu
-    channelPrompt: 'Dans quel salon veux-tu créer ce menu ? Tu peux entrer son nom, son ID, ou le mentionner.',
-    titlePrompt: 'Entre le titre du menu sur la première ligne, puis la description sur les suivantes.',
-    rolesPrompt: "Entre les émojis et les rôles associés. Chaque paire doit être sur une ligne à part, le tout dans un seul message. Tu dois entrer l'émoji, un espace puis le rôle (son nom, son ID, ou en le mentionnant). Seuls les 20 premières entrées seront utilisées.",
+    modals: {
+      titleLabel: 'Titre du menu',
+      titlePlaceholder: 'Titre du menu...',
+      descriptionLabel: 'Description du menu',
+      descriptionPlaceholder: 'Description du menu...',
+      createTitle: 'Créer un menu de réaction',
+    },
 
-    duplicatedEmojis: "Oups, tu as mis plusieurs fois le même émoji pour différents rôles... Ce n'est pas possible ! Recréé un menu en mettant un emoji unique pour chaque rôle. (Émojis utilisés en double : {duplicatedEmojis})",
-    duplicatedRoles: "Oups, tu as mis plusieurs fois le même rôle... Ce n'est pas possible ! Recréé un menu en mettant chaque rôle une unique fois. (Rôles utilisés en double : {duplicatedRoles})",
+    // Create menu
     invalidEntries: "Aucune paire réaction/rôle valide n'a été retrouvée dans ton message... :confused:",
+    createdMenu: 'Le menu de réaction **{title}** a bien été créé !',
 
-    confirmationTitle: "Parfait, la mise en place est terminée ! Peux-tu confirmer que c'est correct ?",
-    confirmationContent: stripIndents`
-      Je vais créer un menu de réaction(s), dans le salon {channel}.
-      {rolesList}
-
-      Le titre est "{title}", et la description est
-      >>> {description}
-    `,
-    rolesListItem: '• La réaction {reaction} donnera la rôle {role}.',
-    noDescription: '*Aucune description définie.*',
-    stoppedPrompting: 'Tu as bien abandonné la création du menu !',
-
-    // List the menus
+    // List menus
     noMenus: "Je n'ai trouvé aucun menu de réaction dans la base de données !",
     listTitle: 'Liste des menus de réaction ({total})',
     listFieldDescription: stripIndent`
@@ -285,10 +219,10 @@ export const reactionRole = {
       Condition de rôle : {condition}
     `,
 
-    // Remove a menu
+    // Remove menu
     removedMenu: 'Ce menu a bien été supprimé !',
 
-    // Edit a menu
+    // Edit menu
     editedMenu: 'Ce menu a bien été modifié !',
 
     // Add a role to a menu
@@ -297,7 +231,6 @@ export const reactionRole = {
     addedPairSuccessfuly: `C'est fait ! La réaction {reaction} donnera le rôle "{role.name}" sur le menu ${hideLinkEmbed('{rrMessage.url}')}.`,
 
     // Remove a role from a menu
-    reactionNotUsed: "Cette réaction n'est pas dans ce menu !",
     roleNotUsed: "Ce rôle n'est pas dans ce menu !",
     removedPairSuccessfuly: `C'est fait ! Cette paire à bien été supprimée du menu ${hideLinkEmbed('{rrMessage.url}')}.`,
 
@@ -312,119 +245,52 @@ export const reactionRole = {
     removedRoleCondition: 'Tu as supprimé la condition de rôle pour ce menu.',
     roleCondition: 'La condition de rôle pour ce menu est : {role}.',
     noRoleCondition: "Il n'y a pas de condition de rôle pour ce menu.",
+  },
+} as const;
 
-    // Help page
-    helpEmbedTitle: 'Aide des menus de réaction',
-    helpEmbedDescription: [
-      { name: 'Créer un menu', value: '`!rr start [salon]` puis répondre aux questions' },
-      { name: 'Liste des menus', value: '`!rr list`' },
-      { name: 'Supprimer un menu', value: '`!rr remove <ID message>`' },
-      { name: 'Modifier un menu', value: '`!rr edit <ID message>` puis répondre aux questions' },
-      { name: 'Ajouter une paire à un menu', value: '`!rr addpair <ID message> <emoji> <rôle>`' },
-      { name: "Enlever une paire d'un menu", value: '`!rr removepair <ID message> <rôle>`' },
-      { name: 'Gérer le mode "Rôle unique"', value: '`!rr unique <ID message> [booléen]`' },
-      { name: 'Gérer la condition de rôle', value: '`!rr condition <ID message> [rôle | "clear"]`' },
-      { name: "Page d'aide", value: '`!rr help`' },
-    ],
+export const roleIntersection = {
+  descriptions: {
+    name: 'role-intersection',
+    command: 'Créé un rôle qui est ajouté aux membres ayant tous les rôles données.',
+    options: {
+      persistent: 'Garder le rôle après son utilisation.',
+      role: "Rôle avec lequel effectuer l'intersection",
+    },
+  },
+  messages: {
+    noTargetedUsers: "Personne n'a ces {num} rôles à la fois dans ce serveur, il n'a donc pas été créé.",
+    successTemporary: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s). Il sera supprimé 2 jours après sa première utilisation.',
+    successPersistent: 'Le rôle **{newRole.name}** à bien été créé, et il a été ajouté à {targetedMembers.size} membre(s).',
   },
 } as const;
 
 export const setup = {
-  options: {
-    aliases: ['setup', 'config', 'configure', 'define'],
-    description: 'Permet de définir les salons et rôles particuliers dont le bot à besoin.',
-    enabled: true,
-    usage: 'setup <create | see | list | remove | help>',
-    examples: ['setup add cours-semaine #cours-de-la-semaine', 'setup new role-staff 188341077902753794', 'setup remove role-staff', 'setup see @Staff'],
+  descriptions: {
+    name: 'setup',
+    command: 'Définir les salons et rôles particuliers pour la guilde.',
+    subcommands: {
+      setChannel: 'Définir un salon.',
+      setRole: 'Définir un rôle.',
+      list: 'Afficher la liste des salons et rôles définis pour la guilde.',
+      remove: 'Supprimer un salon ou rôle défini.',
+      see: 'Afficher un salon ou rôle défini.',
+    },
+    options: {
+      name: 'Nom du champ.',
+      channel: 'Salon à utiliser.',
+      role: 'Rôle à utiliser.',
+    },
   },
   messages: {
     successfullyDefined: 'Entrée définie avec succès !',
     successfullyUndefined: 'Entrée déréférencé avec succès !',
-    invalidRole: 'Ce rôle est invalide.',
-    unknown: 'Entrée inconnue. Voici la liste des entrées possibles : {list}',
+    chooseOne: 'Choissez une seule option à inspecter.',
     associatedKeys: 'Les clés associées à cette valeur sont : `{keys}`.',
-    noAssociatedKey: "Ce valeur-là n'a pas de clé associé.",
-    associatedValue: 'Le valeur associée est : {value}.',
-    noAssociatedValue: "Cette clé n'a aucune valeur associé",
-    possibilitiesTitle: 'Liste des entrées possibles',
+    noAssociatedKey: "Cette valeur-là n'a pas de clé associée.",
+    associatedValue: 'La valeur associée est : {value}.',
+    noAssociatedValue: "Cette clé n'a aucune valeur associée",
     listTitle: 'Liste des valeurs',
     lineWithValue: '**{name}** : {value}',
     lineWithoutValue: '**{name}** : Aucune valeur associée',
-    helpEmbedTitle: 'Aide de la commande de setup',
-    helpEmbedDescription: [
-      { name: 'Définir une valeur', value: '`!setup set <keyword> [(salon | role)=salon actuel]`' },
-      { name: 'Déréférencer une valeur', value: '`!setup remove <keyword>`' },
-      { name: 'Informations sur un salon ou rôle', value: '`!setup info [(keyword | salon | role)=salon actuel]`' },
-      { name: 'Liste des valeurs', value: '`!setup list`' },
-      { name: "Page d'aide", value: '`!setup help`' },
-    ],
-  },
-} as const;
-
-export const tags = {
-  options: {
-    aliases: ['tags', 'tag'],
-    description: 'Permet de créer des tags (= messages dynamiques, entièrement configurable directement via discord). Lors de leur création, tu peux choisir si un tag devra être affiché dans un embed. Tu peux changer ce paramètre après, avec `!tag embed <nom> <booléen>',
-    enabled: true,
-    usage: 'tags <create | list | remove | edit | rename | alias | help>',
-    examples: ['tags create --embed test Ceci est le contenu !', 'tags list', 'tags remove test', 'tags help'],
-  },
-  messages: {
-    // Global
-    invalidTag: "Ce nom de tag n'est pas valide.",
-    invalidAliases: "Un de ces aliases n'est pas valide ou est déjà utilisé.",
-    stoppedPrompting: 'Tu as bien abandonné la création de ce tag !',
-
-    // Create a tag
-    createdTag: 'Ce tag a bien été créé !',
-
-    // List the tags
-    noTags: "Je n'ai trouvé aucun tag dans la base de données !",
-    listTitle: 'Liste des tags ({total})',
-    listLine: '• `{name}` ({aliases}) : {uses} utilisations',
-
-    // Remove a tag
-    removedTag: 'Ce tag a bien été supprimé !',
-
-    // Edit a tag
-    editedTag: 'Ce tag a bien été modifié !',
-
-    // Set in an embed (or not)
-    showTagEmbed: 'Ce tag est affiché {inOrWithout} embed.',
-    editedTagEmbed: 'Ce tag sera maintenant affiché {inOrWithout} embed !',
-    inEmbed: 'dans un',
-    withoutEmbed: 'sans',
-
-    // Help page
-    helpEmbedTitle: 'Aide des Tags',
-    helpEmbedDescription: [
-      { name: 'Créer un tag', value: '`tags create [--embed] <nom> <contenu>`' },
-      { name: 'Liste des tags', value: '`tags list`' },
-      { name: 'Supprimer un tag', value: '`tags remove <nom>`' },
-      { name: 'Modifier un tag', value: '`tags edit <nom> <contenu>`' },
-      { name: 'Renommer un tag', value: '`tags rename <nom> <nouveau nom>`' },
-      { name: "Définir les aliases d'un tag", value: '`tags aliases <nom> <aliases1, aliases2, ... | clear>`' },
-      { name: "Mode d'affichage du tag", value: '`tags embed <nom> <booléen>`' },
-      { name: "Page d'aide", value: '`tags help`' },
-    ],
-
-    prompts: {
-      name: {
-        base: 'Entre le nom du tag :',
-        invalid: 'Ce nom de tag est déjà utilisé ou est invalide.',
-      },
-      newName: {
-        base: 'Entre le nouveau nom du tag :',
-        invalid: 'Ce nom de tag est déjà utilisé ou est invalide.',
-      },
-      aliases: {
-        base: 'Entre les aliases du tag :',
-        invalid: 'Ces aliases de tags sont déjà utilisés ou sont invalides.',
-      },
-      content: {
-        base: 'Entre le contenu du tag :',
-        invalid: 'Ce contenu est invalide.',
-      },
-    },
   },
 } as const;

@@ -1,19 +1,30 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions } from '@sapphire/framework';
-import type { Message } from 'discord.js';
 import { latex as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
-@ApplyOptions<CommandOptions>(config.options)
-export default class LatexCommand extends HorizonCommand {
-  public async messageRun(message: Message, args: Args): Promise<void> {
-    const equation = await args.restResult('string');
-    if (equation.error) {
-      await message.channel.send(config.messages.noEquationGiven);
-      return;
-    }
+enum Options {
+  Equation = 'equation',
+}
 
-    await message.channel.send(settings.apis.latex + encodeURIComponent(equation.value));
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class LatexCommand extends HorizonCommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(true)
+        .addStringOption(
+          option => option
+            .setName(Options.Equation)
+            .setDescription(this.descriptions.options.equation),
+        ),
+    );
+  }
+
+  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+    const equation = interaction.options.getString(Options.Equation, true);
+    await interaction.reply(settings.apis.latex + encodeURIComponent(equation));
   }
 }

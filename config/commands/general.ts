@@ -4,30 +4,48 @@ import { Formatters } from 'discord.js';
 import { timeFormat } from '@/utils';
 
 export const code = {
-  options: {
-    aliases: ['code', 'run'],
-    description: stripIndent`
-      Permet d'exécuter du code directement depuis Discord.
-      • Pour certains langages (Java, C, C++...), tu peux ajouter le drapeau \`--wrap\` pour automatiquement ajouter la fonction/classe \`main\` autour de ton code.
-      • Tu peux écrire ton code directement après le langage, ou dans un bloc de code Markdown.
-      • Pour voir la liste des langages supportés, tape \`code list\`.
-      • Si ton programme *demande* des données à l'utilisateur, tu peux en fournir via \`--input=123\` ou \`--input="mes données"\` avec des guillements si ton texte contient plusieurs mots.
-      • Je ne peux faire cette commande qu'un nombre limité de fois : elle est cappée à 200 utilisations par jour, en tout. Merci de ne pas en abuser pour que tout le monde puisse en profiter ! :) (ne vous étonnez pas si elle ne répond plus quand vous l'exécutez : vous l'avez surement trop spammée.)
-    `,
-    enabled: true,
-    usage: 'run list | <langage> [--wrap] <code>',
-    examples: ['code list', 'run java --wrap System.out.println("Test");', 'run js --input=test console.log(process.argv[0]);'],
+  descriptions: {
+    name: 'Lancer le code',
   },
   messages: {
     noMoreCredits: 'Cette commande peut malheureusement être utilisée maximum 200 fois par jour, et ce quota a été atteint... Réessaye à partir de 13h !',
-    unknownLanguage: 'Le langage spécifié est invalide. Voici la liste des langages que je supporte : {languages}',
-    noCode: "Tu as oublié d'ajouter du code à exécuter !",
-    result: "Résultat de l'éxecution de ce code en {lang.value.display}. (Temps CPU : {cpuTime} / Memoire : {memory})",
-    creditStatus: "Crédits restant pour aujourd'hui : {remaining}",
-    informationBlock: stripIndent`
-      Abbréviations : {formattedSlugs}
-      Version : {lang.version}
-    `,
+    messageNotFound: "Le message n'a pas été trouvé.",
+    result: "Résultat de l'éxecution de ce code en {language.display} ({language.version}). (Temps CPU : {cpuTime} / Memoire : {memory})\n ```ph\n{output}```",
+    wrapNames: {
+      c: 'une fonction `main` autour de ton code, et importer `stdio.h` et `stdlib.h`',
+      cpp: 'une fonction `main` autour de ton code, et importer `iostream`',
+      java: 'une classe `Main` et méthode static `main` autour de ton code',
+      nodejs: 'une IIFE async autour de ton code',
+    },
+    codeSelectMenu: {
+      prompt: 'Plusieurs codes ont été trouvés. Choisis lequel utiliser :',
+      placeholder: 'Choisis un code',
+      itemWithLanguage: 'Code {i}',
+      itemWithoutLanguage: 'Code {i} (en {code.lang})',
+    },
+    languageSelectMenu: {
+      prompt: 'Choisis le langage de ton code :',
+      placeholder: 'Choisis un langage',
+    },
+    wrapConfirmation: {
+      prompt: 'Souhaites-tu injecter {wrapName} ?\nExemple : ```{code}```',
+      yes: 'Oui',
+      no: 'Non',
+    },
+  },
+} as const;
+
+export const contacts = {
+  descriptions: {
+    name: 'contacts',
+    command: "Consulter les contacts utiles des membres de l'administration de l'école.",
+  },
+  messages: {
+    noContacts: "Aucun contact n'a été ajouté !",
+    listLine: '**__{contact}__**\n*{description}*',
+    pageTitle: 'Contact {teamName}',
+    selectMenuItemDescription: 'Page {pageIndex}',
+    selectMenuItemEmoji: '🏷',
   },
 } as const;
 
@@ -58,53 +76,47 @@ export const help = {
 } as const;
 
 export const latex = {
-  options: {
-    aliases: ['latex', 'tex', 'math'],
-    description: 'Permet de formatter du texte LaTeX proprement.',
-    enabled: true,
-    usage: 'latex <latex>',
-    examples: ['latex \\int_{a}^{b} f(x) dx'],
+  descriptions: {
+    name: 'latex',
+    command: 'Formatter du texte LaTeX proprement.',
+    options: {
+      equation: 'Équation à formatter.',
+    },
   },
-  messages: {
-    noEquationGiven: "Tu as oublié d'ajouter une équation à formatter !",
-  },
+  messages: {},
 } as const;
 
-export const mergePDF = {
-  options: {
-    aliases: ['merge-pdf', 'pdf'],
-    description: "Permet de combiner plusieurs fichiers PDF en pièces jointes ou via **des messages Discord**, via leurs liens ou leurs IDs. Vous pouvez utiliser l'option `--name=\"nom\"` afin de définir le nom du fichier résultant, qui sera sinon \"merged.pdf\".",
-    enabled: true,
-    usage: 'mergepdf <lien message discord 1> <lien message discord 2> <lien message discord 3>',
-    examples: ['mergepdf (avec en pièces jointes des PDFs)', 'mergepdf 850464765536763904-902974093366812772 913345932106543114'],
+export const mergePdf = {
+  descriptions: {
+    name: 'merge-pdf',
+    command: "Combiner plusieurs fichiers PDF en pièces jointes de ce message ou d'un autre.",
+    options: {
+      messages: 'Liens des messages desquels récupérer les PDFs à combiner, séparés par des espaces.',
+      attachment: 'Pièce jointe à combiner.',
+      name: 'Nom du fichier de sortie.',
+    },
   },
   messages: {
     noPDFGiven: 'Il faut ajouter des PDFs à ton message, ou donner le lien de messages contenant des PDFs !',
     notEnoughFiles: 'Il faut me donner au moins 2 fichiers pour que je puisse les fusionner !',
+    error: 'Une erreur est survenue lors de la fusion des fichiers...',
   },
 } as const;
 
 export const ping = {
-  options: {
-    aliases: ['ping', 'pong', 'ms'],
-    description: "Permet de connaître la latence de HorizonBot et de l'API Discord.",
-    enabled: true,
-    usage: 'ping',
-    examples: ['ping'],
+  descriptions: {
+    name: 'ping',
+    command: "Connaître la latence de HorizonBot et de l'API Discord.",
   },
   messages: {
-    firstMessage: 'Ping !',
-    secondMessage: "Pong ! Latence de HorizonBot : {botPing}ms. Latence de l'API : {apiPing}ms.",
+    message: "Pong ! Latence de HorizonBot : {botPing}ms. Latence de l'API : {apiPing}ms.",
   },
 } as const;
 
-export const records = {
-  options: {
-    aliases: ['records', 'record', 'enregistrements', 'enregistrement', 'vidéos', 'vidéo', 'videos', 'video'],
-    description: 'Permet de voir la liste des enregistrements des eclasses disponibles.',
-    enabled: true,
-    usage: 'records',
-    examples: ['records'],
+export const recordings = {
+  descriptions: {
+    name: 'recordings',
+    command: 'Consulter la liste des enregistrements des eclasses disponibles.',
   },
   messages: {
     noRecords: "Je n'ai trouvé aucun enregistrement de classes dans la base de données !",
@@ -115,12 +127,20 @@ export const records = {
 } as const;
 
 export const reminders = {
-  options: {
-    aliases: ['reminders', 'reminder', 'remind', 'remindme', 'rappels', 'rappel'],
-    description: "Permet de créer/modifier et lister des rappels. Pour la création d'un rappel, vous pouvez écrire directement la durée, sans passée par la sous-commande `create` (cf exemples). Pour entrer une date, utilisez des guillemets pour pouvoir entrer une date et une heure.",
-    enabled: true,
-    usage: 'reminders <create | list | remove | help>',
-    examples: ['reminder 2h Aller me coucher', 'reminders "25/12 00h" Joyeux Noël !', 'tags remove 12we6f', 'reminders list'],
+  descriptions: {
+    name: 'reminders',
+    command: 'Gérer des rappels personnels.',
+    subcommands: {
+      create: 'Créer un rappel.',
+      list: 'Consulter ses rappels à venir.',
+      edit: 'Modifier un rappel.',
+      remove: 'Supprimer un rappel.',
+    },
+    options: {
+      dateOrDuration: 'Date du rappel ou durée au bout de laquel je dois te rappel.',
+      content: 'Message à te rappeler.',
+      id: 'Identifiant du rappel à modifier.',
+    },
   },
   messages: {
     // Global
@@ -138,37 +158,17 @@ export const reminders = {
 
     // Edit a reminder
     editedReminder: `Ce rappel a bien été modifié, je te le rappellerai le ${timeFormat('{date}')} !`,
+    invalidUsage: 'Ajoute la date ou le message à modifier.',
 
     // Remove a reminder
     removedReminder: 'Ce rappel a bien été supprimé !',
-
-    // Help page
-    helpEmbedTitle: 'Aide des rappels',
-    helpEmbedDescription: [
-      { name: 'Créer un rappel', value: '`reminders [create] <durée | "date"> [description]`' },
-      { name: 'Liste de tes rappels', value: '`reminders list`' },
-      { name: 'Modifier un rappel', value: '`reminders edit <ID> <date | [description]>`' },
-      { name: 'Supprimer un rappel', value: '`reminders remove <ID>`' },
-      { name: "Page d'aide", value: '`reminders help`' },
-    ],
-
-    // Prompts
-    prompts: {
-      id: {
-        base: "Entre l'ID du rappel :",
-        invalid: 'Cet ID de rappel est invalide.',
-      },
-    },
   },
 } as const;
 
 export const serverInfo = {
-  options: {
-    aliases: ['server-info', 'serveur-info'],
-    description: 'Affiche diverses informations sur la guilde où la commande est exécutée.',
-    enabled: true,
-    usage: 'serverinfo',
-    examples: ['serverinfo'],
+  descriptions: {
+    name: 'server-info',
+    command: 'Affiche diverses informations sur la guilde où la commande est exécutée.',
   },
   messages: {
     embed: {
@@ -189,17 +189,14 @@ export const serverInfo = {
 } as const;
 
 export const statistics = {
-  options: {
-    aliases: ['statistiques', 'statistique', 'statistics', 'statistic', 'stats', 'stat', 'botinfo'],
-    description: 'Affiche des statistiques et diverses informations sur le bot, comme son temps de fonctionnement, sa version etc.',
-    enabled: true,
-    usage: 'statistiques',
-    examples: ['statistiques'],
+  descriptions: {
+    name: 'statistics',
+    command: 'Affiche des statistiques et diverses informations sur le bot.',
   },
   messages: {
     embed: {
       title: 'Statistiques de HorizonBot',
-      description: 'Le préfixe est `{prefix}`. Faites `{prefix}aide` pour avoir la liste des commandes.',
+      description: 'Tapez `/` (sans envoyer le message) pour afficher la liste des commandes.',
       version: '❯ Version',
       versionContent: stripIndent`
         Version : {version}
@@ -213,13 +210,35 @@ export const statistics = {
   },
 } as const;
 
+export const tag = {
+  descriptions: {
+    name: 'tag',
+    command: 'Consulter les "tags" (messages dynamiques, entièrement configurable directement via discord).',
+    options: {
+      name: 'Nom du tag.',
+    },
+  },
+  messages: {
+    modals: {
+      contentLabel: 'Contenu du tag',
+      contentPlaceholder: 'Entrez le contenu du tag ici.',
+      createTitle: 'Créer un tag',
+      editTitle: 'Modifier le tag {name}',
+    },
+
+    noTags: "Aucun tag n'a été créé !",
+    listTitle: 'Liste des tags ({total})',
+    listLine: '• `{name}` : {uses} utilisations',
+  },
+} as const;
+
 export const userInfo = {
-  options: {
-    aliases: ['userinfo'],
-    description: "Permet d'afficher diverses informations sur un membre en particulier du Discord.",
-    enabled: true,
-    usage: 'userinfo [@mention | pseudo | ID]',
-    examples: ['userinfo', 'userinfo Ivan STEPANIAN'],
+  descriptions: {
+    name: 'user-info',
+    command: 'Affiche diverses informations sur un membre en particulier du Discord.',
+    options: {
+      member: 'Membre sur lequel regarder les informations.',
+    },
   },
   messages: {
     embed: {
@@ -271,21 +290,16 @@ export const userInfo = {
         },
       },
     },
- },
+  },
 } as const;
 
 export const vocalCount = {
-  options: {
-    aliases: ['vocal-count', 'voc-count', 'vocount'],
-    description: 'Affiche le nombre de personnes connectées dans les salons vocaux du serveur.',
-    enabled: true,
-    usage: 'vocalcount',
-    examples: ['vocalcount'],
+  descriptions: {
+    name: 'vocal-count',
+    command: 'Affiche le nombre de personnes connectées dans les salons vocaux du serveur.',
   },
   messages: {
-    invalidUse: "Tu n'as pas spécifié de salon vocal, et tu n'es dans aucun salon !",
     topLine: `\`{index}.\` ${channelMention('{channelId}')} : {count} membres`,
     noOnlineMembers: "Personne n'est connecté dans un salon vocal dans ce serveur.",
-    count: 'Il y a {count} personnes connectées dans ce salon vocal !',
   },
 } as const;

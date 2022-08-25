@@ -1,56 +1,60 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { CommandOptions } from '@sapphire/framework';
 import { Constants, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { serverInfo as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
-@ApplyOptions<CommandOptions>({
-  ...config.options,
-  preconditions: ['GuildOnly'],
-})
-export default class ServerInfoCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage): Promise<void> {
-    const texts = config.messages.embed;
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class ServerInfoCommand extends HorizonCommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(false),
+    );
+  }
+
+  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+    const texts = this.messages.embed;
 
     const embed = new MessageEmbed()
       .setColor(settings.colors.primary)
-      .setTitle(pupa(texts.title, message.guild))
-      .setThumbnail(message.guild.iconURL())
+      .setTitle(pupa(texts.title, interaction.guild))
+      .setThumbnail(interaction.guild.iconURL())
       .addFields([
-        { name: texts.membersTitle, value: pupa(texts.membersValue, message.guild), inline: true },
+        { name: texts.membersTitle, value: pupa(texts.membersValue, interaction.guild), inline: true },
         {
           name: texts.channelsTitle,
           value: pupa(texts.channelsValue, {
-            ...message.guild,
-            text: message.guild.channels.cache.filter(channel => channel.isText()).size,
-            voice: message.guild.channels.cache.filter(channel => channel.isVoice()).size,
-            categories: message.guild.channels.cache.filter(channel => channel.type === 'GUILD_CATEGORY').size,
+            ...interaction.guild,
+            text: interaction.guild.channels.cache.filter(channel => channel.isText()).size,
+            voice: interaction.guild.channels.cache.filter(channel => channel.isVoice()).size,
+            categories: interaction.guild.channels.cache.filter(channel => channel.type === 'GUILD_CATEGORY').size,
           }),
           inline: true,
         },
         {
           name: texts.boostsTitle,
           value: pupa(texts.boostsValue, {
-            ...message.guild,
-            premiumTier: Constants.PremiumTiers[message.guild.premiumTier],
+            ...interaction.guild,
+            premiumTier: Constants.PremiumTiers[interaction.guild.premiumTier],
           }),
           inline: true,
         },
-        { name: texts.rolesTitle, value: pupa(texts.rolesValue, message.guild), inline: true },
+        { name: texts.rolesTitle, value: pupa(texts.rolesValue, interaction.guild), inline: true },
         {
           name: texts.createdAtTitle,
           value: pupa(texts.createdAtValue, {
-            ...message.guild,
-            createdTimestamp: Math.round(message.guild.createdTimestamp / 1000),
+            ...interaction.guild,
+            createdTimestamp: Math.round(interaction.guild.createdTimestamp / 1000),
           }),
           inline: true,
         },
       ])
-      .setFooter({ text: pupa(texts.footer, message.guild) });
+      .setFooter({ text: pupa(texts.footer, interaction.guild) });
 
-    await message.channel.send({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

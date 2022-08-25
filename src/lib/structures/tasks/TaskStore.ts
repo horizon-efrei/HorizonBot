@@ -1,4 +1,4 @@
-import { Store } from '@sapphire/pieces';
+import { Store } from '@sapphire/framework';
 import type { Constructor } from '@sapphire/utilities';
 import Task from '@/structures/tasks/Task';
 

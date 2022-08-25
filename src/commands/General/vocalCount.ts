@@ -1,29 +1,33 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions } from '@sapphire/framework';
 import type { BaseGuildVoiceChannel } from 'discord.js';
 import pupa from 'pupa';
 import { vocalCount as config } from '@/config/commands/general';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
-@ApplyOptions<CommandOptions>({
-  ...config.options,
-  preconditions: ['GuildOnly'],
-  generateDashLessAliases: true,
-})
-export default class VocalCountCommand extends HorizonCommand {
-  public async messageRun(message: GuildMessage, _args: Args): Promise<void> {
-    const allChannels = [...message.guild.channels.cache.values()];
-    const voiceChannels = allChannels
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class VocalCountCommand extends HorizonCommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(false),
+    );
+  }
+
+  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+    const voiceChannels = [...interaction.guild.channels.cache.values()]
       .filter(chan => chan.isVoice() && chan.members.size > 0) as BaseGuildVoiceChannel[];
+
+    if (voiceChannels.length === 0) {
+      await interaction.reply({ content: this.messages.noOnlineMembers, ephemeral: true });
+      return;
+    }
+
     const lines = voiceChannels
       .sort((chan1, chan2) => chan2.members.size - chan1.members.size)
-      .map((chan, i) => pupa(config.messages.topLine, { index: i + 1, channelId: chan.id, count: chan.members.size }));
-
-    await message.channel.send(
-      lines.length > 0
-        ? lines.join('\n')
-        : config.messages.noOnlineMembers,
-    );
+      .map((chan, i) => pupa(this.messages.topLine, { index: i + 1, channelId: chan.id, count: chan.members.size }))
+      .join('\n');
+    await interaction.reply(lines);
   }
 }

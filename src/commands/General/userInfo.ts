@@ -1,19 +1,35 @@
 import { TimestampStyles } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
-import type { Args, CommandOptions } from '@sapphire/framework';
 import { Formatters, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { userInfo as config } from '@/config/commands/general';
 import settings from '@/config/settings';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
-import type { GuildMessage } from '@/types';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
-@ApplyOptions<CommandOptions>(config.options)
-export default class UserInfoCommand extends HorizonCommand {
-  public override async messageRun(message: GuildMessage, args: Args): Promise<void> {
-    const member = await args.rest('member').catch(() => message.member);
+enum Options {
+  Member = 'member',
+}
 
-    const embedConfig = config.messages.embed;
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class UserInfoCommand extends HorizonCommand<typeof config> {
+    public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+      registry.registerChatInputCommand(
+        command => command
+          .setName(this.descriptions.name)
+          .setDescription(this.descriptions.command)
+          .setDMPermission(true)
+          .addUserOption(
+            option => option
+              .setName(Options.Member)
+              .setDescription(this.descriptions.options.member),
+          ),
+      );
+    }
+
+  public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
+    const member = interaction.options.getMember(Options.Member) ?? interaction.member;
+
+    const embedConfig = this.messages.embed;
 
     let presenceDetails = '';
     const activity = member.presence?.activities[0];
@@ -65,6 +81,6 @@ export default class UserInfoCommand extends HorizonCommand {
         { name: embedConfig.presence.title, value: presenceContent, inline: true },
       ]);
 
-    await message.channel.send({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

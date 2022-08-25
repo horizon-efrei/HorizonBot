@@ -1,13 +1,11 @@
 import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
-import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
-import { isGuildMessage } from '@/utils';
 
 export default class MessageUpdateListener extends Listener {
-  public async run(oldMessage: GuildMessage, newMessage: Message): Promise<void> {
-    if (newMessage.author.bot || newMessage.system || !isGuildMessage(newMessage))
+  public async run(oldMessage: Message, newMessage: Message): Promise<void> {
+    if (newMessage.author.bot || newMessage.system || !newMessage.inGuild())
       return;
 
     await DiscordLogManager.logAction({

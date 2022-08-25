@@ -1,30 +1,43 @@
-import type { IMessagePrompterExplicitMessageReturn } from '@sapphire/discord.js-utilities';
-import type { CommandOptions } from '@sapphire/framework';
 import type {
   DMChannel,
-  Guild,
   GuildMember,
   Message,
   PartialDMChannel,
   Role,
 } from 'discord.js';
-import type HorizonClient from '@/structures/HorizonClient';
-import type { EclassPlace, SubjectBase } from '@/types/database';
-
-/* ************ */
-/*  Util types  */
-/* ************ */
-
-export type Writable<T> = { -readonly [P in keyof T]: T[P] };
+import type { EclassPlace, SubjectDocument } from '@/types/database';
 
 /* ******************************************* */
 /*  Custom Types used all across the codebase  */
 /* ******************************************* */
 
-// Overwrite 'appliedMessage' and 'response' in 'IMessagePrompterExplicitMessageReturn' for them
-// to be GuildMessages rather than Messages
-export type PrompterMessageResult = Omit<IMessagePrompterExplicitMessageReturn, 'appliedMessage' | 'response'> & { response: GuildMessage; appliedMessage: GuildMessage };
-export type PrompterText = Partial<Record<'base' | 'invalid', string>>;
+export interface CommandDescriptionOptions {
+  name: string;
+  command: string;
+  options?: Record<string, string>;
+}
+
+export interface ContextMenuCommandDescriptionOptions {
+  name: string;
+  command?: never;
+}
+
+export interface SubcommandDescriptionOptions {
+  name: string;
+  command: string;
+  subcommands?: Record<string, string>;
+  options?: Record<string, string>;
+}
+
+export interface CommandConfiguration {
+  descriptions: CommandDescriptionOptions | ContextMenuCommandDescriptionOptions;
+  messages: object;
+}
+
+export interface SubcommandConfiguration {
+  descriptions: SubcommandDescriptionOptions;
+  messages: object;
+}
 
 export enum SchoolYear {
   L1 = 'L1',
@@ -39,10 +52,9 @@ export enum TeachingUnit {
   PhysicsElectronics = 'Physique & Électronique',
 }
 
-export type AnnouncementSchoolYear = SchoolYear | 'general';
 export interface EclassCreationOptions {
   date: Date;
-  subject: SubjectBase;
+  subject: SubjectDocument;
   topic: string;
   duration: number;
   professor: GuildMember;
@@ -60,56 +72,21 @@ export interface EclassEmbedOptions {
   end: number;
   isRecorded: boolean;
   professor: GuildMember;
-  subject: SubjectBase;
+  subject: SubjectDocument;
   place: EclassPlace;
   placeInformation: string | null;
   topic: string;
 }
 
-export type HorizonCommandOptions = CommandOptions & {
-  usage: string;
-  examples: string[];
-  runnableBy: string;
-};
-
+// TODO: remove
 export type GuildTextBasedChannel = Exclude<Message['channel'], DMChannel | PartialDMChannel>;
 
-export interface GuildMessage extends Message {
-  channel: GuildTextBasedChannel;
-  readonly client: HorizonClient;
-  readonly guild: Guild;
-  readonly member: GuildMember;
-}
+export type GuildMessage = Message<true>;
 
 export interface CodeLanguageResult {
   display: string;
   language: string;
-  slugs: string[];
   version: string;
   versionIndex: string;
-}
-
-export interface ReactionRolePair {
-  reaction: string;
-  role: Role;
-}
-
-export interface HourMinutes {
-  hour: number;
-  minutes: number;
-  formatted: string;
-}
-
-export interface DurationPart {
-  number: string;
-  unit: string;
-}
-
-export interface ReactionRoleReturnPayload {
-  isError: boolean;
-  errorPayload?: {
-    reactions?: string[];
-    roles?: string[];
-  };
-  reactionRoles: ReactionRolePair[];
+  slugs: string[];
 }

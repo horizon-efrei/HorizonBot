@@ -1,20 +1,28 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { CommandOptions } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { Message } from 'discord.js';
 import pupa from 'pupa';
 import { ping as config } from '@/config/commands/general';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
-@ApplyOptions<CommandOptions>(config.options)
-export default class PingCommand extends HorizonCommand {
-  public async messageRun(message: Message): Promise<void> {
-    const msg = await message.channel.send(config.messages.firstMessage);
-
-    await msg.edit(
-      pupa(config.messages.secondMessage, {
-        botPing: Math.round(this.container.client.ws.ping),
-        apiPing: msg.createdTimestamp - message.createdTimestamp,
-      }),
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class PingCommand extends HorizonCommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(true),
     );
+  }
+
+  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+    const defer = await interaction.deferReply({ fetchReply: true });
+    if (!(defer instanceof Message))
+      return;
+
+    const botPing = (defer.editedAt ?? defer.createdAt).getTime() - interaction.createdAt.getTime();
+    const apiPing = Math.round(this.container.client.ws.ping);
+
+    await interaction.followUp(pupa(this.messages.message, { botPing, apiPing }));
   }
 }

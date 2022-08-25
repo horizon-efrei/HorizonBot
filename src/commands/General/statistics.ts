@@ -1,23 +1,30 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import type { CommandOptions } from '@sapphire/framework';
 import dayjs from 'dayjs';
-import type { Message } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
 import pkg from '@/root/package.json';
-import HorizonCommand from '@/structures/commands/HorizonCommand';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import { getGitRev } from '@/utils';
 
-@ApplyOptions<CommandOptions>(config.options)
-export default class StatisticsCommand extends HorizonCommand {
-  public async messageRun(message: Message): Promise<void> {
-    const embedMessages = config.messages.embed;
+@ApplyOptions<HorizonCommand.Options>(config)
+export default class StatisticsCommand extends HorizonCommand<typeof config> {
+  public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
+    registry.registerChatInputCommand(
+      command => command
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
+        .setDMPermission(true),
+    );
+  }
+
+  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+    const embedMessages = this.messages.embed;
     const commitHash = await getGitRev();
     const embed = new MessageEmbed()
       .setColor(settings.colors.default)
-      .setDescription(pupa(config.messages.embed.description, { prefix: settings.prefix }))
+      .setDescription(this.messages.embed.description)
       .addFields([
         {
           name: embedMessages.version,
@@ -34,6 +41,6 @@ export default class StatisticsCommand extends HorizonCommand {
       ])
       .setTimestamp();
 
-    await message.channel.send({ embeds: [embed] });
+    await interaction.reply({ embeds: [embed] });
   }
 }

@@ -7,26 +7,22 @@ import {
 import { Identifiers } from '@sapphire/framework';
 import { oneLine, stripIndent } from 'common-tags';
 import settings from '@/config/settings';
-import { DiscordLogType } from '@/types/database';
+import { DiscordLogType, LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
 
 export default {
   global: {
     oops: ":warning: Oups... Quelque chose s'est mal passé en réalisant cette action. Il se peut qu'elle ne se soit pas complètement terminée, voire pas commencée. Désolé !",
     dmFailed: ":warning: Impossible de t'envoyer le message en privé. Vérifie que tu ne bloques pas les messages privés provenant de ce serveur, ou que tu ne m'ai pas bloqué.",
+    onlySlashCommands: "Les commandes traditionnelles ne sont plus disponibles, il faut maintenant utiliser les \"slash commands\".\n\n:grey_question: Kézako\n> Les \"slashs commands\" est un nouveau système intégré à Discord permettant aux bots de fournir une expérience enrichie pour les utilisateurs. Écris `/` (sans envoyer le message) pour voir la liste des commandes que je propose. Ce sont les mêmes qu'avant à l'exception de la commande d'aide, qui a été supprimée en faveur de la liste que tu vois en tapant `/` !",
   },
   errors: {
     precondition: {
-      [Identifiers.PreconditionStaffOnly]: ":x: Aïe, tu n'as pas la permission de faire cela :confused:",
-      [Identifiers.PreconditionGuildOnly]: ':x: Aïe, cette commande ne peut être utilisée que dans un serveur :confused:',
       [Identifiers.PreconditionCooldown]: 'Pas si vite ! Cette commande est sous cooldown, attendez un peu avant de la réutiliser.',
       unknownError: "Une pré-condition de commande inconnue t'empêche d'effectuer cette action.",
     },
   },
   miscellaneous: {
-    eprofMentionPublic: '{eProf} nous avons besoin de toi !',
-    eprofMentionPrivate: '{member} a besoin de toi là-bas : {message.channel}',
-    paginatedMessagePrompt: 'À quelle page désires-tu aller ?',
     wrongUserInteractionReply: 'Tu ne peux pas cliquer sur ces boutons, ils sont réservés à {user}.',
   },
   logs: {
@@ -63,6 +59,12 @@ export default {
       [DiscordLogType.VoiceJoin]: 'connection en vocal',
       [DiscordLogType.VoiceLeave]: "déconnexion d'un salon vocal",
       [DiscordLogType.VoiceMove]: 'changement de salon vocal',
+    },
+    readableStatuses: {
+      [LogStatuses.Disabled]: 'Désactivé',
+      [LogStatuses.Silent]: 'Silencieux (stocké)',
+      [LogStatuses.Console]: 'Console (stocké + affiché dans la console)',
+      [LogStatuses.Discord]: 'Discord (stocké + affiché dans la console + envoyé sur Discord)',
     },
     embedTitle: 'Logs automatiques',
     fields: {
@@ -242,53 +244,5 @@ export default {
       sérieux et amical, nous t'invitons donc à supprimer ce message ou enlever cette insulte le plus rapidement possible.
       Merci !\n{message.url}
     `,
-  },
-  prompts: {
-    channel: {
-      base: 'Entre un salon (mentionne-le ou entre son nom ou son ID) :',
-      invalid: 'Ce salon est invalide.',
-    },
-    message: {
-      base: 'Entre un message (son ID ou son URL) :',
-      invalid: 'Ce message est invalide.',
-    },
-    text: {
-      base: 'Entre du texte :',
-      invalid: 'Ce texte est invalide.',
-    },
-    url: {
-      base: 'Entre une URL :',
-      invalid: 'Cette URL est invalide.',
-    },
-    day: {
-      base: 'Entre une date (au format "jj/MM")  :',
-      invalid: 'Cette date est invalide.',
-    },
-    hour: {
-      base: 'Entre une heure (au format "HH:mm") :',
-      invalid: 'Cette heure est invalide.',
-    },
-    date: {
-      base: 'Entre une date (au format "jj/MM HH:mm")  :',
-      invalid: 'Cette date est invalide.',
-    },
-    duration: {
-      base: 'Entre une durée (en anglais ou en francais).\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
-      invalid: 'Cette durée est invalide.',
-    },
-    member: {
-      base: 'Entre un membre (mentionne-le ou entre son pseudo ou son ID) :',
-      invalid: 'Ce membre est invalide.',
-    },
-    role: {
-      base: 'Entre un rôle (mentionne-le ou entre son nom ou son ID) :',
-      invalid: 'Ce rôle est invalide.',
-    },
-    boolean: {
-      base: 'Entre un booléen ("oui"/"non") :',
-      invalid: 'Ce booléan est invalide.',
-    },
-
-    stoppedPrompting: 'Tu as bien abandonné la commande !',
   },
 } as const;

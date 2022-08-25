@@ -3,11 +3,11 @@ import type { Message } from 'discord.js';
 import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
-import { isGuildMessage, nullop } from '@/utils';
+import { nullop } from '@/utils';
 
 export default class MessageDeleteListener extends Listener {
   public async run(message: Message): Promise<void> {
-    if (message.system || message.partial || message.channel.partial || !isGuildMessage(message))
+    if (message.system || message.partial || message.channel.partial || !message.inGuild())
       return;
 
     if (!message.author.bot) {

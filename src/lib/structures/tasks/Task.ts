@@ -1,5 +1,4 @@
-import type { PieceContext, PieceJSON, PieceOptions } from '@sapphire/pieces';
-import { Piece } from '@sapphire/pieces';
+import { Piece } from '@sapphire/framework';
 import cron from 'node-cron';
 import type { Object } from 'ts-toolbelt';
 import { Events } from '@/types/sapphire';
@@ -34,7 +33,7 @@ export default abstract class Task extends Piece {
   private _scheduleCron: cron.ScheduledTask;
   private readonly _callback: (() => Promise<void>) | null;
 
-  constructor(context: PieceContext, options: TaskOptions) {
+  constructor(context: Piece.Context, options: TaskOptions) {
     super(context, options);
 
     this.interval = options.interval;
@@ -56,7 +55,7 @@ export default abstract class Task extends Piece {
       this._scheduleCron.stop();
   }
 
-  public toJSON(): PieceJSON & { interval: number | undefined; cron: string | undefined } {
+  public toJSON(): Piece.JSON & { interval: number | undefined; cron: string | undefined } {
     return {
       ...super.toJSON(),
       interval: this.interval,
@@ -75,4 +74,4 @@ export default abstract class Task extends Piece {
   public abstract run(): unknown;
 }
 
-export type TaskOptions = Object.Either<PieceOptions & { cron: string; interval: number }, 'cron' | 'interval'>;
+export type TaskOptions = Object.Either<Piece.Options & { cron: string; interval: number }, 'cron' | 'interval'>;

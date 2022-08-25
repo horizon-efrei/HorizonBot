@@ -6,36 +6,72 @@ import {
   userMention,
 } from '@discordjs/builders';
 import { stripIndent } from 'common-tags';
-import type { MessageSelectOptionData } from 'discord.js';
+import type { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
 import { SchoolYear } from '@/types';
 import type { SubjectBase } from '@/types/database';
 import { EclassPlace, EclassStatus } from '@/types/database';
 import { getGraduationYear, timeFormat } from '@/utils';
 
 export const eclass = {
-  options: {
-    aliases: ['cours', 'class', 'ecours', 'eclass', 'e-cours', 'e-class'],
-    description: stripIndent`
-      Commande permettant de gérer les cours organisés sur ce Discord.
-      Pour créer un cours, tu peux utiliser \`!cours create\` et te laisser guider par le menu interactif qui apparaîtra.
-      Quand le cours sera créé, des messages seront envoyés dans les bons salons pour prévenir les membres, et un rôle spécial sera créé pour que les personnes voulant assister au cours puissent être notifiées.
-      Le cours se lancera tout seul à l'heure indiquée (ou jusqu'à 2 minutes après). Sinon, tu peux le lancer manuellement avec \`!cours start <ID cours>\`.
-      Le cours s'arrêtera au bout de la durée spécifiée. S'il se fini avant, tu peux l'arrêter manuellement avec \`!cours finish <ID cours>\`.
-      Pour plus d'informations sur comment utiliser cette commande, faites \`!cours help\`.
-    `,
-    enabled: true,
-    usage: 'cours <create | start | finish | edit | cancel | list | info | help>',
-    examples: ['!cours setup', '!cours list', '!cours start pierre_230023082021_jneh'],
+  descriptions: {
+    name: 'eclass',
+    command: 'Gérer les cours organisés sur ce Discord.',
+    subcommands: {
+      create: 'Créer un cours.',
+      list: 'Voir les cours.',
+      start: 'Débuter votre cours manuellement.',
+      finish: 'Arrêter votre cours manuellement.',
+      edit: 'Modifier un cours.',
+      cancel: 'Annuler un cours prévu.',
+      record: "Gérer les enregistrements d'un cours.",
+      info: "Voir les informations d'un cours.",
+    },
+    options: {
+      schoolYear: 'Promotion visée par le cours.',
+      subject: 'Matière sur laquelle le cours porte.',
+      topic: 'Sujet du cours.',
+      professor: 'Professeur en charge du cours.',
+      duration: 'Durée du cours.',
+      date: 'Date à laquelle le cours est prévu.',
+      targetRole: 'Rôle visé par le cours.',
+      place: 'Lieu où le cours est prévu.',
+      isRecorded: 'Si le cours est enregistré.',
+      status: 'Statut du cours.',
+      id: 'Identifiant du cours à utiliser.',
+      shouldPing: "S'il faut mentionner les personnes inscrites au cours pour leur prévenir du changement.",
+      choice: 'Choix à donner.',
+      silent: "S'il faut envoyer le lien dans le salon du cours.",
+      link: 'Lien du cours.',
+    },
   },
   messages: {
     // Global
     invalidClassId: "Cet identifiant n'est pas valide. L'identifiant de la classe a été envoyé quand elle a été créée, et il est toujours disponible dans l'embed d'annonce du cours. Sinon, tu peux le retrouver en faisant `!cours list`.",
     onlyProfessor: 'Seul les professeurs peuvent effectuer cette action !',
-    unresolvedProfessor: ':x: Impossible de retrouver le professeur pour ce cours !',
     unconfiguredChannel: "Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configures-en un en tapant la commande `setup set class-<promo> #salon`.",
     unconfiguredRole: "Oups, impossible de créer ce cours car aucun rôle de promo n'a été configuré. Configures-en un en tapant la commande `setup set role-<promo> @Role`.",
     editUnauthorized: "Tu ne peux pas modifier un cours qui n'est pas à toi !",
     statusIncompatible: 'Tu ne peux pas faire cette action alors que le cours {status}.',
+    professorOverlap: ':warning: **AÏE !** Ce professeur a déjà un cours de prévu à cette date.',
+    schoolYearOverlap: ':warning: **AÏE !** Cette promotion a déjà un cours de prévu à cette date.',
+    invalidSubject: "La matière entrée est invalide. Entre son code cours (ex: `TI304`), en faisant attention à ce qu'il te soit proposé. Sinon, cela signifie que la matière n'est pas disponible. Si tu penses que c'est un problème, contact un responsable eProf.",
+    invalidDuration: 'Cette durée est invalide. Il faut entrer une durée en anglais ou en français.\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` ou `1h45`.',
+    invalidDate: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée, qu'elle soit prévue pour dans moins de 2 mois et qu'elle soit au format `jj/MM HH:mm`.",
+    invalidTeamsUrl: "Le lien de la réunion Microsoft Teams donné n'est pas valide.",
+    invalidRecordLink: "Le lien de l'enregistrement donné n'est pas valide.",
+    placeInformationModal: {
+      title: 'Détails sur le lieu.',
+      label: {
+        [EclassPlace.OnSite]: 'Salle de cours',
+        [EclassPlace.Teams]: "Lien de la réunion ou de l'équipe Teams",
+        [EclassPlace.Other]: 'Lieu du cours',
+      },
+      placeholder: {
+        [EclassPlace.OnSite]: 'A304, M111, Amphi C...',
+        [EclassPlace.Teams]: 'Lien...',
+        [EclassPlace.Other]: 'Lieu...',
+      },
+    },
 
     // Readable enums
     statuses: {
@@ -66,20 +102,6 @@ export const eclass = {
       }
     },
 
-    // Help subcommand
-    helpEmbedTitle: 'Aide de la commande de cours',
-    helpEmbedDescription: [
-      { name: 'Créer un cours', value: '`!cours create`' },
-      { name: 'Commencer un cours', value: '`!cours start <ID-cours>`' },
-      { name: 'Terminer un cours manuellement', value: '`!cours finish <ID-cours>`' },
-      { name: 'Modifier un cours', value: '`!cours edit <ID-cours> <propriété> <valeur>`\n`propriété`: "sujet", "date", "heure", "durée", "professeur", "rôle", "lieu" ou "enregistré"' },
-      { name: 'Annuler un cours', value: '`!cours cancel <ID-cours>`' },
-      { name: 'Liste des cours', value: '`!cours list [--statut=<statut>] [--matiere=<matière>] [--professeur=<professeur>] [--role=<role>]`' },
-      { name: 'Définir/voir si le cours est enregistré', value: '`!cours record <ID-cours> [lien]`' },
-      { name: 'Informations sur un cours', value: '`!cours info <ID-cours>`' },
-      { name: "Page d'aide", value: '`!cours help`' },
-    ],
-
     // List subcommand
     listTitle: 'Liste des cours',
     noClassesFound: "Aucune classe n'a été trouvée...",
@@ -88,8 +110,8 @@ export const eclass = {
     noFilter: 'Aucun filtre de recherche appliqué.\n\n',
     statusFilter: '• Statut : {value}',
     professorFilter: '• Professeur : {value}',
-    roleFilter: '• Rôle : {value}',
     subjectFilter: '• Matière : {value}',
+    schoolYearFilter: '• Promo : {value}',
     listFieldTitle: '{topic} ({subject.name})',
     listFieldDescription: stripIndent`
       Prévu ${timeFormat('{date}', TimestampStyles.RelativeTime)}, dure {duration}, se termine à ${timeFormat('{end}', TimestampStyles.ShortTime)}
@@ -124,122 +146,39 @@ export const eclass = {
       footer: 'ID : {classId}',
     },
 
-    createClassSetup: {
-      embed: {
-        title: "Création d'un cours",
-        description: "Bienvenue dans l'assistant de création de cours ! Suis les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il te sera demandé. Tu peux, à tout moment, abandonner la création du cours en cliquant sur \"Abandonner\".",
-        stepPreviewTitle: 'Aperçu des étapes',
-        currentStepTitle: 'Étape actuelle : {step}',
-        currentStepDescription: [
-          'Choisis dans le menu déroulant ci-dessous quelle promotion ton cours vise.',
-          'Choisis dans le menu déroulant ci-dessous sur quelle matière ton cours porte.',
-          'Envoie un message contenant le sujet de ton cours.',
-          'Envoie un message contenant le professeur en charge de ton cours.',
-          'Envoie un message contenant la durée de ton cours.',
-          'Envoie un message contenant la date à laquelle ton cours est prévu.',
-          'Envoie un message contenant le rôle visé par ton cours.',
-          'Choisis dans le menu déroulant ci-dessous où présenter ton cours.',
-          'Choisis dans le menu déroulant ci-dessous si oui ou non ton cours sera enregistré. Cette option peut être changée plus tard.',
-          'Terminé !',
-        ],
-      },
-      promptMessageMenu: 'Choisis une option dans le menu ci-dessus :arrow_heading_up: ',
-      stepPreview: stripIndent`
-        **1.** __Promotion :__ {schoolYear}
-        **2.** __Matière :__ {subject}
-        **3.** __Sujet :__ {topic}
-        **4.** __Professeur :__ {professor}
-        **5.** __Durée :__ {duration}
-        **6.** __Date :__ {date}
-        **7.** __Rôle visé :__ {targetRole}
-        **8.** __Lieu :__ {where}
-        **9.** __Enregistré :__ {isRecorded}
-      `,
-      schoolYearMenu: {
-        placeholder: 'Aucune année sélectionnée',
-        options: (): MessageSelectOptionData[] => [
-          { label: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, emoji: '1⃣', value: SchoolYear.L1 },
-          { label: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, emoji: '2⃣', value: SchoolYear.L2 },
-          { label: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, emoji: '3⃣', value: SchoolYear.L3 },
-        ],
-      },
-      subjectMenu: {
-        placeholder: 'Aucune matière sélectionnée',
-      },
-      placeMenu: {
-        placeholder: 'Aucune valeur sélectionnée',
-        options: [{
-          label: 'Discord',
-          description: 'Le cours se passera sur discord',
-          value: 'discord',
-        }, {
-          label: 'Campus',
-          description: 'Le cours se passera sur le campus, dans la salle définie',
-          value: 'on-site',
-        }, {
-          label: 'Teams',
-          description: 'Le cours se passera sur Microsoft Teams, dans le groupe défini',
-          value: 'teams',
-        }, {
-          label: 'Autre',
-          description: 'Choisis un endroit personnalisé',
-          value: 'other',
-        }] as MessageSelectOptionData[],
-      },
-      isRecordedMenu: {
-        placeholder: 'Aucune valeur sélectionnée',
-        options: [{
-          label: 'Oui',
-          description: 'Le cours sera enregistré par le professeur ou un élève',
-          emoji: '✅',
-          value: 'yes',
-        }, {
-          label: 'Non',
-          description: 'Le cours ne sera pas enregistré',
-          emoji: '❌',
-          value: 'no',
-        }] as MessageSelectOptionData[],
-      },
-      rescheduleButtons: {
-        reschedule: 'Nouvelle date',
-        ignore: 'Ignorer',
-      },
-      abortMenu: {
-        label: 'Abandonner',
-      },
-      errors: {
-        main: 'Oups, une erreur est survenue lors de cette action :confused:\n> {details}',
-        noSubjects: "Aucune matière n'existe pour cette année là.",
-      },
-    },
+    schoolYearChoices: (): Array<APIApplicationCommandOptionChoice<string>> => [
+      { name: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, value: SchoolYear.L1 },
+      { name: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, value: SchoolYear.L2 },
+      { name: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, value: SchoolYear.L3 },
+    ],
+    placeChoices: [
+      { name: 'Sur Discord', value: EclassPlace.Discord },
+      { name: 'Sur le Campus', value: EclassPlace.OnSite },
+      { name: 'Sur Microsoft Teams', value: EclassPlace.Teams },
+      { name: 'Autre', value: EclassPlace.Other },
+    ] as Array<APIApplicationCommandOptionChoice<string>>,
 
     // Edit subcommand
-    invalidEditProperty: 'Cette propriété est invalide. Choisis parmi "sujet", "date", "heure", "durée", "professeur", "rôle", "lieu" et "enregistré".',
+    headerEdited: 'Tu as bien modifié :\n',
+    headerPingEdited: '{pingRole}, le cours a été modifié :\n',
 
-    editedTopic: 'Tu as bien modifié le thème du cours en "{topic}".',
-    pingEditedTopic: '{pingRole}, le thème du cours a été changé en "{topic}".',
+    editedTopic: '- le thème du cours en "{topic}".',
+    pingEditedTopic: '- le thème est maintenant "*{topic}*".',
 
-    editedDate: `Tu as bien déplacé le cours pour le ${timeFormat('{date}', TimestampStyles.LongDateTime)}.`,
-    pingEditedDate: `{pingRole}, le cours a été déplacé le ${timeFormat('{date}', TimestampStyles.LongDateTime)} (${timeFormat('{date}', TimestampStyles.RelativeTime)}).`,
+    editedDate: `- la date du cours pour le ${timeFormat('{date}', TimestampStyles.LongDateTime)}.`,
+    pingEditedDate: `- il a été déplacé au ${timeFormat('{date}', TimestampStyles.LongDateTime)} (${timeFormat('{date}', TimestampStyles.RelativeTime)}).`,
 
-    editedHour: `Tu as bien déplacé le cours à ${timeFormat('{date}', TimestampStyles.ShortTime)}.`,
-    pingEditedHour: `{pingRole}, le cours a été déplacé à ${timeFormat('{date}', TimestampStyles.ShortTime)} (${timeFormat('{date}', TimestampStyles.RelativeTime)}).`,
+    editedDuration: '- la durée du cours en {duration}.',
+    pingEditedDuration: '- il durera à présent *{duration}*.',
 
-    editedDuration: 'Tu as bien modifié la durée du cours en {duration}.',
-    pingEditedDuration: '{pingRole}, le cours durera à présent en {duration}.',
+    editedProfessor: `- le professeur du cours qui est maintenant ${userMention('{professor}')}.`,
+    pingEditedProfessor: `- il sera maintenant donné par ${userMention('{professor}')}.`,
 
-    editedProfessor: `Tu as bien modifié le professeur du cours qui est maintenant ${userMention('{professor}')}.`,
-    pingEditedProfessor: `{pingRole}, le professeur a été changé pour ${userMention('{professor}')}.`,
+    editedPlace: '- le lieu du cours, qui sera maintenant {where}.',
+    pingEditedPlace: '- il se tiendra à présent {where}.',
 
-    editedRole: 'Tu as bien modifié le rôle visé en "{role}".',
-    pingEditedRole: '{pingRole}, le rôle visé a été changé au rôle "{role}".',
-
-    editedPlace: 'Tu as bien modifié le lieu du cours, qui sera maintenant {where}.',
-    pingEditedPlace: '{pingRole}, le lieu du cours a été changé, il est maintenant {where}.',
-
-    editedRecorded: "Tu as bien modifié le statut d'enregistrement du cours en `{isRecorded}`.",
-    pingEditedRecorded: '{pingRole}, le cours a été modifié : ',
-    pingEditedRecordedValues: ['il ne sera plus enregistré.', 'il sera maintenant enregistré.'],
+    editedIsRecorded: "- le statut d'enregistrement du cours en `{isRecorded}`.",
+    pingEditedIsRecorded: ['- il ne sera plus enregistré.', '- il sera maintenant enregistré.'],
 
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
@@ -294,6 +233,7 @@ export const eclass = {
     // Cancel subcommand
     confirmCancel: 'Es-tu sûr de vouloir annuler ce cours ? Cette action est irrévocable.',
     successfullyCanceled: 'Le cours a bien été annulé !',
+    canceledCancel: "Le cours n'a pas été annulé.",
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
 
     // Record subcommand
@@ -301,6 +241,8 @@ export const eclass = {
     noRecordLink: "Il n'y a pas de lien d'enregistrement disponible pour ce cours !",
     linkAnnouncement: `L'enregistrement du cours "{topic}" ({date}) a été publié sur ce lien : ${hideLinkEmbed('{link}')} !`,
     successfullyAddedLink: 'Le lien a bien été ajouté au cours !',
+    successfullyRemovedLink: 'Le lien a bien été retiré !',
+    noRecordLinkProvided: "Ajoute le lien de l'enregistrement à définir !",
 
     // Show subcommand
     showEmbed: {
@@ -324,197 +266,5 @@ export const eclass = {
     // Subscribing
     subscribed: "Tu t'es bien inscrit au cours de \"{topic}\" ({subject.name}) ! Je te le rappellerai un peu avant :)",
     unsubscribed: "Tu t'es bien désinscrit du cours de \"{topic}\" ({subject.name}) !",
-
-    // Prompts
-    prompts: {
-      topic: {
-        base: 'Entre le sujet du cours que tu souhaites donner (nom du chapitre, thème du cours...) :',
-        invalid: 'Ce sujet est invalide.',
-      },
-      date: {
-        base: 'Entre la date du cours que tu souhaites donner (au format "jj/MM HH:mm") :',
-        invalid: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
-        hint: 'Elle doit être au format "jj/MM HH:mm".',
-        professorOverlap: ':warning: **AÏE !** Ce professeur a déjà un cours de prévu à cette date.',
-        schoolYearOverlap: ':warning: **AÏE !** Cette promotion a déjà un cours de prévu à cette date.',
-        chooseAgain: 'Souhaites-tu choisir une nouvelle date ?',
-      },
-      hour: {
-        base: "Entre l'heure de début du cours que tu souhaites donner (au format \"HH:mm\") :",
-        hint: 'Elle doit être au format "HH:mm".',
-        invalid: "Cette heure est invalide. Vérifie bien que la date ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
-      },
-      duration: {
-        base: 'Entre une durée pour ton cours (en anglais ou en français).\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` est par exemple une durée valide.',
-        hint: 'Elle doit être en anglais ou en français, par exemple `30min` ou `1h30`.',
-        invalid: 'Cette durée est invalide.',
-      },
-      professor: {
-        base: 'Entre le professeur qui va donner le cours (mentionne-le ou entre son pseudo ou son ID) :',
-        hint: 'Entre son pseudo, son ID ou mentionne-le.',
-        invalid: 'Ce membre est invalide.',
-      },
-      targetRole: {
-        base: 'Entre le rôle de révision visé ("Promo 2025", "Rattrapages Informatique"...) (mentionne-le ou entre son nom ou son ID) :',
-        hint: 'Entre son nom, son ID ou mentionne-le.',
-        invalid: 'Ce rôle est invalide.',
-      },
-      place: {
-        base: 'Entre le lieu du cours ("discord", "teams", "campus", "autre") :',
-        hint: 'Choisis parmi "discord", "teams", "campus" ou "autre".',
-        invalid: 'Ce lieu est invalide.',
-      },
-      teamsLink: {
-        base: "Entre le lien de la réunion ou de l'équipe Microsoft Teams :",
-        hint: '',
-        invalid: 'Ce lien est invalide.',
-      },
-      room: {
-        base: 'Entre la salle de cours (ex: "A304", "Amphi C001") :',
-        hint: '',
-        invalid: 'Cette salle est invalide.',
-      },
-      customPlace: {
-        base: 'Entre le lieu du cours :',
-        hint: '',
-        invalid: 'Ce lieu est invalide.',
-      },
-      recorded: {
-        hint: 'Choisis entre "oui" ou "non".',
-        invalid: 'Cette valeur est invalide.',
-      },
-
-      stoppedPrompting: "Tu as bien abandonné la commande ! Aucun cours n'a été créé.",
-      promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucun cours n'a été créé.",
-    },
-  },
-} as const;
-
-export const subject = {
-  options: {
-    aliases: ['subject', 'matière', 'matiere'],
-    description: stripIndent`
-      Commande permettant de créer une matière.
-      Pour créer une nouvelle matière, tu peux utiliser \`!subject create\` et te laisser guider par le menu interactif qui apparaîtra.
-      Pour plus d'informations sur comment utiliser cette commande, faites \`!subject help\`.
-    `,
-    enabled: true,
-    usage: 'subject <create | remove | list | help>',
-    examples: ['!subject help', '!subject create', '!subject list'],
-  },
-  messages: {
-    // Global
-    invalidCode: "Le code cours entré n'est pas valide !",
-    unknownSubject: 'Impossible de trouver une matière correspondant à ce code cours',
-
-    // Help subcommand
-    helpEmbedTitle: 'Aide de la commande de matières',
-    helpEmbedDescription: [
-      { name: 'Créer une matière', value: '`!subject create`' },
-      { name: 'Supprimer une matière', value: '`!subject remove <code cours>`' },
-      { name: 'Liste des matières', value: '`!subject list`' },
-      { name: "Page d'aide", value: '`!subject help`' },
-    ],
-
-    // List subcommand
-    listTitle: 'Liste des matières',
-    noSubjectFound: "Aucune matière n'a été trouvée...",
-    someSubjectsFound: (amount: number): string => `${amount} matière${amount > 1 ? 's ont' : ' a'} été trouvée${amount > 1 ? 's' : ''} !`,
-    listFieldTitle: '{emoji} {name} ({schoolYear})',
-    listFieldDescription: stripIndent`
-      {classCode} - {teachingUnit}
-      [Moodle]({moodleLink})
-      Salons : {channels}
-    `,
-
-    // Create subcommand
-    successfullyCreated: 'La matière a bien été créée !',
-    alreadyExists: 'Une matière avec le même code cours existe déjà !',
-
-    createSubjectSetup: {
-      embed: {
-        title: "Création d'une matière",
-        description: "Bienvenue dans l'assistant de création de matières. Suis les étapes ci-dessous en sélectionnant l'option dans le menu déroulant qui s'affiche, ou en envoyant un message comme il te sera demandé. Tu peux, à tout moment, abandonner la création de la matière en cliquant sur \"Abandonner\".",
-        stepPreviewTitle: 'Aperçu des étapes',
-        currentStepTitle: 'Étape actuelle : {step}',
-        currentStepDescription: [
-          'Choisis dans le menu déroulant ci-dessous quelle promotion ta matière vise.',
-          "Choisis dans le menu déroulant ci-dessous dans quelle UE ta matière s'inscrit.",
-          'Envoie un message contenant le nom de ta matière.',
-          'Envoie un message contenant le nom en anglais (pour les INTs) de ta matière.',
-          'Envoie un message contenant le code cours de ta matière (par exemple "TI403" ou "SM204").',
-          'Envoie un message contenant le lien Moodle de ta matière.',
-          'Envoie un message contenant le salon textuel associé à ta matière.',
-          'Envoie un message contenant un émoji représentant ta matière.',
-          'Terminé !',
-        ],
-      },
-      promptMessageDropdown: 'Choisis une option dans le menu déroulant ci-dessus :arrow_heading_up: ',
-      stepPreview: stripIndent`
-        **1.** __Promotion :__ {schoolYear}
-        **2.** __UE :__ {teachingUnit}
-        **3.** __Nom :__ {name}
-        **4.** __Nom anglais :__ {nameEnglish}
-        **5.** __Code cours :__ {classCode}
-        **6.** __Moodle :__ {moodleLink}
-        **7.** __Salon :__ {textChannel}
-        **8.** __Emoji :__ {emoji}
-      `,
-      schoolYearMenu: {
-        placeholder: 'Aucune année sélectionnée',
-        options: [
-          { label: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, emoji: '1⃣' },
-          { label: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, emoji: '2⃣' },
-          { label: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, emoji: '3⃣' },
-        ] as Array<Omit<MessageSelectOptionData, 'value'>>,
-      },
-      teachingUnitMenu: {
-        placeholder: 'Aucune UE sélectionnée',
-        options: [
-          { label: 'Formation Générale', emoji: '🧑‍🎓' },
-          { label: 'Mathématiques', emoji: '🔢' },
-          { label: 'Informatique', emoji: '💻' },
-          { label: 'Physique & Électronique', emoji: '🔋' },
-        ] as Array<Omit<MessageSelectOptionData, 'value'>>,
-      },
-      abortMenu: {
-        label: 'Abandonner',
-      },
-    },
-
-    // Remove subcommand
-    successfullyRemoved: 'La matière a bien été supprimée !',
-    removalFailed: "La matière n'a **pas** pu être supprimée, car elle est utilisée par {amount} cours. Si la supprimer est une nécessité, contacte un administrateur pour faire cette action manuellement.",
-
-    // Prompts
-    prompts: {
-      name: {
-        base: 'Entre le nom de la matière que tu souhaites ajouter :',
-        invalid: 'Ce nom de matière est invalide.',
-      },
-      englishName: {
-        base: 'Entre le nom de la matière que tu souhaites ajouter, en anglais (pour les classes INTs) :',
-        invalid: 'Ce nom de matière est invalide.',
-      },
-      classCode: {
-        base: 'Entre le code cours de la matière que tu souhaites ajouter (par exemple "TI403" ou "SM204") :',
-        invalid: 'Cette code cours est invalide.',
-      },
-      moodleLink: {
-        base: 'Entre le lien Moodle de la matière que tu souhaites ajouter. Sélectionne le lien Moodle de la matière pour les classes classiques (pas INT, ni renforcé, ni bordeaux...) :',
-        invalid: 'Ce lien est invalide.',
-      },
-      textChannel: {
-        base: 'Entre le salon textuel associé à ta matière (mentionne-le, ou entre son nom ou son ID) :',
-        invalid: 'Ce salon textuel est invalide.',
-      },
-      emoji: {
-        base: "Entre l'émoji qui correspond au mieux à la matière que tu ajoutes :",
-        invalid: 'Cet émoji est invalide.',
-      },
-
-      stoppedPrompting: "Tu as bien abandonné la commande ! Aucune matière n'a été créé.",
-      promptTimeout: "La durée maximale a été dépassée, la commande a été abandonnée et aucune matière n'a été créée.",
-    },
   },
 } as const;

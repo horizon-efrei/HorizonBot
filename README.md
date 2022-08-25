@@ -28,8 +28,8 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
 - **`config` :** Dossier où se trouvent tous les fichiers de configuration de HorizonBot.
 - **`dist`** *(pas sur GitHub)* **:** Dossier où se trouve le code transpilé de HorizonBot, après avoir lancé `npm run build` (ou `npm start`).
 - **`src` :**
-  - **`arguments` :** Dossier où se trouvent tous les arguments customs.
   - **`commands` :** Dossier où se trouvent toutes les commandes, rangées dans des sous-dossiers correspondant à leurs catégories.
+  - **`interaction-handlers` :** Dossier contenant les handlers qui gère les "Interactions" reçus.
   - **`lib` :** Dossier contenant plusieurs fichiers utiles dans le code.
     - **`decorators` :** Dossier contenant différents decorators utilisés à travers le code.
     - **`eclasses` :** Dossier contenant des classes et utilitaires relatifs aux e-classes.
@@ -39,7 +39,6 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
     - **`types` :** Fichiers contenant les typings TypeScript nécessaires pour HorizonBot.
     - **`utils` :** Dossier contenant différentes fonctions utilitaires.
   - **`listeners` :** Dossier où se trouvent tous les gestionnaires d'évènement, rangés par émetteurs.
-  - **`preconditions` :** Dossier où se trouvent les pré-conditions customs.
   - **`tasks` :** Dossier où se trouvent toutes les tâches.
 - **`typings` :** Typings TypeScript pour les librairies externes.
 

@@ -1,4 +1,4 @@
-import { container } from '@sapphire/pieces';
+import { container } from '@sapphire/framework';
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
 import { model, Schema } from 'mongoose';
