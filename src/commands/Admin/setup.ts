@@ -1,4 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
+import { filterNullAndUndefined } from '@sapphire/utilities';
 import { ChannelType } from 'discord-api-types/v10';
 import type { NewsChannel, TextChannel } from 'discord.js';
 import { Formatters, MessageEmbed, Permissions } from 'discord.js';
@@ -176,7 +177,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
     await interaction.reply(this.messages.successfullyDefined);
   }
 
-  public async remove(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+  public async remove(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const query = interaction.options.getString(Options.Name, true) as ConfigEntries;
 
     await this.container.client.configManager.remove(query, interaction.guild);
@@ -189,13 +190,13 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
     const channel = interaction.options.getChannel(Options.Channel) as AllowedChannels | null;
     const role = interaction.options.getRole(Options.Role);
 
-    if ([query, channel, role].filter(Boolean).length !== 1) {
+    if ([query, channel, role].filter(filterNullAndUndefined).length !== 1) {
       await interaction.reply({ content: this.messages.chooseOne, ephemeral: true });
       return;
     }
 
     if (channel || role) {
-      const entries = await Configuration.find({ guild: interaction.guild.id, value: (channel || role).id });
+      const entries = await Configuration.find({ guild: interaction.guild.id, value: (channel ?? role)!.id });
       await interaction.reply(entries.length > 0
         ? pupa(this.messages.associatedKeys, { keys: entries.map(e => allEntries[e.name]).join(' `, `') })
         : this.messages.noAssociatedKey);
@@ -217,7 +218,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
   public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
     const definedEntries = await Configuration.find({ guild: interaction.guildId });
 
-    const allEntriesFilled = new Map<ConfigEntries, { name: string; document: ConfigurationDocument }>();
+    const allEntriesFilled = new Map<ConfigEntries, { name: string; document: ConfigurationDocument | undefined }>();
     for (const [entry, name] of Object.entries(allEntries))
       allEntriesFilled.set(entry as ConfigEntries, { name, document: definedEntries.find(e => e.name === entry) });
 
@@ -226,7 +227,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
       .setItems([...allEntriesFilled.entries()]
         .map(([entry, { name, document }]) => pupa(
           document ? this.messages.lineWithValue : this.messages.lineWithoutValue,
-          { name, value: this._getMention(entry, document?.value) },
+          { name, value: document ? this._getMention(entry, document.value) : null },
         )))
       .setItemsPerPage(15)
       .make()

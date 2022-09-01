@@ -35,7 +35,7 @@ export default class StatisticsCommand extends HorizonCommand<typeof config> {
           inline: true,
         },
         { name: embedMessages.memory, value: `${(process.memoryUsage().rss / 1024 / 1024).toFixed(2)} Mo`, inline: true },
-        { name: embedMessages.uptime, value: dayjs.duration(this.container.client.uptime).humanize(), inline: true },
+        { name: embedMessages.uptime, value: dayjs.duration(this.container.client.uptime!).humanize(), inline: true },
         { name: embedMessages.maintainers, value: settings.maintainers.join('\n'), inline: true },
         { name: embedMessages.thanks, value: settings.thanks.join('\n'), inline: true },
       ])

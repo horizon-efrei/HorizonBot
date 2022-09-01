@@ -61,16 +61,17 @@ export default class LogsCommand extends HorizonSubcommand<typeof config> {
     );
   }
 
-  public async edit(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+  public async edit(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const logType = interaction.options.getInteger(Options.LogType, true) as DiscordLogType | -1;
     const logStatus = interaction.options.getInteger(Options.LogStatus, true) as LogStatusesEnum;
 
     const guildId = interaction.guild.id;
+    const guildLogs = this.container.client.logStatuses.get(guildId)!;
 
     if (logType === -1) {
       await LogStatuses.updateMany({ guildId }, { status: logStatus });
       for (const type of Object.values(DiscordLogType).filter(Number.isInteger))
-        this.container.client.logStatuses.get(guildId).set(type as DiscordLogType, logStatus);
+        guildLogs.set(type as DiscordLogType, logStatus);
 
       await interaction.reply(
         pupa(this.messages.updatedAllLog, { status: messages.logs.readableStatuses[logStatus] }),
@@ -79,7 +80,7 @@ export default class LogsCommand extends HorizonSubcommand<typeof config> {
     }
 
     await LogStatuses.updateOne({ type: logType, guildId }, { status: logStatus });
-    this.container.client.logStatuses.get(guildId).set(logType, logStatus);
+    guildLogs.set(logType, logStatus);
 
     await interaction.reply(
       pupa(this.messages.updatedLog, {
@@ -90,7 +91,7 @@ export default class LogsCommand extends HorizonSubcommand<typeof config> {
   }
 
   public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const logs = await LogStatuses.find({ guildId: interaction.guild.id });
+    const logs = await LogStatuses.find({ guildId: interaction.guildId });
 
     await new PaginatedContentMessageEmbed()
       .setTemplate(new MessageEmbed().setTitle(this.messages.listTitle))

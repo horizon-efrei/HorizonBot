@@ -3,7 +3,7 @@ import { err, ok } from '@sapphire/framework';
 
 const DATE_REGEX = /^(?<day>\d{1,2})[/-](?<month>\d{1,2})(?:[/-](?<year>\d{1,4}))?(?: (?:a|à)?\s*(?<hour>\d{1,2})[h:](?<minutes>\d{1,2}(?:m(?:in(?:s)?)?)?)?)?$/imu;
 
-const intOrNull = (value: string | undefined): number | null => Number.parseInt(value || '', 10) || null;
+const intOrNull = (value: string | undefined): number | null => Number.parseInt(value ?? '', 10) || null;
 const isPast = (date: Date): boolean => date.getTime() < Date.now();
 
 export default function resolveDate(parameter: string, options?: { canBePast: boolean }): Result<Date, 'dateError'> {
@@ -19,8 +19,8 @@ export default function resolveDate(parameter: string, options?: { canBePast: bo
   // that are not 31 days long. (this took me hours of debugging)
   date.setDate(1);
   const year = intOrNull(groups.year?.padStart(4, '20')) ?? new Date().getFullYear();
-  const month = intOrNull(groups.month) - 1;
-  const day = intOrNull(groups.day);
+  const month = Number.parseInt(groups.month, 10) - 1;
+  const day = Number.parseInt(groups.day, 10);
 
   const hour = intOrNull(groups.hour) ?? new Date().getHours();
   const minutes = typeof groups.hour === 'undefined'

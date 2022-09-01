@@ -30,10 +30,10 @@ export default class TagCommand extends HorizonCommand<typeof config> {
 
   public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
     const name = interaction.options.getString(Options.Name);
-    const tag = await Tags.findOne({ guildId: interaction.guild.id, name });
+    const tag = await Tags.findOne({ guildId: interaction.guildId, name });
 
     if (!tag) {
-      const tags = await Tags.find({ guildId: interaction.guild.id });
+      const tags = await Tags.find({ guildId: interaction.guildId });
       if (tags.length === 0) {
         await interaction.reply({ content: this.messages.noTags, ephemeral: true });
         return;

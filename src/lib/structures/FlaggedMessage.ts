@@ -24,10 +24,12 @@ export default class FlaggedMessage {
 
     // Create the flag message and assign its properties
     const flaggedMessage = new FlaggedMessage(message, moderator);
-    flaggedMessage.logChannel = await container.client.configManager.get(
+    const logChannel = await container.client.configManager.get(
       ConfigEntriesChannels.ModeratorFeedback,
       flaggedMessage.message.guild.id,
     );
+    if (logChannel)
+      flaggedMessage.logChannel = logChannel;
     return flaggedMessage;
   }
 
@@ -51,7 +53,7 @@ export default class FlaggedMessage {
 
   public async alertUser(): Promise<void> {
     try {
-      await this.message.member.send(pupa(messages.antiSwear.swearUserAlertPrivate, { message: this.message }));
+      await this.message.member!.send(pupa(messages.antiSwear.swearUserAlertPrivate, { message: this.message }));
     } catch {
       await this.message.channel.send(pupa(messages.antiSwear.swearUserAlertPublic, { message: this.message }));
     }
@@ -70,10 +72,12 @@ export default class FlaggedMessage {
   private async _alertModerators(): Promise<void> {
     // Cache the log channel if not already
     if (!this.logChannel) {
-      this.logChannel = await container.client.configManager.get(
+      const logChannel = await container.client.configManager.get(
         ConfigEntriesChannels.ModeratorFeedback,
         this.message.guild.id,
       );
+      if (logChannel)
+        this.logChannel = logChannel;
     }
 
     // Send the alert to the moderators

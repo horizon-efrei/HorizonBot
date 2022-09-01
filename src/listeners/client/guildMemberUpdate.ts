@@ -13,7 +13,7 @@ export default class GuildMemberUpdateListener extends Listener {
   private async _logNicknameChanges(oldMember: GuildMember, newMember: GuildMember): Promise<void> {
     if (oldMember.nickname !== newMember.nickname) {
       const auditLogs = await newMember.guild.fetchAuditLogs({ type: 'MEMBER_UPDATE' }).catch(nullop);
-      const lastMemberUpdate = auditLogs?.entries.filter(entry => entry.target.id === newMember.id).first();
+      const lastMemberUpdate = auditLogs?.entries.filter(entry => entry.target?.id === newMember.id).first();
 
       // Tell executor ID
       await DiscordLogManager.logAction({
@@ -36,13 +36,13 @@ export default class GuildMemberUpdateListener extends Listener {
     const removedRoles = [...oldRoles.filter(role => !newRoles.has(role.id)).keys()];
 
     const auditLogs = await newMember.guild.fetchAuditLogs({ type: 'MEMBER_ROLE_UPDATE' }).catch(nullop);
-    const lastMemberRoleUpdate = auditLogs?.entries.filter(entry => entry.target.id === newMember.id).first();
+    const lastMemberRoleUpdate = auditLogs?.entries.filter(entry => entry.target?.id === newMember.id).first();
 
     if (addedRoles.length > 0) {
       await DiscordLogManager.logAction({
         type: DiscordLogType.RoleAdd,
         context: {
-          executorId: lastMemberRoleUpdate.executor.id,
+          executorId: lastMemberRoleUpdate?.executor?.id,
           userId: newMember.id,
         },
         content: addedRoles,

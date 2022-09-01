@@ -15,7 +15,7 @@ export default class VocalCountCommand extends HorizonCommand<typeof config> {
     );
   }
 
-  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
     const voiceChannels = [...interaction.guild.channels.cache.values()]
       .filter(chan => chan.isVoice() && chan.members.size > 0) as BaseGuildVoiceChannel[];
 

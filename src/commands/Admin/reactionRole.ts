@@ -95,7 +95,7 @@ const optionPairs = [
 type EmojiOptionCallback = (option: SlashCommandStringOption) => SlashCommandStringOption;
 type RoleOptionCallback = (option: SlashCommandRoleOption) => SlashCommandRoleOption;
 
-function * emojiGenerator(this: void): Generator<EmojiOptionCallback, EmojiOptionCallback> {
+function * emojiGenerator(this: void): Generator<EmojiOptionCallback, null> {
   for (const [emoji] of optionPairs) {
     yield (option): SlashCommandStringOption => option
       .setName(emoji)
@@ -106,7 +106,7 @@ function * emojiGenerator(this: void): Generator<EmojiOptionCallback, EmojiOptio
   return null;
 }
 
-function * roleGenerator(this: void): Generator<RoleOptionCallback, RoleOptionCallback> {
+function * roleGenerator(this: void): Generator<RoleOptionCallback, null> {
   for (const [, role] of optionPairs) {
     yield (option): SlashCommandRoleOption => option
       .setName(role)
@@ -151,16 +151,16 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
                 .addChannelTypes(ChannelType.GuildNews, ChannelType.GuildText)
                 .setRequired(true),
             )
-            .addStringOption(multipleEmojiOptions.next().value)
-            .addRoleOption(multipleRoleOptions.next().value)
-            .addStringOption(multipleEmojiOptions.next().value)
-            .addRoleOption(multipleRoleOptions.next().value)
-            .addStringOption(multipleEmojiOptions.next().value)
-            .addRoleOption(multipleRoleOptions.next().value)
-            .addStringOption(multipleEmojiOptions.next().value)
-            .addRoleOption(multipleRoleOptions.next().value)
-            .addStringOption(multipleEmojiOptions.next().value)
-            .addRoleOption(multipleRoleOptions.next().value)
+            .addStringOption(multipleEmojiOptions.next().value!)
+            .addRoleOption(multipleRoleOptions.next().value!)
+            .addStringOption(multipleEmojiOptions.next().value!)
+            .addRoleOption(multipleRoleOptions.next().value!)
+            .addStringOption(multipleEmojiOptions.next().value!)
+            .addRoleOption(multipleRoleOptions.next().value!)
+            .addStringOption(multipleEmojiOptions.next().value!)
+            .addRoleOption(multipleRoleOptions.next().value!)
+            .addStringOption(multipleEmojiOptions.next().value!)
+            .addRoleOption(multipleRoleOptions.next().value!)
             .addBooleanOption(
               option => option
                 .setName(Options.Unique)
@@ -309,10 +309,12 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     for (const [emojiOption, roleOption] of optionPairs) {
       const emoji = interaction.options.getString(emojiOption);
       const role = interaction.options.getRole(roleOption);
+      if (!emoji || !role)
+        continue;
 
       const reaction = CustomResolvers.resolveEmoji(emoji, interaction.guild);
 
-      if (reaction.isOk() && role
+      if (reaction.isOk()
         && !pairs.map(r => r.reaction).includes(reaction.unwrap())
         && !pairs.map(r => r.role).includes(role))
         pairs.push({ reaction: reaction.unwrap(), role });
@@ -356,7 +358,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     await ReactionRole.create({
       messageId: reactionRoleMessage.id,
       channelId: reactionRoleMessage.channel.id,
-      guildId: reactionRoleMessage.guild.id,
+      guildId: reactionRoleMessage.guildId,
       reactionRolePairs: pairs.map(({ reaction, role }) => ({ reaction, role: role.id })),
       uniqueRole,
     });
@@ -364,15 +366,15 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     await submit.reply(pupa(this.messages.createdMenu, { title }));
   }
 
-  public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const reactionRoles = await ReactionRole.find({ guildId: interaction.guild.id });
+  public async list(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
+    const reactionRoles = await ReactionRole.find({ guildId: interaction.guildId });
     if (!reactionRoles || reactionRoles.length === 0) {
       await interaction.reply(this.messages.noMenus);
       return;
     }
 
     const items: Array<{
-      condition: string;
+      condition: string | null;
       title: string;
       total: number;
       unique: boolean;
@@ -386,7 +388,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
 
       items.push({
         condition: rr.roleCondition,
-        title: rrMessage.embeds[0].title,
+        title: rrMessage.embeds[0].title ?? 'Titre inconnu',
         total: rr.reactionRolePairs.length,
         unique: rr.uniqueRole,
         url: rrMessage.url,
@@ -474,7 +476,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     await submit.reply(this.messages.editedMenu);
   }
 
-  public async addPair(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+  public async addPair(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const metadata = await this._resolveMenuMetadata(interaction);
     if (metadata.isErr()) {
       await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
@@ -526,7 +528,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       return;
     }
 
-    await rrMessage.reactions.cache.get(pair.reaction).remove();
+    await rrMessage.reactions.cache.get(pair.reaction)?.remove();
 
     document.reactionRolePairs.pull(pair);
     await document.save();
@@ -599,7 +601,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     interaction: HorizonSubcommand.ChatInputInteraction,
   ): Promise<Result<{ document: ReactionRoleDocument; rrMessage: GuildMessage }, string>> {
     const resultMessage = await Resolvers.resolveMessage(
-      interaction.options.getString(Options.MessageUrl),
+      interaction.options.getString(Options.MessageUrl, true),
       { messageOrInteraction: interaction },
     );
 
@@ -615,6 +617,8 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       return Result.err(this.messages.notAMenu);
 
     const document = await ReactionRole.findOne({ messageId: rrMessage.id });
+    if (!document)
+      return Result.err(this.messages.notAMenu);
 
     return Result.ok({ document, rrMessage });
   }

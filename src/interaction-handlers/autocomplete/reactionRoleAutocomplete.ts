@@ -18,7 +18,7 @@ interface CachedReactionRole {
 })
 export class ReactionRoleAutocompleteHandler extends InteractionHandler {
   private _cache: CachedReactionRole[] = [];
-  private _cacheDate: Date = null;
+  private _cacheDate: Date | null = null;
 
   public override async run(
     interaction: AutocompleteInteraction,
@@ -28,7 +28,7 @@ export class ReactionRoleAutocompleteHandler extends InteractionHandler {
   }
 
   public override async parse(
-    interaction: AutocompleteInteraction,
+    interaction: AutocompleteInteraction<'cached'>,
   ): Promise<Option<ApplicationCommandOptionChoiceData[]>> {
     if (interaction.commandName !== 'reaction-role')
       return this.none();
@@ -58,14 +58,15 @@ export class ReactionRoleAutocompleteHandler extends InteractionHandler {
       this._cache = [];
       for (const document of documents) {
         const channel = this.container.client.guilds.cache.get(document.guildId)
-          .channels.cache.get(document.channelId) as TextChannel;
-        const message = await (channel)
-          .messages.fetch(document.messageId);
+          ?.channels.cache.get(document.channelId) as TextChannel;
+        if (!channel)
+          continue;
+        const message = await channel.messages.fetch(document.messageId);
 
         this._cache.push({
           messageUrl: makeMessageLink(document.guildId, document.channelId, document.messageId),
           channelName: channel.name,
-          title: message.embeds[0].title,
+          title: message.embeds[0].title ?? 'Titre inconnu',
         });
       }
       this._cacheDate = new Date();

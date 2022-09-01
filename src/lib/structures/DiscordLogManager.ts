@@ -16,6 +16,9 @@ const getMessageUrl = <T extends DiscordLogWithMessageContext>(payload: T): stri
 
 export function getContentValue(payload: DiscordLogBase): string {
   const guild = container.client.guilds.cache.get(payload.guildId);
+  if (!guild)
+    throw new Error(`Could not find guild with id ${payload.guildId}`);
+
   const fieldTexts = messages.logs.fields[payload.type];
 
   switch (payload.type) {
@@ -31,7 +34,7 @@ export function getContentValue(payload: DiscordLogBase): string {
           roles: payload.content.roles.length > 0
             ? listAndFormatter.format(payload.content.roles.map(Formatters.roleMention))
             : 'aucun',
-          joinedAt: Math.round(payload.content.joinedAt / 1000),
+          joinedAt: payload.content.joinedAt ? Math.round(payload.content.joinedAt / 1000) : null,
         },
       });
     }
@@ -72,7 +75,11 @@ export function getContentValue(payload: DiscordLogBase): string {
 }
 
 export async function logAction(payload: DiscordLogBase): Promise<void> {
-  const logStatus = container.client.logStatuses.get(payload.guildId).get(payload.type);
+  const guild = container.client.logStatuses.get(payload.guildId);
+  if (!guild)
+    throw new Error(`Could not find guild with id ${payload.guildId}`);
+
+  const logStatus = guild.get(payload.type);
   if (logStatus === LogStatuses.Disabled)
     return;
 
@@ -89,7 +96,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
     return;
 
   const fieldOptions = messages.logs.fields[payload.type];
-  const contentValue: string = this.getContentValue(payload);
+  const contentValue = this.getContentValue(payload);
 
   const embed = new MessageEmbed()
     .setAuthor({ name: messages.logs.embedTitle })

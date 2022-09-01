@@ -88,17 +88,17 @@ export const eclass = {
     },
     recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
     where: ({ place, placeInformation, subject }: {
-      place: EclassPlace; placeInformation: string; subject: SubjectBase;
+      place: EclassPlace; placeInformation: string | null; subject: SubjectBase;
     }): string => {
       switch (place) {
         case EclassPlace.Discord:
           return `sur Discord (${subject.voiceChannel ? channelMention(subject.voiceChannel) : 'aucun salon vocal défini'})`;
         case EclassPlace.OnSite:
-          return `sur le campus (salle ${placeInformation})`;
+          return `sur le campus (salle ${placeInformation ?? 'inconnue'})`;
         case EclassPlace.Teams:
-          return `sur Microsoft Teams (lien de la réunion : ${hideLinkEmbed(placeInformation)})`;
+          return `sur Microsoft Teams (lien de la réunion : ${hideLinkEmbed(placeInformation ?? 'inconnu')})`;
         case EclassPlace.Other:
-          return `sur "${placeInformation}"`;
+          return `sur "${placeInformation ?? 'inconnu'}"`;
       }
     },
 
@@ -133,6 +133,8 @@ export const eclass = {
       author: "Ef'Réussite - Nouveau cours !",
       date: '🗓️ Date et heure',
       dateValue: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}`,
+      dateValueInProgress: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}\n[En cours]`,
+      dateValueFinished: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}\n[Terminé]`,
       duration: '⏳ Durée prévue',
       professor: '🧑‍🏫 Professeur',
       recorded: '🎥 Enregistré',
@@ -185,7 +187,6 @@ export const eclass = {
     startClassNotification: `:bell: ${roleMention('{classRole}')}, le cours commence !`,
     remindClassNotification: `:bell: ${roleMention('{classRole}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}, {where}`,
     remindClassPrivateNotification: `:bell: Tu t'es inscrit au cours "{topic}". Il commence ${timeFormat('{date}', TimestampStyles.RelativeTime)} ! Tiens-toi prêt :\\)\nIl se passera {where}.`,
-    valueInProgress: '[En cours]',
     alertProfessor: stripIndent`
       Bonjour, ton cours "{topic}" (en {subject.name}) va commencer dans environ 15 minutes.
       Voici quelques conseils et rappels pour le bon déroulement du cours :
@@ -228,7 +229,6 @@ export const eclass = {
 
     // Finish subcommand
     successfullyFinished: 'Le cours a bien été terminé !',
-    valueFinished: '[Terminé]',
 
     // Cancel subcommand
     confirmCancel: 'Es-tu sûr de vouloir annuler ce cours ? Cette action est irrévocable.',

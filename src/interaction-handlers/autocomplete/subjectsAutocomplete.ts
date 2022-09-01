@@ -12,7 +12,7 @@ import type { SubjectDocument } from '@/types/database';
 })
 export class SubjectsAutocompleteHandler extends InteractionHandler {
   private _cache: SubjectDocument[] = [];
-  private _cacheDate: Date = null;
+  private _cacheDate: Date | null = null;
 
   public override async run(
     interaction: AutocompleteInteraction,

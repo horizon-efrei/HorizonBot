@@ -87,6 +87,9 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
   }
 
   public override async contextMenuRun(interaction: HorizonCommand.ContextMenuInteraction): Promise<void> {
+    if (!interaction.channel)
+      return;
+
     if (this.container.client.remainingCompilerApiCredits <= 0) {
       await interaction.reply({ content: this.messages.noMoreCredits, ephemeral: true });
       return;
@@ -103,7 +106,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
     // 1. Extract code blocks from the message
     const codes = extractCodeBlocks(message.content);
     let codeToRun = codes[0]?.text ?? message.content;
-    let language = settings.languages.find(lang => lang.slugs.includes(codes[0]?.lang));
+    let language = settings.languages.find(lang => codes[0]?.lang && lang.slugs.includes(codes[0].lang));
 
     // 2. If multiple codes were found, ask the user which one to use
     if (codes.length > 1) {
@@ -157,7 +160,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
   private async _askWhichCode(
     prompter: InteractionPrompter,
     codes: ExtractedCodes,
-  ): Promise<Result<{ codeToRun: string; language: CodeLanguageResult }, null>> {
+  ): Promise<Result<{ codeToRun: string; language: CodeLanguageResult | undefined }, null>> {
     await prompter.send({ content: this.messages.codeSelectMenu.prompt, components: [codeMenu(codes)] });
 
     // 2.b Get the language response
@@ -171,7 +174,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
     const chosenCode = codes[Number(codeInteraction.unwrap().values[0])];
     return Result.ok({
       codeToRun: chosenCode.text,
-      language: settings.languages.find(lang => lang.slugs.includes(chosenCode.lang)),
+      language: settings.languages.find(lang => chosenCode.lang && lang.slugs.includes(chosenCode.lang)),
     });
   }
 
@@ -187,7 +190,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
       return Result.err(null);
 
     return Result.ok(
-      settings.languages.find(lang => lang.language === languageInteraction.unwrap().values[0]),
+      settings.languages.find(lang => lang.language === languageInteraction.unwrap().values[0])!,
     );
   }
 

@@ -28,7 +28,7 @@ export default class MessageReactionRemoveListener extends Listener {
         authorId: message.author.id,
         executorId: user.id,
       },
-      content: reaction.emoji.id ?? reaction.emoji.name,
+      content: reaction.emoji.id ?? reaction.emoji.name ?? 'unknown',
       guildId: message.guild.id,
       severity: 1,
     });
@@ -62,16 +62,16 @@ export default class MessageReactionRemoveListener extends Listener {
     if (!document.reactionRolePairs.some(pair => pair.reaction === reaction.emoji.toString()))
       return;
 
-    const { reaction: emoji, role: givenRoleId } = document.reactionRolePairs
+    const pairs = document.reactionRolePairs
       .find(elt => elt.reaction === reaction.emoji.toString());
-    if (!emoji) {
+    if (!pairs?.reaction) {
       reaction.remove().catch(noop);
       return;
     }
 
-    const givenRole = message.guild.roles.cache.get(givenRoleId);
+    const givenRole = message.guild.roles.cache.get(pairs.role);
     if (!givenRole) {
-      this.container.logger.warn(`[Reaction Roles] The role with id ${givenRoleId} does not exist.`);
+      this.container.logger.warn(`[Reaction Roles] The role with id ${pairs.role} does not exist.`);
       return;
     }
 

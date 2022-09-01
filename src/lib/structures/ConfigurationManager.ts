@@ -3,12 +3,7 @@ import type { Guild } from 'discord.js';
 import { Collection, GuildChannel, Role } from 'discord.js';
 import Configuration from '@/models/configuration';
 import type { GuildTextBasedChannel } from '@/types';
-import type {
- ConfigEntries,
- ConfigEntriesChannels,
- ConfigEntryHolds,
- ConfigurationDocument,
-} from '@/types/database';
+import type { ConfigEntries, ConfigEntriesChannels, ConfigEntryHolds } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class ConfigurationManager {
@@ -36,19 +31,19 @@ export default class ConfigurationManager {
   public getFromCache<
     T extends ConfigEntries,
     Return = T extends ConfigEntriesChannels ? GuildTextBasedChannel : Role,
-  >(name: T, guildId: string): Return {
+  >(name: T, guildId: string): Return | undefined {
     const key = this._getKey(name, guildId);
-    if (this._entries.get(key))
-      return this._entries.get(key).value as unknown as Return;
+    if (this._entries.has(key))
+      return this._entries.get(key)!.value as unknown as Return;
   }
 
   public async get<
     T extends ConfigEntries,
     Return = T extends ConfigEntriesChannels ? GuildTextBasedChannel : Role,
-  >(name: T, guildId: string): Promise<Return> {
+  >(name: T, guildId: string): Promise<Return | undefined> {
     const key = this._getKey(name, guildId);
-    if (this._entries.get(key))
-      return this._entries.get(key).value as unknown as Return;
+    if (this._entries.has(key))
+      return this._entries.get(key)!.value as unknown as Return;
 
     const result = await Configuration.findOne({ guild: guildId, name }).catch(nullop);
     if (result?.value) {
@@ -61,19 +56,18 @@ export default class ConfigurationManager {
   }
 
   public async loadAll(): Promise<void> {
-    const documents: ConfigurationDocument[] = await Configuration.find().catch(nullop);
+    const documents = await Configuration.find().catch(nullop);
     if (!documents)
       return;
 
     for (const document of documents) {
-      this._entries.set(
-        this._getKey(document.name, document.guild),
-        {
-          guild: document.guild,
-          name: document.name,
-          value: this._resolve(document.value, document.guild),
-        },
-      );
+      const value = this._resolve(document.value, document.guild);
+      if (value) {
+        this._entries.set(
+          this._getKey(document.name, document.guild),
+          { guild: document.guild, name: document.name, value },
+        );
+      }
     }
   }
 
@@ -81,12 +75,13 @@ export default class ConfigurationManager {
     return `${guildId}-${name}`;
   }
 
-  private _resolve(value: string, guildId: string): ConfigEntryHolds {
+  private _resolve(value: string, guildId: string): ConfigEntryHolds | undefined {
     const guild = container.client.guilds.cache.get(guildId);
+    if (!guild)
+      return;
 
     const resolved = guild.channels.resolve(value) ?? guild.roles.resolve(value);
     if (resolved instanceof Role || (resolved instanceof GuildChannel && resolved.isText()))
       return resolved;
-    return null;
   }
 }

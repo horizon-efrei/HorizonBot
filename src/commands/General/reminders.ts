@@ -1,4 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
+import { filterNullAndUndefinedAndEmpty } from '@sapphire/utilities';
 import { DMChannel, MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { reminders as config } from '@/config/commands/general';
@@ -108,7 +109,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       content: [
         pupa(this.messages.createdReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
         hasDmOpened ? '' : this.messages.openDm,
-      ].filter(Boolean).join('\n'),
+      ].filter(filterNullAndUndefinedAndEmpty).join('\n'),
       ephemeral: true,
     });
   }
@@ -150,12 +151,14 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    const date = this._parseTime(dateOrDuration);
-    if (date) {
-      reminder.date = date;
-    } else if (dateOrDuration) {
-      await interaction.reply({ content: this.messages.invalidTime, ephemeral: true });
-      return;
+    if (dateOrDuration) {
+      const date = this._parseTime(dateOrDuration);
+      if (date) {
+        reminder.date = date;
+      } else {
+        await interaction.reply({ content: this.messages.invalidTime, ephemeral: true });
+        return;
+      }
     }
 
     if (content)

@@ -104,6 +104,8 @@ EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string =
 
 EclassSchema.methods.getMessageLink = function (this: EclassDocument): string {
   const announcementChannel = container.client.configManager.getFromCache(this.announcementChannel, this.guild);
+  if (!announcementChannel)
+    throw new Error(`Could not find [eclass:${this.classId} announcement's channel (${this.announcementChannel}).`);
   return makeMessageLink(this.guild, announcementChannel.id, this.announcementMessage);
 };
 

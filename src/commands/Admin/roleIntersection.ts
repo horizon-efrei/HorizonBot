@@ -1,4 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
+import { filterNullAndUndefined } from '@sapphire/utilities';
 import { Permissions } from 'discord.js';
 import pupa from 'pupa';
 import { roleIntersection as config } from '@/config/commands/admin';
@@ -20,8 +21,8 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
 
     registry.registerChatInputCommand(
       command => command
-        .setName(this.options.name)
-        .setDescription(this.options.description)
+        .setName(this.descriptions.name)
+        .setDescription(this.descriptions.command)
         .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
         .setDMPermission(false)
         .addRoleOption(option => option.setName(Options.Role1).setDescription(roleDescription).setRequired(true))
@@ -46,7 +47,7 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
       interaction.options.getRole(Options.Role3),
       interaction.options.getRole(Options.Role4),
       interaction.options.getRole(Options.Role5),
-    ].filter(Boolean);
+    ].filter(filterNullAndUndefined);
 
     const members = await interaction.guild.members.fetch({ force: true });
     const targetedMembers = members

@@ -27,12 +27,14 @@ export default function ValidateEclassArgument(options?: ValidationOptions): Met
 
       // Check if the professor is the right one
       const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
-      if (interaction.member.id !== eclass.professor && !interaction.member.roles.cache.has(staffRole.id)) {
+      if (interaction.member.id !== eclass.professor
+        && staffRole
+        && !interaction.member.roles.cache.has(staffRole.id)) {
         await interaction.reply({ content: config.messages.editUnauthorized, ephemeral: true });
         return;
       }
 
-      if (options?.statusIn.length > 0 && !options.statusIn.includes(eclass.status)) {
+      if (options?.statusIn && options.statusIn.length > 0 && !options.statusIn.includes(eclass.status)) {
         await interaction.reply({
           content: pupa(config.messages.statusIncompatible, { status: eclass.getStatus() }),
           ephemeral: true,

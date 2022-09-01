@@ -15,7 +15,7 @@ import { trimText } from '@/utils';
 })
 export class EclassAutocompleteHandler extends InteractionHandler {
   private _cache: EclassDocument[] = [];
-  private _cacheDate: Date = null;
+  private _cacheDate: Date | null = null;
 
   public override async run(
     interaction: AutocompleteInteraction,

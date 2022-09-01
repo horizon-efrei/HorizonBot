@@ -42,7 +42,7 @@ export default class UserInfoCommand extends HorizonCommand<typeof config> {
       if (activity.state)
         presenceDetails += pupa(embedConfig.presence.state, { activity });
 
-      if (activity.timestamps) {
+      if (activity.timestamps?.start) {
         const time = Formatters.time(activity.timestamps.start, TimestampStyles.RelativeTime);
         presenceDetails += pupa(embedConfig.presence.timestamps, { time });
       }

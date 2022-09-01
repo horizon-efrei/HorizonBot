@@ -189,7 +189,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
     }
 
     const newName = interaction.options.getString(Options.NewName, true);
-    const existing = await Tags.findOne({ name: { $regex: new RegExp(newName, 'i') }, guildId: interaction.guild.id });
+    const existing = await Tags.findOne({ name: { $regex: new RegExp(newName, 'i') }, guildId: interaction.guildId });
     if (existing) {
       await interaction.reply({ content: this.messages.invalidNewName, ephemeral: true });
       return;

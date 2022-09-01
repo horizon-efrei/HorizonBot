@@ -42,6 +42,9 @@ export default abstract class Task extends Piece {
   }
 
   public onLoad(): void {
+    if (!this._callback)
+      return;
+
     if (this.interval)
       this._scheduleInterval = setInterval(this._callback, this.interval);
     else if (this.cron)

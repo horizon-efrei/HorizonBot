@@ -7,11 +7,12 @@ import dayjs from 'dayjs';
 import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import {
   MessageActionRow,
+  MessageButton,
   MessageEmbed,
   Modal,
   TextInputComponent,
 } from 'discord.js';
-import { TextInputStyles } from 'discord.js/typings/enums';
+import { MessageButtonStyles, MessageComponentTypes, TextInputStyles } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 
 import { eclass as config } from '@/config/commands/professors';
@@ -25,7 +26,19 @@ import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedField
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import type { GuildTextBasedChannel, SchoolYear } from '@/types';
 import { EclassPlace, EclassPopulatedDocument, EclassStatus } from '@/types/database';
-import { capitalize, confirm } from '@/utils';
+import { capitalize, nullop } from '@/utils';
+
+const yesButton = new MessageButton()
+  .setCustomId('yes-button')
+  .setStyle(MessageButtonStyles.SUCCESS)
+  .setLabel('Oui');
+
+const noButton = new MessageButton()
+  .setCustomId('no-button')
+  .setStyle(MessageButtonStyles.DANGER)
+  .setLabel('Non');
+
+const yesNoButtonsRow = new MessageActionRow().setComponents(noButton, yesButton);
 
 const placeInformationModal = (place: Exclude<EclassPlace, EclassPlace.Discord>): Modal => new Modal()
   .setTitle(config.messages.placeInformationModal.title)
@@ -534,47 +547,51 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     await eclass.save();
     const { guild } = answerTo;
 
-    // Fetch the announcement message
-    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannel, guild.id);
-    const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessage);
-
-    // Edit the announcement embed
     const formattedDate = dayjs(eclass.date).format(settings.configuration.dateFormat);
     const classChannel = answerTo.guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
-    await originalMessage.edit({
-      content: originalMessage.content,
-      embeds: [EclassManager.createAnnouncementEmbed({
-        ...eclass.normalizeDates(),
-        subject: eclass.subject,
-        topic: eclass.topic,
-        duration: eclass.duration,
-        professor: await guild.members.fetch(eclass.professor),
-        classChannel,
-        classId: eclass.classId,
-        isRecorded: eclass.isRecorded,
-        place: eclass.place,
-        placeInformation: eclass.placeInformation,
-      })],
-    });
+
+    // Fetch the announcement message
+    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannel, guild.id);
+    if (originalChannel) {
+      const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessage);
+
+      // Edit the announcement embed
+      await originalMessage.edit({
+        content: originalMessage.content,
+        embeds: [EclassManager.createAnnouncementEmbed({
+          ...eclass.normalizeDates(),
+          subject: eclass.subject,
+          topic: eclass.topic,
+          duration: eclass.duration,
+          professor: await guild.members.fetch(eclass.professor),
+          classChannel,
+          classId: eclass.classId,
+          isRecorded: eclass.isRecorded,
+          place: eclass.place,
+          placeInformation: eclass.placeInformation,
+        })],
+      });
+    }
 
     // Edit the global announcement messages (calendar & week upcoming classes)
     await EclassManager.updateGlobalAnnouncements(guild.id, eclass.subject.schoolYear);
 
     // Edit the role
     const originalRole = guild.roles.resolve(eclass.classRole);
-    const newRoleName = EclassManager.getRoleNameForClass({
-      formattedDate,
-      subject: eclass.subject,
-      topic: eclass.topic,
-    });
-    if (originalRole.name !== newRoleName)
-      await originalRole.setName(newRoleName);
+    if (originalRole) {
+      const newRoleName = EclassManager.getRoleNameForClass({
+        formattedDate,
+        subject: eclass.subject,
+        topic: eclass.topic,
+      });
+      if (originalRole.name !== newRoleName)
+        await originalRole.setName(newRoleName);
+    }
 
     // Send messages
     const payload = {
       ...eclass.toJSON(),
       ...eclass.normalizeDates(true),
-      role: guild.roles.resolve(eclass.targetRole).name,
       pingRole: guild.roles.resolve(eclass.classRole),
       where: this.messages.where(eclass),
     };
@@ -586,8 +603,22 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned, EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
   public async cancel(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
-    const { buttonInteraction, isConfirmed } = await confirm(interaction, this.messages.confirmCancel);
-    if (!isConfirmed) {
+    await interaction.reply({
+      content: this.messages.confirmCancel,
+      components: [yesNoButtonsRow],
+    });
+
+    const buttonInteraction = await interaction.channel!.awaitMessageComponent({
+      componentType: MessageComponentTypes.BUTTON,
+      time: 30_000,
+      filter: int => int.user.id === interaction.user.id && (int.customId === 'yes-button' || int.customId === 'no-button'),
+    }).catch(nullop);
+    if (!buttonInteraction) {
+      await interaction.editReply(this.messages.canceledCancel);
+      return;
+    }
+
+    if (buttonInteraction.customId !== 'yes-button') {
       await buttonInteraction.update(this.messages.canceledCancel);
       return;
     }

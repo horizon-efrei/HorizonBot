@@ -11,7 +11,7 @@ import Tags from '@/models/tags';
 })
 export class TagAutocompleteHandler extends InteractionHandler {
   private _cache: string[] = [];
-  private _cacheDate: Date = null;
+  private _cacheDate: Date | null = null;
 
   public override async run(
     interaction: AutocompleteInteraction,
@@ -21,7 +21,7 @@ export class TagAutocompleteHandler extends InteractionHandler {
   }
 
   public override async parse(
-    interaction: AutocompleteInteraction,
+    interaction: AutocompleteInteraction<'cached'>,
   ): Promise<Option<ApplicationCommandOptionChoiceData[]>> {
     if (!['manage-tags', 'tag'].includes(interaction.commandName))
       return this.none();

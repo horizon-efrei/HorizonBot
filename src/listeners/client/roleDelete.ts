@@ -23,9 +23,12 @@ export default class RoleDeleteListener extends Listener {
     if (affectedReactionRoles.length > 0) {
       for (const reactionRole of affectedReactionRoles) {
         const pair = reactionRole.reactionRolePairs.find(rrp => rrp.role === role.id);
+        if (!pair)
+          continue;
+
         const message = await (this.container.client
           .guilds.cache.get(reactionRole.guildId)
-          .channels.cache.get(reactionRole.channelId) as GuildTextBasedChannel)
+          ?.channels.cache.get(reactionRole.channelId) as GuildTextBasedChannel | undefined)
           ?.messages.fetch(reactionRole.messageId);
         await message?.reactions.cache.get(pair.reaction)?.remove();
       }

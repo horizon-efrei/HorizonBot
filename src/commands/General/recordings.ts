@@ -50,7 +50,7 @@ export default class RecordingsCommand extends HorizonCommand<typeof config> {
 
     const selectMenuAction = PaginatedMessage.defaultActions
       .find(action => 'customId' in action && action.customId === '@sapphire/paginated-messages.goToPage');
-    paginator.setActions([selectMenuAction]);
+    paginator.setActions(selectMenuAction ? [selectMenuAction] : []);
 
     for (const { name, value } of fields)
       paginator.addPageEmbed(embed => embed.setTitle(name).setDescription(value));

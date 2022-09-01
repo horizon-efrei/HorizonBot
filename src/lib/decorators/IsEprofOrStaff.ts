@@ -13,26 +13,26 @@ export default function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDec
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (interaction: HorizonSubcommand.ChatInputInteraction<'cached'>, eclass?: EclassDocument): Promise<void> {
-      if (!eclass && options.isOriginalEprof)
+      if (!eclass && options?.isOriginalEprof)
         throw new TypeError('The third argument of IsEprofOrStaff is required if Options.isOriginalEprof is true. This likely mean you forgot the ValidateEclassArgument decorator.');
 
       const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
       const userHighestRolePosition = interaction.member.roles.highest.position;
       // Check if the user is a staff member or better
-      if (userHighestRolePosition >= staffRole.position) {
+      if (staffRole && userHighestRolePosition >= staffRole.position) {
         Reflect.apply(originalMethod, this, [interaction, eclass]);
         return;
       }
 
       // Check if the user is not an eprof
       const eprofRole = await container.client.configManager.get(ConfigEntriesRoles.Eprof, interaction.guild.id);
-      if (!interaction.member.roles.cache.has(eprofRole.id)) {
+      if (eprofRole && !interaction.member.roles.cache.has(eprofRole.id)) {
         await interaction.reply(config.messages.onlyProfessor);
         return;
       }
 
       // Check if the professor is the right one
-      if (options?.isOriginalEprof && interaction.member.id !== eclass.professor) {
+      if (options?.isOriginalEprof && interaction.member.id !== eclass!.professor) {
         await interaction.reply(config.messages.editUnauthorized);
         return;
       }

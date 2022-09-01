@@ -16,12 +16,12 @@ declare global {
   interface Set<T> {
     addAll(...values: T[]): this;
     deleteAll(...values: T[]): this;
-    every(predicate: (value: T, _: T, set: Set<T>) => unknown, thisArg?: any): boolean;
     every<S extends T>(predicate: (value: T, _: T, set: Set<T>) => value is S, thisArg?: any): this is Set<S>;
-    filter(predicate: (value: T, _: T, set: Set<T>) => unknown, thisArg?: any): Set<T>;
+    every(predicate: (value: T, _: T, set: Set<T>) => unknown, thisArg?: any): boolean;
     filter<S extends T>(predicate: (value: T, _: T, set: Set<T>) => value is S, thisArg?: any): Set<S>;
-    find(predicate: (value: T, _: T, set: Set<T>) => unknown, thisArg?: any): T | undefined;
+    filter(predicate: (value: T, _: T, set: Set<T>) => unknown, thisArg?: any): Set<T>;
     find<S extends T>(predicate: (this: void, value: T, _: T, set: Set<T>) => value is S, thisArg?: any): S | undefined;
+    find(predicate: (value: T, _: T, set: Set<T>) => unknown, thisArg?: any): T | undefined;
     join(separator?: string): string;
     map<U>(callbackfn: (value: T, _: T, set: Set<T>) => U, thisArg?: any): Set<U>;
     reduce(callbackfn: (previousValue: T, currentValue: T, _: T, set: Set<T>) => T, initialValue: T): T;

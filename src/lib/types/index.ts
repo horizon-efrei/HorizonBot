@@ -58,7 +58,7 @@ export interface EclassCreationOptions {
   topic: string;
   duration: number;
   professor: GuildMember;
-  targetRole: Role | null;
+  targetRole: Role | null | undefined;
   place: EclassPlace;
   placeInformation: string | null;
   isRecorded: boolean;

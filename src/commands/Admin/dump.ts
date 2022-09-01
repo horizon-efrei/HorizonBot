@@ -50,9 +50,9 @@ function memberSorterFactory(order: OptionOrderChoices): (a: GuildMember, b: Gui
       case OptionOrderChoices.Created:
         return a.user.createdTimestamp - b.user.createdTimestamp;
       case OptionOrderChoices.Joined:
-        return a.joinedTimestamp - b.joinedTimestamp;
+        return Math.max((a.joinedTimestamp ?? 0) - (b.joinedTimestamp ?? 0), 0);
       case OptionOrderChoices.Nick:
-        return a.nickname?.localeCompare(b.nickname) ?? 0;
+        return a.displayName?.localeCompare(b.displayName) ?? 0;
     }
   };
 }

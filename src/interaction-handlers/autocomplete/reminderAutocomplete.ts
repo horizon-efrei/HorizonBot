@@ -15,7 +15,7 @@ import { trimText } from '@/utils';
 })
 export class ReminderAutocompleteHandler extends InteractionHandler {
   private _cache: ReminderDocument[] = [];
-  private _cacheDate: Date = null;
+  private _cacheDate: Date | null = null;
 
   public override async run(
     interaction: AutocompleteInteraction,

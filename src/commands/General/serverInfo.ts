@@ -16,13 +16,12 @@ export default class ServerInfoCommand extends HorizonCommand<typeof config> {
     );
   }
 
-  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+  public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
     const texts = this.messages.embed;
 
     const embed = new MessageEmbed()
       .setColor(settings.colors.primary)
       .setTitle(pupa(texts.title, interaction.guild))
-      .setThumbnail(interaction.guild.iconURL())
       .addFields([
         { name: texts.membersTitle, value: pupa(texts.membersValue, interaction.guild), inline: true },
         {
@@ -54,6 +53,9 @@ export default class ServerInfoCommand extends HorizonCommand<typeof config> {
         },
       ])
       .setFooter({ text: pupa(texts.footer, interaction.guild) });
+
+    if (interaction.guild.iconURL())
+      embed.setThumbnail(interaction.guild.iconURL()!);
 
     await interaction.reply({ embeds: [embed] });
   }

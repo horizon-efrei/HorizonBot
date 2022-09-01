@@ -1,4 +1,5 @@
 import { LogLevel, SapphireClient } from '@sapphire/framework';
+import { filterNullAndUndefined } from '@sapphire/utilities';
 import axios from 'axios';
 import { Collection, Intents, Permissions } from 'discord.js';
 import settings from '@/config/settings';
@@ -80,12 +81,12 @@ export default class HorizonClient extends SapphireClient {
     for (const guild of this.guilds.cache.values()) {
       // Check guild-level permissions
       const guildMissingPerms = guild.me?.permissions.missing(requiredGuildPermissions);
-      if (guildMissingPerms.length > 0)
+      if (guildMissingPerms && guildMissingPerms.length > 0)
         this.logger.warn(`[Main] The bot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does not contain: ${guildMissingPerms.join(', ')}.`);
 
       // Check channel-level permissions
       for (const channel of guild.channels.cache.values()) {
-        const channelMissingPerms = channel.permissionsFor(guild.me).missing(requiredChannelPermissions);
+        const channelMissingPerms = channel.permissionsFor(guild.me!).missing(requiredChannelPermissions);
         if (channelMissingPerms.length > 0)
           this.logger.warn(`[Main] The bot is missing permission(s) ${channelMissingPerms.join(', ')} in channel "#${channel.name}" in guild "${guild.name}".`);
       }
@@ -98,7 +99,7 @@ export default class HorizonClient extends SapphireClient {
     if (reactionRoles) {
       this.reactionRolesIds.addAll(...reactionRoles
         .map(document => document?.messageId)
-        .filter(Boolean));
+        .filter(filterNullAndUndefined));
     }
   }
 
@@ -108,7 +109,7 @@ export default class HorizonClient extends SapphireClient {
     if (eclassRoles) {
       this.eclassRolesIds.addAll(...eclassRoles
         .map(document => document?.announcementMessage)
-        .filter(Boolean));
+        .filter(filterNullAndUndefined));
     }
   }
 
@@ -130,7 +131,7 @@ export default class HorizonClient extends SapphireClient {
         const type = logType as DiscordLogType;
         const currentSetting = logs.find(log => log.guildId === guildId && log.type === logType);
 
-        this.logStatuses.get(guildId).set(type, currentSetting?.status ?? LogStatusesEnum.Discord);
+        this.logStatuses.get(guildId)!.set(type, currentSetting?.status ?? LogStatusesEnum.Discord);
         if (!currentSetting)
           docs.push({ guildId, type, status: LogStatusesEnum.Discord });
       }

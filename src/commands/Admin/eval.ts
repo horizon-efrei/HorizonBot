@@ -39,6 +39,9 @@ export default class EvalCommand extends HorizonCommand<typeof config> {
   }
 
   public override async contextMenuRun(interaction: HorizonCommand.ContextMenuInteraction): Promise<void> {
+    if (!interaction.channel)
+      return;
+
     const message = await interaction.channel.messages.fetch(interaction.targetId) as GuildMessage;
     if (!message) {
       await interaction.reply({ content: this.messages.messageNotFound, ephemeral: true });
@@ -112,7 +115,7 @@ export default class EvalCommand extends HorizonCommand<typeof config> {
     stopwatch.stop();
     if (typeof result !== 'string') {
       result = result instanceof Error
-        ? result.stack.replace(new RegExp(process.cwd(), 'gi'), '.')
+        ? result.stack!.replace(new RegExp(process.cwd(), 'gi'), '.')
         : inspect(result, { depth: 3, showHidden: true });
     }
 

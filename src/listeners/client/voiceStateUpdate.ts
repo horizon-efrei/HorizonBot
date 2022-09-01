@@ -6,7 +6,7 @@ import { DiscordLogType } from '@/types/database';
 
 export default class VoiceStateUpdateListener extends Listener {
   public async run(oldState: VoiceState, newState: VoiceState): Promise<void> {
-    if (!oldState.member)
+    if (!oldState.member || !newState.member)
       return;
 
     // Was not in a channel, but now is

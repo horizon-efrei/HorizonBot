@@ -12,7 +12,7 @@ import type { ContactDocument } from '@/types/database';
 })
 export class ContactsAutocompleteHandler extends InteractionHandler {
   private _cache: ContactDocument[] = [];
-  private _cacheDate: Date = null;
+  private _cacheDate: Date | null = null;
 
   public override async run(
     interaction: AutocompleteInteraction,

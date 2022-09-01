@@ -1,6 +1,7 @@
 import type { SlashCommandAttachmentOption } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Resolvers } from '@sapphire/framework';
+import { filterNullAndUndefined } from '@sapphire/utilities';
 import axios from 'axios';
 import PDFMerger from 'pdf-merger-js';
 import { mergePdf as config } from '@/config/commands/general';
@@ -36,7 +37,7 @@ const attachmentOptions = [
 
 type AttachmentOptionCallback = (option: SlashCommandAttachmentOption) => SlashCommandAttachmentOption;
 
-function * attachmentGenerator(this: void): Generator<AttachmentOptionCallback, AttachmentOptionCallback> {
+function * attachmentGenerator(this: void): Generator<AttachmentOptionCallback, null> {
   for (const attachment of attachmentOptions) {
     yield (option): SlashCommandAttachmentOption => option
       .setName(attachment)
@@ -60,16 +61,16 @@ export default class MergePdfCommand extends HorizonCommand<typeof config> {
             .setName(Options.Messages)
             .setDescription(this.descriptions.options.messages),
         )
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
-        .addAttachmentOption(multipleAttachmentOptions.next().value)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
+        .addAttachmentOption(multipleAttachmentOptions.next().value!)
         .addStringOption(
           option => option
             .setName(Options.Name)
@@ -85,15 +86,15 @@ export default class MergePdfCommand extends HorizonCommand<typeof config> {
       .replace(/\.pdf$/, '')
       .replace(/^\.*/, '');
 
-    const messageUrls = interaction.options.getString(Options.Messages)?.split(' ') || [];
+    const messageUrls = interaction.options.getString(Options.Messages)?.split(' ') ?? [];
     const attachments = attachmentOptions
       .map(option => interaction.options.getAttachment(option))
-      .filter(Boolean);
+      .filter(filterNullAndUndefined);
 
     const messagesResults = await Promise.all(
       messageUrls.map(async url => Resolvers.resolveMessage(url, { messageOrInteraction: interaction })),
     );
-    const messages = messagesResults.map(result => result.unwrapOr<null>(null)).filter(Boolean);
+    const messages = messagesResults.map(result => result.unwrapOr<null>(null)).filter(filterNullAndUndefined);
 
     // If no message are given or they don't have any attachments AND no attachments were given in the command's
     // message then we stop here as no PDFs were given at all.
@@ -107,7 +108,7 @@ export default class MergePdfCommand extends HorizonCommand<typeof config> {
       ...messages
         .flatMap(msg => [...msg.attachments.values()])
         .filter(file => file.contentType === 'application/pdf'),
-    ].filter(Boolean);
+    ].filter(filterNullAndUndefined);
 
     if (allFiles.length < 2) {
       await interaction.followUp({ content: this.messages.notEnoughFiles, ephemeral: true });

@@ -1,4 +1,5 @@
 import { Listener } from '@sapphire/framework';
+import { filterNullAndUndefined } from '@sapphire/utilities';
 import type { Message } from 'discord.js';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
@@ -37,7 +38,7 @@ export default class MessageListener extends Listener {
     const invites = message.content.matchAll(discordInviteLinkRegex);
     const foreignInvites = [...invites]
       .map(invite => invite.groups?.code)
-      .filter(code => !message.guild.invites.cache.has(code))
+      .filter(code => code && !message.guild.invites.cache.has(code))
       .map(code => `https://discord.gg/${code}`);
 
     if (foreignInvites.length > 0) {
@@ -52,7 +53,8 @@ export default class MessageListener extends Listener {
 
     const mentionnedTempIntersectionRoles = this.container.client.roleIntersections
       .filter(r => message.mentions.roles.has(r))
-      .map(roleId => message.guild.roles.resolve(roleId));
+      .map(roleId => message.guild.roles.resolve(roleId))
+      .filter(filterNullAndUndefined);
     if (mentionnedTempIntersectionRoles.size > 0) {
       this.container.logger.debug(`[Intersection Roles] ${mentionnedTempIntersectionRoles.size} role was just mentionned by ${message.author.username}. It will expire in two days.`);
 

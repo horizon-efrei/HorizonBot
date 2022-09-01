@@ -17,7 +17,7 @@ export default class LimitsCommand extends HorizonCommand<typeof config> {
     );
   }
 
-  public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
+  public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
     await interaction.reply(pupa(this.messages.limits, {
       channels: interaction.guild.channels.cache.size,
       roles: interaction.guild.roles.cache.size,

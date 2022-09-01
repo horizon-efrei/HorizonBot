@@ -291,7 +291,7 @@ export interface GuildLeaveUserSnapshot {
   userId: string;
   username: string;
   displayName: string;
-  joinedAt: number;
+  joinedAt: number | null;
   roles: string[];
 }
 
@@ -312,7 +312,7 @@ interface BeforeAfter<T = string> {
 
 interface ActionReference {
   userId: string;
-  executorId: string;
+  executorId: string | undefined;
 }
 
 /** Type for the "Discord Logs"'s mongoose schema */

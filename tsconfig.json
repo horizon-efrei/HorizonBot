@@ -39,6 +39,7 @@
     "removeComments": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
+    "strictNullChecks": true,
     "sourceMap": true,
     "target": "es2021",
     "typeRoots": ["./typings", "./node_modules/@types"],
