@@ -49,32 +49,6 @@ export const contacts = {
   },
 } as const;
 
-export const help = {
-  options: {
-    aliases: ['help', 'aide'],
-    description: "Permet de voir la liste des commandes de HorizonBot, ou d'avoir des informations sur une commande en particulier.",
-    enabled: true,
-    usage: 'help [commande]',
-    examples: ['help', 'aide statistique'],
-  },
-  messages: {
-    commandInfo: {
-      title: ':star: Commande "{command.name}"',
-      description: '❯ Description',
-      usage: '❯ Utilisation',
-      usableBy: '❯ Utilisable par',
-      aliases: '❯ Aliases',
-      examples: '❯ Exemples',
-    },
-    commandsList: {
-      title: 'Commandes de HorizonBot ({amount})',
-      description: "Faites `{helpCommand}` pour avoir plus d'informations sur une commande en particulier.\nSeulement les commandes que tu peux exécuter s'affichent.",
-      category: '❯ {categoryName}',
-    },
-    tagsCategory: 'Tags',
-  },
-} as const;
-
 export const latex = {
   descriptions: {
     name: 'latex',
