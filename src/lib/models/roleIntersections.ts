@@ -11,7 +11,7 @@ const RoleIntersectionSchema = new Schema<RoleIntersectionDocument, RoleIntersec
     required: true,
   },
   expiration: {
-    type: Number,
+    type: Date,
     required: true,
   },
 }, { timestamps: true });

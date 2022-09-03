@@ -213,9 +213,9 @@ export default {
     noClasses: 'Aucun cours prévu pour le moment.',
     noSubjects: 'Aucune matière disponible.',
     subjectTitle: '{emoji} {name}',
-    textChannel: channelMention('{textChannel}'),
-    textDocsChannel: ` • Documents : ${channelMention('{textDocsChannel}')}`,
-    voiceChannel: ` • Vocal : ${channelMention('{voiceChannel}')} *(cliquez pour rejoindre)*`,
+    textChannel: channelMention('{textChannelId}'),
+    textDocsChannel: ` • Documents : ${channelMention('{textDocsChannelId}')}`,
+    voiceChannel: ` • Vocal : ${channelMention('{voiceChannelId}')} *(cliquez pour rejoindre)*`,
     finishedClasses: stripIndent`
       **Cours terminés ou annulés :**
       {finishedClasses}
@@ -224,8 +224,8 @@ export default {
       **Cours prévus :**
       {plannedClasses}
     `,
-    recordLink: '| [[Enregistrement]]({recordLink})',
-    classLine: `• ${timeFormat('{date}', TimestampStyles.RelativeTime)} - {beginHour}-{endHour} (${userMention('{professor}')}) : {topic} [[Voir plus]]({messageLink})`,
+    recordLink: '| [[Enregistrement]]({link})',
+    classLine: `• ${timeFormat('{date}', TimestampStyles.RelativeTime)} - {beginHour}-{endHour} (${userMention('{professorId}')}) : {topic} [[Voir plus]]({messageLink})`,
   },
   antiSwear: {
     swearModeratorAlert: stripIndent`

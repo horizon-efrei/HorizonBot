@@ -108,7 +108,7 @@ export default class HorizonClient extends SapphireClient {
     const eclassRoles = await Eclass.find().catch(nullop);
     if (eclassRoles) {
       this.eclassRolesIds.addAll(...eclassRoles
-        .map(document => document?.announcementMessage)
+        .map(document => document?.announcementMessageId)
         .filter(filterNullAndUndefined));
     }
   }

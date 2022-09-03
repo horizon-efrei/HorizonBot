@@ -61,11 +61,11 @@ export default class ConfigurationManager {
       return;
 
     for (const document of documents) {
-      const value = this._resolve(document.value, document.guild);
+      const value = this._resolve(document.value, document.guildId);
       if (value) {
         this._entries.set(
-          this._getKey(document.name, document.guild),
-          { guild: document.guild, name: document.name, value },
+          this._getKey(document.name, document.guildId),
+          { guild: document.guildId, name: document.name, value },
         );
       }
     }

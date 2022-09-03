@@ -92,7 +92,7 @@ export const eclass = {
     }): string => {
       switch (place) {
         case EclassPlace.Discord:
-          return `sur Discord (${subject.voiceChannel ? channelMention(subject.voiceChannel) : 'aucun salon vocal défini'})`;
+          return `sur Discord (${subject.voiceChannelId ? channelMention(subject.voiceChannelId) : 'aucun salon vocal défini'})`;
         case EclassPlace.OnSite:
           return `sur le campus (salle ${placeInformation ?? 'inconnue'})`;
         case EclassPlace.Teams:
@@ -123,10 +123,10 @@ export const eclass = {
     // Create subcommand
     successfullyCreated: 'Le cours a bien été créé ! Son ID est `{eclass.classId}`.',
     alreadyExists: 'Ce cours (même matière, sujet, heure, jour) a déjà été prévu !',
-    newClassNotification: ':bell: {targetRole}, un nouveau cours a été plannifié ! :arrow_heading_down: {newClassNotificationPlaceAlert}',
+    newClassNotification: ':bell: {targetRoleId}, un nouveau cours a été plannifié ! :arrow_heading_down: {newClassNotificationPlaceAlert}',
     newClassNotificationPlaceAlert: '\n\n:warning: __**ATTENTION :**__ le cours sera **{where}** !',
 
-    recordedLink: '[Lien]({recordLink})',
+    recordedLink: '[Lien]({link})',
     newClassEmbed: {
       title: '{subject.name} - {topic}',
       description: `Cours en {classChannel} le **${timeFormat('{date}')}** !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !`,
@@ -140,7 +140,7 @@ export const eclass = {
       recorded: '🎥 Enregistré',
       place: '📍 Lieu',
       placeValues: {
-        [EclassPlace.Discord]: `Sur Discord, dans ${channelMention('{subject.voiceChannel}')}`,
+        [EclassPlace.Discord]: `Sur Discord, dans ${channelMention('{subject.voiceChannelId}')}`,
         [EclassPlace.OnSite]: "Au campus de l'EFREI, salle {placeInformation}",
         [EclassPlace.Teams]: 'Sur [Microsoft Teams (lien de la réunion)]({placeInformation})',
         [EclassPlace.Other]: '{placeInformation}',
@@ -173,8 +173,8 @@ export const eclass = {
     editedDuration: '- la durée du cours en {duration}.',
     pingEditedDuration: '- il durera à présent *{duration}*.',
 
-    editedProfessor: `- le professeur du cours qui est maintenant ${userMention('{professor}')}.`,
-    pingEditedProfessor: `- il sera maintenant donné par ${userMention('{professor}')}.`,
+    editedProfessor: `- le professeur du cours qui est maintenant ${userMention('{professorId}')}.`,
+    pingEditedProfessor: `- il sera maintenant donné par ${userMention('{professorId}')}.`,
 
     editedPlace: '- le lieu du cours, qui sera maintenant {where}.',
     pingEditedPlace: '- il se tiendra à présent {where}.',
@@ -184,8 +184,8 @@ export const eclass = {
 
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
-    startClassNotification: `:bell: ${roleMention('{classRole}')}, le cours commence !`,
-    remindClassNotification: `:bell: ${roleMention('{classRole}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}, {where}`,
+    startClassNotification: `:bell: ${roleMention('{classRoleId}')}, le cours commence !`,
+    remindClassNotification: `:bell: ${roleMention('{classRoleId}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}, {where}`,
     remindClassPrivateNotification: `:bell: Tu t'es inscrit au cours "{topic}". Il commence ${timeFormat('{date}', TimestampStyles.RelativeTime)} ! Tiens-toi prêt :\\)\nIl se passera {where}.`,
     alertProfessor: stripIndent`
       Bonjour, ton cours "{topic}" (en {subject.name}) va commencer dans environ 15 minutes.
@@ -220,8 +220,8 @@ export const eclass = {
       title: 'Le cours en {eclass.subject.name} va commencer !',
       author: "Ef'Réussite - Un cours commence !",
       baseDescription: `Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par ${userMention('{eclass.professor}')} commence !\n\n:round_pushpin: Il aura lieu {where}\n\n{isRecorded}`,
-      descriptionAllChannels: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannel}')}, et le salon vocal est ${channelMention('{eclass.subject.voiceChannel}')}.`,
-      descriptionTextChannel: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannel}')}.`,
+      descriptionAllChannels: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannelId}')}, et le salon vocal est ${channelMention('{eclass.subject.voiceChannelId}')}.`,
+      descriptionTextChannel: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannelId}')}.`,
       descriptionIsRecorded: ':red_circle: Le cours est enregistré !',
       descriptionIsNotRecorded: ":warning: Le cours n'est pas enregistré !",
       footer: 'ID : {classId}',
@@ -237,12 +237,13 @@ export const eclass = {
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
 
     // Record subcommand
-    recordLink: `Le lien d'enregistrement de ce cours est ${hideLinkEmbed('{link}')}.`,
-    noRecordLink: "Il n'y a pas de lien d'enregistrement disponible pour ce cours !",
+    recordLinksHeader: "Liens d'enregistrement du cours :\n{links}",
+    recordLinkLine: `- ${hideLinkEmbed('{link}')}`,
+    noRecordLinks: "Il n'y a pas de lien d'enregistrement disponible pour ce cours !",
     linkAnnouncement: `L'enregistrement du cours "{topic}" ({date}) a été publié sur ce lien : ${hideLinkEmbed('{link}')} !`,
     successfullyAddedLink: 'Le lien a bien été ajouté au cours !',
     successfullyRemovedLink: 'Le lien a bien été retiré !',
-    noRecordLinkProvided: "Ajoute le lien de l'enregistrement à définir !",
+    noRecordLinkProvided: "Ajoute un lien d'enregistrement !",
 
     // Show subcommand
     showEmbed: {
@@ -254,13 +255,13 @@ export const eclass = {
       dateName: 'Date',
       dateValue: `${timeFormat('{date}', TimestampStyles.LongDate)}, ${timeFormat('{date}', TimestampStyles.RelativeTime)}\nDe ${timeFormat('{date}', TimestampStyles.ShortTime)} à ${timeFormat('{end}', TimestampStyles.ShortTime)}, dure {duration}.`,
       professorName: 'Professeur',
-      professorValue: userMention('{professor}'),
+      professorValue: userMention('{professorId}'),
       placeName: 'Lieu',
       placeValue: '{where}',
       recordedName: 'Enregistré',
       recordedValue: '{recorded}',
       relatedName: 'Autres données associées',
-      relatedValue: `Rôle visé : ${roleMention('{targetRole}')}\n[Message d'annonce]({messageLink})`,
+      relatedValue: `Rôle visé : ${roleMention('{targetRoleId}')}\n[Message d'annonce]({messageLink})`,
     },
 
     // Subscribing

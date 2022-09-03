@@ -67,14 +67,10 @@ async function migrate(): Promise<void> {
   const eclasses = await Eclass.find();
   for (const eclass of eclasses) {
     if (eclass.date && typeof eclass.date === 'number')
-      // @ts-expect-error: we are updating the document
       eclass.date = new Date(eclass.date);
     if (eclass.end && typeof eclass.end === 'number')
-      // @ts-expect-error: we are updating the document
       eclass.end = new Date(eclass.end);
-    // @ts-expect-error: we are updating the document
     if (eclass.recordLinks && typeof eclass.recordLinks === 'string')
-      // @ts-expect-error: we are updating the document
       eclass.recordLinks = [eclass.recordLinks];
     if (!eclass.recordLinks)
       eclass.recordLinks = [];
@@ -106,7 +102,6 @@ async function migrate(): Promise<void> {
   const roleIntersections = await RoleIntersection.find();
   for (const roleIntersection of roleIntersections) {
     if (roleIntersection.expiration && typeof roleIntersection.expiration === 'number')
-      // @ts-expect-error: we are updating the document
       roleIntersection.expiration = new Date(roleIntersection.expiration);
   }
   await Promise.all(roleIntersections.map(async roleIntersection => roleIntersection.save()));
@@ -119,7 +114,6 @@ async function migrate(): Promise<void> {
   const reminders = await Reminder.find();
   for (const reminder of reminders) {
     if (reminder.date && typeof reminder.date === 'number')
-      // @ts-expect-error: we are updating the document
       reminder.date = new Date(reminder.date);
   }
   await Promise.all(reminders.map(async reminder => reminder.save()));

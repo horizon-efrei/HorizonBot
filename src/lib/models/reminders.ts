@@ -11,7 +11,7 @@ const ReminderSchema = new Schema<ReminderDocument, ReminderModel>({
     unique: true,
   },
   date: {
-    type: Number,
+    type: Date,
     required: true,
   },
   description: {
@@ -25,17 +25,19 @@ const ReminderSchema = new Schema<ReminderDocument, ReminderModel>({
 }, { timestamps: true });
 
 ReminderSchema.post('save', async () => {
-  await container.client.loadReminders();
+  if (container.client)
+    await container.client.loadReminders();
 });
 ReminderSchema.post('remove', async () => {
-  await container.client.loadReminders();
+  if (container.client)
+    await container.client.loadReminders();
 });
 
 ReminderSchema.methods.normalizeDates = function (this: ReminderDocument): { date: number } {
-  const { date } = this.toObject();
+  const { date }: { date: Date } = this.toObject();
 
   return {
-    date: Math.floor(date / 1000),
+    date: Math.floor(date.getTime() / 1000),
   };
 };
 

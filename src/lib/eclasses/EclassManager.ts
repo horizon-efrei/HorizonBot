@@ -115,7 +115,7 @@ export async function createClass(
     return;
   }
 
-  const classChannel = await interaction.guild.channels.fetch(subject.textChannel) as GuildTextBasedChannel;
+  const classChannel = await interaction.guild.channels.fetch(subject.textChannelId) as GuildTextBasedChannel;
 
   // Create & send the announcement embed
   const embed = createAnnouncementEmbed({
@@ -185,7 +185,7 @@ export async function createClass(
   });
 
   // Edit the global announcement messages (calendar & week upcoming classes)
-  await updateGlobalAnnouncements(eclass.guild, subject.schoolYear);
+  await updateGlobalAnnouncements(eclass.guildId, subject.schoolYear);
 
   // Send confirmation message
   await interaction.reply(pupa(config.messages.successfullyCreated, { eclass }));
@@ -195,10 +195,10 @@ export async function createClass(
 
 export async function startClass(eclass: EclassPopulatedDocument): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannel, eclass.guild);
+  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
-    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannel}).`);
-  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
   const announcementEmbed = announcementMessage.embeds[0];
@@ -218,8 +218,8 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
 
   // Send an embed in the corresponding text channel
   const classChannel = container.client
-    .guilds.resolve(eclass.guild)
-    ?.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel | undefined;
+    .guilds.resolve(eclass.guildId)
+    ?.channels.resolve(eclass.subject.textChannelId) as GuildTextBasedChannel | undefined;
 
   const texts = config.messages.startClassEmbed;
   // @ts-expect-error: setAuthor will work as expected if we pass it a nullish value
@@ -231,14 +231,14 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
       eclass,
       isRecorded: eclass.isRecorded ? texts.descriptionIsRecorded : texts.descriptionIsNotRecorded,
       textChannels: pupa(
-        eclass.subject.voiceChannel ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
+        eclass.subject.voiceChannelId ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
       ),
       where: config.messages.where(eclass),
     }))
     .setFooter({ text: pupa(texts.footer, eclass) });
 
   await classChannel?.send({
-    content: pupa(config.messages.startClassNotification, { classRole: eclass.classRole }),
+    content: pupa(config.messages.startClassNotification, { classRole: eclass.classRoleId }),
     embeds: [embed],
   });
 
@@ -250,10 +250,10 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
 
 export async function finishClass(eclass: EclassPopulatedDocument): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannel, eclass.guild);
+  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
-    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannel}).`);
-  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
   const announcementEmbed = announcementMessage.embeds[0];
@@ -271,25 +271,25 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
 
   // Remove the associated role
   await container.client
-    .guilds.cache.get(eclass.guild)
-    ?.roles.cache.get(eclass.classRole)
+    .guilds.cache.get(eclass.guildId)
+    ?.roles.cache.get(eclass.classRoleId)
     ?.delete('Class finished');
 
   // Mark the class as finished
   await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
 
   // Edit the global announcement messages (calendar & week upcoming classes)
-  await updateGlobalAnnouncements(eclass.guild, eclass.subject.schoolYear);
+  await updateGlobalAnnouncements(eclass.guildId, eclass.subject.schoolYear);
 
   container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
 }
 
 export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannel, eclass.guild);
+  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
-    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannel}).`);
-  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
   const announcementEmbed = announcementMessage.embeds[0];
@@ -304,41 +304,43 @@ export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void
 
   // Remove the associated role
   await container.client
-    .guilds.cache.get(eclass.guild)
-    ?.roles.cache.get(eclass.classRole)
+    .guilds.cache.get(eclass.guildId)
+    ?.roles.cache.get(eclass.classRoleId)
     ?.delete('Class canceled');
 
   // Mark the class as finished
   await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Canceled });
 
   // Edit the global announcement messages (calendar & week upcoming classes)
-  await updateGlobalAnnouncements(eclass.guild, eclass.subject.schoolYear);
+  await updateGlobalAnnouncements(eclass.guildId, eclass.subject.schoolYear);
 
   container.logger.debug(`[e-class:${eclass.classId}] Canceled class.`);
 }
 
-export async function setRecordLink(
+export async function addRecordLink(
   eclass: EclassPopulatedDocument,
   recordLink: string,
   silent = false,
 ): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannel, eclass.guild);
+  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
-    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannel}).`);
-  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
   const announcementEmbed = announcementMessage.embeds[0];
   const recordField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
   const baseValue = config.messages.recordedValues[Number(eclass.isRecorded)];
-  const linkValue = pupa(config.messages.recordedLink, { recordLink });
+  const linksValue = [...eclass.recordLinks, recordLink]
+    .map(link => pupa(config.messages.recordedLink, { link }))
+    .join(', ');
   if (recordField) {
-    recordField.value = `${baseValue}\n${linkValue}`;
+    recordField.value = `${baseValue}\n${linksValue}`;
   } else {
     announcementEmbed.addFields({
       name: config.messages.newClassEmbed.recorded,
-      value: `${baseValue}\n${linkValue}`,
+      value: `${baseValue}\n${linksValue}`,
       inline: true,
     });
   }
@@ -348,8 +350,8 @@ export async function setRecordLink(
   if (!silent) {
     // Send the link in the corresponding text channel
     const classChannel = container.client
-      .guilds.resolve(eclass.guild)
-      ?.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel | undefined;
+      .guilds.resolve(eclass.guildId)
+      ?.channels.resolve(eclass.subject.textChannelId) as GuildTextBasedChannel | undefined;
     await classChannel?.send(pupa(config.messages.linkAnnouncement, {
       topic: eclass.topic,
       date: dayjs(eclass.date).format(settings.configuration.dateFormat),
@@ -358,23 +360,28 @@ export async function setRecordLink(
   }
 
   // Store the link in the DB
-  await Eclass.findByIdAndUpdate(eclass._id, { recordLink });
+  await Eclass.findByIdAndUpdate(eclass._id, { $push: { recordLinks: recordLink } });
 
   container.logger.debug(`[e-class:${eclass.classId}] Added record link.`);
 }
 
-export async function clearRecordLink(eclass: EclassPopulatedDocument): Promise<void> {
+export async function removeRecordLink(eclass: EclassPopulatedDocument, recordLink: string): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannel, eclass.guild);
+  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
-    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannel}).`);
-  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessage);
+    throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
   const announcementEmbed = announcementMessage.embeds[0];
   const recordField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
+  const baseValue = config.messages.recordedValues[Number(eclass.isRecorded)];
+  const linksValue = eclass.recordLinks
+    .filter(link => link !== recordLink)
+    .map(link => pupa(config.messages.recordedLink, { link }))
+    .join(', ');
   if (recordField) {
-    recordField.value = config.messages.recordedValues[Number(eclass.isRecorded)];
+    recordField.value = `${baseValue}\n${linksValue}`;
   } else {
     announcementEmbed.addFields({
       name: config.messages.newClassEmbed.recorded,
@@ -385,7 +392,7 @@ export async function clearRecordLink(eclass: EclassPopulatedDocument): Promise<
   await announcementMessage.edit({ embeds: [announcementEmbed] });
 
   // Store the link in the DB
-  await Eclass.findByIdAndUpdate(eclass._id, { recordLink: null });
+  await Eclass.findByIdAndUpdate(eclass._id, { $pull: { recordLinks: recordLink } });
 
   container.logger.debug(`[e-class:${eclass.classId}] Removed record link.`);
 }
@@ -395,14 +402,14 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
   await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
 
   // Resolve the associated channel
-  const guild = container.client.guilds.resolve(eclass.guild);
+  const guild = container.client.guilds.resolve(eclass.guildId);
   if (!guild)
     return;
 
-  const classChannel = guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
+  const classChannel = guild.channels.resolve(eclass.subject.textChannelId) as GuildTextBasedChannel;
 
   // Alert the professor
-  const professor = await guild.members.fetch({ user: eclass.professor, cache: false }).catch(nullop);
+  const professor = await guild.members.fetch({ user: eclass.professorId, cache: false }).catch(nullop);
 
   await professor?.send(
     pupa(config.messages.alertProfessor, {
@@ -432,7 +439,7 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
 
   // Send the private message to the subscribers
   const reminder = pupa(config.messages.remindClassPrivateNotification, payload);
-  await massSend(guild, eclass.subscribers, reminder);
+  await massSend(guild, eclass.subscriberIds, reminder);
 
   container.logger.debug(`[e-class:${eclass.classId}] Sent reminders.`);
 }
@@ -440,12 +447,12 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
 export async function subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
   if (eclass.status !== EclassStatus.Planned)
     return;
-  if (eclass.professor === member.id)
+  if (eclass.professorId === member.id)
     return;
 
-  const givenRole = member.guild.roles.cache.get(eclass.classRole);
+  const givenRole = member.guild.roles.cache.get(eclass.classRoleId);
   if (!givenRole) {
-    container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
+    container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRoleId} does not exist.`);
     return;
   }
 
@@ -462,9 +469,9 @@ export async function unsubscribeMember(member: GuildMember, eclass: EclassPopul
   if (eclass.status !== EclassStatus.Planned)
     return;
 
-  const givenRole = member.guild.roles.cache.get(eclass.classRole);
+  const givenRole = member.guild.roles.cache.get(eclass.classRoleId);
   if (!givenRole) {
-    container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRole} does not exist.`);
+    container.logger.warn(`[e-class:${eclass.classId}] The role with id ${eclass.classRoleId} does not exist.`);
     return;
   }
 
@@ -483,10 +490,10 @@ export function validateDateSpan(date: Date): boolean {
 
 // TODO: Use Result/Some
 export async function checkOverlaps(
-  data: Partial<Pick<EclassPopulatedDocument, 'classId'>> & Pick<EclassPopulatedDocument, 'date' | 'duration' | 'professor' | 'subject'>,
+  data: Partial<Pick<EclassPopulatedDocument, 'classId'>> & Pick<EclassPopulatedDocument, 'date' | 'duration' | 'professorId' | 'subject'>,
 ): Promise<{ professorOverlap: boolean; schoolYearOverlap: boolean; any: boolean; error: string | null }> {
   const myStart = data.date;
-  const myEnd = myStart + data.duration;
+  const myEnd = new Date(myStart.getTime() + data.duration);
 
   const allOverlapping = await Eclass.find<EclassPopulatedDocument>({
     classId: { $ne: data.classId },
@@ -496,7 +503,7 @@ export async function checkOverlaps(
   });
 
   const schoolYearOverlap = allOverlapping.some(eclass => eclass.subject.schoolYear === data.subject.schoolYear);
-  const professorOverlap = allOverlapping.some(eclass => eclass.professor === data.professor);
+  const professorOverlap = allOverlapping.some(eclass => eclass.professorId === data.professorId);
 
   return {
     professorOverlap,

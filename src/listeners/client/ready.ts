@@ -38,12 +38,12 @@ export default class ReadyListener extends Listener {
     const eclasses = await Eclass.find({ status: EclassStatus.Planned });
     for (const eclass of eclasses) {
       // TODO: Improve the "remove-if-fail" logic. What if the channel was deleted? What if we just don't have perm?
-      const channel = await this.container.client.configManager.get(eclass.announcementChannel, eclass.guild);
-      channel?.messages.fetch(eclass.announcementMessage)
+      const channel = await this.container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
+      channel?.messages.fetch(eclass.announcementMessageId)
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await ReactionRole.findByIdAndDelete(eclass._id);
-          this.container.client.reactionRolesIds.delete(eclass.announcementMessage);
+          this.container.client.reactionRolesIds.delete(eclass.announcementMessageId);
         });
     }
 

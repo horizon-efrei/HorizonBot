@@ -18,7 +18,7 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     required: true,
     index: true,
   },
-  guild: {
+  guildId: {
     type: String,
     required: true,
   },
@@ -33,7 +33,7 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     autopopulate: true,
   },
   date: {
-    type: Number,
+    type: Date,
     required: true,
   },
   duration: {
@@ -41,19 +41,19 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     required: true,
   },
   end: {
-    type: Number,
-    default(this: EclassDocument): number { return this.date + this.duration; },
+    type: Date,
+    default(this: EclassDocument): Date { return new Date(this.date.getTime() + this.duration); },
   },
-  professor: {
+  professorId: {
     type: String,
     required: true,
   },
-  classRole: {
+  classRoleId: {
     type: String,
     required: true,
     index: true,
   },
-  targetRole: {
+  targetRoleId: {
     type: String,
     required: true,
   },
@@ -66,12 +66,12 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     type: String,
     required: false,
   },
-  announcementChannel: {
+  announcementChannelId: {
     type: String,
     required: true,
     enum: ConfigEntriesChannels,
   },
-  announcementMessage: {
+  announcementMessageId: {
     type: String,
     required: true,
   },
@@ -84,15 +84,12 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     type: Boolean,
     default: false,
   },
-  subscribers: [String],
+  subscriberIds: [String],
   isRecorded: {
     type: Boolean,
     default: false,
   },
-  recordLink: {
-    type: String,
-    default: null,
-  },
+  recordLinks: [String],
 }, { timestamps: true });
 
 
@@ -103,21 +100,21 @@ EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string =
 ].join('_');
 
 EclassSchema.methods.getMessageLink = function (this: EclassDocument): string {
-  const announcementChannel = container.client.configManager.getFromCache(this.announcementChannel, this.guild);
+  const announcementChannel = container.client.configManager.getFromCache(this.announcementChannelId, this.guildId);
   if (!announcementChannel)
-    throw new Error(`Could not find [eclass:${this.classId} announcement's channel (${this.announcementChannel}).`);
-  return makeMessageLink(this.guild, announcementChannel.id, this.announcementMessage);
+    throw new Error(`Could not find [eclass:${this.classId} announcement's channel (${this.announcementChannelId}).`);
+  return makeMessageLink(this.guildId, announcementChannel.id, this.announcementMessageId);
 };
 
 EclassSchema.methods.normalizeDates = function (
   this: EclassDocument,
   formatDuration?: boolean,
 ): { date: number; end: number; duration: number | string } {
-  const { date, end, duration }: { date: number; end: number; duration: number } = this.toObject();
+  const { date, end, duration }: { date: Date; end: Date; duration: number } = this.toObject();
 
   return {
-    date: Math.floor(date / 1000),
-    end: Math.floor(end / 1000),
+    date: Math.floor(date.getTime() / 1000),
+    end: Math.floor(end.getTime() / 1000),
     duration: formatDuration ? dayjs.duration(duration).humanize() : Math.floor(duration / 1000),
   };
 };

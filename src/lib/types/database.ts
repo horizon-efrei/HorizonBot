@@ -43,7 +43,7 @@ export type ConfigEntryHolds = GuildTextBasedChannel | Role;
 /** Interface for the "Configuration"'s mongoose schema */
 export interface ConfigurationBase {
   name: ConfigEntries;
-  guild: string;
+  guildId: string;
   value: string;
 }
 
@@ -78,29 +78,29 @@ export enum EclassPlace {
 /** Interface for the "Eclass"'s mongoose schema */
 export interface EclassBase {
   classId: string;
-  guild: string;
+  guildId: string;
   topic: string;
   subject: SubjectDocument | Types.ObjectId;
-  date: number;
+  date: Date;
   duration: number;
-  end: number;
-  professor: string;
-  classRole: string;
-  targetRole: string;
+  end: Date;
+  professorId: string;
+  classRoleId: string;
+  targetRoleId: string;
   place: EclassPlace;
   placeInformation: string | null;
-  announcementChannel: ConfigEntriesChannels;
-  announcementMessage: string;
+  announcementChannelId: ConfigEntriesChannels;
+  announcementMessageId: string;
   status: EclassStatus;
   reminded: boolean;
-  subscribers: string[];
+  subscriberIds: string[];
   isRecorded: boolean;
-  recordLink: string | null;
+  recordLinks: string[];
 }
 
 /** Interface for the "Eclass"'s mongoose document */
 interface EclassBaseDocument extends EclassBase, Document {
-  subscribers: Types.Array<string>;
+  subscriberIds: Types.Array<string>;
   getMessageLink(): string;
   formatDates(): { date: string; end: string; duration: string };
   getStatus(): string;
@@ -140,10 +140,9 @@ export interface SubjectBase {
   docsLink: string;
   teachingUnit: TeachingUnit;
   schoolYear: SchoolYear;
-  textChannel: string;
-  textDocsChannel?: string;
-  voiceChannel?: string;
-  exams: Array<{ name: string; date: number }>;
+  textChannelId: string;
+  textDocsChannelId?: string;
+  voiceChannelId?: string;
 }
 
 /** Interface for the "Subject"'s mongoose document */
@@ -188,7 +187,7 @@ export type ReactionRoleModel = Model<ReactionRoleDocument>;
 export interface RoleIntersectionBase {
   roleId: string;
   guildId: string;
-  expiration: number;
+  expiration: Date;
 }
 
 /** Interface for the "RoleIntersection"'s mongoose document */
@@ -227,7 +226,6 @@ export type FlaggedMessageModel = Model<FlaggedMessageDocument>;
 /** Interface for the "Tag"'s mongoose schema */
 export interface TagBase {
   name: string;
-  aliases: string[];
   content: string;
   uses: number;
   isEmbed: boolean;
@@ -249,7 +247,7 @@ export type TagModel = Model<TagDocument>;
 /** Interface for the "Reminder"'s mongoose schema */
 export interface ReminderBase {
   reminderId: string;
-  date: number;
+  date: Date;
   description: string;
   userId: string;
 }
@@ -403,6 +401,7 @@ export interface ContactBase {
   team: string;
   name: string;
   contact: string;
+  guildId: string;
   description: string;
 }
 

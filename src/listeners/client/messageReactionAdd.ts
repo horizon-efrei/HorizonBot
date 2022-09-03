@@ -122,7 +122,7 @@ export default class MessageReactionAddListener extends Listener {
     }
 
     // eslint-disable-next-line unicorn/prefer-ternary
-    if (document.professor === member.id)
+    if (document.professorId === member.id)
       await reaction.users.remove(member);
     else
       await EclassManager.subscribeMember(member, document);

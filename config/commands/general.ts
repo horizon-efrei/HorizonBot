@@ -121,7 +121,8 @@ export const recordings = {
   messages: {
     noRecords: "Je n'ai trouvé aucun enregistrement de classes dans la base de données !",
     listTitle: 'Liste des enregistrements ({total})',
-    listLine: `• [{topic}]({recordLink}) par ${Formatters.userMention('{professor}')} (${timeFormat('{date}', TimestampStyles.RelativeTime)})`,
+    listLine: `• {topic} par ${Formatters.userMention('{professorId}')} (${timeFormat('{date}', TimestampStyles.RelativeTime)}) : {links}`,
+    listLineLink: '[Lien {num}]({link})',
     pageDescription: '{total} enregistrement(s)',
   },
 } as const;

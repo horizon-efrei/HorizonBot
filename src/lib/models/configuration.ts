@@ -8,7 +8,7 @@ const ConfigurationSchema = new Schema<ConfigurationDocument, ConfigurationModel
     required: true,
     enum: [Object.values(ConfigEntriesChannels), Object.values(ConfigEntriesRoles)].flat(),
   },
-  guild: {
+  guildId: {
     type: String,
     required: true,
   },

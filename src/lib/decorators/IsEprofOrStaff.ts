@@ -32,7 +32,7 @@ export default function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDec
       }
 
       // Check if the professor is the right one
-      if (options?.isOriginalEprof && interaction.member.id !== eclass!.professor) {
+      if (options?.isOriginalEprof && interaction.member.id !== eclass!.professorId) {
         await interaction.reply(config.messages.editUnauthorized);
         return;
       }

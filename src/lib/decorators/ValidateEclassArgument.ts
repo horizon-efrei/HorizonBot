@@ -27,7 +27,7 @@ export default function ValidateEclassArgument(options?: ValidationOptions): Met
 
       // Check if the professor is the right one
       const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
-      if (interaction.member.id !== eclass.professor
+      if (interaction.member.id !== eclass.professorId
         && staffRole
         && !interaction.member.roles.cache.has(staffRole.id)) {
         await interaction.reply({ content: config.messages.editUnauthorized, ephemeral: true });

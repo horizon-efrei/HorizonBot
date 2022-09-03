@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { ApplyOptions } from '@sapphire/decorators';
+import type { Result } from '@sapphire/framework';
 import { Resolvers } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import { oneLine } from 'common-tags';
@@ -65,7 +66,7 @@ const statusChoices = Object.entries(statusOptions).map(([value, name]) => ({ na
 
 enum OptionRecordChoiceChoices {
   Add = 'add',
-  Clear = 'clear',
+  Remove = 'remove',
   Show = 'show',
 }
 
@@ -302,8 +303,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
                 .setDescription(this.descriptions.options.choice)
                 .setRequired(true)
                 .setChoices(
-                  { name: 'Définir le lien', value: OptionRecordChoiceChoices.Add },
-                  { name: 'Supprimer le lien', value: OptionRecordChoiceChoices.Clear },
+                  { name: 'Ajouter le lien', value: OptionRecordChoiceChoices.Add },
+                  { name: 'Enlever le lien', value: OptionRecordChoiceChoices.Remove },
                   { name: 'Voir le lien', value: OptionRecordChoiceChoices.Show },
                 ),
             )
@@ -369,9 +370,9 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     }
 
     const overlaps = await EclassManager.checkOverlaps({
-      date: date.unwrap().getTime(),
+      date: date.unwrap(),
       duration: duration.unwrap(),
-      professor: professor.id,
+      professorId: professor.id,
       subject,
     });
     if (overlaps.any) {
@@ -438,7 +439,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     const isRecorded = interaction.options.getBoolean(Options.IsRecorded);
 
     let duration: number | null = null;
-    let date: number | null = null;
+    let date: Date | null = null;
 
     if (rawDuration) {
       const durationResult = CustomResolvers.resolveDuration(rawDuration);
@@ -455,7 +456,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
         await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
         return;
       }
-      date = dateResult.unwrap().getTime();
+      date = dateResult.unwrap();
     }
 
     const updateMessages: string[] = [];
@@ -469,7 +470,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     }
 
     if (professor) {
-      eclass.professor = professor.id;
+      eclass.professorId = professor.id;
       updateMessages.push(this.messages.editedProfessor);
       notificationMessages.push(this.messages.pingEditedProfessor);
     }
@@ -548,12 +549,12 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     const { guild } = answerTo;
 
     const formattedDate = dayjs(eclass.date).format(settings.configuration.dateFormat);
-    const classChannel = answerTo.guild.channels.resolve(eclass.subject.textChannel) as GuildTextBasedChannel;
+    const classChannel = answerTo.guild.channels.resolve(eclass.subject.textChannelId) as GuildTextBasedChannel;
 
     // Fetch the announcement message
-    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannel, guild.id);
+    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannelId, guild.id);
     if (originalChannel) {
-      const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessage);
+      const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessageId);
 
       // Edit the announcement embed
       await originalMessage.edit({
@@ -563,7 +564,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
           subject: eclass.subject,
           topic: eclass.topic,
           duration: eclass.duration,
-          professor: await guild.members.fetch(eclass.professor),
+          professor: await guild.members.fetch(eclass.professorId),
           classChannel,
           classId: eclass.classId,
           isRecorded: eclass.isRecorded,
@@ -577,7 +578,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     await EclassManager.updateGlobalAnnouncements(guild.id, eclass.subject.schoolYear);
 
     // Edit the role
-    const originalRole = guild.roles.resolve(eclass.classRole);
+    const originalRole = guild.roles.resolve(eclass.classRoleId);
     if (originalRole) {
       const newRoleName = EclassManager.getRoleNameForClass({
         formattedDate,
@@ -592,7 +593,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     const payload = {
       ...eclass.toJSON(),
       ...eclass.normalizeDates(true),
-      pingRole: guild.roles.resolve(eclass.classRole),
+      pingRole: guild.roles.resolve(eclass.classRoleId),
       where: this.messages.where(eclass),
     };
     await answerTo.followUp(pupa(`${this.messages.headerEdited}${updateMessages.join('\n')}`, payload));
@@ -641,54 +642,52 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
   public async record(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
     const action = interaction.options.getString(Options.Choice, true) as OptionRecordChoiceChoices;
 
+    let link: Result<URL, string> | null = null;
+    if ([OptionRecordChoiceChoices.Add, OptionRecordChoiceChoices.Remove].includes(action)) {
+      // Check the status before setting a URL
+      if (eclass.status !== EclassStatus.Finished) {
+        await interaction.reply({
+          content: pupa(this.messages.statusIncompatible, { status: eclass.getStatus() }),
+          ephemeral: true,
+        });
+        return;
+      }
+
+      const rawLink = interaction.options.getString(Options.Link);
+      if (!rawLink) {
+        await interaction.reply({ content: this.messages.noRecordLinkProvided, ephemeral: true });
+        return;
+      }
+
+      link = Resolvers.resolveHyperlink(rawLink);
+      if (link.isErr()) {
+        await interaction.reply({ content: this.messages.invalidRecordLink, ephemeral: true });
+        return;
+      }
+    }
+
     switch (action) {
       case OptionRecordChoiceChoices.Add: {
-        // Check the status before setting a URL
-        if (eclass.status !== EclassStatus.Finished) {
-          await interaction.reply({
-            content: pupa(this.messages.statusIncompatible, { status: eclass.getStatus() }),
-            ephemeral: true,
-          });
-          return;
-        }
-
         const silent = interaction.options.getBoolean(Options.Silent) ?? false;
-        const rawLink = interaction.options.getString(Options.Link);
-        if (!rawLink) {
-          await interaction.reply({ content: this.messages.noRecordLinkProvided, ephemeral: true });
-          return;
-        }
-
-        const link = Resolvers.resolveHyperlink(rawLink);
-        if (link.isErr()) {
-          await interaction.reply({ content: this.messages.invalidRecordLink, ephemeral: true });
-          return;
-        }
 
         // Change the URL & confirm
-        await EclassManager.setRecordLink(eclass, link.unwrap().toString(), silent);
+        await EclassManager.addRecordLink(eclass, link!.unwrap().toString(), silent);
         await interaction.reply(this.messages.successfullyAddedLink);
         break;
       }
-      case OptionRecordChoiceChoices.Clear:
-        // Check the status before setting a URL
-        if (eclass.status !== EclassStatus.Finished) {
-          await interaction.reply({
-            content: pupa(this.messages.statusIncompatible, { status: eclass.getStatus() }),
-            ephemeral: true,
-          });
-          return;
-        }
-
+      case OptionRecordChoiceChoices.Remove: {
         // Change the URL & confirm
-        await EclassManager.clearRecordLink(eclass);
+        await EclassManager.removeRecordLink(eclass, link!.unwrap().toString());
         await interaction.reply(this.messages.successfullyRemovedLink);
         break;
+      }
       case OptionRecordChoiceChoices.Show:
         // Show the current URL if any
-        await interaction.reply(eclass.recordLink
-          ? pupa(this.messages.recordLink, { link: eclass.recordLink })
-          : this.messages.noRecordLink);
+        await interaction.reply(eclass.recordLinks.length > 0
+          ? pupa(this.messages.recordLinksHeader, {
+              links: eclass.recordLinks.map(l => pupa(this.messages.recordLinkLine, { link: l })).join('\n'),
+            })
+          : this.messages.noRecordLinks);
         break;
     }
   }
@@ -698,11 +697,12 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     const payload = {
       ...eclass.toJSON(),
       ...eclass.normalizeDates(true),
+      subject: eclass.subject.toJSON(),
       status: capitalize(this.messages.rawStatuses[eclass.status]),
       where: this.messages.where(eclass),
       recorded: oneLine`
         ${this.messages.recordedValues[Number(eclass.isRecorded)]}
-        ${eclass.recordLink ? pupa(this.messages.recordedLink, eclass) : ''}
+        ${eclass.recordLinks.map(link => pupa(this.messages.recordedLink, { link })).join('\n')}
       `,
       messageLink: eclass.getMessageLink(),
     };
@@ -749,7 +749,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
 
     const professor = interaction.options.getMember(Options.Professor);
     if (professor) {
-      filters.push(eclass => eclass.professor === professor.id);
+      filters.push(eclass => eclass.professorId === professor.id);
       filterDescriptions.push(pupa(this.messages.professorFilter, { value: professor }));
     }
 

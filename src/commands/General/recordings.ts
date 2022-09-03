@@ -22,7 +22,7 @@ export default class RecordingsCommand extends HorizonCommand<typeof config> {
   }
 
   public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
-    const classes: EclassPopulatedDocument[] = await Eclass.find({ recordLink: { $ne: null } });
+    const classes: EclassPopulatedDocument[] = await Eclass.find({ recordLinks: { $not: { $size: 0 } } });
     if (classes.length === 0) {
       await interaction.reply(this.messages.noRecords);
       return;
@@ -32,7 +32,11 @@ export default class RecordingsCommand extends HorizonCommand<typeof config> {
     const fields = Object.entries(groups)
       .map(([name, value]) => ({
         name,
-        value: value.map(eclass => pupa(this.messages.listLine, { ...eclass.toJSON(), ...eclass.normalizeDates() })).join('\n'),
+        value: value.map(eclass => pupa(this.messages.listLine, {
+          ...eclass.toJSON(),
+          ...eclass.normalizeDates(),
+          links: eclass.recordLinks.map((link, i) => pupa(this.messages.listLineLink, { num: i + 1, link })).join(' '),
+        })).join('\n'),
       }))
       .slice(0, 25);
 

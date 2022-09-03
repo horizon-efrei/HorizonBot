@@ -128,7 +128,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       .setItems([
         ...reminders.map(reminder => pupa(this.messages.listLine, {
           ...reminder.toJSON(),
-          timestamp: Math.round(reminder.date / 1000),
+          timestamp: Math.round(reminder.date.getTime() / 1000),
         })),
       ])
       .setItemsPerPage(10)
@@ -184,11 +184,11 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
     await interaction.reply({ content: this.messages.removedReminder, ephemeral: true });
   }
 
-  private _parseTime(dateOrDuration: string): number | null {
+  private _parseTime(dateOrDuration: string): Date | null {
     return CustomResolvers.resolveDuration(dateOrDuration)
       .mapOr(
-        CustomResolvers.resolveDate(dateOrDuration).mapOr(null, dat => dat.getTime()),
-        duration => Date.now() + duration,
+        CustomResolvers.resolveDate(dateOrDuration).unwrapOr(null),
+        duration => new Date(Date.now() + duration),
       );
   }
 }

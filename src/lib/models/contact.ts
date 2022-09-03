@@ -14,6 +14,10 @@ const ContactSchema = new Schema<ContactDocument, ContactModel, null>({
     type: String,
     required: true,
   },
+  guildId: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
   },

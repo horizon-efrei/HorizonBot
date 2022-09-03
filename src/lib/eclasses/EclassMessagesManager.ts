@@ -1,4 +1,3 @@
-import { time, TimestampStyles } from '@discordjs/builders';
 import { EmbedLimits, MessageLimits } from '@sapphire/discord-utilities';
 import { container } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
@@ -68,14 +67,10 @@ function getCalendarClassContentForSubject(
   dropOffset = 0,
 ): string {
   let content = pupa(messages.classesCalendar.textChannel, subject);
-  if (subject.textDocsChannel)
+  if (subject.textDocsChannelId)
     content += pupa(messages.classesCalendar.textDocsChannel, subject);
-  if (subject.voiceChannel)
+  if (subject.voiceChannelId)
     content += pupa(messages.classesCalendar.voiceChannel, subject);
-
-  const exams = subject.exams.map(exam => `${exam.name} ${time(Math.floor(exam.date / 1000), TimestampStyles.RelativeTime)}`).join(' • ');
-  if (exams.length > 0)
-    content += `\n${exams}`;
 
   const formatter = (eclass: EclassPopulatedDocument): string => oneLine`
     ${pupa(messages.classesCalendar.classLine, {
@@ -85,7 +80,7 @@ function getCalendarClassContentForSubject(
       endHour: dayjs(eclass.end).format('HH[h]mm'),
       messageLink: eclass.getMessageLink(),
     })}
-    ${eclass.recordLink ? pupa(messages.classesCalendar.recordLink, eclass) : ''}
+    ${eclass.recordLinks.map(link => pupa(messages.classesCalendar.recordLink, { link })).join(' ')}
   `;
 
   const finishedClasses = allClasses
@@ -140,12 +135,12 @@ function generateCalendarEmbeds(allClasses: EclassPopulatedDocument[], subjects:
 
 function generateUpcomingClassesMessage(upcomingClasses: EclassDocument[]): string {
   // Sort the upcoming classes by date.
-  upcomingClasses.sort((a, b) => a.date - b.date);
+  upcomingClasses.sort((a, b) => a.date.getTime() - b.date.getTime());
   // Group together classes that are the same day
-  const classGroupsObj = groupBy(upcomingClasses, val => new Date(val.date).getDate());
+  const classGroupsObj = groupBy(upcomingClasses, val => val.date);
   const classGroups = Object.values(classGroupsObj);
   // Sort the groups we get by date, because we don't necessarily want Monday to be the first day displayed
-  classGroups.sort((grpA, grpB) => grpA[0].date - grpB[0].date);
+  classGroups.sort((grpA, grpB) => grpA[0].date.getTime() - grpB[0].date.getTime());
 
   let builder = messages.upcomingClasses.header;
 
@@ -256,7 +251,7 @@ export async function updateUpcomingClassesForGuild(
       ],
     });
   } else {
-    upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guild === guildId);
+    upcomingClasses = allUpcomingClasses.filter(eclass => eclass.guildId === guildId);
   }
 
   await updateUpcomingClasses(channel, upcomingClasses);

@@ -42,20 +42,16 @@ const SubjectSchema = new Schema<SubjectDocument, SubjectModel, null>({
     enum: SchoolYear,
     required: true,
   },
-  textChannel: {
+  textChannelId: {
     type: String,
     required: true,
   },
-  textDocsChannel: {
+  textDocsChannelId: {
     type: String,
   },
-  voiceChannel: {
+  voiceChannelId: {
     type: String,
   },
-  exams: [{
-    name: String,
-    date: Number,
-  }],
 }, { timestamps: true });
 
 export default model<SubjectDocument, SubjectModel>('Subject', SubjectSchema);
