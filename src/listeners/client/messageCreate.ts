@@ -51,14 +51,14 @@ export default class MessageListener extends Listener {
       });
     }
 
-    const mentionnedTempIntersectionRoles = this.container.client.roleIntersections
+    const mentionedTempIntersectionRoles = this.container.client.roleIntersections
       .filter(r => message.mentions.roles.has(r))
       .map(roleId => message.guild.roles.resolve(roleId))
       .filter(filterNullAndUndefined);
-    if (mentionnedTempIntersectionRoles.size > 0) {
-      this.container.logger.debug(`[Intersection Roles] ${mentionnedTempIntersectionRoles.size} role was just mentionned by ${message.author.username}. It will expire in two days.`);
+    if (mentionedTempIntersectionRoles.size > 0) {
+      this.container.logger.debug(`[Intersection Roles] ${mentionedTempIntersectionRoles.size} role was just mentioned by ${message.author.username}. It will expire in two days.`);
 
-      for (const role of mentionnedTempIntersectionRoles) {
+      for (const role of mentionedTempIntersectionRoles) {
         await RoleIntersections.findOneAndUpdate(
           { roleId: role.id, guildId: role.guild.id },
           { expiration: Date.now() + settings.configuration.roleIntersectionExpiration },

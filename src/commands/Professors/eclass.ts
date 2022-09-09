@@ -764,7 +764,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       : this.messages.noFilter;
 
     // Change the ".every" to ".some" to have a "OR" between the filters, rather than "AND".
-    const filteredClasses = eclasses.filter(eclass => filters.every(filt => filt(eclass)));
+    const filteredClasses = eclasses.filter(eclass => filters.every(filter => filter(eclass)));
 
     const baseEmbed = new MessageEmbed()
       .setTitle(this.messages.listTitle)

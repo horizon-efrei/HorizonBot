@@ -509,7 +509,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     document.reactionRolePairs.push({ reaction, role: role.id });
     await document.save();
 
-    await interaction.reply(pupa(this.messages.addedPairSuccessfuly, { reaction, role, rrMessage }));
+    await interaction.reply(pupa(this.messages.addedPairSuccessfully, { reaction, role, rrMessage }));
   }
 
   public async removePair(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
@@ -532,7 +532,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
 
     document.reactionRolePairs.pull(pair);
     await document.save();
-    await interaction.reply(pupa(this.messages.removedPairSuccessfuly, { rrMessage }));
+    await interaction.reply(pupa(this.messages.removedPairSuccessfully, { rrMessage }));
   }
 
   public async unique(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {

@@ -10,8 +10,8 @@ interface CodeToken {
 
 /**
  * Extracts all code blocks from a markdown string
- * @param source The markdown text to analyse
- * @returns The codes found in the markdown text
+ * @param source The Markdown text to analyse
+ * @returns The codes found in the Markdown text
  */
 export default function extractCodeBlocks(source: string): Array<{ text: string; lang?: string | undefined }> {
   return marked.lexer(source.replaceAll('```', '\n```'))

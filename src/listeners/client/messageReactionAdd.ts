@@ -95,7 +95,7 @@ export default class MessageReactionAddListener extends Listener {
     // If we have the role we are asking for, stop here
     if (member.roles.cache.get(givenRole.id))
       return;
-    // If we can have only 1 role at a time from the menu and we have at least one of the menu's roles, stop here
+    // If we can have only 1 role at a time from the menu, and we have at least one of the menu's roles, stop here
     if (document.uniqueRole && member.roles.cache.hasAny(...document.reactionRolePairs.map(pair => pair.role))) {
       await reaction.users.remove(member);
       return;

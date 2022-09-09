@@ -3,12 +3,12 @@ const REGEX = /^(?<number>\d+) ?(?<unit>[a-z]+)?$/i;
 enum Durations {
   /* eslint-disable no-multi-spaces, @typescript-eslint/prefer-literal-enum-member */
   Second = 1,
-  Minute = 1 * 60,
-  Hour   = 1 * 60 * 60,
-  Day    = 1 * 60 * 60 * 24,
-  Week   = 1 * 60 * 60 * 24 * 7,
-  Month  = 1 * 60 * 60 * 24 * 30,
-  Year   = 1 * 60 * 60 * 24 * 365,
+  Minute = 60,
+  Hour   = 60 * 60,
+  Day    = 60 * 60 * 24,
+  Week   = 60 * 60 * 24 * 7,
+  Month  = 60 * 60 * 24 * 30,
+  Year   = 60 * 60 * 24 * 365,
 }
 
 function tokenize(str: string): string[] {

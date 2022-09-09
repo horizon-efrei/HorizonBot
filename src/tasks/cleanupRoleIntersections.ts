@@ -12,7 +12,7 @@ export default class CleanupRoleIntersectionsTask extends Task {
       .filter(filterNullAndUndefined);
 
     if (roles.length > 0) {
-      this.container.logger.debug(`[Intersection Roles] Removed ${roles.length} role ("${roles.map(r => r.name).join('", "')}") as it was mentionned and has expired.`);
+      this.container.logger.debug(`[Intersection Roles] Removed ${roles.length} role ("${roles.map(r => r.name).join('", "')}") as it was mentioned and has expired.`);
       for (const role of roles)
         await role.delete();
     }

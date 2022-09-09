@@ -46,7 +46,7 @@ export const eclass = {
   },
   messages: {
     // Global
-    invalidClassId: "Cet identifiant n'est pas valide. L'identifiant de la classe a été envoyé quand elle a été créée, et il est toujours disponible dans l'embed d'annonce du cours. Sinon, tu peux le retrouver en faisant `!cours list`.",
+    invalidClassId: "Cet identifiant n'est pas valide. L'identifiant de la classe a été envoyé quand elle a été créée, et il est toujours disponible dans l'embed d'annonce du cours. Sinon, tu peux le retrouver en faisant `/eclass list`.",
     onlyProfessor: 'Seul les professeurs peuvent effectuer cette action !',
     unconfiguredChannel: "Oups, impossible de créer ce cours car aucun salon n'a été configuré pour les annonces. Configures-en un en tapant la commande `setup set class-<promo> #salon`.",
     unconfiguredRole: "Oups, impossible de créer ce cours car aucun rôle de promo n'a été configuré. Configures-en un en tapant la commande `setup set role-<promo> @Role`.",
@@ -202,16 +202,16 @@ export const eclass = {
       - N'hésite-pas à demander à des fauteurs de trouble de partir, ou prévient un membre du staff si besoin ;
 
       **APRÈS**
-      - J'arrêterai le cours automatiquement au bout de la durée prévue. Ce n'est pas grave s'il dure plus ou moins longtemps. Tu peux l'arrêter manuellement avec \`!ecours finish {classId}\`
+      - J'arrêterai le cours automatiquement au bout de la durée prévue. Ce n'est pas grave s'il dure plus ou moins longtemps. Tu peux l'arrêter manuellement avec \`/eclass finish {classId}\`
       {afterChecklist}
 
-      :warning: Rappel : il a été prévu que le cours {isIsNot} enregistré ! Tu peux changer cela avec \`!ecours edit {classId} record {notIsRecorded}\`.
+      :warning: Rappel : il a été prévu que le cours {isIsNot} enregistré ! Tu peux changer cela avec \`/eclass edit {classId} record {notIsRecorded}\`.
 
       Bon courage !
     `,
     alertProfessorComplements: {
       startRecord: "- Lance ton logiciel d'enregistrement pour filmer le cours ;",
-      registerRecording: `- Télécharge ton enregistrement sur ce lien ${hideLinkEmbed(process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`!ecours record {classId} <ton lien>\` ;`,
+      registerRecording: `- Télécharge ton enregistrement sur ce lien ${hideLinkEmbed(process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`/eclass record {classId} add <ton lien>\` ;`,
       isRecorded: 'soit',
       isNotRecorded: 'ne soit pas',
     },

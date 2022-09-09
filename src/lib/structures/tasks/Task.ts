@@ -14,7 +14,7 @@ import { Events } from '@/types/sapphire';
  * import type { TaskOptions } from '@/structures/Task';
  *
  * // Define a class extending `Task`, then export it.
- * // You can use a interval in milliseconds
+ * // You can use an interval in milliseconds
  * @ApplyOptions<TaskOptions>({ interval: 10_000 })
  * // or a cron
  * @ApplyOptions<TaskOptions>({ cron: '* * * * *' })

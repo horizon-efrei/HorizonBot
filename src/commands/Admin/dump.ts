@@ -166,7 +166,7 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
       }
     }
 
-    // Keeps members who have all of the specified roles
+    // Keeps members who have all the specified roles
     const allRoleFilter = interaction.options.getString(Options.HasAllRoles);
     if (allRoleFilter) {
       const roles = [...allRoleFilter.matchAll(/<@&(?<id>\d{17,20})>/g)].map(match => match.groups!.id);

@@ -33,7 +33,7 @@ export default class GuildMemberAddListener extends Listener {
     // Otherwise, this likely means the code was not in one of the caches, so get the difference
     possibleUsedCode.push(...previousUses
       .difference(currentUses)
-      .filter(uses => typeof uses === 'number' && uses > 0)
+      .filter(uses => uses > 0)
       .map((uses, code): InviteUses => [code, uses]));
 
     return possibleUsedCode.map(([code]) => code);

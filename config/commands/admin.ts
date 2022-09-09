@@ -7,10 +7,10 @@ export const dump = {
     name: 'dump',
     command: 'Consulter le liste des membres du serveur actuel qui répond (ou non) à certains critères.',
     options: {
-      format: 'Formatte les membres en fonction du template donné.',
+      format: 'Formate les membres en fonction du template donné.',
       hasAllRoles: 'Affiche les membres qui ont tous les rôles indiqués.',
       hasRoles: 'Affiche les membres qui ont au moins un des rôles indiqués.',
-      reacted: 'Affiche les membres qui ont reagi à un message.',
+      reacted: 'Affiche les membres qui ont réagi à un message.',
       order: 'Trie les membres par ordre alphabétique.',
       limit: 'Affiche uniquement le nombre de membres indiqué.',
       separator: "Change le séparateur entre chaque membre. Par défaut, il s'agit d'une nouvelle ligne.",
@@ -32,7 +32,7 @@ export const evaluate = {
     name: 'Éval du code via le bot',
   },
   messages: {
-    evalTimeout: "Le code a pris plus de 1min pour s'éxecuter...",
+    evalTimeout: "Le code a pris plus de 1min pour s'exécuter...",
     output: '**Résultat**\n{output}\n**Type**\n{type}\n:stopwatch: {time}',
     messageNotFound: "Le message n'a pas été trouvé.",
   },
@@ -87,7 +87,7 @@ export const manageContacts = {
     options: {
       name: 'Nom du contact.',
       contact: 'Moyen de contact du contact (mail, téléphone...).',
-      team: 'Service auquelle le contact est associé.',
+      team: 'Service auquel le contact est associé.',
       description: 'Description du contact.',
       field: 'Champ à modifier.',
       value: 'Nouvelle valeur du champ.',
@@ -228,11 +228,11 @@ export const reactionRole = {
     // Add a role to a menu
     reactionAlreadyUsed: 'Cette réaction est déjà utilisée dans ce menu !',
     roleAlreadyUsed: 'Ce rôle est déjà utilisé dans ce menu !',
-    addedPairSuccessfuly: `C'est fait ! La réaction {reaction} donnera le rôle "{role.name}" sur le menu ${hideLinkEmbed('{rrMessage.url}')}.`,
+    addedPairSuccessfully: `C'est fait ! La réaction {reaction} donnera le rôle "{role.name}" sur le menu ${hideLinkEmbed('{rrMessage.url}')}.`,
 
     // Remove a role from a menu
     roleNotUsed: "Ce rôle n'est pas dans ce menu !",
-    removedPairSuccessfuly: `C'est fait ! Cette paire à bien été supprimée du menu ${hideLinkEmbed('{rrMessage.url}')}.`,
+    removedPairSuccessfully: `C'est fait ! Cette paire à bien été supprimée du menu ${hideLinkEmbed('{rrMessage.url}')}.`,
 
     // Unique role mode
     uniqueMode: 'Sur ce menu, le mode "Rôle unique" est : {uniqueMode}.',
@@ -284,7 +284,7 @@ export const setup = {
   messages: {
     successfullyDefined: 'Entrée définie avec succès !',
     successfullyUndefined: 'Entrée déréférencé avec succès !',
-    chooseOne: 'Choissez une seule option à inspecter.',
+    chooseOne: 'Choisissez une seule option à inspecter.',
     associatedKeys: 'Les clés associées à cette valeur sont : `{keys}`.',
     noAssociatedKey: "Cette valeur-là n'a pas de clé associée.",
     associatedValue: 'La valeur associée est : {value}.',

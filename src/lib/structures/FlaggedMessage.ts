@@ -87,7 +87,7 @@ export default class FlaggedMessage {
         pupa(messages.antiSwear.swearModeratorAlert, { ...payload, preview: trimText(this.message.content, 200) }),
       );
     } else {
-      container.logger.warn('[Anti Swear] A swear was detected but no log channel was found, unable to report. Setup a log channel with "/setup set-channel name:mod channel:<channel>"');
+      container.logger.warn('[Anti Swear] A swear was detected but no log channel was found, unable to report. Set up a log channel with "/setup set-channel name:mod channel:<channel>"');
     }
   }
 }

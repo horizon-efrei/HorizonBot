@@ -87,7 +87,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
   if (logStatus === LogStatuses.Silent)
     return;
 
-  container.logger.info(`[Logs:${DiscordLogType[payload.type]}] New logged event happend: ${JSON.stringify(payload, (k, v) => (k === 'type' ? DiscordLogType[v] : v))}`);
+  container.logger.info(`[Logs:${DiscordLogType[payload.type]}] New logged event happened: ${JSON.stringify(payload, (k, v) => (k === 'type' ? DiscordLogType[v] : v))}`);
   if (logStatus === LogStatuses.Console)
     return;
 

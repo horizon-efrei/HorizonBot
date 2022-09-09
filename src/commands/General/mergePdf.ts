@@ -96,7 +96,7 @@ export default class MergePdfCommand extends HorizonCommand<typeof config> {
     );
     const messages = messagesResults.map(result => result.unwrapOr<null>(null)).filter(filterNullAndUndefined);
 
-    // If no message are given or they don't have any attachments AND no attachments were given in the command's
+    // If no message are given, or they don't have any attachments AND no attachments were given in the command's
     // message then we stop here as no PDFs were given at all.
     if (messages.every(msg => msg.attachments.size === 0) && attachments.length === 0) {
       await interaction.followUp({ content: this.messages.noPDFGiven, ephemeral: true });

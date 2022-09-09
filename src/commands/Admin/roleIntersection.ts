@@ -65,7 +65,7 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
       name: allRoles.map(r => r.name).join(' + '),
       hoist: false,
       mentionable: true,
-      reason: `${interaction.member.displayName} a éxecuté la commande RoleIntersection`,
+      reason: `${interaction.member.displayName} a exécuté la commande RoleIntersection`,
     });
 
     for (const member of targetedMembers.values())

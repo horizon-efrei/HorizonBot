@@ -131,8 +131,7 @@ export default class ManageContactsCommand extends HorizonSubcommand<typeof conf
     }
 
     const field = interaction.options.getString(Options.Field, true) as OptionFieldChoices;
-    const value = interaction.options.getString(Options.Value, true);
-    contact[field] = value;
+    contact[field] = interaction.options.getString(Options.Value, true);
     await contact.save();
 
     await interaction.reply(this.messages.editedContact);

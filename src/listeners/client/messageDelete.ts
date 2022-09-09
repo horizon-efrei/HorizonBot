@@ -13,10 +13,8 @@ export default class MessageDeleteListener extends Listener {
     if (!message.author.bot) {
       const auditLogs = await message.guild.fetchAuditLogs({ type: 'MESSAGE_DELETE' }).catch(nullop);
       // We can't filter by the message's id, the best we can do is filter by the channel id...
-      const lastMessageDelete = auditLogs?.entries.filter(entry => (
-        typeof entry.extra.channel === 'string'
-          ? entry.extra.channel === message.channel.id
-          : entry.extra.channel.id === message.channel.id))
+      const lastMessageDelete = auditLogs?.entries
+        .filter(entry => entry.extra.channel.id === message.channel.id)
         .first();
 
       await DiscordLogManager.logAction({

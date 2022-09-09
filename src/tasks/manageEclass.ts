@@ -11,9 +11,9 @@ export default class ManageEclassTask extends Task {
   public async run(): Promise<void> {
     const eclasses = Eclass.find({
       // This queries find classes that:
-      // - are planned and we reached the beggining (to start it)
-      // - are planned and we are 15 minutes before (to send a reminder)
-      // - are in progress and we reach the end (to finish it)
+      // - are planned, and we reached the beginning (to start it)
+      // - are planned, and we are 15 minutes before (to send a reminder)
+      // - are in progress, and we reach the end (to finish it)
       $or: [{
         status: EclassStatus.Planned,
         date: { $lte: Date.now() },

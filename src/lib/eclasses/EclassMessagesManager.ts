@@ -218,7 +218,7 @@ export async function updateClassesCalendarForGuildAndSchoolYear(
 ): Promise<void> {
   const channel = await container.client.configManager.get(calendarMapping[schoolYear], guildId);
   if (!channel) {
-    container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Setup an calendar channel with "/setup set-channel name:calendar-${schoolYear} channel:<channel>"`);
+    container.logger.warn(`[Calendar] Needing to update calendar but no calendar channel was found for school year ${schoolYear} in guild ${guildId}. Set up a calendar channel with "/setup set-channel name:calendar-${schoolYear} channel:<channel>"`);
     return;
   }
 
@@ -236,11 +236,11 @@ export async function updateUpcomingClassesForGuild(
 ): Promise<void> {
   const channel = await container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
   if (!channel) {
-    container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Setup an announcement channel with "/setup set-channel name:week-class channel:<channel>"`);
+    container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Set up an announcement channel with "/setup set-channel name:week-class channel:<channel>"`);
     return;
   }
 
-  let upcomingClasses: EclassPopulatedDocument[] = [];
+  let upcomingClasses: EclassPopulatedDocument[];
   if (isNullish(allUpcomingClasses)) {
     upcomingClasses = await Eclass.find({
       $and: [

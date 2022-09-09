@@ -59,7 +59,7 @@ export type ConfigurationModel = Model<ConfigurationDocument>;
 /* ****************************** */
 
 // #region Eclass Database Types
-/** Enum for the eclass's current status */
+/** Enum for the eclass' current status */
 export enum EclassStatus {
   Planned,
   InProgress,
@@ -67,7 +67,7 @@ export enum EclassStatus {
   Canceled,
 }
 
-/** Enum for the eclass's place */
+/** Enum for the eclass' place */
 export enum EclassPlace {
   Discord = 'discord',
   Teams = 'teams',
