@@ -82,12 +82,12 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
             .setName(Options.Format)
             .setDescription(this.descriptions.options.format),
         )
-        .addRoleOption(
+        .addStringOption(
           option => option
             .setName(Options.HasAllRoles)
             .setDescription(this.descriptions.options.hasAllRoles),
         )
-        .addRoleOption(
+        .addStringOption(
           option => option
             .setName(Options.HasRoles)
             .setDescription(this.descriptions.options.hasRoles),
@@ -151,22 +151,30 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
     );
   }
 
+  // eslint-disable-next-line complexity
   public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
     let members = await interaction.guild.members.fetch();
 
     // Keeps members who have at least one of the specified roles
-    // TODO: support multiple roles (perform an "OR")
-    const roleFilter = interaction.options.getRole(Options.HasRoles);
-    if (roleFilter)
-      members = members.filter(member => member.roles.cache.has(roleFilter.id));
+    const roleFilter = interaction.options.getString(Options.HasRoles);
+    if (roleFilter) {
+      const roles = [...roleFilter.matchAll(/<@&(?<id>\d{17,20})>/g)].map(match => match.groups!.id);
+      if (roles.length > 0) {
+        members = members.filter(
+          member => roles.some(role => member.roles.cache.has(role)),
+        );
+      }
+    }
 
     // Keeps members who have all of the specified roles
-    // TODO: support multiple roles (perform an "AND")
-    const allRoleFilter = interaction.options.getRole(Options.HasAllRoles);
+    const allRoleFilter = interaction.options.getString(Options.HasAllRoles);
     if (allRoleFilter) {
-      members = members.filter(
-        member => [allRoleFilter].every(role => member.roles.cache.has(role.id)),
-      );
+      const roles = [...allRoleFilter.matchAll(/<@&(?<id>\d{17,20})>/g)].map(match => match.groups!.id);
+      if (roles.length > 0) {
+        members = members.filter(
+          member => roles.every(role => member.roles.cache.has(role)),
+        );
+      }
     }
 
     // Keeps members who don't have any roles at all (except for @everyone)
@@ -236,7 +244,7 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
     let formattedMembers = members.map(formatter);
 
     // Reverse the order if asked
-    const desc = interaction.options.getString(Options.Sort) as OptionSortChoices === OptionSortChoices.Desc;
+    const desc = (interaction.options.getString(Options.Sort) as OptionSortChoices | null) === OptionSortChoices.Desc;
     if (desc)
       formattedMembers.reverse();
 
