@@ -375,8 +375,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       professorId: professor.id,
       subject,
     });
-    if (overlaps.any) {
-      await interaction.reply({ content: overlaps.error, ephemeral: true });
+    if (overlaps.isSome()) {
+      await interaction.reply({ content: overlaps.unwrap(), ephemeral: true });
       return;
     }
 
@@ -405,7 +405,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       }
     }
 
-    await EclassManager.createClass(answerTo, {
+    const result = await EclassManager.createClass(answerTo, {
       subject,
       topic,
       professor,
@@ -416,6 +416,13 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       placeInformation,
       isRecorded,
     });
+
+    if (result.isErr()) {
+      await answerTo.reply({ content: result.unwrapErr(), ephemeral: true });
+      return;
+    }
+
+    await interaction.reply(pupa(config.messages.successfullyCreated, { eclass: result.unwrap() }));
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
@@ -495,8 +502,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       }
 
       const overlaps = await EclassManager.checkOverlaps(eclass);
-      if (overlaps.any) {
-        await interaction.reply({ content: overlaps.error, ephemeral: true });
+      if (overlaps.isSome()) {
+        await interaction.reply({ content: overlaps.unwrap(), ephemeral: true });
         return;
       }
 

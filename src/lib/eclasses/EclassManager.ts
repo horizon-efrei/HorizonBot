@@ -1,5 +1,5 @@
 import { EmbedLimits, RoleLimits } from '@sapphire/discord-utilities';
-import { container } from '@sapphire/framework';
+import { container, Option, Result } from '@sapphire/framework';
 import dayjs from 'dayjs';
 import type { CommandInteraction, GuildMember, ModalSubmitInteraction } from 'discord.js';
 import { MessageEmbed } from 'discord.js';
@@ -89,30 +89,26 @@ export async function createClass(
   {
     date, subject, topic, duration, professor, isRecorded, targetRole, place, placeInformation,
   }: EclassCreationOptions,
-): Promise<void> {
+): Promise<Result<EclassPopulatedDocument, string>> {
   // Prepare the date
   const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
 
   targetRole ??= await container.client.configManager.get(schoolYearRoles[subject.schoolYear], interaction.guildId);
   if (!targetRole) {
     container.logger.warn('[e-class:not-created] A new e-class was planned but no school year role found, unable to create.');
-    await interaction.reply({ content: config.messages.unconfiguredRole, ephemeral: true });
-    return;
+    return Result.err(config.messages.unconfiguredRole);
   }
 
   const roleName = getRoleNameForClass({ formattedDate, subject, topic });
-  if (interaction.guild.roles.cache.some(r => r.name === roleName)) {
-    await interaction.reply({ content: config.messages.alreadyExists, ephemeral: true });
-    return;
-  }
+  if (interaction.guild.roles.cache.some(r => r.name === roleName))
+    return Result.err(config.messages.alreadyExists);
 
   // Get the corresponding channels
   const announcementChannel = await container.client.configManager
     .get(classAnnouncement[subject.schoolYear], interaction.guild.id);
   if (!announcementChannel) {
     container.logger.warn('[e-class:not-created] A new e-class was planned but no announcement channel was found, unable to create.');
-    await interaction.reply({ content: config.messages.unconfiguredChannel, ephemeral: true });
-    return;
+    return Result.err(config.messages.unconfiguredChannel);
   }
 
   const classChannel = await interaction.guild.channels.fetch(subject.textChannelId) as GuildTextBasedChannel;
@@ -187,10 +183,8 @@ export async function createClass(
   // Edit the global announcement messages (calendar & week upcoming classes)
   await updateGlobalAnnouncements(eclass.guildId, subject.schoolYear);
 
-  // Send confirmation message
-  await interaction.reply(pupa(config.messages.successfullyCreated, { eclass }));
-
   container.logger.debug(`[e-class:${classId}] Created eclass.`);
+  return Result.ok(eclass);
 }
 
 export async function startClass(eclass: EclassPopulatedDocument): Promise<void> {
@@ -488,10 +482,9 @@ export function validateDateSpan(date: Date): boolean {
   return dayjs(date).isBetween(dayjs(), dayjs().add(2, 'months'));
 }
 
-// TODO: Use Result/Some
 export async function checkOverlaps(
   data: Partial<Pick<EclassPopulatedDocument, 'classId'>> & Pick<EclassPopulatedDocument, 'date' | 'duration' | 'professorId' | 'subject'>,
-): Promise<{ professorOverlap: boolean; schoolYearOverlap: boolean; any: boolean; error: string | null }> {
+): Promise<Option<string>> {
   const myStart = data.date;
   const myEnd = new Date(myStart.getTime() + data.duration);
 
@@ -505,14 +498,8 @@ export async function checkOverlaps(
   const schoolYearOverlap = allOverlapping.some(eclass => eclass.subject.schoolYear === data.subject.schoolYear);
   const professorOverlap = allOverlapping.some(eclass => eclass.professorId === data.professorId);
 
-  return {
-    professorOverlap,
-    schoolYearOverlap,
-    any: professorOverlap || schoolYearOverlap,
-    error: schoolYearOverlap
-      ? config.messages.schoolYearOverlap
-      : professorOverlap
-        ? config.messages.professorOverlap
-        : null,
-  };
+  if (professorOverlap || schoolYearOverlap)
+    return Option.none;
+
+  return Option.some(schoolYearOverlap ? config.messages.schoolYearOverlap : config.messages.professorOverlap);
 }
