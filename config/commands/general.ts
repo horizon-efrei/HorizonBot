@@ -10,7 +10,7 @@ export const code = {
   messages: {
     noMoreCredits: 'Cette commande peut malheureusement être utilisée maximum 200 fois par jour, et ce quota a été atteint... Réessaye à partir de 13h !',
     messageNotFound: "Le message n'a pas été trouvé.",
-    result: "Résultat de l'exécution de ce code en {language.display} ({language.version}). (Temps CPU : {cpuTime} / Memoire : {memory})\n ```ph\n{output}```",
+    result: "Résultat de l'exécution de ce code en **{language.display} ({language.version})**. (Temps CPU : {cpuTime} / Memoire : {memory})\n ```ph\n{output}```",
     wrapNames: {
       c: 'une fonction `main` autour de ton code, et importer `stdio.h` et `stdlib.h`',
       cpp: 'une fonction `main` autour de ton code, et importer `iostream`',
