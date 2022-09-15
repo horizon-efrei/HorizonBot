@@ -36,11 +36,6 @@ const schoolYearRoles: Record<SchoolYear, ConfigEntriesRoles> = {
   [SchoolYear.L3]: ConfigEntriesRoles.SchoolYearL3,
 };
 
-export async function updateGlobalAnnouncements(guildId: string, schoolYear: SchoolYear): Promise<void> {
-  await EclassMessagesManager.updateUpcomingClassesForGuild(guildId);
-  await EclassMessagesManager.updateClassesCalendarForGuildAndSchoolYear(guildId, schoolYear);
-}
-
 export function createAnnouncementEmbed({
   classChannel,
   classId,
@@ -180,8 +175,8 @@ export async function createClass(
     embeds: [embed.setFooter({ text: pupa(config.messages.newClassEmbed.footer, eclass) })],
   });
 
-  // Edit the global announcement messages (calendar & week upcoming classes)
-  await updateGlobalAnnouncements(eclass.guildId, subject.schoolYear);
+  // Edit the global week-upcoming-classes announcement messages
+  await EclassMessagesManager.updateUpcomingClassesForGuild(eclass.guildId);
 
   container.logger.debug(`[e-class:${classId}] Created eclass.`);
   return Result.ok(eclass);
@@ -272,8 +267,8 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
   // Mark the class as finished
   await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
 
-  // Edit the global announcement messages (calendar & week upcoming classes)
-  await updateGlobalAnnouncements(eclass.guildId, eclass.subject.schoolYear);
+  // Edit the global week-upcoming-classes announcement messages
+  await EclassMessagesManager.updateUpcomingClassesForGuild(eclass.guildId);
 
   container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
 }
@@ -305,8 +300,8 @@ export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void
   // Mark the class as finished
   await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Canceled });
 
-  // Edit the global announcement messages (calendar & week upcoming classes)
-  await updateGlobalAnnouncements(eclass.guildId, eclass.subject.schoolYear);
+  // Edit the global week-upcoming-classes announcement messages
+  await EclassMessagesManager.updateUpcomingClassesForGuild(eclass.guildId);
 
   container.logger.debug(`[e-class:${eclass.classId}] Canceled class.`);
 }

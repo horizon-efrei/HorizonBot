@@ -209,24 +209,6 @@ export default {
     today: " (Aujourd'hui)",
     classLine: `• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} ${channelMention('{eclass.subject.textChannel}')} (par ${userMention('{eclass.professor}')}) [${roleMention('{eclass.targetRole}')}]\n`,
   },
-  classesCalendar: {
-    noClasses: 'Aucun cours prévu pour le moment.',
-    noSubjects: 'Aucune matière disponible.',
-    subjectTitle: '{emoji} {name}',
-    textChannel: channelMention('{textChannelId}'),
-    textDocsChannel: ` • Documents : ${channelMention('{textDocsChannelId}')}`,
-    voiceChannel: ` • Vocal : ${channelMention('{voiceChannelId}')} *(cliquez pour rejoindre)*`,
-    finishedClasses: stripIndent`
-      **Cours terminés ou annulés :**
-      {finishedClasses}
-    `,
-    plannedClasses: stripIndent`
-      **Cours prévus :**
-      {plannedClasses}
-    `,
-    recordLink: '| [[Enregistrement]]({link})',
-    classLine: `• ${timeFormat('{date}', TimestampStyles.RelativeTime)} - {beginHour}-{endHour} (${userMention('{professorId}')}) : {topic} [[Voir plus]]({messageLink})`,
-  },
   antiSwear: {
     swearModeratorAlert: stripIndent`
       {message.member} a envoyé un message jugé innaproprié par {moderator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.

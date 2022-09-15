@@ -20,6 +20,7 @@ import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import { IsEprofOrStaff, ValidateEclassArgument } from '@/decorators';
 import * as EclassManager from '@/eclasses/EclassManager';
+import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
 import Eclass from '@/models/eclass';
 import Subject from '@/models/subject';
 import * as CustomResolvers from '@/resolvers';
@@ -581,8 +582,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       });
     }
 
-    // Edit the global announcement messages (calendar & week upcoming classes)
-    await EclassManager.updateGlobalAnnouncements(guild.id, eclass.subject.schoolYear);
+    // Edit the global week-upcoming-classes announcement messages
+    await EclassMessagesManager.updateUpcomingClassesForGuild(guild.id);
 
     // Edit the role
     const originalRole = guild.roles.resolve(eclass.classRoleId);
