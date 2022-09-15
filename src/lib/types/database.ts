@@ -9,13 +9,9 @@ import type { GuildTextBasedChannel, SchoolYear, TeachingUnit } from '@/types';
 // #region Configuration Database Types
 /** Enum for the "Configuration"'s mongoose schema */
 export enum ConfigEntriesChannels {
-  ClassAnnouncementGeneral = 'channel-class-announcement-general',
   ClassAnnouncementL1 = 'channel-class-announcement-l1',
   ClassAnnouncementL2 = 'channel-class-announcement-l2',
   ClassAnnouncementL3 = 'channel-class-announcement-l3',
-  ClassCalendarL1 = 'channel-class-calendar-l1',
-  ClassCalendarL2 = 'channel-class-calendar-l2',
-  ClassCalendarL3 = 'channel-class-calendar-l3',
   Logs = 'channel-logs',
   ModeratorFeedback = 'channel-moderator-feedback',
   WeekUpcomingClasses = 'channel-week-upcoming-classes',
@@ -23,16 +19,9 @@ export enum ConfigEntriesChannels {
 
 export enum ConfigEntriesRoles {
   Eprof = 'role-eprof',
-  EprofComputerScience = 'role-eprof-computer-science',
-  EprofGeneralFormation = 'role-eprof-general-formation',
-  EprofMathematics = 'role-eprof-mathematics',
-  EprofPhysicsElectronics = 'role-eprof-physics-electronics',
   SchoolYearL1 = 'role-l1',
   SchoolYearL2 = 'role-l2',
   SchoolYearL3 = 'role-l3',
-  SchoolYearL3Abroad = 'role-l3-abroad',
-  SchoolYearL3HalfCampus = 'role-l3-half-campus',
-  SchoolYearL3FullCampus = 'role-l3-full-campus',
   Staff = 'role-staff',
 }
 

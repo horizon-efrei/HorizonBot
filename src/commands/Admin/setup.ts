@@ -17,27 +17,16 @@ const channelEntries = {
   [ConfigEntriesChannels.ClassAnnouncementL1]: 'Annonces L1',
   [ConfigEntriesChannels.ClassAnnouncementL2]: 'Annonces L2',
   [ConfigEntriesChannels.ClassAnnouncementL3]: 'Annonces L3',
-  [ConfigEntriesChannels.ClassAnnouncementGeneral]: 'Annonces Générales',
   [ConfigEntriesChannels.WeekUpcomingClasses]: 'Cours de la semaine',
-  [ConfigEntriesChannels.ClassCalendarL1]: 'Calendrier L1',
-  [ConfigEntriesChannels.ClassCalendarL2]: 'Calendrier L2',
-  [ConfigEntriesChannels.ClassCalendarL3]: 'Calendrier L3',
   [ConfigEntriesChannels.Logs]: 'Logs',
 } as const;
 
 const roleEntries = {
   [ConfigEntriesRoles.Staff]: 'Staff',
-  [ConfigEntriesRoles.EprofComputerScience]: 'eProf Info',
-  [ConfigEntriesRoles.EprofMathematics]: 'eProf Maths',
-  [ConfigEntriesRoles.EprofGeneralFormation]: 'eProf Formation Générale',
-  [ConfigEntriesRoles.EprofPhysicsElectronics]: 'eProf Physique',
   [ConfigEntriesRoles.Eprof]: 'eProf',
   [ConfigEntriesRoles.SchoolYearL1]: 'Role L1',
   [ConfigEntriesRoles.SchoolYearL2]: 'Role L2',
   [ConfigEntriesRoles.SchoolYearL3]: 'Role L3',
-  [ConfigEntriesRoles.SchoolYearL3Abroad]: "Role L3 à l'étranger",
-  [ConfigEntriesRoles.SchoolYearL3FullCampus]: 'Role L3 Full Campus',
-  [ConfigEntriesRoles.SchoolYearL3HalfCampus]: 'Role L3 Moitié Campus',
 } as const;
 
 const allEntries = {
