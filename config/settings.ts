@@ -21,7 +21,6 @@ export default {
     booleanFalses: ['non', 'no', 'n', 'faux', 'f', 'false'],
     enableCompilerApi: true,
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
-    flagMessageReaction: '🚩',
     dateFormat: 'DD/MM [à] HH:mm',
     dayFormat: 'DD/MM/YYYY',
     eclassRoleFormat: 'Cours {subject.classCode}: {topic} ({formattedDate})',

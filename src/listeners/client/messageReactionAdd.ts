@@ -5,9 +5,8 @@ import * as EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
-import FlaggedMessage from '@/structures/FlaggedMessage';
 import type { GuildMessage } from '@/types';
-import { ConfigEntriesRoles, DiscordLogType } from '@/types/database';
+import { DiscordLogType } from '@/types/database';
 import { noop } from '@/utils';
 
 export default class MessageReactionAddListener extends Listener {
@@ -40,13 +39,6 @@ export default class MessageReactionAddListener extends Listener {
       return;
     }
 
-    // If a moderator is flagging a message
-    const role = await this.container.client.configManager.get(ConfigEntriesRoles.Staff, message.guild.id);
-    if (role
-      && (reaction.emoji.id ?? reaction.emoji.name) === settings.configuration.flagMessageReaction
-      && member.roles.cache.has(role.id))
-      await this._handleModFlag(reaction, member, message);
-
     // If we are reacting to a reaction role
     if (this.container.client.reactionRolesIds.has(reaction.message.id))
       await this._handleReactionRole(reaction, member, message);
@@ -55,15 +47,6 @@ export default class MessageReactionAddListener extends Listener {
     if (this.container.client.eclassRolesIds.has(reaction.message.id)
       && reaction.emoji.name === settings.emojis.yes)
       await this._handleEclassRole(reaction, member, message);
-  }
-
-  private async _handleModFlag(
-    _reaction: MessageReaction,
-    member: GuildMember,
-    message: GuildMessage,
-  ): Promise<void> {
-    if (member.id !== message.author.id)
-      await new FlaggedMessage(message, member).start();
   }
 
   private async _handleReactionRole(
