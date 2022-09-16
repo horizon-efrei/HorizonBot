@@ -26,7 +26,7 @@ export default class PaginatedMessageEmbedFields extends PaginatedMessage {
   constructor(options?: PaginatedMessageOptions) {
     super(options);
     this.setWrongUserInteractionReply(user => ({
-      content: pupa(messages.miscellaneous.wrongUserInteractionReply, { user }),
+      content: pupa(messages.errors.wrongUserInteractionReply, { user }),
       ephemeral: true,
       allowedMentions: { users: [], roles: [] },
     }));

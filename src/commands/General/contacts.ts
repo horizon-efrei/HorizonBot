@@ -33,7 +33,7 @@ export default class ContactsCommand extends HorizonCommand<typeof config> {
 
     const paginator = new PaginatedMessage({ template: new MessageEmbed().setColor(settings.colors.default) })
       .setWrongUserInteractionReply(user => ({
-        content: pupa(messages.miscellaneous.wrongUserInteractionReply, { user }),
+        content: pupa(messages.errors.wrongUserInteractionReply, { user }),
         ephemeral: true,
         allowedMentions: { users: [], roles: [] },
       }))

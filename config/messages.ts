@@ -21,8 +21,6 @@ export default {
       [Identifiers.PreconditionCooldown]: 'Pas si vite ! Cette commande est sous cooldown, attendez un peu avant de la réutiliser.',
       unknownError: "Une pré-condition de commande inconnue t'empêche d'effectuer cette action.",
     },
-  },
-  miscellaneous: {
     wrongUserInteractionReply: 'Tu ne peux pas cliquer sur ces boutons, ils sont réservés à {user}.',
   },
   logs: {
