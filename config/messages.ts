@@ -5,7 +5,7 @@ import {
   userMention,
 } from '@discordjs/builders';
 import { Identifiers } from '@sapphire/framework';
-import { oneLine, stripIndent } from 'common-tags';
+import { stripIndent } from 'common-tags';
 import settings from '@/config/settings';
 import { DiscordLogType, LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
@@ -208,23 +208,5 @@ export default {
     noClasses: 'Aucune séance de prévue !',
     today: " (Aujourd'hui)",
     classLine: `• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} ${channelMention('{eclass.subject.textChannel}')} (par ${userMention('{eclass.professor}')}) [${roleMention('{eclass.targetRole}')}]\n`,
-  },
-  antiSwear: {
-    swearModeratorAlert: stripIndent`
-      {message.member} a envoyé un message jugé innaproprié par {moderator} dans {message.channel}. Il/elle a donc été sommé(e) en MP.
-
-      Aperçu du message ({message.url}) :
-      > {preview}
-    `,
-    swearUserAlertPrivate: oneLine`
-      Bonjour {message.member}, je suis le bot du Discord de révision Ef'Réussite. Tu as tenu un propos innaproprié
-      dans {message.channel}. On s'efforce à garder ce serveur sérieux et amical, nous t'invitons donc à supprimer
-      ce message ou enlever cette insulte le plus rapidement possible. Merci !\n{message.url}
-    `,
-    swearUserAlertPublic: oneLine`
-      Bonjour {message.member}. Tu as tenu un propos innaproprié dans ce salon. On s'efforce à garder ce serveur
-      sérieux et amical, nous t'invitons donc à supprimer ce message ou enlever cette insulte le plus rapidement possible.
-      Merci !\n{message.url}
-    `,
   },
 } as const;

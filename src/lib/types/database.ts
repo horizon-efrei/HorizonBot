@@ -13,7 +13,6 @@ export enum ConfigEntriesChannels {
   ClassAnnouncementL2 = 'channel-class-announcement-l2',
   ClassAnnouncementL3 = 'channel-class-announcement-l3',
   Logs = 'channel-logs',
-  ModeratorFeedback = 'channel-moderator-feedback',
   WeekUpcomingClasses = 'channel-week-upcoming-classes',
 }
 
@@ -184,27 +183,6 @@ export interface RoleIntersectionDocument extends RoleIntersectionBase, Document
 
 /** Interface for the "RoleIntersection"'s mongoose model */
 export type RoleIntersectionModel = Model<RoleIntersectionDocument>;
-// #endregion
-
-/* ********************************* */
-/*  FlaggedMessage Database Types  */
-/* ********************************* */
-
-// #region FlaggedMessage Database Types
-/** Interface for the "FlaggedMessage"'s mongoose schema */
-export interface FlaggedMessageBase {
-  guildId: string;
-  channelId: string;
-  messageId: string;
-  authorId: string;
-  moderatorId: string;
-}
-
-/** Interface for the "FlaggedMessage"'s mongoose document */
-export interface FlaggedMessageDocument extends FlaggedMessageBase, Document {}
-
-/** Interface for the "FlaggedMessage"'s mongoose model */
-export type FlaggedMessageModel = Model<FlaggedMessageDocument>;
 // #endregion
 
 /* ******************** */

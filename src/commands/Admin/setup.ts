@@ -13,7 +13,6 @@ import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
 import { ConfigEntriesChannels, ConfigEntriesRoles } from '@/types/database';
 
 const channelEntries = {
-  [ConfigEntriesChannels.ModeratorFeedback]: 'Informations Modérateurs',
   [ConfigEntriesChannels.ClassAnnouncementL1]: 'Annonces L1',
   [ConfigEntriesChannels.ClassAnnouncementL2]: 'Annonces L2',
   [ConfigEntriesChannels.ClassAnnouncementL3]: 'Annonces L3',
