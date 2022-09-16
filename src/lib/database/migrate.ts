@@ -8,20 +8,15 @@ import 'reflect-metadata';
 import 'source-map-support/register';
 
 import mongoose from 'mongoose';
-import Configuration from '@/models/configuration';
-import Contact from '@/models/contact';
-import Eclass from '@/models/eclass';
-import Reminder from '@/models/reminders';
-import RoleIntersection from '@/models/roleIntersections';
-import Subject from '@/models/subject';
-import Tags from '@/models/tags';
 import { ConfigEntriesChannels, ConfigEntriesRoles } from '@/types/database';
 
 const guildId = process.argv[process.argv.indexOf('--guild') + 1];
 console.log(`contact.guildId will be ${guildId}`);
 
 async function migrate(): Promise<void> {
-  await mongoose.connect(process.env.MONGO_URI);
+  const client = new mongoose.mongo.MongoClient(process.env.MONGO_URI);
+  await client.connect();
+  const db = client.db();
 
   console.log('Starting migration...');
 
@@ -30,9 +25,9 @@ async function migrate(): Promise<void> {
   // Remove no longer existing values
   const names = [...Object.values(ConfigEntriesChannels), ...Object.values(ConfigEntriesRoles)];
   console.log('Configuration: pruning...');
-  console.log(await Configuration.deleteMany({ name: { $nin: names } }));
+  console.log(await db.collection('configurations').deleteMany({ name: { $nin: names } }));
   console.log('Configuration: renaming...');
-  console.log(await Configuration.updateMany({}, { $rename: { guild: 'guildId' } }));
+  console.log(await db.collection('configurations').updateMany({}, { $rename: { guild: 'guildId' } }));
 
   console.log('Configuration: migrated\n\n');
 
@@ -50,7 +45,7 @@ async function migrate(): Promise<void> {
   // end: number => end: Date
   // recordLinks: string => recordLinks: string[]
   console.log('Eclass: renaming...');
-  console.log(await Eclass.updateMany({}, {
+  console.log(await db.collection('eclasses').updateMany({}, {
     $rename: {
       guild: 'guildId',
       professor: 'professorId',
@@ -64,20 +59,26 @@ async function migrate(): Promise<void> {
   }));
 
   console.log('Eclass: updating...');
-  const eclasses = await Eclass.find();
-  for (const eclass of eclasses) {
-    if (eclass.date && typeof eclass.date === 'number')
-      eclass.date = new Date(eclass.date);
-    if (eclass.end && typeof eclass.end === 'number')
-      eclass.end = new Date(eclass.end);
-    if (eclass.recordLinks && typeof eclass.recordLinks === 'string')
-      eclass.recordLinks = [eclass.recordLinks];
-    if (!eclass.recordLinks)
-      eclass.recordLinks = [];
-  }
-  await Promise.all(eclasses.map(async eclass => eclass.save({ validateBeforeSave: false })));
+  const eclasses = await db.collection('eclasses').find().toArray();
+  const eclassesPromises: Array<Promise<unknown>> = [];
 
-  console.log('Eclass: migrated\n\n');
+  for (const eclass of eclasses) {
+    const $set: Record<string, unknown> = {};
+    if (eclass.date && typeof eclass.date === 'number')
+      $set.date = new Date(eclass.date);
+    if (eclass.end && typeof eclass.end === 'number')
+      $set.end = new Date(eclass.end);
+    if (eclass.recordLinks && typeof eclass.recordLinks === 'string')
+      $set.recordLinks = [eclass.recordLinks];
+    if (!eclass.recordLinks)
+      $set.recordLinks = [];
+
+    if (Object.keys($set).length > 0)
+      eclassesPromises.push(db.collection('eclasses').updateOne({ _id: eclass._id }, { $set }));
+  }
+  await Promise.all(eclassesPromises);
+
+  console.log(`Eclass: migrated ${eclassesPromises.length}\n\n`);
 
   // Subject
   // textChannel => textChannelId
@@ -85,7 +86,7 @@ async function migrate(): Promise<void> {
   // voiceChannel => voiceChannelId
   // -exams
   console.log('Subject: renaming & updating...');
-  console.log(await Subject.updateMany({}, {
+  console.log(await db.collection('subjects').updateMany({}, {
     $rename: {
       textChannel: 'textChannelId',
       textDocsChannel: 'textDocsChannelId',
@@ -99,38 +100,52 @@ async function migrate(): Promise<void> {
   // RoleIntersection
   // expiration: number => expiration: Date
   console.log('RoleIntersection: updating...');
-  const roleIntersections = await RoleIntersection.find();
-  for (const roleIntersection of roleIntersections) {
-    if (roleIntersection.expiration && typeof roleIntersection.expiration === 'number')
-      roleIntersection.expiration = new Date(roleIntersection.expiration);
-  }
-  await Promise.all(roleIntersections.map(async roleIntersection => roleIntersection.save()));
+  const roleIntersections = await db.collection('roleintersections').find().toArray();
+  const roleIntersectionsPromises: Array<Promise<unknown>> = [];
 
-  console.log('RoleIntersection: migrated\n\n');
+  for (const roleIntersection of roleIntersections) {
+    if (roleIntersection.expiration && typeof roleIntersection.expiration === 'number') {
+      roleIntersectionsPromises.push(
+        db.collection('roleintersections').updateOne({ _id: roleIntersection._id }, {
+          $set: { expiration: new Date(roleIntersection.expiration) },
+        }),
+      );
+    }
+  }
+  await Promise.all(roleIntersectionsPromises);
+
+  console.log(`RoleIntersection: migrated ${roleIntersectionsPromises.length}\n\n`);
 
   // Reminder
   // date: number => date: Date
   console.log('Reminder: updating...');
-  const reminders = await Reminder.find();
-  for (const reminder of reminders) {
-    if (reminder.date && typeof reminder.date === 'number')
-      reminder.date = new Date(reminder.date);
-  }
-  await Promise.all(reminders.map(async reminder => reminder.save()));
+  const reminders = await db.collection('reminders').find().toArray();
+  const remindersPromises: Array<Promise<unknown>> = [];
 
-  console.log('Reminder: migrated\n\n');
+  for (const reminder of reminders) {
+    if (reminder.date && typeof reminder.date === 'number') {
+      remindersPromises.push(
+        db.collection('reminders').updateOne({ _id: reminder._id }, {
+          $set: { date: new Date(reminder.date) },
+        }),
+      );
+    }
+  }
+  await Promise.all(remindersPromises);
+
+  console.log(`Reminder: migrated ${remindersPromises.length}\n\n`);
 
   // Contact
   // +guildId
   console.log('Contact: updating...');
-  console.log(await Contact.updateMany({}, { $set: { guildId } }));
+  console.log(await db.collection('contacts').updateMany({}, { $set: { guildId } }));
 
   console.log('Contact: migrated\n\n');
 
   // Tags
   // -aliases
   console.log('Tags: updating...');
-  await Tags.updateMany({}, { $unset: { aliases: '' } });
+  console.log(await db.collection('tags').updateMany({}, { $unset: { aliases: '' } }));
 
   console.log('Tags: migrated\n\n');
 
