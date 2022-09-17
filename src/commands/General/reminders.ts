@@ -110,7 +110,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
         pupa(this.messages.createdReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
         hasDmOpened ? '' : this.messages.openDm,
       ].filter(filterNullAndUndefinedAndEmpty).join('\n'),
-      ephemeral: true,
+      ephemeral: interaction.inGuild(),
     });
   }
 
@@ -121,7 +121,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ ephemeral: interaction.inGuild() });
 
     await new PaginatedContentMessageEmbed()
       .setTemplate(new MessageEmbed().setTitle(pupa(this.messages.listTitle, { total: reminders.size })))
@@ -168,7 +168,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
 
     await interaction.reply({
       content: pupa(this.messages.editedReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
-      ephemeral: true,
+      ephemeral: interaction.inGuild(),
     });
   }
 
@@ -181,7 +181,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
     }
 
     await reminder.remove();
-    await interaction.reply({ content: this.messages.removedReminder, ephemeral: true });
+    await interaction.reply({ content: this.messages.removedReminder, ephemeral: interaction.inGuild() });
   }
 
   private _parseTime(dateOrDuration: string): Date | null {
