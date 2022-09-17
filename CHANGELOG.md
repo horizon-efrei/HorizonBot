@@ -6,6 +6,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.0.0] - 2022/09/17
+
+### Switched to application commands !
+
+- Make all commands Chat Input Interactions
+- Rename `PingRoleIntersection` to `RoleIntersection`
+- Separate `manage-tags` (tag creation, edition, removal...) & `tag` (list & see) commands
+- Separate `manage-contacts` (contact creation, edition, removal) & `contact` (list) commands
+- Made `code` command a Context Menu Interaction
+- Made `eval` command a Context Menu Interaction
+
+### Added
+
+- Added ability to edit multiple properties of eclasses at once
+- Added ability to add multiple record links to an eclass
+- Added ability to remove a record link from an eclass
+
+### Improved
+
+- Improved error handling of `MergePdf` command
+- Improved database's data homogeneity
+- Enabled "strictNullChecks" in tsconfig.json
+- Improved code quality
+
+### Removed
+
+- Removed calendars as they were not used
+- Removed flagged-messages as they were not used
+- Removed the `subject` command as it was impractical
+- Removed the `help` command as it is now built-in thanks to Chat Input Interactions
+
+
 ## [0.12.0] - 2022/08/20
 
 ### Added

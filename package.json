@@ -1,6 +1,6 @@
 {
   "name": "horizonbot",
-  "version": "0.12.0",
+  "version": "1.0.0",
   "description": "The discord bot for Ef'Réussite",
   "main": "./dist/src/main.js",
   "scripts": {
@@ -19,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "github",
-    "url": "https://github.com/horizon-teamdev/HorizonBot"
+    "url": "https://github.com/horizon-efrei/HorizonBot"
   },
   "dependencies": {
     "@discordjs/builders": "^0.16.0",
