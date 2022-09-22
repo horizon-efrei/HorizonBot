@@ -25,9 +25,9 @@ const tagContentComponents = new MessageActionRow<TextInputComponent>().addCompo
 );
 
 enum Options {
-  Name = 'name',
-  InEmbed = 'in-embed',
-  NewName = 'new-name',
+  Name = 'nom',
+  InEmbed = 'dans-embed',
+  NewName = 'nouveau-nom',
 }
 
 @ApplyOptions<HorizonSubcommand.Options>({

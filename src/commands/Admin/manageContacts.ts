@@ -5,13 +5,13 @@ import Contact from '@/models/contact';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 
 enum Options {
-  Name = 'name',
+  Name = 'nom',
   // eslint-disable-next-line @typescript-eslint/no-shadow
   Contact = 'contact',
-  Team = 'team',
+  Team = 'équipe',
   Description = 'description',
-  Field = 'field',
-  Value = 'value',
+  Field = 'champ',
+  Value = 'valeur',
 }
 
 enum OptionFieldChoices {

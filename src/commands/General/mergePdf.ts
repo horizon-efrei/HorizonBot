@@ -9,17 +9,17 @@ import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
   Messages = 'messages',
-  Attachment1 = 'attachment1',
-  Attachment2 = 'attachment2',
-  Attachment3 = 'attachment3',
-  Attachment4 = 'attachment4',
-  Attachment5 = 'attachment5',
-  Attachment6 = 'attachment6',
-  Attachment7 = 'attachment7',
-  Attachment8 = 'attachment8',
-  Attachment9 = 'attachment9',
-  Attachment10 = 'attachment10',
-  Name = 'name',
+  Attachment1 = 'piece-jointe-1',
+  Attachment2 = 'piece-jointe-2',
+  Attachment3 = 'piece-jointe-3',
+  Attachment4 = 'piece-jointe-4',
+  Attachment5 = 'piece-jointe-5',
+  Attachment6 = 'piece-jointe-6',
+  Attachment7 = 'piece-jointe-7',
+  Attachment8 = 'piece-jointe-8',
+  Attachment9 = 'piece-jointe-9',
+  Attachment10 = 'piece-jointe-10',
+  Name = 'nom',
 }
 
 const attachmentOptions = [

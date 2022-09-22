@@ -8,7 +8,7 @@ import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEm
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
-  Name = 'name',
+  Name = 'nom',
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)

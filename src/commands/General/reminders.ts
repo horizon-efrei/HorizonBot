@@ -9,8 +9,8 @@ import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEm
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 
 enum Options {
-  DateOrDuration = 'date-or-duration',
-  Content = 'content',
+  DateOrDuration = 'date-ou-duree',
+  Content = 'contenu',
   Id = 'id',
 }
 

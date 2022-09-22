@@ -45,8 +45,8 @@ const allowedChannels = [ChannelType.GuildNews, ChannelType.GuildText] as const;
 type AllowedChannels = NewsChannel | TextChannel;
 
 enum Options {
-  Name = 'name',
-  Channel = 'channel',
+  Name = 'nom',
+  Channel = 'salon',
   Role = 'role',
 }
 

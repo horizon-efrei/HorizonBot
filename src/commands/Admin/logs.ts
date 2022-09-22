@@ -16,7 +16,7 @@ const logStatusChoices = Object.entries(messages.logs.readableStatuses)
 
 enum Options {
   LogType = 'log-type',
-  LogStatus = 'log-status',
+  LogStatus = 'log-statut',
 }
 
 @ApplyOptions<HorizonSubcommand.Options>({

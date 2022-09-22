@@ -6,7 +6,7 @@ import { roleIntersection as config } from '@/config/commands/admin';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
-  Persistent = 'persistent',
+  Persistent = 'persistant',
   Role1 = 'role1',
   Role2 = 'role2',
   Role3 = 'role3',

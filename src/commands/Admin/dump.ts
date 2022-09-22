@@ -14,25 +14,25 @@ import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
   Format = 'format',
-  HasAllRoles = 'has-all-roles',
-  HasRoles = 'has-roles',
-  Reacted = 'reacted',
-  Order = 'order',
-  Limit = 'limit',
-  Separator = 'separator',
-  DateFormat = 'date-format',
-  Sort = 'sort',
-  NoRoles = 'no-roles',
-  Enumerate = 'enumerate',
-  Dm = 'dm',
+  HasAllRoles = 'a-tous-les-roles',
+  HasRoles = 'a-un-des-roles',
+  Reacted = 'a-reagis',
+  Order = 'ordre',
+  Limit = 'limite',
+  Separator = 'separateur',
+  DateFormat = 'format-date',
+  Sort = 'tri',
+  NoRoles = 'aucun-role',
+  Enumerate = 'enumerer',
+  Dm = 'mp',
 }
 
 enum OptionOrderChoices {
-  Name = 'name',
+  Name = 'nom',
   Id = 'id',
-  Created = 'created',
-  Joined = 'joined',
-  Nick = 'nick',
+  Created = 'creation-compte',
+  Joined = 'arrivee-guilde',
+  Nick = 'surnom',
 }
 
 enum OptionSortChoices {

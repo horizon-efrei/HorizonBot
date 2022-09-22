@@ -7,7 +7,7 @@ import settings from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
-  Member = 'member',
+  Member = 'membre',
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)

@@ -32,14 +32,14 @@ import type { ReactionRoleDocument } from '@/types/database';
 import { nullop, trimText } from '@/utils';
 
 enum Options {
-  Channel = 'channel',
+  Channel = 'salon',
   Unique = 'unique',
   RoleCondition = 'role-condition',
   Emoji = 'emoji',
   // eslint-disable-next-line @typescript-eslint/no-shadow
   Role = 'role',
   MessageUrl = 'message-url',
-  Choice = 'choice',
+  Choice = 'choix',
   Emoji1 = 'emoji1',
   Role1 = 'role1',
   Emoji2 = 'emoji2',
@@ -53,15 +53,15 @@ enum Options {
 }
 
 enum OptionEditChoiceChoices {
-  Title = 'title',
+  Title = 'titre',
   Description = 'description',
-  TitleAndDescription = 'title-and-description',
+  TitleAndDescription = 'titre-et-description',
 }
 
 enum OptionRoleConditionChoiceChoices {
-  Add = 'add',
-  Clear = 'clear',
-  Show = 'show',
+  Add = 'ajout',
+  Clear = 'tout-supprimer',
+  Show = 'afficher',
 }
 
 const titleInput = new TextInputComponent()

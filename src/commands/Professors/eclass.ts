@@ -66,30 +66,30 @@ const statusOptions = {
 const statusChoices = Object.entries(statusOptions).map(([value, name]) => ({ name, value: Number(value) }));
 
 enum OptionRecordChoiceChoices {
-  Add = 'add',
-  Remove = 'remove',
-  Show = 'show',
+  Add = 'ajout',
+  Remove = 'enlever',
+  Show = 'afficher',
 }
 
 enum Options {
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  SchoolYear = 'school-year',
+  SchoolYear = 'promo',
   // eslint-disable-next-line @typescript-eslint/no-shadow
-  Subject = 'subject',
-  Topic = 'topic',
-  Professor = 'professor',
-  Duration = 'duration',
+  Subject = 'matière',
+  Topic = 'thème',
+  Professor = 'professeur',
+  Duration = 'duree',
   Date = 'date',
-  TargetRole = 'target-role',
-  Place = 'place',
-  PlaceInformation = 'place-information',
-  IsRecorded = 'is-recorded',
-  Status = 'status',
+  TargetRole = 'role-vise',
+  Place = 'lieu',
+  PlaceInformation = 'lieu-information',
+  IsRecorded = 'est-enregistre',
+  Status = 'statut',
   Id = 'id',
-  ShouldPing = 'should-ping',
-  Choice = 'choice',
-  Silent = 'silent',
-  Link = 'link',
+  ShouldPing = 'doit-ping',
+  Choice = 'choix',
+  Silent = 'silencieux',
+  Link = 'lien',
 }
 
 type Interaction = HorizonSubcommand.ChatInputInteraction<'cached'>;
