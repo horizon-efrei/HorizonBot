@@ -5,7 +5,7 @@ import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction, TextChannel } from 'discord.js';
 import FuzzySearch from 'fuzzy-search';
 import ReactionRole from '@/models/reactionRole';
-import { makeMessageLink } from '@/utils';
+import { makeMessageLink, trimText } from '@/utils';
 
 interface CachedReactionRole {
   messageUrl: string;
@@ -43,7 +43,7 @@ export class ReactionRoleAutocompleteHandler extends InteractionHandler {
 
         const results = fuzzy.search(focusedOption.value);
         return this.some(results.map(match => ({
-          name: `${match.title} (dans #${match.channelName})`,
+          name: trimText(`${match.title} (dans #${match.channelName})`, AutoCompleteLimits.MaximumLengthOfNameOfOption),
           value: match.messageUrl,
         })));
       }
