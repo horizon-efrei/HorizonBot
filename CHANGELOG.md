@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.1.0] - 2022/09/24
+
+### Improved
+
+- Make slash command options french
+- Remove unused messages in configuration
+- Cleanup useless types
+
+### Fixed
+
+- Fix timeout in /reaction-role create by defering modal reply
+- Trim autocomplete item name for reaction-role
+
+
 ## [1.0.0] - 2022/09/17
 
 ### Switched to application commands !
