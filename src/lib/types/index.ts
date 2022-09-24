@@ -1,8 +1,7 @@
 import type {
-  DMChannel,
   GuildMember,
+  GuildTextBasedChannel,
   Message,
-  PartialDMChannel,
   Role,
 } from 'discord.js';
 import type { EclassPlace, SubjectDocument } from '@/types/database';
@@ -77,9 +76,6 @@ export interface EclassEmbedOptions {
   placeInformation: string | null;
   topic: string;
 }
-
-// TODO: remove
-export type GuildTextBasedChannel = Exclude<Message['channel'], DMChannel | PartialDMChannel>;
 
 export type GuildMessage = Message<true>;
 

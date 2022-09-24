@@ -5,7 +5,7 @@ import { Resolvers } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import { oneLine } from 'common-tags';
 import dayjs from 'dayjs';
-import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
+import type { CommandInteraction, GuildTextBasedChannel, ModalSubmitInteraction } from 'discord.js';
 import {
   MessageActionRow,
   MessageButton,
@@ -26,7 +26,7 @@ import Subject from '@/models/subject';
 import * as CustomResolvers from '@/resolvers';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
-import type { GuildTextBasedChannel, SchoolYear } from '@/types';
+import type { SchoolYear } from '@/types';
 import { EclassPlace, EclassPopulatedDocument, EclassStatus } from '@/types/database';
 import { capitalize, nullop } from '@/utils';
 

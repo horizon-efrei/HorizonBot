@@ -18,7 +18,7 @@ export const dump = {
       sort: 'Trie les lignes par ordre croissant/décroissant.',
       noRoles: 'Affiche les membres sans rôles.',
       enumerate: 'Affiche des numéros devant chaque membre.',
-      dm: 'Envoie le résultat en message privé.',
+      private: "Envoie le résultat dans un message privé, qu'uniquement toi peut voir.",
     },
   },
   messages: {

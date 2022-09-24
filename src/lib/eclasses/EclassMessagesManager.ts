@@ -1,12 +1,12 @@
 import { container } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
-import type { MessageOptions, TextBasedChannel } from 'discord.js';
+import type { GuildTextBasedChannel, MessageOptions, TextBasedChannel } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
 import messages from '@/config/messages';
 import Eclass from '@/models/eclass';
-import type { GuildMessage, GuildTextBasedChannel } from '@/types';
+import type { GuildMessage } from '@/types';
 import type { EclassDocument, EclassPopulatedDocument } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import {

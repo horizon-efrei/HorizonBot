@@ -1,14 +1,19 @@
 import { EmbedLimits, RoleLimits } from '@sapphire/discord-utilities';
 import { container, Option, Result } from '@sapphire/framework';
 import dayjs from 'dayjs';
-import type { CommandInteraction, GuildMember, ModalSubmitInteraction } from 'discord.js';
+import type {
+  CommandInteraction,
+  GuildMember,
+  GuildTextBasedChannel,
+  ModalSubmitInteraction,
+} from 'discord.js';
 import { MessageEmbed } from 'discord.js';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
 import Eclass from '@/models/eclass';
-import type { EclassCreationOptions, EclassEmbedOptions, GuildTextBasedChannel } from '@/types';
+import type { EclassCreationOptions, EclassEmbedOptions } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import {

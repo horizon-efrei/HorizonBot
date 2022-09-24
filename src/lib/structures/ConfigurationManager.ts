@@ -1,8 +1,7 @@
 import { container } from '@sapphire/framework';
-import type { Guild } from 'discord.js';
+import type { Guild, GuildTextBasedChannel } from 'discord.js';
 import { Collection, GuildChannel, Role } from 'discord.js';
 import Configuration from '@/models/configuration';
-import type { GuildTextBasedChannel } from '@/types';
 import type { ConfigEntries, ConfigEntriesChannels, ConfigEntryHolds } from '@/types/database';
 import { nullop } from '@/utils';
 

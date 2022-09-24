@@ -7,7 +7,6 @@ import type { GuildMember } from 'discord.js';
 import { Permissions } from 'discord.js';
 import pupa from 'pupa';
 import { dump as config } from '@/config/commands/admin';
-import messages from '@/config/messages';
 import settings from '@/config/settings';
 import { resolveCompleteEmoji } from '@/resolvers';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -24,7 +23,7 @@ enum Options {
   Sort = 'tri',
   NoRoles = 'aucun-role',
   Enumerate = 'enumerer',
-  Dm = 'mp',
+  Private = 'privé',
 }
 
 enum OptionOrderChoices {
@@ -145,8 +144,8 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
         )
         .addBooleanOption(
           option => option
-            .setName(Options.Dm)
-            .setDescription(this.descriptions.options.dm),
+            .setName(Options.Private)
+            .setDescription(this.descriptions.options.private),
         ),
     );
   }
@@ -264,17 +263,11 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
     const output = formattedMembers.join(separator);
     const payload = output.length > MessageLimits.MaximumLength
       ? { files: [{ attachment: Buffer.from(output), name: 'dump.txt' }] }
-      : output;
+      : { content: output };
 
-    if (interaction.options.getBoolean(Options.Dm)) {
-      try {
-        await interaction.member.send(payload);
-        await interaction.reply({ content: this.messages.dmSuccess, ephemeral: true });
-      } catch {
-        await interaction.reply({ content: messages.global.dmFailed, ephemeral: true });
-      }
-    } else {
-      await interaction.reply(payload);
-    }
+    await interaction.reply({
+      ...payload,
+      ephemeral: interaction.options.getBoolean(Options.Private) ?? false,
+    });
   }
 }

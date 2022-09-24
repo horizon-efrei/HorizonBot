@@ -1,8 +1,7 @@
 import { Listener } from '@sapphire/framework';
-import type { Role } from 'discord.js';
+import type { GuildTextBasedChannel, Role } from 'discord.js';
 import Configuration from '@/models/configuration';
 import ReactionRole from '@/models/reactionRole';
-import type { GuildTextBasedChannel } from '@/types';
 
 export default class RoleDeleteListener extends Listener {
   public async run(role: Role): Promise<void> {

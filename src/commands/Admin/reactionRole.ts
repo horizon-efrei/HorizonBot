@@ -7,6 +7,7 @@ import { Resolvers, Result } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import { ChannelType } from 'discord-api-types/v10';
 import type {
+  GuildTextBasedChannel,
   InteractionReplyOptions,
   NewsChannel,
   Role,
@@ -27,7 +28,7 @@ import ReactionRole from '@/models/reactionRole';
 import * as CustomResolvers from '@/resolvers';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
-import type { GuildMessage, GuildTextBasedChannel } from '@/types';
+import type { GuildMessage } from '@/types';
 import type { ReactionRoleDocument } from '@/types/database';
 import { nullop, trimText } from '@/utils';
 

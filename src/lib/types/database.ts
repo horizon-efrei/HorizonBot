@@ -1,6 +1,6 @@
-import type { GuildMember, Role } from 'discord.js';
+import type { GuildMember, GuildTextBasedChannel, Role } from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
-import type { GuildTextBasedChannel, SchoolYear, TeachingUnit } from '@/types';
+import type { SchoolYear, TeachingUnit } from '@/types';
 
 /* ****************************** */
 /*  Configuration Database Types  */
