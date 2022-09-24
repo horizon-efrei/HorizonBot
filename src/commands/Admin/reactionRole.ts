@@ -343,6 +343,8 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       time: 900_000, // 15 minutes
     });
 
+    await submit.deferReply();
+
     const title = submit.fields.getTextInputValue('title');
     const description = submit.fields.getTextInputValue('description');
 
@@ -363,7 +365,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       uniqueRole,
     });
 
-    await submit.reply(pupa(this.messages.createdMenu, { title }));
+    await submit.followUp(pupa(this.messages.createdMenu, { title }));
   }
 
   public async list(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
