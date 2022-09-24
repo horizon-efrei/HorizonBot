@@ -12,8 +12,6 @@ import { timeFormat } from '@/utils';
 
 export default {
   global: {
-    oops: ":warning: Oups... Quelque chose s'est mal passé en réalisant cette action. Il se peut qu'elle ne se soit pas complètement terminée, voire pas commencée. Désolé !",
-    dmFailed: ":warning: Impossible de t'envoyer le message en privé. Vérifie que tu ne bloques pas les messages privés provenant de ce serveur, ou que tu ne m'ai pas bloqué.",
     onlySlashCommands: "Les commandes traditionnelles ne sont plus disponibles, il faut maintenant utiliser les \"slash commands\".\n\n:grey_question: Kézako\n> Les \"slashs commands\" est un nouveau système intégré à Discord permettant aux bots de fournir une expérience enrichie pour les utilisateurs. Écris `/` (sans envoyer le message) pour voir la liste des commandes que je propose. Ce sont les mêmes qu'avant à l'exception de la commande d'aide, qui a été supprimée en faveur de la liste que tu vois en tapant `/` !",
   },
   errors: {

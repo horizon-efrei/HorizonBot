@@ -16,10 +16,6 @@ export default {
   },
   mainGuildIds: process.env.MAIN_GUILD_IDS?.split(',') ?? [],
   configuration: {
-    stop: new Set(['stop', 'cancel', 'retour']),
-    booleanTruths: ['oui', 'o', 'yes', 'y', 'vrai', 'v', 'true', 't'],
-    booleanFalses: ['non', 'no', 'n', 'faux', 'f', 'false'],
-    enableCompilerApi: true,
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
     dateFormat: 'DD/MM [à] HH:mm',
     dayFormat: 'DD/MM/YYYY',
