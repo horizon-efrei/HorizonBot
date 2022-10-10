@@ -31,7 +31,7 @@ export class TagAutocompleteHandler extends InteractionHandler {
     await this._updateCache(interaction.guildId);
 
     switch (focusedOption.name) {
-      case 'name': {
+      case 'nom': {
         const fuzzy = new FuzzySearch(this._cache, [], { sort: true });
 
         const results = fuzzy.search(focusedOption.value);

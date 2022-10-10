@@ -24,7 +24,7 @@ export class ContactsAutocompleteHandler extends InteractionHandler {
   public override async parse(
     interaction: AutocompleteInteraction,
   ): Promise<Option<ApplicationCommandOptionChoiceData[]>> {
-    if (interaction.commandName !== 'contacts')
+    if (interaction.commandName !== 'manage-contacts')
       return this.none();
 
     const focusedOption = interaction.options.getFocused(true);
@@ -32,7 +32,7 @@ export class ContactsAutocompleteHandler extends InteractionHandler {
     await this._updateCache();
 
     switch (focusedOption.name) {
-      case 'name': {
+      case 'nom': {
         const fuzzy = new FuzzySearch(this._cache, ['name'], { sort: true });
 
         const results = fuzzy.search(focusedOption.value);
@@ -41,7 +41,7 @@ export class ContactsAutocompleteHandler extends InteractionHandler {
           value: match.name,
         })));
       }
-      case 'team': {
+      case 'équipe': {
         const teams = this._cache.map(contact => contact.team);
         const fuzzy = new FuzzySearch(teams, [], { sort: true });
 
