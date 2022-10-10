@@ -30,6 +30,7 @@ export default {
   emojis: {
     yes: '✅',
     no: '❌',
+    remove: '🗑️',
   },
   languages: [
     {

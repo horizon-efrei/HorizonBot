@@ -1,9 +1,14 @@
 import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
+import { User } from 'discord.js';
+import pupa from 'pupa';
+import messages from '@/config/messages';
+import settings from '@/config/settings';
 import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
+import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
-import { nullop } from '@/utils';
+import { noop, nullop } from '@/utils';
 
 export default class MessageDeleteListener extends Listener {
   public async run(message: Message): Promise<void> {
@@ -36,5 +41,53 @@ export default class MessageDeleteListener extends Listener {
       this.container.client.reactionRolesIds.delete(message.id);
       this.container.logger.debug(`[Reaction Roles] Removed reaction-role message ${message.id} because it was deleted. (url: ${message.url})`);
     }
+
+    await this._checkAntiGhostPing(message);
+  }
+
+  private async _checkAntiGhostPing(message: GuildMessage): Promise<void> {
+    // List of all the usernames that were mentionned in the deleted message.
+    const userMentions = [...message.mentions.users.values()]
+      .filter(usr => !usr.bot && usr.id !== message.author.id);
+    // List of all the roles ids that were mentionned in the deleted message.
+    const roleMentions = [...message.mentions.roles.values()];
+    // List of usernames / roles ids that were mentionned.
+    const mentions = [...userMentions, ...roleMentions];
+
+    // If no-one was mentionned, then ignore.
+    if (mentions.length === 0)
+      return;
+
+    // Choose the message (plural if multiple people (or a role) were ghost-ping)
+    const severalPeopleAffected = mentions.length > 1 || roleMentions.length > 0;
+    const baseMessage = severalPeopleAffected
+      ? messages.ghostPing.alertPlural
+      : messages.ghostPing.alertSingular;
+
+    const botNotificationMessage = await message.channel.send(
+      pupa(baseMessage, {
+        mentions: mentions
+          .map(mention => (mention instanceof User ? mention.username : mention.name))
+          .join(', '),
+        user: message.author,
+      }),
+    ).catch(noop);
+    if (!botNotificationMessage)
+      return;
+
+    // If a group of people were ghost-ping, we don't want one people to just remove the alert.
+    if (severalPeopleAffected)
+      return;
+
+    await botNotificationMessage.react(settings.emojis.remove).catch(noop);
+    const collector = botNotificationMessage
+      .createReactionCollector({
+        filter: (r, user) => (r.emoji.id ?? r.emoji.name) === settings.emojis.remove
+          && (user.id === message.mentions.users.first()!.id)
+          && !user.bot,
+      }).on('collect', async () => {
+        collector.stop();
+        await botNotificationMessage.delete().catch(noop);
+      });
   }
 }

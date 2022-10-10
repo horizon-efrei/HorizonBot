@@ -21,6 +21,10 @@ export default {
     },
     wrongUserInteractionReply: 'Tu ne peux pas cliquer sur ces boutons, ils sont réservés à {user}.',
   },
+  ghostPing: {
+    alertSingular: ':warning: {mentions}, tu as été ghost-ping par {user.username}. :innocent:',
+    alertPlural: ':warning: {mentions}, vous avez été ghost-ping par {user.username}. :innocent:',
+  },
   logs: {
     readableEvents: {
       [DiscordLogType.ChangeNickname]: ':label: Changement de surnom',
