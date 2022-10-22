@@ -123,7 +123,7 @@ export const eclass = {
     // Create subcommand
     successfullyCreated: 'Le cours a bien été créé ! Son ID est `{eclass.classId}`.',
     alreadyExists: 'Ce cours (même matière, sujet, heure, jour) a déjà été prévu !',
-    newClassNotification: ':bell: {targetRoleId}, un nouveau cours a été plannifié ! :arrow_heading_down: {newClassNotificationPlaceAlert}',
+    newClassNotification: `:bell: ${roleMention('{targetRole.id}')}, un nouveau cours a été plannifié ! :arrow_heading_down: {newClassNotificationPlaceAlert}`,
     newClassNotificationPlaceAlert: '\n\n:warning: __**ATTENTION :**__ le cours sera **{where}** !',
 
     recordedLink: '[Lien]({link})',
