@@ -25,7 +25,7 @@ export class SubjectsAutocompleteHandler extends InteractionHandler {
     interaction: AutocompleteInteraction,
   ): Promise<Option<ApplicationCommandOptionChoiceData[]>> {
     const focusedOption = interaction.options.getFocused(true);
-    if (!focusedOption.name.includes('subject'))
+    if (!focusedOption.name.includes('matière'))
       return this.none();
 
     await this._updateCache();
