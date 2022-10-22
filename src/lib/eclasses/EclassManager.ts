@@ -499,7 +499,7 @@ export async function checkOverlaps(
   const professorOverlap = allOverlapping.some(eclass => eclass.professorId === data.professorId);
 
   if (professorOverlap || schoolYearOverlap)
-    return Option.none;
+    return Option.some(schoolYearOverlap ? config.messages.schoolYearOverlap : config.messages.professorOverlap);
 
-  return Option.some(schoolYearOverlap ? config.messages.schoolYearOverlap : config.messages.professorOverlap);
+  return Option.none;
 }
