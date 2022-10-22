@@ -158,20 +158,19 @@ export async function createClass(
   // Add the class to the database
   const classId = Eclass.generateId(professor, date);
   const eclass = await Eclass.create({
-    classChannel: classChannel.id,
-    guild: classChannel.guild.id,
+    classId,
+    guildId: classChannel.guild.id,
     topic,
     subject,
     date: date.getTime(),
     duration,
-    professor: professor.id,
-    classRole: role.id,
-    targetRole: targetRole.id,
+    professorId: professor.id,
+    classRoleId: role.id,
+    targetRoleId: targetRole.id,
     place,
     placeInformation,
-    announcementMessage: announcementMessage.id,
-    announcementChannel: classAnnouncement[subject.schoolYear],
-    classId,
+    announcementChannelId: classAnnouncement[subject.schoolYear],
+    announcementMessageId: announcementMessage.id,
     isRecorded,
   });
   // Use the newly created ID in the embed
