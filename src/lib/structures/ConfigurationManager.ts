@@ -8,22 +8,22 @@ import { nullop } from '@/utils';
 export default class ConfigurationManager {
   private readonly _entries = new Collection<
     string,
-    { guild: string; name: ConfigEntries; value: ConfigEntryHolds }
+    { guildId: string; name: ConfigEntries; value: ConfigEntryHolds }
   >();
 
   public async set(name: ConfigEntries, value: ConfigEntryHolds): Promise<void> {
-    const guild = value.guild.id;
+    const guildId = value.guild.id;
     await Configuration.findOneAndUpdate(
-      { guild, name },
-      { guild, value: value.id },
+      { guildId, name },
+      { guildId, value: value.id },
       { upsert: true },
     );
 
-    this._entries.set(this._getKey(name, value.guild.id), { guild, name, value });
+    this._entries.set(this._getKey(name, value.guild.id), { guildId, name, value });
   }
 
   public async remove(name: ConfigEntries, guild: Guild): Promise<void> {
-    await Configuration.findOneAndDelete({ guild: guild.id, name });
+    await Configuration.findOneAndDelete({ guildId: guild.id, name });
     this._entries.delete(this._getKey(name, guild.id));
   }
 
@@ -44,11 +44,11 @@ export default class ConfigurationManager {
     if (this._entries.has(key))
       return this._entries.get(key)!.value as unknown as Return;
 
-    const result = await Configuration.findOne({ guild: guildId, name }).catch(nullop);
+    const result = await Configuration.findOne({ guildId, name }).catch(nullop);
     if (result?.value) {
       const resolved = this._resolve(result.value, guildId);
       if (resolved) {
-        this._entries.set(key, { guild: guildId, name, value: resolved });
+        this._entries.set(key, { guildId, name, value: resolved });
         return resolved as unknown as Return;
       }
     }
@@ -64,7 +64,7 @@ export default class ConfigurationManager {
       if (value) {
         this._entries.set(
           this._getKey(document.name, document.guildId),
-          { guild: document.guildId, name: document.name, value },
+          { guildId: document.guildId, name: document.name, value },
         );
       }
     }
