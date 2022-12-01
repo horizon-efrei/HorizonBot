@@ -46,12 +46,13 @@ export default class MessageDeleteListener extends Listener {
   }
 
   private async _checkAntiGhostPing(message: GuildMessage): Promise<void> {
-    // List of all the usernames that were mentionned in the deleted message.
+    // List of all the users that were mentionned in the deleted message.
     const userMentions = [...message.mentions.users.values()]
       .filter(usr => !usr.bot && usr.id !== message.author.id);
-    // List of all the roles ids that were mentionned in the deleted message.
-    const roleMentions = [...message.mentions.roles.values()];
-    // List of usernames / roles ids that were mentionned.
+    // List of all the roles that were mentionned in the deleted message.
+    const roleMentions = [...message.mentions.roles.values()]
+      .filter(role => !role.managed);
+    // List of users/roles that were mentionned.
     const mentions = [...userMentions, ...roleMentions];
 
     // If no-one was mentionned, then ignore.

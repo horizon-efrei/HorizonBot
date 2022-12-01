@@ -30,7 +30,8 @@ export default class MessageUpdateListener extends Listener {
     const oldUserMentions = [...oldMessage.mentions.users.values()]
       .filter(usr => !usr.bot && usr.id !== newMessage.author.id);
       // List of all roles that were mentionned in the old message.
-    const oldRoleMentions = [...oldMessage.mentions.roles.values()];
+    const oldRoleMentions = [...oldMessage.mentions.roles.values()]
+      .filter(role => !role.managed);
     // List of usernames / roles name's that were mentionned in the old message.
     const oldMentions = [...oldUserMentions, ...oldRoleMentions];
 
@@ -38,7 +39,8 @@ export default class MessageUpdateListener extends Listener {
     const newUserMentions = [...newMessage.mentions.users.values()]
       .filter(usr => !usr.bot && usr.id !== newMessage.author.id);
     // List of all roles that are mentionned in the new message.
-    const newRoleMentions = [...newMessage.mentions.roles.values()];
+    const newRoleMentions = [...newMessage.mentions.roles.values()]
+      .filter(role => !role.managed);
     // List of usernames / roles name's that are mentionned in the new message.
     const newMentions = [...newUserMentions, ...newRoleMentions];
 
