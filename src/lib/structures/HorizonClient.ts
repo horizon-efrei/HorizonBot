@@ -86,8 +86,8 @@ export default class HorizonClient extends SapphireClient {
 
       // Check channel-level permissions
       for (const channel of guild.channels.cache.values()) {
-        const channelMissingPerms = channel.permissionsFor(guild.me!).missing(requiredChannelPermissions);
-        if (channelMissingPerms.length > 0)
+        const channelMissingPerms = channel.permissionsFor(guild.me!)?.missing(requiredChannelPermissions);
+        if (channelMissingPerms && channelMissingPerms.length > 0)
           this.logger.warn(`[Main] The bot is missing permission(s) ${channelMissingPerms.join(', ')} in channel "#${channel.name}" in guild "${guild.name}".`);
       }
     }
