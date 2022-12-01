@@ -184,14 +184,14 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
     }
 
     if (channel || role) {
-      const entries = await Configuration.find({ guild: interaction.guild.id, value: (channel ?? role)!.id });
+      const entries = await Configuration.find({ guildId: interaction.guild.id, value: (channel ?? role)!.id });
       await interaction.reply(entries.length > 0
         ? pupa(this.messages.associatedKeys, { keys: entries.map(e => allEntries[e.name]).join(' `, `') })
         : this.messages.noAssociatedKey);
       return;
     }
 
-    const entry = await Configuration.findOne({ guild: interaction.guild.id, name: query });
+    const entry = await Configuration.findOne({ guildId: interaction.guild.id, name: query });
     await interaction.reply(entry
       ? {
           embeds: [new MessageEmbed()
@@ -204,7 +204,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
   }
 
   public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const definedEntries = await Configuration.find({ guild: interaction.guildId });
+    const definedEntries = await Configuration.find({ guildId: interaction.guildId });
 
     const allEntriesFilled = new Map<ConfigEntries, { name: string; document: ConfigurationDocument | undefined }>();
     for (const [entry, name] of Object.entries(allEntries))

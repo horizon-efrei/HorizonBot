@@ -119,7 +119,7 @@ export async function updateUpcomingClassesForGuild(
         { date: { $lte: dayjs().add(1, 'week').unix() * 1000 } },
         { date: { $gte: Date.now() } },
         { status: EclassStatus.Planned },
-        { guild: guildId },
+        { guildId },
       ],
     });
   } else {

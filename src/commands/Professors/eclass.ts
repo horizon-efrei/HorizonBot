@@ -735,7 +735,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
   public async list(interaction: Interaction): Promise<void> {
     // TODO: Add filter by date (before/after)
     // TODO: Add ability to combine same filters with each-other
-    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guild: interaction.guild.id });
+    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guildId: interaction.guild.id });
 
     const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [];
     const filterDescriptions: string[] = [];
