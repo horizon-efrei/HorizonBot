@@ -18,7 +18,7 @@ labels: ['type: bug', 'status: unconfirmed']
 3. Étape 3...
 
 **Comportement attendu**
-<!-- Une description claire et concise de ce qui aurait du se passer. -->
+<!-- Une description claire et concise de ce qui aurait dû se passer. -->
 
 **Screenshots**
 <!-- Si possible, mettez un screenshot du bug, ou un lien vers le message. -->
