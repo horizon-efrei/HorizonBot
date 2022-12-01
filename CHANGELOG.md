@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.2.1] - 2022/10/10
+
+### Fixed
+
+- Fix typo in the "Bug Report" issue template
+- Fix subjects' name in autocomplete
+- Fix field names in ConfigurationManager
+- Fix eclass' role mention
+- Fix field names of eclass creation
+- Fix logs by calling getContentValue correctly and adding a fallback
+- Fix eclass overlaps check
+- Fix crash on load when checking permissions
+- Fix condition on reaction-role creation
+
+
 ## [1.2.0] - 2022/10/10
 
 ### Added
