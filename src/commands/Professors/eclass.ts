@@ -683,12 +683,11 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
         await interaction.reply(this.messages.successfullyAddedLink);
         break;
       }
-      case OptionRecordChoiceChoices.Remove: {
+      case OptionRecordChoiceChoices.Remove:
         // Change the URL & confirm
         await EclassManager.removeRecordLink(eclass, link!.unwrap().toString());
         await interaction.reply(this.messages.successfullyRemovedLink);
         break;
-      }
       case OptionRecordChoiceChoices.Show:
         // Show the current URL if any
         await interaction.reply(eclass.recordLinks.length > 0

@@ -115,7 +115,7 @@ export default class EvalCommand extends HorizonCommand<typeof config> {
     stopwatch.stop();
     if (typeof result !== 'string') {
       result = result instanceof Error
-        ? result.stack!.replace(new RegExp(process.cwd(), 'gi'), '.')
+        ? result.stack!.replaceAll(new RegExp(process.cwd(), 'gi'), '.')
         : inspect(result, { depth: 3, showHidden: true });
     }
 

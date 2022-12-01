@@ -41,7 +41,7 @@ export default class TagCommand extends HorizonCommand<typeof config> {
 
       await new PaginatedContentMessageEmbed()
         .setTemplate(new MessageEmbed().setTitle(pupa(this.messages.listTitle, { total: tags.length })))
-        .setItems([...tags.map(t => pupa(this.messages.listLine, { name: t.name, uses: t.uses }))])
+        .setItems(tags.map(t => pupa(this.messages.listLine, { name: t.name, uses: t.uses })))
         .setItemsPerPage(10)
         .make()
         .run(interaction);

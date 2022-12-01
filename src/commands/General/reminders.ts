@@ -125,6 +125,8 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
 
     await new PaginatedContentMessageEmbed()
       .setTemplate(new MessageEmbed().setTitle(pupa(this.messages.listTitle, { total: reminders.size })))
+      // This is a Set, not an array!
+      // eslint-disable-next-line unicorn/no-useless-spread
       .setItems([
         ...reminders.map(reminder => pupa(this.messages.listLine, {
           ...reminder.toJSON(),

@@ -9,9 +9,6 @@ module.exports = {
     project: './tsconfig.eslint.json',
   },
   rules: {
-    // Buggy
-    'import/no-extraneous-dependencies': 'off',
-
     // It cannot resolve TypeScript's path aliases. See https://github.com/mysticatea/eslint-plugin-node/issues/233
     'node/no-missing-import': 'off',
 
@@ -25,12 +22,7 @@ module.exports = {
     // but neither do we want them to be static.
     'class-methods-use-this': 'off',
 
-    // We turn it off because of the Args class in Sapphire where almost all the methods
-    // are async, although in other cases we try to stick to this as much as possible.
-    'unicorn/no-await-expression-member': 'off',
-
     'no-await-in-loop': 'off',
-    'require-atomic-updates': 'off',
   },
   settings: {
     'import/parsers': {

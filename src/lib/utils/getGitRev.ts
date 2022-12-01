@@ -11,9 +11,12 @@ export default async function getGitRev(): Promise<string> {
   if (cachedCommit)
     return cachedCommit;
 
-  let rev = (await fs.readFile(path.join(process.cwd(), '.git', 'HEAD'))).toString();
-  if (rev.includes(':'))
-    rev = (await fs.readFile(path.join(process.cwd(), '.git', rev.slice(5).trim()))).toString();
+  const headContent = await fs.readFile(path.join(process.cwd(), '.git', 'HEAD'));
+  let rev = headContent.toString();
+  if (rev.includes(':')) {
+    const branchContent = await fs.readFile(path.join(process.cwd(), '.git', rev.slice(5).trim()));
+    rev = branchContent.toString();
+  }
 
   cachedCommit = rev;
   return rev;
