@@ -304,6 +304,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
   public async create(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const uniqueRole = interaction.options.getBoolean(Options.Unique) ?? false;
     const channel = interaction.options.getChannel(Options.Channel, true) as NewsChannel | TextChannel;
+    const condition = interaction.options.getRole(Options.RoleCondition);
 
     const pairs: Array<{ reaction: string; role: Role }> = [];
 
@@ -364,6 +365,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       guildId: reactionRoleMessage.guildId,
       reactionRolePairs: pairs.map(({ reaction, role }) => ({ reaction, role: role.id })),
       uniqueRole,
+      roleCondition: condition?.id,
     });
 
     await submit.followUp(pupa(this.messages.createdMenu, { title }));
