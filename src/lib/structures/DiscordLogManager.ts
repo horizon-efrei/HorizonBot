@@ -96,7 +96,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
     return;
 
   const fieldOptions = messages.logs.fields[payload.type];
-  const contentValue = this.getContentValue(payload);
+  const contentValue = getContentValue(payload) ?? "Impossible de charger plus d'informations";
 
   const embed = new MessageEmbed()
     .setAuthor({ name: messages.logs.embedTitle })
