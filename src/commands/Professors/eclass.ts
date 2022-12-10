@@ -423,7 +423,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    await interaction.reply(pupa(config.messages.successfullyCreated, { eclass: result.unwrap() }));
+    await answerTo.reply(pupa(config.messages.successfullyCreated, { eclass: result.unwrap() }));
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
