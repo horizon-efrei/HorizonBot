@@ -231,7 +231,7 @@ export const eclass = {
     successfullyFinished: 'Le cours a bien été terminé !',
 
     // Cancel subcommand
-    confirmCancel: 'Es-tu sûr de vouloir annuler ce cours ? Cette action est irrévocable.',
+    confirmCancel: ":warning: __Si tu t'es trompé dans la création du cours, utilise `/eclass edit` plutôt. Annuler et recréer le cours aura pour effet de mentionner les intéressés deux fois.__\n\nEs-tu sûr de vouloir annuler ce cours ? **Cette action est irrévocable.**",
     successfullyCanceled: 'Le cours a bien été annulé !',
     canceledCancel: "Le cours n'a pas été annulé.",
     valueCanceled: ':warning: **__COURS ANNULÉ !__**',
