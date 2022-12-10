@@ -8,6 +8,7 @@ import FuzzySearch from 'fuzzy-search';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import type { EclassDocument } from '@/types/database';
+import { EclassStatus } from '@/types/database';
 import { trimText } from '@/utils';
 
 @ApplyOptions<InteractionHandler.Options>({
@@ -36,8 +37,27 @@ export class EclassAutocompleteHandler extends InteractionHandler {
 
     switch (focusedOption.name) {
       case 'id': {
-        const fuzzy = new FuzzySearch(this._cache, ['classId', 'topic'], { sort: true });
+        const subcommandName = interaction.options.getSubcommand(true);
 
+        let pool: EclassDocument[] = [];
+        switch (subcommandName) {
+          case 'start':
+          case 'edit':
+            pool = this._cache.filter(eclass => eclass.status === EclassStatus.Planned);
+            break;
+          case 'finish':
+            pool = this._cache.filter(eclass => eclass.status === EclassStatus.InProgress);
+            break;
+          case 'cancel':
+            pool = this._cache
+              .filter(eclass => eclass.status === EclassStatus.Planned || eclass.status === EclassStatus.InProgress);
+            break;
+          case 'record':
+            pool = this._cache;
+            break;
+        }
+
+        const fuzzy = new FuzzySearch(pool, ['classId', 'topic'], { sort: true });
         const results = fuzzy.search(focusedOption.value);
         return this.some(results.map((match) => {
           const title = ` — ${dayjs(match.date).format(settings.configuration.dateFormat)} [${match.classId}]`;
