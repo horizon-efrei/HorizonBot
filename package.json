@@ -1,6 +1,6 @@
 {
   "name": "horizonbot",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "The discord bot for Ef'Réussite",
   "main": "./dist/src/main.js",
   "scripts": {
