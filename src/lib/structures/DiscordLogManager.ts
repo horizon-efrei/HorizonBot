@@ -24,7 +24,10 @@ export function getContentValue(payload: DiscordLogBase): string {
   switch (payload.type) {
     case DiscordLogType.GuildJoin: {
       const invites = guild.invites.cache;
-      return payload.content.map(code => pupa(fieldTexts.contentValue, { code, link: invites.get(code) })).join('\nou : ');
+      return payload.content
+        .map(code => pupa(fieldTexts.contentValue, { code, link: invites.get(code) }))
+        .join('\nou : ')
+        || 'Inconnue';
     }
     case DiscordLogType.GuildLeave:
       return pupa(fieldTexts.contentValue, {
