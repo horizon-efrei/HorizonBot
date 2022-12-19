@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { stripIndent } from 'common-tags';
 import { Permissions } from 'discord.js';
 import pupa from 'pupa';
-import { pave as config } from '@/config/commands/admin';
+import { lxp as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -15,7 +15,7 @@ interface AggregatedEclass {
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class PaveCommand extends HorizonCommand<typeof config> {
+export default class LxpCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

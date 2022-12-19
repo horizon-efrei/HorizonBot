@@ -75,6 +75,18 @@ export const logs = {
   },
 } as const;
 
+export const lxp = {
+  descriptions: {
+    name: 'lxp',
+    command: 'Obtenir la liste des heures de cours données par les eProfs durant le semestre actuel.',
+  },
+  messages: {
+    summary: 'Liste des heures de cours données par les eProfs durant le semestre actuel (depuis le {firstDay}) :',
+    summaryLine: `    • ${userMention('{prof}')} : {time} heures\n`,
+    noEclasses: "Aucun cours n'a été donné durant le semestre actuel (depuis le {firstDay}).",
+  },
+} as const;
+
 export const manageContacts = {
   descriptions: {
     name: 'manage-contacts',
@@ -152,18 +164,6 @@ export const manageTags = {
     editedTagEmbed: 'Ce tag sera maintenant affiché {inOrWithout} embed !',
     inEmbed: 'dans un',
     withoutEmbed: 'sans',
-  },
-} as const;
-
-export const pave = {
-  descriptions: {
-    name: 'pave',
-    command: 'Obtenir la liste des heures de cours données par les eProfs durant le semestre actuel.',
-  },
-  messages: {
-    summary: 'Liste des heures de cours données par les eProfs durant le semestre actuel (depuis le {firstDay}) :',
-    summaryLine: `    • ${userMention('{prof}')} : {time} heures\n`,
-    noEclasses: "Aucun cours n'a été donné durant le semestre actuel (depuis le {firstDay}).",
   },
 } as const;
 
