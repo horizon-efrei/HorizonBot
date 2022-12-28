@@ -11,9 +11,7 @@ import { DiscordLogType, LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
 
 export default {
-  global: {
-    onlySlashCommands: "Les commandes traditionnelles ne sont plus disponibles, il faut maintenant utiliser les \"slash commands\".\n\n:grey_question: Kézako\n> Les \"slashs commands\" est un nouveau système intégré à Discord permettant aux bots de fournir une expérience enrichie pour les utilisateurs. Écris `/` (sans envoyer le message) pour voir la liste des commandes que je propose. Ce sont les mêmes qu'avant à l'exception de la commande d'aide, qui a été supprimée en faveur de la liste que tu vois en tapant `/` !",
-  },
+  global: {},
   errors: {
     precondition: {
       [Identifiers.PreconditionCooldown]: 'Pas si vite ! Cette commande est sous cooldown, attendez un peu avant de la réutiliser.',

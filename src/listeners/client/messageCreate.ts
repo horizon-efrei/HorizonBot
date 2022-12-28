@@ -27,11 +27,6 @@ export default class MessageListener extends Listener {
       });
     }
 
-    if (message.content.startsWith('!')) {
-      await message.reply(messages.global.onlySlashCommands);
-      return;
-    }
-
     if (!message.inGuild())
       return;
 
