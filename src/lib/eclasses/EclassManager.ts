@@ -231,7 +231,7 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
     .setFooter({ text: pupa(texts.footer, eclass) });
 
   await classChannel?.send({
-    content: pupa(config.messages.startClassNotification, { classRole: eclass.classRoleId }),
+    content: pupa(config.messages.startClassNotification, eclass.toJSON()),
     embeds: [embed],
   });
 

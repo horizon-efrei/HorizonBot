@@ -207,6 +207,6 @@ export default {
     header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',
     noClasses: 'Aucune séance de prévue !',
     today: " (Aujourd'hui)",
-    classLine: `• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} ${channelMention('{eclass.subject.textChannel}')} (par ${userMention('{eclass.professor}')}) [${roleMention('{eclass.targetRole}')}]\n`,
+    classLine: `• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} ${channelMention('{eclass.subject.textChannelId}')} (par ${userMention('{eclass.professorId}')}) [${roleMention('{eclass.targetRoleId}')}]\n`,
   },
 } as const;
