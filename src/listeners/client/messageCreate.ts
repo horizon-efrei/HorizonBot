@@ -1,7 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import { filterNullAndUndefined } from '@sapphire/utilities';
 import type { Message } from 'discord.js';
-import messages from '@/config/messages';
 import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
