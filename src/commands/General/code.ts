@@ -3,9 +3,9 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { SelectMenuLimits } from '@sapphire/discord-utilities';
 import { BucketScope, Result } from '@sapphire/framework';
 import axios from 'axios';
-import { ApplicationCommandType } from 'discord-api-types/v10';
 import {
   ActionRowBuilder,
+  ApplicationCommandType,
   ButtonBuilder,
   ButtonStyle,
   ComponentType,

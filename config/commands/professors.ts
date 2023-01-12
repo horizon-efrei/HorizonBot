@@ -1,5 +1,5 @@
 import { stripIndent } from 'common-tags';
-import type { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
+import type { APIApplicationCommandOptionChoice } from 'discord.js';
 import {
   channelMention,
   hideLinkEmbed,

@@ -1,9 +1,9 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { filterNullAndUndefined } from '@sapphire/utilities';
-import { ChannelType } from 'discord-api-types/v10';
 import type { NewsChannel, TextChannel } from 'discord.js';
 import {
   channelMention,
+  ChannelType,
   EmbedBuilder,
   PermissionsBitField,
   roleMention,

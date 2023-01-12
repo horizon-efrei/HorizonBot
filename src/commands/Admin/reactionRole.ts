@@ -3,7 +3,6 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { EmbedLimits } from '@sapphire/discord-utilities';
 import { Resolvers, Result } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
-import { ChannelType } from 'discord-api-types/v10';
 import type {
   GuildTextBasedChannel,
   InteractionReplyOptions,
@@ -15,6 +14,7 @@ import type {
 } from 'discord.js';
 import {
   ActionRowBuilder,
+  ChannelType,
   EmbedBuilder,
   ModalBuilder,
   PermissionsBitField,
