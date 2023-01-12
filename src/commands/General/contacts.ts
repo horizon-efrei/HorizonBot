@@ -22,7 +22,7 @@ export default class ContactsCommand extends HorizonCommand<typeof config> {
   }
 
   public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
-    const contacts = await Contact.find();
+    const contacts = await Contact.find({ guildId: interaction.guildId });
     if (contacts.length === 0) {
       await interaction.reply(this.messages.noContacts);
       return;

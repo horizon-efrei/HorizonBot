@@ -118,13 +118,14 @@ export default class ManageContactsCommand extends HorizonSubcommand<typeof conf
       contact: interaction.options.getString(Options.Contact, true),
       team: interaction.options.getString(Options.Team, true),
       description: interaction.options.getString(Options.Description, true),
+      guildId: interaction.guildId,
     });
     await interaction.reply(this.messages.createdContact);
   }
 
   public async edit(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
     const targetName = interaction.options.getString(Options.Name, true);
-    const contact = await Contact.findOne({ name: { $regex: new RegExp(targetName, 'i') } });
+    const contact = await Contact.findOne({ name: { $regex: new RegExp(targetName, 'i') }, guildId: interaction.guildId });
     if (!contact) {
       await interaction.reply({ content: this.messages.invalidContact, ephemeral: true });
       return;
@@ -139,7 +140,7 @@ export default class ManageContactsCommand extends HorizonSubcommand<typeof conf
 
   public async remove(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
     const targetName = interaction.options.getString(Options.Name, true);
-    const contact = await Contact.findOne({ name: { $regex: new RegExp(targetName, 'i') } });
+    const contact = await Contact.findOne({ name: { $regex: new RegExp(targetName, 'i') }, guildId: interaction.guildId });
     if (!contact) {
       await interaction.reply({ content: this.messages.invalidContact, ephemeral: true });
       return;
