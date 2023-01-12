@@ -491,6 +491,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
 
     if (date) {
       eclass.date = date;
+      eclass.end = new Date(date.getTime() + eclass.duration);
       updateMessages.push(this.messages.editedDate);
       notificationMessages.push(this.messages.pingEditedDate);
     }
