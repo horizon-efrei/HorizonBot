@@ -1,6 +1,11 @@
 import { container } from '@sapphire/framework';
 import type { Guild, GuildTextBasedChannel } from 'discord.js';
-import { Collection, GuildChannel, Role } from 'discord.js';
+import {
+  ChannelType,
+  Collection,
+  GuildChannel,
+  Role,
+} from 'discord.js';
 import Configuration from '@/models/configuration';
 import type { ConfigEntries, ConfigEntriesChannels, ConfigEntryHolds } from '@/types/database';
 import { nullop } from '@/utils';
@@ -80,7 +85,7 @@ export default class ConfigurationManager {
       return;
 
     const resolved = guild.channels.resolve(value) ?? guild.roles.resolve(value);
-    if (resolved instanceof Role || (resolved instanceof GuildChannel && resolved.isText()))
+    if (resolved instanceof Role || (resolved instanceof GuildChannel && resolved.type === ChannelType.GuildText))
       return resolved;
   }
 }

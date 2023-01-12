@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Constants, MessageEmbed } from 'discord.js';
+import { ChannelType, EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { serverInfo as config } from '@/config/commands/general';
 import settings from '@/config/settings';
@@ -19,7 +19,7 @@ export default class ServerInfoCommand extends HorizonCommand<typeof config> {
   public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
     const texts = this.messages.embed;
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(settings.colors.primary)
       .setTitle(pupa(texts.title, interaction.guild))
       .addFields([
@@ -28,9 +28,10 @@ export default class ServerInfoCommand extends HorizonCommand<typeof config> {
           name: texts.channelsTitle,
           value: pupa(texts.channelsValue, {
             ...interaction.guild,
-            text: interaction.guild.channels.cache.filter(channel => channel.isText()).size,
-            voice: interaction.guild.channels.cache.filter(channel => channel.isVoice()).size,
-            categories: interaction.guild.channels.cache.filter(channel => channel.type === 'GUILD_CATEGORY').size,
+            text: interaction.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildText).size,
+            voice: interaction.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).size,
+            // eslint-disable-next-line max-len
+            categories: interaction.guild.channels.cache.filter(channel => channel.type === ChannelType.GuildCategory).size,
           }),
           inline: true,
         },
@@ -38,7 +39,7 @@ export default class ServerInfoCommand extends HorizonCommand<typeof config> {
           name: texts.boostsTitle,
           value: pupa(texts.boostsValue, {
             ...interaction.guild,
-            premiumTier: Constants.PremiumTiers[interaction.guild.premiumTier],
+            premiumTier: interaction.guild.premiumTier,
           }),
           inline: true,
         },
@@ -55,7 +56,7 @@ export default class ServerInfoCommand extends HorizonCommand<typeof config> {
       .setFooter({ text: pupa(texts.footer, interaction.guild) });
 
     if (interaction.guild.iconURL())
-      embed.setThumbnail(interaction.guild.iconURL()!);
+      embed.setThumbnail(interaction.guild.iconURL());
 
     await interaction.reply({ embeds: [embed] });
   }

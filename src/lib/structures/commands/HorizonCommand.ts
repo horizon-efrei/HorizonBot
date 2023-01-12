@@ -25,8 +25,9 @@ export namespace HorizonCommand {
   export type JSON = Command.JSON;
   export type Context = Command.Context;
   export type RunInTypes = Command.RunInTypes;
-  export type ChatInputInteraction<Cached extends CacheType = CacheType> = Command.ChatInputInteraction<Cached>;
-  export type ContextMenuInteraction<Cached extends CacheType = CacheType> = Command.ContextMenuInteraction<Cached>;
+  export type ChatInputInteraction<Cached extends CacheType = CacheType> = Command.ChatInputCommandInteraction<Cached>;
+  export type ContextMenuInteraction<Cached extends CacheType = CacheType> =
+    Command.ContextMenuCommandInteraction<Cached>;
   export type AutocompleteInteraction<Cached extends CacheType = CacheType> = Command.AutocompleteInteraction<Cached>;
   export type Registry = Command.Registry;
 }

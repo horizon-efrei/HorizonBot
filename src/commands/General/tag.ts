@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { tag as config } from '@/config/commands/general';
 import settings from '@/config/settings';
@@ -40,7 +40,7 @@ export default class TagCommand extends HorizonCommand<typeof config> {
       }
 
       await new PaginatedContentMessageEmbed()
-        .setTemplate(new MessageEmbed().setTitle(pupa(this.messages.listTitle, { total: tags.length })))
+        .setTemplate(new EmbedBuilder().setTitle(pupa(this.messages.listTitle, { total: tags.length })))
         .setItems(tags.map(t => pupa(this.messages.listLine, { name: t.name, uses: t.uses })))
         .setItemsPerPage(10)
         .make()
@@ -49,7 +49,7 @@ export default class TagCommand extends HorizonCommand<typeof config> {
     }
 
     if (tag.isEmbed) {
-      const embed = new MessageEmbed()
+      const embed = new EmbedBuilder()
         .setColor(settings.colors.default)
         .setDescription(tag.content)
         .setTimestamp();

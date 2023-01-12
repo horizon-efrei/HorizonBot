@@ -1,4 +1,4 @@
-import type { TimestampStylesString } from '@discordjs/builders';
+import type { TimestampStylesString } from 'discord.js';
 
 /**
  * Formats a timestamp into a readable Discord-formatted time

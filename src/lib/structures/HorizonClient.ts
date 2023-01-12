@@ -1,7 +1,12 @@
 import { LogLevel, SapphireClient } from '@sapphire/framework';
 import { filterNullAndUndefined } from '@sapphire/utilities';
 import axios from 'axios';
-import { Collection, Intents, Permissions } from 'discord.js';
+import {
+  Collection,
+  GatewayIntentBits,
+  Partials,
+  PermissionsBitField,
+} from 'discord.js';
 import settings from '@/config/settings';
 import Eclass from '@/models/eclass';
 import LogStatuses from '@/models/logStatuses';
@@ -30,18 +35,18 @@ export default class HorizonClient extends SapphireClient {
       },
       loadDefaultErrorListeners: true,
       intents: [
-        Intents.FLAGS.GUILD_PRESENCES, // Access to member's presence for /userinfo.
-        Intents.FLAGS.DIRECT_MESSAGES, // Access to Direct Messages.
-        Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, // Access to MessageReactionAdd/Remove events in DMs.
-        Intents.FLAGS.GUILD_EMOJIS_AND_STICKERS, // Access to EmojiDelete events.
-        Intents.FLAGS.GUILD_INVITES, // Access to InviteCreate events.
-        Intents.FLAGS.GUILD_MEMBERS, // Access to GuildMemberAdd/Update/Remove events.
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS, // Access to MessageReactionAdd/Remove events.
-        Intents.FLAGS.GUILD_MESSAGES, // Access to MessageCreate/Update/Delete events.
-        Intents.FLAGS.GUILD_VOICE_STATES, // Access to VoiceStateUpdate events.
-        Intents.FLAGS.GUILDS, // Access to Guilds, Channels, Threads, Roles events.
+        GatewayIntentBits.GuildPresences, // Access to member's presence for /userinfo.
+        GatewayIntentBits.DirectMessages, // Access to Direct Messages.
+        GatewayIntentBits.DirectMessageReactions, // Access to MessageReactionAdd/Remove events in DMs.
+        GatewayIntentBits.GuildEmojisAndStickers, // Access to EmojiDelete events.
+        GatewayIntentBits.GuildInvites, // Access to InviteCreate events.
+        GatewayIntentBits.GuildMembers, // Access to GuildMemberAdd/Update/Remove events.
+        GatewayIntentBits.GuildMessageReactions, // Access to MessageReactionAdd/Remove events.
+        GatewayIntentBits.GuildMessages, // Access to MessageCreate/Update/Delete events.
+        GatewayIntentBits.GuildVoiceStates, // Access to VoiceStateUpdate events.
+        GatewayIntentBits.Guilds, // Access to Guilds, Channels, Threads, Roles events.
       ],
-      partials: ['CHANNEL'],
+      partials: [Partials.Channel],
     });
 
     this.stores.register(new TaskStore());
@@ -62,31 +67,31 @@ export default class HorizonClient extends SapphireClient {
       this.logger.warn('[Main] Disabling Sentry as the DSN was not set in the environment variables (SENTRY_TOKEN).');
 
     // Check permissions
-    const requiredChannelPermissions = new Permissions([
-      'ADD_REACTIONS',
-      'ATTACH_FILES',
-      'MANAGE_MESSAGES',
-      'READ_MESSAGE_HISTORY',
-      'SEND_MESSAGES',
-      'USE_PUBLIC_THREADS',
-      'VIEW_CHANNEL',
+    const requiredChannelPermissions = new PermissionsBitField([
+      PermissionsBitField.Flags.AddReactions,
+      PermissionsBitField.Flags.AttachFiles,
+      PermissionsBitField.Flags.ManageMessages,
+      PermissionsBitField.Flags.ReadMessageHistory,
+      PermissionsBitField.Flags.SendMessages,
+      PermissionsBitField.Flags.CreatePublicThreads,
+      PermissionsBitField.Flags.ViewChannel,
     ]);
-    const requiredGuildPermissions = new Permissions([
+    const requiredGuildPermissions = new PermissionsBitField([
       ...requiredChannelPermissions,
-      'MANAGE_GUILD',
-      'MANAGE_ROLES',
+      PermissionsBitField.Flags.ManageGuild,
+      PermissionsBitField.Flags.ManageRoles,
     ]);
 
     // Traverse each guild we are in
     for (const guild of this.guilds.cache.values()) {
       // Check guild-level permissions
-      const guildMissingPerms = guild.me?.permissions.missing(requiredGuildPermissions);
+      const guildMissingPerms = guild.members.me?.permissions.missing(requiredGuildPermissions);
       if (guildMissingPerms && guildMissingPerms.length > 0)
         this.logger.warn(`[Main] The bot is missing Guild-Level permissions in guild "${guild.name}". Its cumulated roles' permissions does not contain: ${guildMissingPerms.join(', ')}.`);
 
       // Check channel-level permissions
       for (const channel of guild.channels.cache.values()) {
-        const channelMissingPerms = channel.permissionsFor(guild.me!)?.missing(requiredChannelPermissions);
+        const channelMissingPerms = channel.permissionsFor(guild.members.me!)?.missing(requiredChannelPermissions);
         if (channelMissingPerms && channelMissingPerms.length > 0)
           this.logger.warn(`[Main] The bot is missing permission(s) ${channelMissingPerms.join(', ')} in channel "#${channel.name}" in guild "${guild.name}".`);
       }

@@ -21,9 +21,11 @@ export namespace HorizonSubcommand {
   export type JSON = Subcommand.JSON;
   export type Context = Subcommand.Context;
   export type RunInTypes = Subcommand.RunInTypes;
-  export type ChatInputInteraction<Cached extends CacheType = CacheType> = Subcommand.ChatInputInteraction<Cached>;
-  export type ContextMenuInteraction<Cached extends CacheType = CacheType> = Subcommand.ContextMenuInteraction<Cached>;
-  // eslint-disable-next-line max-len
-  export type AutocompleteInteraction<Cached extends CacheType = CacheType> = Subcommand.AutocompleteInteraction<Cached>;
+  export type ChatInputInteraction<Cached extends CacheType = CacheType> =
+    Subcommand.ChatInputCommandInteraction<Cached>;
+  export type ContextMenuInteraction<Cached extends CacheType = CacheType> =
+    Subcommand.ContextMenuCommandInteraction<Cached>;
+  export type AutocompleteInteraction<Cached extends CacheType = CacheType> =
+    Subcommand.AutocompleteInteraction<Cached>;
   export type Registry = Subcommand.Registry;
 }

@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
 import { contacts as config } from '@/config/commands/general';
@@ -31,7 +31,7 @@ export default class ContactsCommand extends HorizonCommand<typeof config> {
     type TeamEntry = [teamName: string, contacts: ContactDocument[]];
     const teams: TeamEntry[] = Object.entries(groupBy(contacts, contact => contact.team));
 
-    const paginator = new PaginatedMessage({ template: new MessageEmbed().setColor(settings.colors.default) })
+    const paginator = new PaginatedMessage({ template: new EmbedBuilder().setColor(settings.colors.default) })
       .setWrongUserInteractionReply(user => ({
         content: pupa(messages.errors.wrongUserInteractionReply, { user }),
         ephemeral: true,

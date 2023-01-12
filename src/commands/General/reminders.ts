@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { filterNullAndUndefinedAndEmpty } from '@sapphire/utilities';
-import { DMChannel, MessageEmbed } from 'discord.js';
+import { DMChannel, EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { reminders as config } from '@/config/commands/general';
 import Reminders from '@/models/reminders';
@@ -124,7 +124,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
     await interaction.deferReply({ ephemeral: interaction.inGuild() });
 
     await new PaginatedContentMessageEmbed()
-      .setTemplate(new MessageEmbed().setTitle(pupa(this.messages.listTitle, { total: reminders.size })))
+      .setTemplate(new EmbedBuilder().setTitle(pupa(this.messages.listTitle, { total: reminders.size })))
       // This is a Set, not an array!
       // eslint-disable-next-line unicorn/no-useless-spread
       .setItems([

@@ -7,7 +7,7 @@ import type {
   GuildTextBasedChannel,
   ModalSubmitInteraction,
 } from 'discord.js';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
@@ -53,9 +53,9 @@ export function createAnnouncementEmbed({
   topic,
   place,
   placeInformation,
-}: EclassEmbedOptions): MessageEmbed {
+}: EclassEmbedOptions): EmbedBuilder {
   const texts = config.messages.newClassEmbed;
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setColor(settings.colors.green)
     .setTitle(pupa(texts.title, { subject, topic }))
     .setDescription(pupa(texts.description, { subject, classChannel, date }))
@@ -194,9 +194,11 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
-  const announcementEmbed = announcementMessage.embeds[0];
+  const rawEmbed = announcementMessage.embeds[0];
+  const announcementEmbed = EmbedBuilder.from(rawEmbed);
+
+  const dateField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
   announcementEmbed.setColor(settings.colors.orange);
-  const dateField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
   if (dateField) {
     dateField.value = pupa(config.messages.newClassEmbed.dateValueInProgress, eclass.normalizeDates());
   } else {
@@ -215,11 +217,10 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
     ?.channels.resolve(eclass.subject.textChannelId) as GuildTextBasedChannel | undefined;
 
   const texts = config.messages.startClassEmbed;
-  // @ts-expect-error: setAuthor will work as expected if we pass it a nullish value
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setColor(settings.colors.primary)
     .setTitle(pupa(texts.title, { eclass }))
-    .setAuthor({ name: texts.author, iconURL: announcementChannel.guild.iconURL() })
+    .setAuthor({ name: texts.author, iconURL: announcementChannel.guild.iconURL()! })
     .setDescription(pupa(texts.baseDescription, {
       eclass,
       isRecorded: eclass.isRecorded ? texts.descriptionIsRecorded : texts.descriptionIsNotRecorded,
@@ -249,8 +250,10 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
-  const announcementEmbed = announcementMessage.embeds[0];
-  const dateField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
+  const rawEmbed = announcementMessage.embeds[0];
+  const announcementEmbed = EmbedBuilder.from(rawEmbed);
+
+  const dateField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
   if (dateField) {
     dateField.value = pupa(config.messages.newClassEmbed.dateValueFinished, eclass.normalizeDates());
   } else {
@@ -285,7 +288,7 @@ export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
-  const announcementEmbed = announcementMessage.embeds[0];
+  const announcementEmbed = EmbedBuilder.from(announcementMessage.embeds[0]);
   announcementEmbed.setColor(settings.colors.red);
   announcementEmbed.setDescription(config.messages.valueCanceled);
   announcementEmbed.spliceFields(0, EmbedLimits.MaximumFields);
@@ -322,8 +325,10 @@ export async function addRecordLink(
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
-  const announcementEmbed = announcementMessage.embeds[0];
-  const recordField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
+  const rawEmbed = announcementMessage.embeds[0];
+  const announcementEmbed = EmbedBuilder.from(rawEmbed);
+
+  const recordField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
   const baseValue = config.messages.recordedValues[Number(eclass.isRecorded)];
   const linksValue = [...eclass.recordLinks, recordLink]
     .map(link => pupa(config.messages.recordedLink, { link }))
@@ -366,8 +371,10 @@ export async function removeRecordLink(eclass: EclassPopulatedDocument, recordLi
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
 
   // Update its embed
-  const announcementEmbed = announcementMessage.embeds[0];
-  const recordField = announcementEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
+  const rawEmbed = announcementMessage.embeds[0];
+  const announcementEmbed = EmbedBuilder.from(rawEmbed);
+
+  const recordField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.recorded);
   const baseValue = config.messages.recordedValues[Number(eclass.isRecorded)];
   const linksValue = eclass.recordLinks
     .filter(link => link !== recordLink)

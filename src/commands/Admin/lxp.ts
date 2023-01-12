@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Permissions } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import pupa from 'pupa';
 import { lxp as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
@@ -20,7 +20,7 @@ export default class LxpCommand extends HorizonCommand<typeof config> {
       command => command
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD),
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild),
       { guildIds: settings.mainGuildIds },
     );
   }

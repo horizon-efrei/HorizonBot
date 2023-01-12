@@ -4,8 +4,13 @@ import { SelectMenuLimits } from '@sapphire/discord-utilities';
 import { BucketScope, Result } from '@sapphire/framework';
 import axios from 'axios';
 import { ApplicationCommandType } from 'discord-api-types/v10';
-import { MessageActionRow, MessageButton, MessageSelectMenu } from 'discord.js';
-import { MessageButtonStyles, MessageComponentTypes } from 'discord.js/typings/enums';
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  StringSelectMenuBuilder,
+} from 'discord.js';
 import pupa from 'pupa';
 import InteractionPrompter from '@/app/lib/structures/InteractionPrompter';
 import type { CodeLanguageResult } from '@/app/lib/types';
@@ -28,9 +33,9 @@ type WrappableLanguage = CodeLanguageResult & {
 const isWrappable = (lang: CodeLanguageResult): lang is WrappableLanguage => Object.keys(wraps).includes(lang.language);
 
 type ExtractedCodes = ReturnType<typeof extractCodeBlocks>;
-const codeMenu = (codes: ExtractedCodes): MessageActionRow =>
-  new MessageActionRow().addComponents(
-    new MessageSelectMenu()
+const codeMenu = (codes: ExtractedCodes): ActionRowBuilder<StringSelectMenuBuilder> =>
+  new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+    new StringSelectMenuBuilder()
       .setCustomId('code-select-menu')
       .setPlaceholder(config.messages.codeSelectMenu.placeholder)
       .addOptions(codes.map((code, i) => ({
@@ -43,8 +48,8 @@ const codeMenu = (codes: ExtractedCodes): MessageActionRow =>
       }))),
   );
 
-const languageSelectMenu = new MessageActionRow().addComponents(
-  new MessageSelectMenu()
+const languageSelectMenu = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+  new StringSelectMenuBuilder()
     .setCustomId('language-select-menu')
     .setPlaceholder(config.messages.languageSelectMenu.placeholder)
     .addOptions(settings.languages.map(option => ({
@@ -54,15 +59,15 @@ const languageSelectMenu = new MessageActionRow().addComponents(
     }))),
 );
 
-const wrapConfirmation = new MessageActionRow().addComponents(
-  new MessageButton()
+const wrapConfirmation = new ActionRowBuilder<ButtonBuilder>().addComponents(
+  new ButtonBuilder()
     .setCustomId('wrap-yes')
     .setLabel(config.messages.wrapConfirmation.yes)
-    .setStyle(MessageButtonStyles.SECONDARY),
-  new MessageButton()
+    .setStyle(ButtonStyle.Secondary),
+  new ButtonBuilder()
     .setCustomId('wrap-no')
     .setLabel(config.messages.wrapConfirmation.no)
-    .setStyle(MessageButtonStyles.PRIMARY),
+    .setStyle(ButtonStyle.Primary),
 );
 
 @ApplyOptions<HorizonCommand.Options>({
@@ -165,7 +170,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
 
     // 2.b Get the language response
     const codeInteraction = await prompter.awaitMessageComponent({
-      componentType: MessageComponentTypes.SELECT_MENU,
+      componentType: ComponentType.SelectMenu,
       filter: int => int.customId === 'code-select-menu' && int.user.id === prompter.interaction.user.id,
     });
     if (codeInteraction.isErr())
@@ -183,7 +188,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
 
     // 3.b Get the language response
     const languageInteraction = await prompter.awaitMessageComponent({
-      componentType: MessageComponentTypes.SELECT_MENU,
+      componentType: ComponentType.StringSelect,
       filter: int => int.customId === 'language-select-menu' && int.user.id === prompter.interaction.user.id,
     });
     if (languageInteraction.isErr())
@@ -208,7 +213,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
 
     // 4.b Get the wrapping response
     const wrapInteraction = await prompter.awaitMessageComponent({
-      componentType: MessageComponentTypes.BUTTON,
+      componentType: ComponentType.Button,
       filter: int => ['wrap-yes', 'wrap-no'].includes(int.customId) && int.user.id === prompter.interaction.user.id,
     });
     if (wrapInteraction.isErr())

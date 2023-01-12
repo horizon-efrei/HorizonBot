@@ -1,4 +1,4 @@
-import { userMention } from '@discordjs/builders';
+import { userMention } from 'discord.js';
 import type { ColorResolvable } from 'discord.js';
 import type { CodeLanguageResult } from '@/types';
 

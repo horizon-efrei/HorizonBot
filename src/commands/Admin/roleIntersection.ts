@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { filterNullAndUndefined } from '@sapphire/utilities';
-import { Permissions } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import pupa from 'pupa';
 import { roleIntersection as config } from '@/config/commands/admin';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -23,7 +23,7 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
       command => command
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .setDMPermission(false)
         .addRoleOption(option => option.setName(Options.Role1).setDescription(roleDescription).setRequired(true))
         .addRoleOption(option => option.setName(Options.Role2).setDescription(roleDescription).setRequired(true))

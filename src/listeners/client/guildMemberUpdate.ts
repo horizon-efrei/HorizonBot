@@ -1,5 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
+import { AuditLogEvent } from 'discord.js';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
@@ -12,7 +13,7 @@ export default class GuildMemberUpdateListener extends Listener {
 
   private async _logNicknameChanges(oldMember: GuildMember, newMember: GuildMember): Promise<void> {
     if (oldMember.nickname !== newMember.nickname) {
-      const auditLogs = await newMember.guild.fetchAuditLogs({ type: 'MEMBER_UPDATE' }).catch(nullop);
+      const auditLogs = await newMember.guild.fetchAuditLogs({ type: AuditLogEvent.MemberUpdate }).catch(nullop);
       const lastMemberUpdate = auditLogs?.entries.filter(entry => entry.target?.id === newMember.id).first();
 
       // Tell executor ID
@@ -35,7 +36,7 @@ export default class GuildMemberUpdateListener extends Listener {
     const addedRoles = [...newRoles.filter(role => !oldRoles.has(role.id)).keys()];
     const removedRoles = [...oldRoles.filter(role => !newRoles.has(role.id)).keys()];
 
-    const auditLogs = await newMember.guild.fetchAuditLogs({ type: 'MEMBER_ROLE_UPDATE' }).catch(nullop);
+    const auditLogs = await newMember.guild.fetchAuditLogs({ type: AuditLogEvent.MemberRoleUpdate }).catch(nullop);
     const lastMemberRoleUpdate = auditLogs?.entries.filter(entry => entry.target?.id === newMember.id).first();
 
     if (addedRoles.length > 0) {

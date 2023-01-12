@@ -1,8 +1,8 @@
-import type { Command } from '@sapphire/framework';
 import { container } from '@sapphire/framework';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
 import Eclass from '@/models/eclass';
+import type { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import type { EclassStatus } from '@/types/database';
 import { ConfigEntriesRoles } from '@/types/database';
 
@@ -14,7 +14,7 @@ export default function ValidateEclassArgument(options?: ValidationOptions): Met
   return (_target, _key, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (interaction: Command.ChatInputInteraction<'cached'>): Promise<void> {
+    descriptor.value = async function (interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
       // Get the class ID
       const classId = interaction.options.getString('id');
 

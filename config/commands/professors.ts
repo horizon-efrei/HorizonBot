@@ -1,12 +1,12 @@
+import { stripIndent } from 'common-tags';
+import type { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
 import {
   channelMention,
   hideLinkEmbed,
   roleMention,
   TimestampStyles,
   userMention,
-} from '@discordjs/builders';
-import { stripIndent } from 'common-tags';
-import type { APIApplicationCommandOptionChoice } from 'discord-api-types/v10';
+} from 'discord.js';
 import { SchoolYear } from '@/types';
 import type { SubjectBase } from '@/types/database';
 import { EclassPlace, EclassStatus } from '@/types/database';
@@ -54,6 +54,7 @@ export const eclass = {
     statusIncompatible: 'Tu ne peux pas faire cette action alors que le cours {status}.',
     professorOverlap: ':warning: **AÏE !** Ce professeur a déjà un cours de prévu à cette date.',
     schoolYearOverlap: ':warning: **AÏE !** Cette promotion a déjà un cours de prévu à cette date.',
+    invalidProfessor: 'Le professeur entré est invalide. Il te suffit de le mentionner avec un `@` comme tu le ferrais dans un message.',
     invalidSubject: "La matière entrée est invalide. Entre son code cours (ex: `TI304`), en faisant attention à ce qu'il te soit proposé. Sinon, cela signifie que la matière n'est pas disponible. Si tu penses que c'est un problème, contact un responsable eProf.",
     invalidDuration: 'Cette durée est invalide. Il faut entrer une durée en anglais ou en français.\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` ou `1h45`.',
     invalidDate: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée, qu'elle soit prévue pour dans moins de 2 mois et qu'elle soit au format `jj/MM HH:mm`.",

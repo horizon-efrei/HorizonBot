@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { MessageEmbed, Permissions } from 'discord.js';
+import { EmbedBuilder, PermissionsBitField } from 'discord.js';
 import pupa from 'pupa';
 import { logs as config } from '@/config/commands/admin';
 import messages from '@/config/messages';
@@ -32,7 +32,7 @@ export default class LogsCommand extends HorizonSubcommand<typeof config> {
       command => command
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .setDMPermission(false)
         .addSubcommand(
           subcommand => subcommand
@@ -94,7 +94,7 @@ export default class LogsCommand extends HorizonSubcommand<typeof config> {
     const logs = await LogStatuses.find({ guildId: interaction.guildId });
 
     await new PaginatedContentMessageEmbed()
-      .setTemplate(new MessageEmbed().setTitle(this.messages.listTitle))
+      .setTemplate(new EmbedBuilder().setTitle(this.messages.listTitle))
       .setItems(logs.map(log => pupa(this.messages.lineValue, {
         type: messages.logs.simplifiedReadableEvents[log.type],
         status: this.messages.statuses[log.status],

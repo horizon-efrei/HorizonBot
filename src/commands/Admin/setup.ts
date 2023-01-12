@@ -2,7 +2,12 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { filterNullAndUndefined } from '@sapphire/utilities';
 import { ChannelType } from 'discord-api-types/v10';
 import type { NewsChannel, TextChannel } from 'discord.js';
-import { Formatters, MessageEmbed, Permissions } from 'discord.js';
+import {
+  channelMention,
+  EmbedBuilder,
+  PermissionsBitField,
+  roleMention,
+} from 'discord.js';
 import pupa from 'pupa';
 import { setup as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
@@ -67,7 +72,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
         .setDMPermission(false)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .addSubcommand(
           subcommand => subcommand
             .setName('set-channel')
@@ -194,7 +199,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
     const entry = await Configuration.findOne({ guildId: interaction.guild.id, name: query });
     await interaction.reply(entry
       ? {
-          embeds: [new MessageEmbed()
+          embeds: [new EmbedBuilder()
             .setColor(settings.colors.transparent)
             .setDescription(
               pupa(this.messages.associatedValue, { value: this._getMention(entry.name, entry.value) }),
@@ -211,7 +216,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
       allEntriesFilled.set(entry as ConfigEntries, { name, document: definedEntries.find(e => e.name === entry) });
 
     await new PaginatedContentMessageEmbed()
-      .setTemplate(new MessageEmbed().setTitle(this.messages.listTitle).setColor(settings.colors.default))
+      .setTemplate(new EmbedBuilder().setTitle(this.messages.listTitle).setColor(settings.colors.default))
       .setItems([...allEntriesFilled.entries()]
         .map(([entry, { name, document }]) => pupa(
           document ? this.messages.lineWithValue : this.messages.lineWithoutValue,
@@ -223,6 +228,6 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
   }
 
   private _getMention(entry: ConfigEntries, value: string): string {
-    return entry.startsWith('channel') ? Formatters.channelMention(value) : Formatters.roleMention(value);
+    return entry.startsWith('channel') ? channelMention(value) : roleMention(value);
   }
 }

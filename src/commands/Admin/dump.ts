@@ -1,10 +1,9 @@
-import { userMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { MessageLimits } from '@sapphire/discord-utilities';
 import { Resolvers } from '@sapphire/framework';
 import dayjs from 'dayjs';
 import type { GuildMember } from 'discord.js';
-import { Permissions } from 'discord.js';
+import { PermissionsBitField, userMention } from 'discord.js';
 import pupa from 'pupa';
 import { dump as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
@@ -75,7 +74,7 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
         .setDMPermission(false)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .addStringOption(
           option => option
             .setName(Options.Format)

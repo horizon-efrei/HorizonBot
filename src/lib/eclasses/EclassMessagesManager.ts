@@ -1,7 +1,7 @@
 import { container } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
-import type { GuildTextBasedChannel, MessageOptions, TextBasedChannel } from 'discord.js';
+import type { BaseMessageOptions, GuildTextBasedChannel, TextBasedChannel } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
 import messages from '@/config/messages';
@@ -19,7 +19,7 @@ import {
 async function updateMessage(
   message: GuildMessage,
   channel: GuildTextBasedChannel,
-  content: Omit<MessageOptions, 'flags'>,
+  content: Omit<BaseMessageOptions, 'flags'>,
 ): Promise<void> {
   const sendMessage = async (chan: TextBasedChannel): Promise<void> => void await chan.send(content)
     .then(async msg => msg.crosspostable && await msg.crosspost());

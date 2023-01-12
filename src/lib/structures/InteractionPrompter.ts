@@ -1,22 +1,22 @@
 import { Result } from '@sapphire/framework';
 import type {
   AwaitMessageCollectorOptionsParams,
-  BaseCommandInteraction,
+  BaseMessageOptions,
+  CommandInteraction,
+  ComponentType,
   MappedInteractionTypes,
   MessageComponentInteraction,
-  MessageOptions,
 } from 'discord.js';
-import type { MessageComponentTypes } from 'discord.js/typings/enums';
 import { nullop } from '@/utils';
 
 export default class InteractionPrompter {
   private _lastInteraction: MessageComponentInteraction;
 
   constructor(
-    public readonly interaction: BaseCommandInteraction,
+    public readonly interaction: CommandInteraction,
   ) {}
 
-  public async send(options: Pick<MessageOptions, 'attachments' | 'components' | 'content' | 'embeds'>): Promise<void> {
+  public async send(options: Pick<BaseMessageOptions, 'components' | 'content' | 'embeds' | 'files'>): Promise<void> {
     if (this._lastInteraction)
       await this._lastInteraction.update(options);
     else if (this.interaction.replied)
@@ -25,7 +25,7 @@ export default class InteractionPrompter {
       await this.interaction.reply(options);
   }
 
-  public async awaitMessageComponent<T extends MessageComponentTypes.BUTTON | MessageComponentTypes.SELECT_MENU>(
+  public async awaitMessageComponent<T extends ComponentType.Button | ComponentType.SelectMenu>(
     options?: AwaitMessageCollectorOptionsParams<T, true>,
   ): Promise<Result<MappedInteractionTypes[T], null>> {
     const interaction = await this.interaction.channel!.awaitMessageComponent({

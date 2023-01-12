@@ -1,6 +1,5 @@
-import { TimestampStyles } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
-import { Formatters, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, time as timeFormatter, TimestampStyles } from 'discord.js';
 import pupa from 'pupa';
 import { userInfo as config } from '@/config/commands/general';
 import settings from '@/config/settings';
@@ -43,7 +42,7 @@ export default class UserInfoCommand extends HorizonCommand<typeof config> {
         presenceDetails += pupa(embedConfig.presence.state, { activity });
 
       if (activity.timestamps?.start) {
-        const time = Formatters.time(activity.timestamps.start, TimestampStyles.RelativeTime);
+        const time = timeFormatter(activity.timestamps.start, TimestampStyles.RelativeTime);
         presenceDetails += pupa(embedConfig.presence.timestamps, { time });
       }
     }
@@ -56,11 +55,11 @@ export default class UserInfoCommand extends HorizonCommand<typeof config> {
     });
     const namesContent = pupa(embedConfig.names.content, { member });
     const createdContent = pupa(embedConfig.created.content, {
-      creation: Formatters.time(member.user.createdAt, Formatters.TimestampStyles.LongDateTime),
+      creation: timeFormatter(member.user.createdAt, TimestampStyles.LongDateTime),
     });
     const joinedContent = pupa(embedConfig.joined.content,
       member.joinedTimestamp
-        ? { joined: Formatters.time(new Date(member.joinedTimestamp), Formatters.TimestampStyles.LongDateTime) }
+        ? { joined: timeFormatter(new Date(member.joinedTimestamp), TimestampStyles.LongDateTime) }
         : { joined: embedConfig.joined.unknown });
     const rolesContent = member.roles.cache.size === 1
       ? embedConfig.roles.noRole
@@ -69,7 +68,7 @@ export default class UserInfoCommand extends HorizonCommand<typeof config> {
         roles: roles.join(', '),
       });
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(settings.colors.default)
       .setAuthor({ name: pupa(embedConfig.title, { member }) })
       .setThumbnail(member.user.displayAvatarURL())

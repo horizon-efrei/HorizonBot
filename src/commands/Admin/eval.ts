@@ -11,7 +11,7 @@ import { Stopwatch } from '@sapphire/stopwatch';
 import Type from '@sapphire/type';
 import { codeBlock, isThenable } from '@sapphire/utilities';
 import { ApplicationCommandType } from 'discord-api-types/v10';
-import { Permissions } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import pupa from 'pupa';
 import { evaluate as config } from '@/config/commands/admin';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -33,7 +33,7 @@ export default class EvalCommand extends HorizonCommand<typeof config> {
       command => command
         .setName(this.descriptions.name)
         .setType(ApplicationCommandType.Message)
-        .setDefaultMemberPermissions(Permissions.FLAGS.ADMINISTRATOR)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
         .setDMPermission(false),
     );
   }

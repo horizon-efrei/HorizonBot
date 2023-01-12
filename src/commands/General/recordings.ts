@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import groupBy from 'lodash.groupby';
 import pupa from 'pupa';
 import { recordings as config } from '@/config/commands/general';
@@ -40,7 +40,7 @@ export default class RecordingsCommand extends HorizonCommand<typeof config> {
       }))
       .slice(0, 25);
 
-    const paginator = new PaginatedMessage({ template: new MessageEmbed().setColor(settings.colors.default) })
+    const paginator = new PaginatedMessage({ template: new EmbedBuilder().setColor(settings.colors.default) })
       .setWrongUserInteractionReply(user => ({
         content: pupa(messages.errors.wrongUserInteractionReply, { user }),
         ephemeral: true,

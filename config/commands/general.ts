@@ -1,6 +1,8 @@
-import { channelMention, TimestampStyles, userMention } from '@discordjs/builders';
 import { stripIndent } from 'common-tags';
-import { Formatters } from 'discord.js';
+import {
+  ActivityType,
+ channelMention, Formatters, TimestampStyles, userMention,
+} from 'discord.js';
 import { timeFormat } from '@/utils';
 
 export const code = {
@@ -246,12 +248,12 @@ export const userInfo = {
           Statut : {status}
           {presenceDetails}`,
         types: {
-          PLAYING: 'Joue à {activity.name}\n',
-          STREAMING: 'Est en live\n',
-          LISTENING: 'Écoute (sur {activity.name}) :\n',
-          WATCHING: 'Regarde : {activity.name}\n',
-          CUSTOM: '{activity.name}\n',
-          COMPETING: 'En compétition ({activity.name})',
+          [ActivityType.Playing]: 'Joue à {activity.name}\n',
+          [ActivityType.Streaming]: 'Est en live\n',
+          [ActivityType.Listening]: 'Écoute (sur {activity.name}) :\n',
+          [ActivityType.Watching]: 'Regarde : {activity.name}\n',
+          [ActivityType.Custom]: '{activity.name}\n',
+          [ActivityType.Competing]: 'En compétition ({activity.name})',
         },
         details: '↳ {activity.details}\n',
         state: '↳ {activity.state}\n',

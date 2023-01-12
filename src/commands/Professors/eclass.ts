@@ -7,13 +7,15 @@ import { oneLine } from 'common-tags';
 import dayjs from 'dayjs';
 import type { CommandInteraction, GuildTextBasedChannel, ModalSubmitInteraction } from 'discord.js';
 import {
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
-  Modal,
-  TextInputComponent,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  EmbedBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from 'discord.js';
-import { MessageButtonStyles, MessageComponentTypes, TextInputStyles } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 
 import { eclass as config } from '@/config/commands/professors';
@@ -30,27 +32,27 @@ import type { SchoolYear } from '@/types';
 import { EclassPlace, EclassPopulatedDocument, EclassStatus } from '@/types/database';
 import { capitalize, nullop } from '@/utils';
 
-const yesButton = new MessageButton()
+const yesButton = new ButtonBuilder()
   .setCustomId('yes-button')
-  .setStyle(MessageButtonStyles.SUCCESS)
+  .setStyle(ButtonStyle.Success)
   .setLabel('Oui');
 
-const noButton = new MessageButton()
+const noButton = new ButtonBuilder()
   .setCustomId('no-button')
-  .setStyle(MessageButtonStyles.DANGER)
+  .setStyle(ButtonStyle.Danger)
   .setLabel('Non');
 
-const yesNoButtonsRow = new MessageActionRow().setComponents(noButton, yesButton);
+const yesNoButtonsRow = new ActionRowBuilder<ButtonBuilder>().setComponents(noButton, yesButton);
 
-const placeInformationModal = (place: Exclude<EclassPlace, EclassPlace.Discord>): Modal => new Modal()
+const placeInformationModal = (place: Exclude<EclassPlace, EclassPlace.Discord>): ModalBuilder => new ModalBuilder()
   .setTitle(config.messages.placeInformationModal.title)
   .setCustomId('place-information-modal')
   .addComponents(
-    new MessageActionRow<TextInputComponent>().addComponents(
-      new TextInputComponent()
+    new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder()
         .setLabel(config.messages.placeInformationModal.label[place])
         .setPlaceholder(config.messages.placeInformationModal.placeholder[place])
-        .setStyle(TextInputStyles.PARAGRAPH)
+        .setStyle(TextInputStyle.Paragraph)
         .setCustomId('place-information')
         .setRequired(true),
     ),
@@ -340,12 +342,17 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
   public async create(interaction: Interaction): Promise<void> {
     const rawSubject = interaction.options.getString(Options.Subject, true);
     const topic = interaction.options.getString(Options.Topic, true);
-    const professor = interaction.options.getMember(Options.Professor, true);
+    const professor = interaction.options.getMember(Options.Professor);
     const rawDuration = interaction.options.getString(Options.Duration, true);
     const rawDate = interaction.options.getString(Options.Date, true);
     const targetRole = interaction.options.getRole(Options.TargetRole, true);
     const place = interaction.options.getString(Options.Place, true) as EclassPlace;
     const isRecorded = interaction.options.getBoolean(Options.IsRecorded, true);
+
+    if (!professor) {
+      await interaction.reply({ content: this.messages.invalidProfessor, ephemeral: true });
+      return;
+    }
 
     const subject = await Subject.findOne({ classCode: rawSubject });
     if (!subject) {
@@ -619,7 +626,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     });
 
     const buttonInteraction = await interaction.channel!.awaitMessageComponent({
-      componentType: MessageComponentTypes.BUTTON,
+      componentType: ComponentType.Button,
       time: 30_000,
       filter: int => int.user.id === interaction.user.id && (int.customId === 'yes-button' || int.customId === 'no-button'),
     }).catch(nullop);
@@ -716,7 +723,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     };
 
     const texts = this.messages.showEmbed;
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(settings.colors.primary)
       .setTitle(pupa(texts.title, eclass.toJSON()))
       .addFields(
@@ -774,7 +781,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     // Change the ".every" to ".some" to have a "OR" between the filters, rather than "AND".
     const filteredClasses = eclasses.filter(eclass => filters.every(filter => filter(eclass)));
 
-    const baseEmbed = new MessageEmbed()
+    const baseEmbed = new EmbedBuilder()
       .setTitle(this.messages.listTitle)
       .setColor(settings.colors.default);
 

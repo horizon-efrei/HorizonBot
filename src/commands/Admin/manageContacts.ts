@@ -1,5 +1,5 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Permissions } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import { manageContacts as config } from '@/config/commands/admin';
 import Contact from '@/models/contact';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
@@ -37,7 +37,7 @@ export default class ManageContactsCommand extends HorizonSubcommand<typeof conf
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
         .setDMPermission(false)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .addSubcommand(
           subcommand => subcommand
             .setName('create')

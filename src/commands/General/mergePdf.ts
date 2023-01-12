@@ -1,8 +1,8 @@
-import type { SlashCommandAttachmentOption } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Resolvers } from '@sapphire/framework';
 import { filterNullAndUndefined } from '@sapphire/utilities';
 import axios from 'axios';
+import type { SlashCommandAttachmentOption } from 'discord.js';
 import PDFMerger from 'pdf-merger-js';
 import { mergePdf as config } from '@/config/commands/general';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';

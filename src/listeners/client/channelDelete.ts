@@ -1,4 +1,3 @@
-import { isDMChannel } from '@sapphire/discord.js-utilities';
 import { Listener } from '@sapphire/framework';
 import type { DMChannel, GuildChannel } from 'discord.js';
 import Configuration from '@/models/configuration';
@@ -6,7 +5,7 @@ import ReactionRole from '@/models/reactionRole';
 
 export default class ChannelDeleteListener extends Listener {
   public async run(channel: DMChannel | GuildChannel): Promise<void> {
-    if (isDMChannel(channel))
+    if (channel.isDMBased())
       return;
 
     const affectedReactionRoles = await ReactionRole.find({ channelId: channel.id });

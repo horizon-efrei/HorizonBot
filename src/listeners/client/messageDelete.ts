@@ -1,6 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
-import { User } from 'discord.js';
+import { AuditLogEvent, User } from 'discord.js';
 import pupa from 'pupa';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
@@ -16,7 +16,7 @@ export default class MessageDeleteListener extends Listener {
       return;
 
     if (!message.author.bot) {
-      const auditLogs = await message.guild.fetchAuditLogs({ type: 'MESSAGE_DELETE' }).catch(nullop);
+      const auditLogs = await message.guild.fetchAuditLogs({ type: AuditLogEvent.MessageDelete }).catch(nullop);
       // We can't filter by the message's id, the best we can do is filter by the channel id...
       const lastMessageDelete = auditLogs?.entries
         .filter(entry => entry.extra.channel.id === message.channel.id && entry.createdTimestamp > Date.now() - 2000)

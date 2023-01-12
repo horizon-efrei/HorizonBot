@@ -1,5 +1,5 @@
 import { container } from '@sapphire/framework';
-import { Formatters, MessageEmbed } from 'discord.js';
+import { EmbedBuilder, roleMention } from 'discord.js';
 import pupa from 'pupa';
 import messages from '@/config/messages';
 import DiscordLogs from '@/models/discordLogs';
@@ -35,7 +35,7 @@ export function getContentValue(payload: DiscordLogBase): string {
         content: {
           ...payload.content,
           roles: payload.content.roles.length > 0
-            ? listAndFormatter.format(payload.content.roles.map(Formatters.roleMention))
+            ? listAndFormatter.format(payload.content.roles.map(roleMention))
             : 'aucun',
           joinedAt: payload.content.joinedAt ? Math.round(payload.content.joinedAt / 1000) : null,
         },
@@ -44,7 +44,7 @@ export function getContentValue(payload: DiscordLogBase): string {
     case DiscordLogType.RoleRemove:
       return pupa(fieldTexts.contentValue, {
         ...payload,
-        content: listAndFormatter.format(payload.content.map(Formatters.roleMention)),
+        content: listAndFormatter.format(payload.content.map(roleMention)),
       });
     case DiscordLogType.InvitePost:
       return pupa(fieldTexts.contentValue, {
@@ -100,7 +100,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
   const fieldOptions = messages.logs.fields[payload.type];
   const contentValue = getContentValue(payload) ?? "Impossible de charger plus d'informations";
 
-  const embed = new MessageEmbed()
+  const embed = new EmbedBuilder()
     .setAuthor({ name: messages.logs.embedTitle })
     .setColor(fieldOptions.color)
     .setTitle(messages.logs.readableEvents[payload.type])

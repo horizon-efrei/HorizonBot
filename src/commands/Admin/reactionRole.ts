@@ -1,6 +1,4 @@
 /* eslint-disable max-lines */
-import type { SlashCommandRoleOption, SlashCommandStringOption } from '@discordjs/builders';
-import { roleMention } from '@discordjs/builders';
 import { ApplyOptions } from '@sapphire/decorators';
 import { EmbedLimits } from '@sapphire/discord-utilities';
 import { Resolvers, Result } from '@sapphire/framework';
@@ -11,16 +9,19 @@ import type {
   InteractionReplyOptions,
   NewsChannel,
   Role,
+  SlashCommandRoleOption,
+  SlashCommandStringOption,
   TextChannel,
 } from 'discord.js';
 import {
-  MessageActionRow,
-  MessageEmbed,
-  Modal,
-  Permissions,
-  TextInputComponent,
+  ActionRowBuilder,
+  EmbedBuilder,
+  ModalBuilder,
+  PermissionsBitField,
+  roleMention,
+  TextInputBuilder,
+  TextInputStyle,
 } from 'discord.js';
-import { TextInputStyles } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import { reactionRole as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
@@ -65,16 +66,16 @@ enum OptionRoleConditionChoiceChoices {
   Show = 'afficher',
 }
 
-const titleInput = new TextInputComponent()
-  .setStyle(TextInputStyles.SHORT)
+const titleInput = new TextInputBuilder()
+  .setStyle(TextInputStyle.Short)
   .setCustomId('title')
   .setLabel(config.messages.modals.titleLabel)
   .setMinLength(1)
   .setMaxLength(EmbedLimits.MaximumTitleLength)
   .setPlaceholder(config.messages.modals.titlePlaceholder);
 
-const descriptionInput = new TextInputComponent()
-  .setStyle(TextInputStyles.PARAGRAPH)
+const descriptionInput = new TextInputBuilder()
+  .setStyle(TextInputStyle.Paragraph)
   .setCustomId('description')
   .setLabel(config.messages.modals.descriptionLabel)
   .setPlaceholder(config.messages.modals.descriptionPlaceholder);
@@ -82,7 +83,7 @@ const descriptionInput = new TextInputComponent()
 const isUnique = (unique: boolean): string => config.messages[unique ? 'uniqueEnabled' : 'uniqueDisabled'];
 
 const getEmbed = (content: string): InteractionReplyOptions => ({
-  embeds: [new MessageEmbed().setColor(settings.colors.transparent).setDescription(content)],
+  embeds: [new EmbedBuilder().setColor(settings.colors.transparent).setDescription(content)],
 });
 
 const optionPairs = [
@@ -140,7 +141,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
         .setDMPermission(false)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .addSubcommand(
           subcommand => subcommand
             .setName('create')
@@ -327,11 +328,11 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       return;
     }
 
-    const createMenuModal = new Modal()
+    const createMenuModal = new ModalBuilder()
       .setTitle(this.messages.modals.createTitle)
       .setComponents(
-        new MessageActionRow<TextInputComponent>().addComponents(titleInput.setRequired(true)),
-        new MessageActionRow<TextInputComponent>().addComponents(descriptionInput),
+        new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput.setRequired(true)),
+        new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput),
       )
       .setCustomId('create-rr-modal');
 
@@ -350,7 +351,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     const title = submit.fields.getTextInputValue('title');
     const description = submit.fields.getTextInputValue('description');
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setTitle(title)
       .setDescription(description);
     const reactionRoleMessage = await channel.send({ embeds: [embed] });
@@ -400,7 +401,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       });
     }
 
-    const baseEmbed = new MessageEmbed()
+    const baseEmbed = new EmbedBuilder()
       .setTitle(pupa(this.messages.listTitle, { total: reactionRoles.length }))
       .setColor(settings.colors.default);
 
@@ -448,13 +449,13 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       interaction.options.getString(Options.Choice) ?? OptionEditChoiceChoices.TitleAndDescription
     ) as OptionEditChoiceChoices;
 
-    const components: Array<MessageActionRow<TextInputComponent>> = [];
+    const components: Array<ActionRowBuilder<TextInputBuilder>> = [];
     if (choice === OptionEditChoiceChoices.Title || choice === OptionEditChoiceChoices.TitleAndDescription)
-      components.push(new MessageActionRow<TextInputComponent>().addComponents(titleInput.setRequired(true)));
+      components.push(new ActionRowBuilder<TextInputBuilder>().addComponents(titleInput.setRequired(true)));
     if (choice === OptionEditChoiceChoices.Description || choice === OptionEditChoiceChoices.TitleAndDescription)
-      components.push(new MessageActionRow<TextInputComponent>().addComponents(descriptionInput.setRequired(true)));
+      components.push(new ActionRowBuilder<TextInputBuilder>().addComponents(descriptionInput.setRequired(true)));
 
-    const editMenuModal = new Modal()
+    const editMenuModal = new ModalBuilder()
       .setTitle(this.messages.modals.createTitle)
       .setComponents(...components)
       .setCustomId('edit-rr-modal');
@@ -469,7 +470,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       time: 900_000, // 15 minutes
     });
 
-    const embed = rrMessage.embeds[0];
+    const embed = EmbedBuilder.from(rrMessage.embeds[0]);
     try {
       embed.setTitle(submit.fields.getTextInputValue('title'));
     } catch { /* Ignored */ }

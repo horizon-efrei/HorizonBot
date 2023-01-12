@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { GuildLimits } from '@sapphire/discord-utilities';
-import { Permissions } from 'discord.js';
+import { PermissionsBitField } from 'discord.js';
 import pupa from 'pupa';
 import { limits as config } from '@/config/commands/admin';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -12,7 +12,7 @@ export default class LimitsCommand extends HorizonCommand<typeof config> {
       command => command
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .setDMPermission(false),
     );
   }

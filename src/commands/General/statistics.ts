@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import dayjs from 'dayjs';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
 import settings from '@/config/settings';
@@ -22,7 +22,7 @@ export default class StatisticsCommand extends HorizonCommand<typeof config> {
   public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
     const embedMessages = this.messages.embed;
     const commitHash = await getGitRev();
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(settings.colors.default)
       .setDescription(this.messages.embed.description)
       .addFields([

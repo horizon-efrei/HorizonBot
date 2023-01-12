@@ -1,5 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { BaseGuildVoiceChannel } from 'discord.js';
+import { ChannelType } from 'discord.js';
 import pupa from 'pupa';
 import { vocalCount as config } from '@/config/commands/general';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -17,7 +18,7 @@ export default class VocalCountCommand extends HorizonCommand<typeof config> {
 
   public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
     const voiceChannels = [...interaction.guild.channels.cache.values()]
-      .filter(chan => chan.isVoice() && chan.members.size > 0) as BaseGuildVoiceChannel[];
+      .filter(chan => chan.type === ChannelType.GuildVoice && chan.members.size > 0) as BaseGuildVoiceChannel[];
 
     if (voiceChannels.length === 0) {
       await interaction.reply({ content: this.messages.noOnlineMembers, ephemeral: true });

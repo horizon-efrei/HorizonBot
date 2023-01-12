@@ -1,5 +1,5 @@
-import { hideLinkEmbed, userMention } from '@discordjs/builders';
 import { stripIndent } from 'common-tags';
+import { hideLinkEmbed, userMention } from 'discord.js';
 import { LogStatuses } from '@/types/database';
 
 export const dump = {

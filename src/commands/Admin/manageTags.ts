@@ -1,11 +1,11 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import {
-  MessageActionRow,
-  Modal,
-  Permissions,
-  TextInputComponent,
+  ActionRowBuilder,
+  ModalBuilder,
+  PermissionsBitField,
+  TextInputBuilder,
+  TextInputStyle,
 } from 'discord.js';
-import { TextInputStyles } from 'discord.js/typings/enums';
 import pupa from 'pupa';
 import { manageTags as config } from '@/config/commands/admin';
 import Tags from '@/models/tags';
@@ -13,9 +13,9 @@ import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 
 const inOrWithout = (inEmbed: boolean): string => config.messages[inEmbed ? 'inEmbed' : 'withoutEmbed'];
 
-const tagContentComponents = new MessageActionRow<TextInputComponent>().addComponents(
-  new TextInputComponent()
-    .setStyle(TextInputStyles.PARAGRAPH)
+const tagContentComponents = new ActionRowBuilder<TextInputBuilder>().addComponents(
+  new TextInputBuilder()
+    .setStyle(TextInputStyle.Paragraph)
     .setCustomId('content')
     .setLabel(config.messages.modals.contentLabel)
     .setMinLength(1)
@@ -46,7 +46,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
       command => command
         .setName(this.descriptions.name)
         .setDescription(this.descriptions.command)
-        .setDefaultMemberPermissions(Permissions.FLAGS.MANAGE_GUILD)
+        .setDefaultMemberPermissions(PermissionsBitField.Flags.ManageGuild)
         .setDMPermission(false)
         .addSubcommand(
           subcommand => subcommand
@@ -132,7 +132,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
     const name = interaction.options.getString(Options.Name, true);
     const isEmbed = interaction.options.getBoolean(Options.InEmbed) ?? false;
 
-    const contentModal = new Modal()
+    const contentModal = new ModalBuilder()
       .setTitle(this.messages.modals.createTitle)
       .setComponents(tagContentComponents)
       .setCustomId('create-tag-modal');
@@ -162,7 +162,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
       return;
     }
 
-    const contentModal = new Modal()
+    const contentModal = new ModalBuilder()
       .setTitle(pupa(this.messages.modals.editTitle, tag))
       .addComponents(tagContentComponents)
       .setCustomId('edit-tag-modal');

@@ -1,11 +1,11 @@
+import { Identifiers } from '@sapphire/framework';
+import { stripIndent } from 'common-tags';
 import {
   channelMention,
   roleMention,
   TimestampStyles,
   userMention,
-} from '@discordjs/builders';
-import { Identifiers } from '@sapphire/framework';
-import { stripIndent } from 'common-tags';
+} from 'discord.js';
 import settings from '@/config/settings';
 import { DiscordLogType, LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
