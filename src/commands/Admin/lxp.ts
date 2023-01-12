@@ -1,5 +1,4 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { stripIndent } from 'common-tags';
 import { Permissions } from 'discord.js';
 import pupa from 'pupa';
 import { lxp as config } from '@/config/commands/admin';
@@ -31,12 +30,12 @@ export default class LxpCommand extends HorizonCommand<typeof config> {
     const result = await Eclass.aggregate<AggregatedEclass>([
       {
         $match: {
-          date: { $gte: firstDate.unix() * 1000 },
+          date: { $gte: firstDate.toDate() },
           status: { $ne: EclassStatus.Canceled },
         },
       }, {
         $group: {
-          _id: '$professor',
+          _id: '$professorId',
           time: {
             $sum: { $divide: ['$duration', 60 * 60 * 1000] },
           },
@@ -51,9 +50,11 @@ export default class LxpCommand extends HorizonCommand<typeof config> {
       return;
     }
 
-    await interaction.reply(stripIndent`
-      ${pupa(this.messages.summary, { firstDay })}
-      ${result.map(({ _id, time }) => pupa(this.messages.summaryLine, { prof: _id, time: time.toFixed(1) }))}
-    `);
+    await interaction.reply(
+      pupa(this.messages.summary, { firstDay })
+      + result
+        .map(({ _id, time }) => pupa(this.messages.summaryLine, { prof: _id, time: time.toFixed(1) }))
+        .join(',\n'),
+    );
   }
 }

@@ -82,7 +82,7 @@ export const lxp = {
   },
   messages: {
     summary: 'Liste des heures de cours données par les eProfs durant le semestre actuel (depuis le {firstDay}) :',
-    summaryLine: `    • ${userMention('{prof}')} : {time} heures\n`,
+    summaryLine: `    • ${userMention('{prof}')} : {time} heures`,
     noEclasses: "Aucun cours n'a été donné durant le semestre actuel (depuis le {firstDay}).",
   },
 } as const;
