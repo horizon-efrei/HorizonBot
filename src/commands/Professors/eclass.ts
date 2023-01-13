@@ -413,6 +413,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       }
     }
 
+    await answerTo.deferReply();
+
     const result = await EclassManager.createClass(answerTo, {
       subject,
       topic,
@@ -426,11 +428,11 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     });
 
     if (result.isErr()) {
-      await answerTo.reply({ content: result.unwrapErr(), ephemeral: true });
+      await answerTo.followUp({ content: result.unwrapErr() });
       return;
     }
 
-    await answerTo.reply(pupa(config.messages.successfullyCreated, { eclass: result.unwrap() }));
+    await answerTo.followUp(pupa(config.messages.successfullyCreated, { eclass: result.unwrap() }));
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
