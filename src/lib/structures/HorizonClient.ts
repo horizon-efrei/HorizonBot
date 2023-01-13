@@ -35,16 +35,17 @@ export default class HorizonClient extends SapphireClient {
       },
       loadDefaultErrorListeners: true,
       intents: [
-        GatewayIntentBits.GuildPresences, // Access to member's presence for /userinfo.
-        GatewayIntentBits.DirectMessages, // Access to Direct Messages.
         GatewayIntentBits.DirectMessageReactions, // Access to MessageReactionAdd/Remove events in DMs.
+        GatewayIntentBits.DirectMessages, // Access to Direct Messages.
         GatewayIntentBits.GuildEmojisAndStickers, // Access to EmojiDelete events.
         GatewayIntentBits.GuildInvites, // Access to InviteCreate events.
         GatewayIntentBits.GuildMembers, // Access to GuildMemberAdd/Update/Remove events.
         GatewayIntentBits.GuildMessageReactions, // Access to MessageReactionAdd/Remove events.
         GatewayIntentBits.GuildMessages, // Access to MessageCreate/Update/Delete events.
-        GatewayIntentBits.GuildVoiceStates, // Access to VoiceStateUpdate events.
+        GatewayIntentBits.GuildPresences, // Access to member's presence for /userinfo.
         GatewayIntentBits.Guilds, // Access to Guilds, Channels, Threads, Roles events.
+        GatewayIntentBits.GuildVoiceStates, // Access to VoiceStateUpdate events.
+        GatewayIntentBits.MessageContent, // Access to message.content.
       ],
       partials: [Partials.Channel],
     });
