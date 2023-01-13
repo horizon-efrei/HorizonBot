@@ -57,7 +57,9 @@ export function getContentValue(payload: DiscordLogBase): string {
     case DiscordLogType.MessageRemove:
       return pupa(fieldTexts.contentValue, {
         ...payload,
-        content: trimText(typeof payload.content === 'string' ? payload.content : payload.content.after),
+        content: typeof payload.content === 'string'
+          ? trimText(payload.content)
+          : { before: trimText(payload.content.before, 400), after: trimText(payload.content.after, 400) },
         url: getMessageUrl(payload),
       });
     case DiscordLogType.ReactionAdd:

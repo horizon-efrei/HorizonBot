@@ -115,7 +115,10 @@ export default {
         contentName: ':pencil: Message',
         contentValue: stripIndent`
           [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
-          Contenu : {content}
+          Contenu : \`\`\`diff
+          - {content.before}
+          + {content.after}
+          \`\`\`
         `,
       },
       [DiscordLogType.MessagePost]: {
