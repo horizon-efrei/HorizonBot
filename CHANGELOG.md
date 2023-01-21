@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.3.0] - 2023/01/21
+
+### Added
+
+- Add before/after for message editing logs (fixes #74)
+
+### Fixed
+
+- Fix crash by defering confirmation reply in eclass creation
+
+### Improved
+
+- Add `Intent.MessageContent` to subscribed's intents
+- Upgraded to Discord.js 14 and Sapphire 4, and removed discord-api-types
+
+
 ## [1.2.5] - 2023/01/12
 
 ### Fixed
