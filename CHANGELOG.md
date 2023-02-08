@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.3.1] - 2023/02/08
+
+### Fixed
+
+- Fix eclass subscription by using the correct field in the query
+- Fix ConfigurationManager's caching logic by checking for all different types of channel types
+
+### Improved
+
+- Remove nonsensical copy-pasted code when caching eclass messages
+
+
 ## [1.3.0] - 2023/01/21
 
 ### Added
