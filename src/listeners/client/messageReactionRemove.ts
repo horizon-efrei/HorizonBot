@@ -86,7 +86,7 @@ export default class MessageReactionRemoveListener extends Listener {
     member: GuildMember,
     message: GuildMessage,
   ): Promise<void> {
-    const document = await Eclass.findOne({ announcementMessage: message.id });
+    const document = await Eclass.findOne({ announcementMessageId: message.id });
     if (document?.subscriberIds.includes(member.id))
       await EclassManager.unsubscribeMember(member, document);
   }

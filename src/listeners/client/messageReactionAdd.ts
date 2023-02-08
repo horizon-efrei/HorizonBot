@@ -98,7 +98,7 @@ export default class MessageReactionAddListener extends Listener {
     member: GuildMember,
     message: GuildMessage,
   ): Promise<void> {
-    const document = await Eclass.findOne({ announcementMessage: message.id });
+    const document = await Eclass.findOne({ announcementMessageId: message.id });
     if (!document) {
       this.container.client.eclassRolesIds.delete(message.id);
       return;
