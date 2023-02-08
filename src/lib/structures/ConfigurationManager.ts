@@ -85,7 +85,13 @@ export default class ConfigurationManager {
       return;
 
     const resolved = guild.channels.resolve(value) ?? guild.roles.resolve(value);
-    if (resolved instanceof Role || (resolved instanceof GuildChannel && resolved.type === ChannelType.GuildText))
+    if (resolved instanceof GuildChannel
+      && (resolved.type === ChannelType.GuildAnnouncement
+        || resolved.type === ChannelType.GuildText
+        || resolved.type === ChannelType.GuildVoice))
+      return resolved;
+
+    if (resolved instanceof Role)
       return resolved;
   }
 }
