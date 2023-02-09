@@ -1,5 +1,5 @@
 import { stripIndent } from 'common-tags';
-import { hideLinkEmbed, userMention } from 'discord.js';
+import { hideLinkEmbed, RESTJSONErrorCodes, userMention } from 'discord.js';
 import { LogStatuses } from '@/types/database';
 
 export const dump = {
@@ -164,6 +164,32 @@ export const manageTags = {
     editedTagEmbed: 'Ce tag sera maintenant affiché {inOrWithout} embed !',
     inEmbed: 'dans un',
     withoutEmbed: 'sans',
+  },
+} as const;
+
+export const purge = {
+  descriptions: {
+    name: 'purge',
+    command: 'Supprimer des messages en masse, avec diverses options de filtre.',
+    options: {
+      amount: 'Nombre de messages à supprimer.',
+      fromUser: 'Utilisateur dont les messages doivent être supprimés.',
+      includes: 'Supprimer uniquement les messages contenant ceci.',
+      withFiles: 'Supprimer uniquement les messages contenant des fichiers.',
+      withLinks: 'Supprimer uniquement les messages contenant des liens.',
+      withInvites: "Supprimer uniquement les messages contenant des liens d'invitations Discord.",
+      fromMe: 'Supprimer uniquement les messages envoyés par moi.',
+      fromBot: 'Supprimer uniquement les messages envoyés par un bot.',
+      fromHuman: 'Supprimer uniquement les messages envoyés par un humain.',
+    },
+  },
+  messages: {
+    noMatchFound: "Aucun message correspondant à ces critères n'a été trouvé.",
+    singularSuccess: 'Un message a bien été supprimé !',
+    pluralSuccess: '{total} messages ont bien été supprimés !',
+    errors: {
+      [RESTJSONErrorCodes.OneOfTheMessagesProvidedWasTooOldForBulkDelete]: 'Impossible de supprimer des messages plus vieux de 14 jours.',
+    },
   },
 } as const;
 

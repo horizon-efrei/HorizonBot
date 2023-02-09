@@ -1,3 +1,4 @@
+export { default as andMix } from './andMix';
 export { default as capitalize } from './capitalize';
 export { default as convertSize } from './convertSize';
 export { default as extractCodeBlocks } from './extractCodeBlocks';
