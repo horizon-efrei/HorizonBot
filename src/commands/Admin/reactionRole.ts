@@ -379,6 +379,8 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       return;
     }
 
+    await interaction.deferReply();
+
     const items: Array<{
       condition: string | null;
       title: string;

@@ -686,17 +686,21 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
 
     switch (action) {
       case OptionRecordChoiceChoices.Add: {
+        await interaction.deferReply();
+
         const silent = interaction.options.getBoolean(Options.Silent) ?? false;
 
         // Change the URL & confirm
         await EclassManager.addRecordLink(eclass, link!.unwrap().toString(), silent);
-        await interaction.reply(this.messages.successfullyAddedLink);
+        await interaction.followUp(this.messages.successfullyAddedLink);
         break;
       }
       case OptionRecordChoiceChoices.Remove:
+        await interaction.deferReply();
+
         // Change the URL & confirm
         await EclassManager.removeRecordLink(eclass, link!.unwrap().toString());
-        await interaction.reply(this.messages.successfullyRemovedLink);
+        await interaction.followUp(this.messages.successfullyRemovedLink);
         break;
       case OptionRecordChoiceChoices.Show:
         // Show the current URL if any

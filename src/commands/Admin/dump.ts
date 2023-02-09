@@ -151,6 +151,8 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
 
   // eslint-disable-next-line complexity
   public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
+    await interaction.deferReply({ ephemeral: interaction.options.getBoolean(Options.Private) ?? false });
+
     let members = await interaction.guild.members.fetch();
 
     // Keeps members who have at least one of the specified roles
@@ -199,7 +201,7 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
             const reactionners = await reaction.users.fetch();
             members = members.filter(member => reactionners.has(member.id));
           } else {
-            await interaction.reply({ content: this.messages.noMatchFound, ephemeral: true });
+            await interaction.followUp({ content: this.messages.noMatchFound });
             return;
           }
         }
@@ -252,7 +254,7 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
       formattedMembers = formattedMembers.map((member, i) => `${i + 1}. ${member}`);
 
     if (formattedMembers.length === 0) {
-      await interaction.reply({ content: this.messages.noMatchFound, ephemeral: true });
+      await interaction.followUp({ content: this.messages.noMatchFound });
       return;
     }
 
@@ -264,9 +266,6 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
       ? { files: [{ attachment: Buffer.from(output), name: 'dump.txt' }] }
       : { content: output };
 
-    await interaction.reply({
-      ...payload,
-      ephemeral: interaction.options.getBoolean(Options.Private) ?? false,
-    });
+    await interaction.followUp(payload);
   }
 }
