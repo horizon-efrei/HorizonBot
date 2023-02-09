@@ -29,7 +29,12 @@ import * as CustomResolvers from '@/resolvers';
 import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import type { SchoolYear } from '@/types';
-import { EclassPlace, EclassPopulatedDocument, EclassStatus } from '@/types/database';
+import {
+  EclassPlace,
+  EclassPopulatedDocument,
+  EclassStatus,
+  EclassStep,
+} from '@/types/database';
 import { capitalize, nullop } from '@/utils';
 
 const yesButton = new ButtonBuilder()
@@ -518,8 +523,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
         return;
       }
 
-      if (eclass.reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
-        eclass.reminded = false;
+      if (eclass.step === EclassStep.Reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
+        eclass.step = EclassStep.None;
     }
 
     if (place) {

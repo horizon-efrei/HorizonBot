@@ -55,6 +55,13 @@ export enum EclassStatus {
   Canceled,
 }
 
+/** Enum for the eclass' current steps */
+export enum EclassStep {
+  None = 'none',
+  Reminded = 'reminded',
+  CleanedUp = 'cleaned-up',
+}
+
 /** Enum for the eclass' place */
 export enum EclassPlace {
   Discord = 'discord',
@@ -80,7 +87,7 @@ export interface EclassBase {
   announcementChannelId: ConfigEntriesChannels;
   announcementMessageId: string;
   status: EclassStatus;
-  reminded: boolean;
+  step: EclassStep;
   subscriberIds: string[];
   isRecorded: boolean;
   recordLinks: string[];

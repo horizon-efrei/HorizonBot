@@ -19,8 +19,11 @@ export default {
     roleIntersectionExpiration: 2 * 24 * 60 * 60 * 1000, // 2 days
     dateFormat: 'DD/MM [à] HH:mm',
     dayFormat: 'DD/MM/YYYY',
+    shortDayFormat: 'DD/MM',
     eclassRoleFormat: 'Cours {subject.classCode}: {topic} ({formattedDate})',
+    eclassRoleFormatFinished: '[Terminé le {formattedDate}] Cours {subject.classCode}: {topic}',
     eclassReminderTime: 15 * 60 * 1000, // 15 minutes
+    eclassRoleExpiration: 7 * 24 * 60 * 60 * 1000, // 7 days
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',

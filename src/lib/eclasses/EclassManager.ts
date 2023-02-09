@@ -17,10 +17,11 @@ import type { EclassCreationOptions, EclassEmbedOptions } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import {
-  ConfigEntriesChannels,
+ ConfigEntriesChannels,
   ConfigEntriesRoles,
   EclassPlace,
   EclassStatus,
+  EclassStep,
 } from '@/types/database';
 import {
   massSend,
@@ -82,6 +83,13 @@ export function getRoleNameForClass(
   const baseRoleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic: '{topic}', formattedDate });
   const remainingLength = RoleLimits.MaximumNameLength - baseRoleName.length + '{topic}'.length;
   return pupa(baseRoleName, { topic: trimText(topic, remainingLength) });
+}
+
+export function getRoleNameForFinishedClass(eclass: EclassPopulatedDocument): string {
+  const formattedDate = dayjs(eclass.end).format(settings.configuration.shortDayFormat);
+  const baseRoleName = pupa(settings.configuration.eclassRoleFormatFinished, { subject: eclass.subject, topic: '{topic}', formattedDate });
+  const remainingLength = RoleLimits.MaximumNameLength - baseRoleName.length + '{topic}'.length;
+  return pupa(baseRoleName, { topic: trimText(eclass.topic, remainingLength) });
 }
 
 export async function createClass(
@@ -265,11 +273,11 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
   }
   await announcementMessage.edit({ embeds: [announcementEmbed] });
 
-  // Remove the associated role
+  // Rename the associated role
   await container.client
     .guilds.cache.get(eclass.guildId)
     ?.roles.cache.get(eclass.classRoleId)
-    ?.delete('Class finished');
+    ?.setName(getRoleNameForFinishedClass(eclass));
 
   // Mark the class as finished
   await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
@@ -278,6 +286,18 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
   await EclassMessagesManager.updateUpcomingClassesForGuild(eclass.guildId);
 
   container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
+}
+
+export async function cleanupClass(eclass: EclassPopulatedDocument): Promise<void> {
+  // Remove the associated role
+  await container.client
+    .guilds.cache.get(eclass.guildId)
+    ?.roles.cache.get(eclass.classRoleId)
+    ?.delete('Class finished');
+
+  await Eclass.findByIdAndUpdate(eclass._id, { step: EclassStep.CleanedUp });
+
+  container.logger.debug(`[e-class:${eclass.classId}] Cleaned up class.`);
 }
 
 export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
@@ -399,7 +419,7 @@ export async function removeRecordLink(eclass: EclassPopulatedDocument, recordLi
 
 export async function remindClass(eclass: EclassPopulatedDocument): Promise<void> {
   // Mark the reminder as sent
-  await Eclass.findByIdAndUpdate(eclass._id, { reminded: true });
+  await Eclass.findByIdAndUpdate(eclass._id, { step: EclassStep.Reminded });
 
   // Resolve the associated channel
   const guild = container.client.guilds.resolve(eclass.guildId);

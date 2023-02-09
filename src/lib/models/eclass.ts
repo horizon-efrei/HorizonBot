@@ -7,7 +7,12 @@ import { customAlphabet, urlAlphabet } from 'nanoid';
 import slug from 'slug';
 import { eclass as eclassConfig } from '@/config/commands/professors';
 import type { EclassDocument, EclassModel } from '@/types/database';
-import { ConfigEntriesChannels, EclassPlace, EclassStatus } from '@/types/database';
+import {
+  ConfigEntriesChannels,
+  EclassPlace,
+  EclassStatus,
+  EclassStep,
+} from '@/types/database';
 import { makeMessageLink } from '@/utils';
 
 const nanoid = customAlphabet(urlAlphabet.replace(/[_-]/, ''), 4);
@@ -80,9 +85,10 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     default: EclassStatus.Planned,
     enum: EclassStatus,
   },
-  reminded: {
-    type: Boolean,
-    default: false,
+  step: {
+    type: String,
+    default: EclassStep.None,
+    enum: EclassStep,
   },
   subscriberIds: [String],
   isRecorded: {
