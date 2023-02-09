@@ -41,6 +41,8 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
   public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
     const isPersistent = interaction.options.getBoolean(Options.Persistent);
 
+    await interaction.deferReply();
+
     const allRoles = [
       interaction.options.getRole(Options.Role1, true),
       interaction.options.getRole(Options.Role2, true),
@@ -54,10 +56,7 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
       .filter(member => allRoles.every(role => member.roles.cache.has(role.id)));
 
     if (targetedMembers.size === 0) {
-      await interaction.reply({
-        content: pupa(this.messages.noTargetedUsers, { num: allRoles.length }),
-        ephemeral: true,
-      });
+      await interaction.followUp({ content: pupa(this.messages.noTargetedUsers, { num: allRoles.length }) });
       return;
     }
 
@@ -71,14 +70,14 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
     for (const member of targetedMembers.values())
       await member.roles.add(newRole);
 
-    await interaction.reply(
+    if (!isPersistent)
+      this.container.client.roleIntersections.add(newRole.id);
+
+    await interaction.followUp(
       pupa(
         isPersistent ? this.messages.successPersistent : this.messages.successTemporary,
         { newRole, targetedMembers },
       ),
     );
-
-    if (!isPersistent)
-      this.container.client.roleIntersections.add(newRole.id);
   }
 }
