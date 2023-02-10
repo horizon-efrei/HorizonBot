@@ -2,7 +2,7 @@ import { container } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import dayjs from 'dayjs';
 import type { BaseMessageOptions, GuildTextBasedChannel, TextBasedChannel } from 'discord.js';
-import groupBy from 'lodash.groupby';
+import { groupBy } from 'lodash';
 import pupa from 'pupa';
 import messages from '@/config/messages';
 import Eclass from '@/models/eclass';

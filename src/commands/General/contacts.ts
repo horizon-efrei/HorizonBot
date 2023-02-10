@@ -1,7 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { EmbedBuilder } from 'discord.js';
-import groupBy from 'lodash.groupby';
+import { groupBy } from 'lodash';
 import pupa from 'pupa';
 import { contacts as config } from '@/config/commands/general';
 import messages from '@/config/messages';

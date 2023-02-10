@@ -38,7 +38,7 @@
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "fuzzy-search": "^3.2.1",
-    "lodash.groupby": "^4.6.0",
+    "lodash": "^4.17.21",
     "marked": "^4.2.5",
     "module-alias": "^2.2.2",
     "mongoose": "^6.8.3",
@@ -57,7 +57,7 @@
   "devDependencies": {
     "@types/common-tags": "^1.8.1",
     "@types/fuzzy-search": "^2.1.2",
-    "@types/lodash.groupby": "^4.6.7",
+    "@types/lodash": "^4.14.191",
     "@types/marked": "^4.0.8",
     "@types/node": "^18.11.18",
     "@types/node-cron": "^3.0.7",
