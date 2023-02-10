@@ -2,7 +2,7 @@ import { Listener } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import type { VoiceState } from 'discord.js';
 import { ChannelType } from 'discord.js';
-import * as DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
 export default class VoiceStateUpdateListener extends Listener {

@@ -3,7 +3,7 @@ import { filterNullAndUndefined } from '@sapphire/utilities';
 import type { Message } from 'discord.js';
 import settings from '@/config/settings';
 import RoleIntersections from '@/models/roleIntersections';
-import * as DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
 export default class MessageListener extends Listener {
@@ -11,21 +11,17 @@ export default class MessageListener extends Listener {
     if (message.author.bot
       || message.partial
       || message.channel.partial
-      || message.system)
+      || message.system
+      || !message.inGuild())
       return;
 
-    if (message.inGuild()) {
-      await DiscordLogManager.logAction({
-        type: DiscordLogType.MessagePost,
-        context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
-        content: message.content,
-        guildId: message.guild.id,
-        severity: 1,
-      });
-    }
-
-    if (!message.inGuild())
-      return;
+    await DiscordLogManager.logAction({
+      type: DiscordLogType.MessagePost,
+      context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
+      content: message.content,
+      guildId: message.guild.id,
+      severity: 1,
+    });
 
     const invites = message.content.matchAll(new RegExp(settings.configuration.discordInviteLinkRegex, 'gi'));
     const foreignInvites = [...invites]

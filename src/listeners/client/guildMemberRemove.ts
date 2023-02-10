@@ -1,6 +1,6 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
-import * as DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
 export default class GuildMemberRemoveListener extends Listener {

@@ -12,11 +12,11 @@ import {
   StringSelectMenuBuilder,
 } from 'discord.js';
 import pupa from 'pupa';
-import InteractionPrompter from '@/app/lib/structures/InteractionPrompter';
-import type { CodeLanguageResult } from '@/app/lib/types';
 import { code as config } from '@/config/commands/general';
 import settings from '@/config/settings';
+import InteractionPrompter from '@/structures/InteractionPrompter';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
+import type { CodeLanguageResult } from '@/types';
 import { convertSize, extractCodeBlocks, trimText } from '@/utils';
 
 const wraps = {

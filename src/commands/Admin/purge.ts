@@ -9,10 +9,10 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { Result } from '@sapphire/framework';
 import { PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
 import pupa from 'pupa';
-import type { GuildMessage } from '@/app/lib/types';
 import { purge as config } from '@/config/commands/admin';
 import settings from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
+import type { GuildMessage } from '@/types';
 import { andMix } from '@/utils';
 
 enum Options {

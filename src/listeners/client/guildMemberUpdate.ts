@@ -1,7 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 import { AuditLogEvent } from 'discord.js';
-import * as DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 

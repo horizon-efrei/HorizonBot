@@ -2,12 +2,12 @@ import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { User } from 'discord.js';
 import pupa from 'pupa';
-import type { GuildMessage } from '@/app/lib/types';
-import { noop } from '@/app/lib/utils';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
-import * as DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
+import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
+import { noop } from '@/utils';
 
 export default class MessageUpdateListener extends Listener {
   public async run(oldMessage: Message, newMessage: Message): Promise<void> {

@@ -4,7 +4,7 @@ import settings from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
 import Eclass from '@/models/eclass';
 import ReactionRole from '@/models/reactionRole';
-import * as DiscordLogManager from '@/structures/DiscordLogManager';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
 import { noop, nullop } from '@/utils';
