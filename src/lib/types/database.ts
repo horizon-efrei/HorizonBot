@@ -1,4 +1,10 @@
-import type { GuildMember, GuildTextBasedChannel, Role } from 'discord.js';
+import type {
+  ChannelType,
+  GuildMember,
+  GuildTextBasedChannel,
+  OverwriteType,
+  Role,
+} from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
 import type { SchoolYear, TeachingUnit } from '@/types';
 
@@ -257,6 +263,9 @@ export enum DiscordLogType {
   VoiceJoin,
   VoiceLeave,
   VoiceMove,
+  ChannelCreate,
+  ChannelUpdate,
+  ChannelRemove,
 }
 
 export interface GuildLeaveUserSnapshot {
@@ -277,7 +286,7 @@ interface ExecutorAndAuthorMessageReference extends AuthorMessageReference {
   executorId: string;
 }
 
-interface BeforeAfter<T = string> {
+interface BeforeAfter<T> {
   before: T;
   after: T;
 }
@@ -287,21 +296,46 @@ interface ActionReference {
   executorId: string | undefined;
 }
 
+export interface ChannelSnapshot {
+  id: string;
+  flags: number;
+  name: string;
+  parentId: string | null;
+  permissionOverwrites: Record<string, {
+    id: string;
+    type: OverwriteType;
+    allow: `${bigint}`;
+    deny: `${bigint}`;
+  }>;
+  permissionsLocked: boolean | null;
+  position: number;
+  type: Exclude<ChannelType, ChannelType.DM | ChannelType.GroupDM>;
+}
+
+type UserId = string;
+type ChannelId = string;
+
 /** Type for the "Discord Logs"'s mongoose schema */
 export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
   & (
     // Context is user id, content is the nickname before and after
-    | { type: DiscordLogType.ChangeNickname; context: ActionReference; content: BeforeAfter }
+    | { type: DiscordLogType.ChangeNickname; context: ActionReference; content: BeforeAfter<string> }
     // Context is user id, content is the username before and after
-    | { type: DiscordLogType.ChangeUsername; context: string; content: BeforeAfter }
+    | { type: DiscordLogType.ChangeUsername; context: UserId; content: BeforeAfter<string> }
+    // Context is channel id, content is the channel snapshot
+    | { type: DiscordLogType.ChannelCreate; context: ChannelId; content: ChannelSnapshot }
+    // Context is channel id, content is the channel snapshot
+    | { type: DiscordLogType.ChannelRemove; context: ChannelId; content: ChannelSnapshot }
+    // Context is channel id, content is the channel snapshot
+    | { type: DiscordLogType.ChannelUpdate; context: ChannelId; content: BeforeAfter<ChannelSnapshot> }
     // Context is user id, content is list of possible invite-code used
-    | { type: DiscordLogType.GuildJoin; context: string; content: string[] }
+    | { type: DiscordLogType.GuildJoin; context: UserId; content: string[] }
     // Context is user id, content is a snapshot of the user
-    | { type: DiscordLogType.GuildLeave; context: string; content: GuildLeaveUserSnapshot }
+    | { type: DiscordLogType.GuildLeave; context: UserId; content: GuildLeaveUserSnapshot }
     // Context is a AuthorMessageReference, content is a list of linked invites
     | { type: DiscordLogType.InvitePost; context: AuthorMessageReference; content: string[] }
     // Context is a AuthorMessageReference, content is the message content before and after
-    | { type: DiscordLogType.MessageEdit; context: AuthorMessageReference; content: BeforeAfter }
+    | { type: DiscordLogType.MessageEdit; context: AuthorMessageReference; content: BeforeAfter<string> }
     // Context is a AuthorMessageReference, content is the new message content
     | { type: DiscordLogType.MessagePost; context: AuthorMessageReference; content: string }
     // Context is a ExecutorAndAuthorMessageReference, content is the message content
@@ -315,11 +349,11 @@ export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
     // Context is ActionReference, content is the roles id
     | { type: DiscordLogType.RoleRemove; context: ActionReference; content: string[] }
     // Context is user id, content is the channel id
-    | { type: DiscordLogType.VoiceJoin; context: string; content: string }
+    | { type: DiscordLogType.VoiceJoin; context: UserId; content: ChannelId }
     // Context is user id, content is the channel id
-    | { type: DiscordLogType.VoiceLeave; context: string; content: string }
+    | { type: DiscordLogType.VoiceLeave; context: UserId; content: ChannelId }
     // Context is user id, content is the channel id before and after
-    | { type: DiscordLogType.VoiceMove; context: string; content: BeforeAfter }
+    | { type: DiscordLogType.VoiceMove; context: UserId; content: BeforeAfter<ChannelId> }
   );
 
 /** Simplified interface for the "Discord Logs"'s mongoose schema */
@@ -328,7 +362,13 @@ interface SimpleDiscordLogBase {
   guildId: string;
   type: DiscordLogType;
   context: ActionReference | AuthorMessageReference | ExecutorAndAuthorMessageReference | string;
-  content: BeforeAfter | GuildLeaveUserSnapshot | string[] | string;
+  content:
+    | BeforeAfter<ChannelSnapshot>
+    | BeforeAfter<string>
+    | ChannelSnapshot
+    | GuildLeaveUserSnapshot
+    | string[]
+    | string;
 }
 
 /** Simplified interface for the "Discord Logs"'s mongoose document */

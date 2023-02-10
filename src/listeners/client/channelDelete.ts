@@ -2,11 +2,22 @@ import { Listener } from '@sapphire/framework';
 import type { DMChannel, GuildChannel } from 'discord.js';
 import Configuration from '@/models/configuration';
 import ReactionRole from '@/models/reactionRole';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
+import { getContentForChannel } from '@/structures/logs/logChannelHelpers';
+import { DiscordLogType } from '@/types/database';
 
 export default class ChannelDeleteListener extends Listener {
   public async run(channel: DMChannel | GuildChannel): Promise<void> {
     if (channel.isDMBased())
       return;
+
+    await DiscordLogManager.logAction({
+      type: DiscordLogType.ChannelRemove,
+      context: channel.id,
+      content: getContentForChannel(channel),
+      guildId: channel.guild.id,
+      severity: 1,
+    });
 
     const affectedReactionRoles = await ReactionRole.find({ channelId: channel.id });
     if (affectedReactionRoles.length > 0) {

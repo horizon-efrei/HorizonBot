@@ -27,6 +27,9 @@ export default {
     readableEvents: {
       [DiscordLogType.ChangeNickname]: ':label: Changement de surnom',
       [DiscordLogType.ChangeUsername]: ':label: Changement de pseudo',
+      [DiscordLogType.ChannelCreate]: ":couch: Création d'un salon",
+      [DiscordLogType.ChannelUpdate]: ":couch: Modification d'un salon",
+      [DiscordLogType.ChannelRemove]: ":couch: Suppression d'un salon",
       [DiscordLogType.GuildJoin]: ':green_heart: Membre rejoint le serveur',
       [DiscordLogType.GuildLeave]: ':broken_heart: Membre quitte le serveur',
       [DiscordLogType.InvitePost]: ':link: Invitation Discord externe postée',
@@ -44,6 +47,9 @@ export default {
     simplifiedReadableEvents: {
       [DiscordLogType.ChangeNickname]: 'changement de surnom',
       [DiscordLogType.ChangeUsername]: 'changement de pseudo',
+      [DiscordLogType.ChannelCreate]: "création d'un salon",
+      [DiscordLogType.ChannelUpdate]: "modification d'un salon",
+      [DiscordLogType.ChannelRemove]: "suppression d'un salon",
       [DiscordLogType.GuildJoin]: 'membre rejoint le serveur',
       [DiscordLogType.GuildLeave]: 'membre quitte le serveur',
       [DiscordLogType.InvitePost]: 'invitation Discord postée',
@@ -79,6 +85,47 @@ export default {
         contextValue: userMention('{context}'),
         contentName: ':label: Nouveau pseudo',
         contentValue: '```diff\n- {content.before}\n+ {content.after}```',
+      },
+      [DiscordLogType.ChannelCreate]: {
+        color: settings.colors.green,
+        contextName: ':bust_in_silhouette: Salon',
+        contextValue: channelMention('{context}'),
+        contentName: ':information_source: Informations',
+        contentValue: stripIndent`
+          **Nom :** "{name}"
+          **Type :** {type}
+          **Salon Parent :** {parentIfExist} (permissions synchronisées : {synced})
+          **Position :** {position}
+          **Flags :** {flags}
+        `,
+      },
+      [DiscordLogType.ChannelUpdate]: {
+        color: settings.colors.orange,
+        contextName: ':bust_in_silhouette: Salon',
+        contextValue: channelMention('{context}'),
+        contentName: ':information_source: Informations',
+        contentValue: '/',
+        contentValueParts: {
+          name: '**Nom :** "{before.name}" → "{after.name}"',
+          type: '**Type :** {before.type} → {after.type}',
+          parent: '**Salon Parent :** {before.parentIfExist} (sync. : {before.synced}) → {after.parentIfExist} (sync. : {after.synced})',
+          position: '**Position :** {before.position} → {after.position}',
+          flags: '**Flags :** {before.flags} → {after.flags}',
+          permissions: '**Permissions :** Voir les changements ci-dessous',
+        },
+      },
+      [DiscordLogType.ChannelRemove]: {
+        color: settings.colors.yellow,
+        contextName: ':bust_in_silhouette: Salon',
+        contextValue: channelMention('{context}'),
+        contentName: ':information_source: Informations',
+        contentValue: stripIndent`
+          **Nom :** "{name}"
+          **Type :** {type}
+          **Salon Parent :** {parentIfExist} (permissions synchronisées : {synced})
+          **Position :** {position}
+          **Flags :** {flags}
+        `,
       },
       [DiscordLogType.GuildJoin]: {
         color: settings.colors.green,
