@@ -29,4 +29,12 @@ declare global {
     reduce<U>(callbackfn: (previousValue: U, currentValue: T, _: T, set: Set<T>) => U, initialValue: U): U;
     some(predicate: (value: T, _: T, set: Set<T>) => unknown, thisArg?: any): boolean;
   }
+
+  // Define the new core-js map-upsert polyfill
+  interface Map<K, V> {
+    emplace(key: K, handlers: {
+      insert?(key: K, map: Map<K, V>): V;
+      update?(existing: V, key: K, map: Map<K, V>): V;
+    }): V;
+  }
 }

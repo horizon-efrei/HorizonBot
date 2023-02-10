@@ -1,11 +1,13 @@
-import { getContentForChannel } from '@/structures/logs/logChannelHelpers';
-import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
-import { DiscordLogType } from '@/types/database';
 import { Listener } from '@sapphire/framework';
 import type { DMChannel, GuildChannel } from 'discord.js';
+import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
+import { getContentForChannel } from '@/structures/logs/logChannelHelpers';
+import { DiscordLogType } from '@/types/database';
 
 export default class ChannelUpdateListener extends Listener {
-  public async run(oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel): Promise<void> {
+  private readonly _buffer = new Map<string, { oldChannel: GuildChannel; newChannel: GuildChannel }>();
+
+  public run(oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel): void {
     if (oldChannel.isDMBased() || newChannel.isDMBased())
       return;
 
@@ -16,16 +18,29 @@ export default class ChannelUpdateListener extends Listener {
       || oldChannel.permissionsLocked !== newChannel.permissionsLocked
       || oldChannel.type !== newChannel.type
       || !oldChannel.permissionOverwrites.cache.equals(newChannel.permissionOverwrites.cache)) {
-      await DiscordLogManager.logAction({
-        type: DiscordLogType.ChannelUpdate,
-        context: newChannel.id,
-        content: {
-          before: getContentForChannel(oldChannel),
-          after: getContentForChannel(newChannel),
-        },
-        guildId: newChannel.guild.id,
-        severity: 1,
+      this._buffer.emplace(newChannel.id, {
+        insert: () => ({ oldChannel, newChannel }),
+        update: existing => ({ ...existing, newChannel }),
       });
+
+      setTimeout(async () => {
+        if (!this._buffer.has(newChannel.id))
+          return;
+
+        const changeSet = this._buffer.get(newChannel.id)!;
+        this._buffer.delete(newChannel.id);
+
+        await DiscordLogManager.logAction({
+          type: DiscordLogType.ChannelUpdate,
+          context: newChannel.id,
+          content: {
+            before: getContentForChannel(changeSet.oldChannel),
+            after: getContentForChannel(changeSet.newChannel),
+          },
+          guildId: newChannel.guild.id,
+          severity: 1,
+        });
+      }, 3000);
     }
   }
 }
