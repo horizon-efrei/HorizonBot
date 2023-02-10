@@ -6,8 +6,6 @@ import RoleIntersections from '@/models/roleIntersections';
 import * as DiscordLogManager from '@/structures/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
-const discordInviteLinkRegex = /(?:https?:\/\/)?(?:www\.)?(?:discord\.gg\/|discord(?:app)?\.com\/invite\/)(?<code>[\w\d-]{2,})/gimu;
-
 export default class MessageListener extends Listener {
   public async run(message: Message): Promise<void> {
     if (message.author.bot
@@ -29,7 +27,7 @@ export default class MessageListener extends Listener {
     if (!message.inGuild())
       return;
 
-    const invites = message.content.matchAll(discordInviteLinkRegex);
+    const invites = message.content.matchAll(new RegExp(settings.configuration.discordInviteLinkRegex, 'gi'));
     const foreignInvites = [...invites]
       .map(invite => invite.groups?.code)
       .filter(code => code && !message.guild.invites.cache.has(code))

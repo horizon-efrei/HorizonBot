@@ -11,6 +11,7 @@ import { PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
 import pupa from 'pupa';
 import type { GuildMessage } from '@/app/lib/types';
 import { purge as config } from '@/config/commands/admin';
+import settings from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import { andMix } from '@/utils';
 
@@ -26,7 +27,6 @@ enum Options {
   FromUser = 'utilisateur',
 }
 
-const inviteRegex = /(?:discord\.(?:gg|io|me|plus|link)|invite\.(?:gg|ink)|discord(?:app)?\.com\/invite)\/[\w-]{2,}/i;
 const anyUrlRegex = /ht{2}ps?:\/{2}[\w-]{2,}\.[\w-]{2,}/i;
 
 @ApplyOptions<HorizonCommand.Options>(config)
@@ -109,7 +109,7 @@ export default class PurgeCommand extends HorizonCommand<typeof config> {
     if (withFiles)
       filters.push((message: GuildMessage) => message.attachments.size > 0);
     if (withLinks)
-      filters.push((message: GuildMessage) => inviteRegex.test(message.content));
+      filters.push((message: GuildMessage) => settings.configuration.discordInviteLinkRegex.test(message.content));
     if (withInvites)
       filters.push((message: GuildMessage) => anyUrlRegex.test(message.content));
     if (fromMe) {
