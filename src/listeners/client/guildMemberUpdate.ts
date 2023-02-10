@@ -18,7 +18,7 @@ export default class GuildMemberUpdateListener extends Listener {
 
       // Tell executor ID
       await DiscordLogManager.logAction({
-        type: DiscordLogType.ChangeNickname,
+        type: DiscordLogType.MemberNicknameUpdate,
         context: { executorId: lastMemberUpdate?.executor?.id, userId: newMember.id },
         content: { before: oldMember.displayName, after: newMember.displayName },
         guildId: newMember.guild.id,
@@ -41,7 +41,7 @@ export default class GuildMemberUpdateListener extends Listener {
 
     if (addedRoles.length > 0) {
       await DiscordLogManager.logAction({
-        type: DiscordLogType.RoleAdd,
+        type: DiscordLogType.MemberRoleAdd,
         context: {
           executorId: lastMemberRoleUpdate?.executor?.id,
           userId: newMember.id,
@@ -54,7 +54,7 @@ export default class GuildMemberUpdateListener extends Listener {
 
     if (removedRoles.length > 0) {
       await DiscordLogManager.logAction({
-        type: DiscordLogType.RoleRemove,
+        type: DiscordLogType.MemberRoleRemove,
         context: {
           executorId: lastMemberRoleUpdate?.executor?.id,
           userId: newMember.id,

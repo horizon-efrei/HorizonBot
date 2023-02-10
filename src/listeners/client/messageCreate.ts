@@ -16,7 +16,7 @@ export default class MessageListener extends Listener {
       return;
 
     await DiscordLogManager.logAction({
-      type: DiscordLogType.MessagePost,
+      type: DiscordLogType.MessageCreate,
       context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
       content: message.content,
       guildId: message.guild.id,

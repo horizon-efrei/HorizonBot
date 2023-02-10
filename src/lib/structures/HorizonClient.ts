@@ -133,9 +133,8 @@ export default class HorizonClient extends SapphireClient {
     for (const guildId of this.guilds.cache.keys()) {
       this.logStatuses.set(guildId, new Collection());
 
-      for (const logType of Object.values(DiscordLogType).filter(Number.isInteger)) {
-        const type = logType as DiscordLogType;
-        const currentSetting = logs.find(log => log.guildId === guildId && log.type === logType);
+      for (const type of Object.values(DiscordLogType)) {
+        const currentSetting = logs.find(log => log.guildId === guildId && log.type === type);
 
         this.logStatuses.get(guildId)!.set(type, currentSetting?.status ?? LogStatusesEnum.Discord);
         if (!currentSetting)

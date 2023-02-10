@@ -11,7 +11,7 @@ export default class UserUpdateListener extends Listener {
         const member = await guild.members.fetch({ user: newUser.id, force: false }).catch(nullop);
         if (member) {
           await DiscordLogManager.logAction({
-            type: DiscordLogType.ChangeUsername,
+            type: DiscordLogType.UserUsernameUpdate,
             context: newUser.id,
             content: { before: oldUser.username, after: newUser.username },
             guildId,

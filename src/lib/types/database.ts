@@ -248,24 +248,30 @@ export type ReminderModel = Model<ReminderDocument>;
 // #region Discord Logs Database Types
 /** Enum for the "Discord Logs"'-type mongoose schema */
 export enum DiscordLogType {
-  ChangeNickname,
-  ChangeUsername,
-  GuildJoin,
-  GuildLeave,
-  InvitePost,
-  MessageEdit,
-  MessagePost,
-  MessageRemove,
-  ReactionAdd,
-  ReactionRemove,
-  RoleAdd,
-  RoleRemove,
-  VoiceJoin,
-  VoiceLeave,
-  VoiceMove,
-  ChannelCreate,
-  ChannelUpdate,
-  ChannelRemove,
+  ChannelCreate = 'channel-create',
+  ChannelUpdate = 'channel-update',
+  ChannelDelete = 'channel-delete',
+
+  GuildJoin = 'guild-join',
+  GuildLeave = 'guild-leave',
+
+  InvitePost = 'invite-post',
+  MessageCreate = 'message-create',
+  MessageUpdate = 'message-update',
+  MessageDelete = 'message-delete',
+
+  MemberNicknameUpdate = 'member-nickname-update',
+  MemberRoleAdd = 'member-role-add',
+  MemberRoleRemove = 'member-role-remove',
+
+  ReactionAdd = 'reaction-add',
+  ReactionRemove = 'reaction-remove',
+
+  UserUsernameUpdate = 'user-username-update',
+
+  VoiceJoin = 'voice-join',
+  VoiceMove = 'voice-move',
+  VoiceLeave = 'voice-leave',
 }
 
 export interface GuildLeaveUserSnapshot {
@@ -318,42 +324,44 @@ type ChannelId = string;
 /** Type for the "Discord Logs"'s mongoose schema */
 export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
   & (
-    // Context is user id, content is the nickname before and after
-    | { type: DiscordLogType.ChangeNickname; context: ActionReference; content: BeforeAfter<string> }
-    // Context is user id, content is the username before and after
-    | { type: DiscordLogType.ChangeUsername; context: UserId; content: BeforeAfter<string> }
+    /* eslint-disable @typescript-eslint/sort-type-constituents */
     // Context is channel id, content is the channel snapshot
     | { type: DiscordLogType.ChannelCreate; context: ChannelId; content: ChannelSnapshot }
     // Context is channel id, content is the channel snapshot
-    | { type: DiscordLogType.ChannelRemove; context: ChannelId; content: ChannelSnapshot }
-    // Context is channel id, content is the channel snapshot
     | { type: DiscordLogType.ChannelUpdate; context: ChannelId; content: BeforeAfter<ChannelSnapshot> }
+    // Context is channel id, content is the channel snapshot
+    | { type: DiscordLogType.ChannelDelete; context: ChannelId; content: ChannelSnapshot }
     // Context is user id, content is list of possible invite-code used
     | { type: DiscordLogType.GuildJoin; context: UserId; content: string[] }
     // Context is user id, content is a snapshot of the user
     | { type: DiscordLogType.GuildLeave; context: UserId; content: GuildLeaveUserSnapshot }
     // Context is a AuthorMessageReference, content is a list of linked invites
     | { type: DiscordLogType.InvitePost; context: AuthorMessageReference; content: string[] }
-    // Context is a AuthorMessageReference, content is the message content before and after
-    | { type: DiscordLogType.MessageEdit; context: AuthorMessageReference; content: BeforeAfter<string> }
     // Context is a AuthorMessageReference, content is the new message content
-    | { type: DiscordLogType.MessagePost; context: AuthorMessageReference; content: string }
+    | { type: DiscordLogType.MessageCreate; context: AuthorMessageReference; content: string }
+    // Context is a AuthorMessageReference, content is the message content before and after
+    | { type: DiscordLogType.MessageUpdate; context: AuthorMessageReference; content: BeforeAfter<string> }
     // Context is a ExecutorAndAuthorMessageReference, content is the message content
-    | { type: DiscordLogType.MessageRemove; context: ExecutorAndAuthorMessageReference; content: string }
+    | { type: DiscordLogType.MessageDelete; context: ExecutorAndAuthorMessageReference; content: string }
+    // Context is user id, content is the nickname before and after
+    | { type: DiscordLogType.MemberNicknameUpdate; context: ActionReference; content: BeforeAfter<string> }
+    // Context is ActionReference, content is the roles id
+    | { type: DiscordLogType.MemberRoleAdd; context: ActionReference; content: string[] }
+    // Context is ActionReference, content is the roles id
+    | { type: DiscordLogType.MemberRoleRemove; context: ActionReference; content: string[] }
     // Context is a ExecutorAndAuthorMessageReference, content is the emoji used
     | { type: DiscordLogType.ReactionAdd; context: ExecutorAndAuthorMessageReference; content: string }
     // Context is a ExecutorAndAuthorMessageReference, content is the emoji used
     | { type: DiscordLogType.ReactionRemove; context: ExecutorAndAuthorMessageReference; content: string }
-    // Context is ActionReference, content is the roles id
-    | { type: DiscordLogType.RoleAdd; context: ActionReference; content: string[] }
-    // Context is ActionReference, content is the roles id
-    | { type: DiscordLogType.RoleRemove; context: ActionReference; content: string[] }
+    // Context is user id, content is the username before and after
+    | { type: DiscordLogType.UserUsernameUpdate; context: UserId; content: BeforeAfter<string> }
     // Context is user id, content is the channel id
     | { type: DiscordLogType.VoiceJoin; context: UserId; content: ChannelId }
-    // Context is user id, content is the channel id
-    | { type: DiscordLogType.VoiceLeave; context: UserId; content: ChannelId }
     // Context is user id, content is the channel id before and after
     | { type: DiscordLogType.VoiceMove; context: UserId; content: BeforeAfter<ChannelId> }
+    // Context is user id, content is the channel id
+    | { type: DiscordLogType.VoiceLeave; context: UserId; content: ChannelId }
+    /* eslint-enable @typescript-eslint/sort-type-constituents */
   );
 
 /** Simplified interface for the "Discord Logs"'s mongoose schema */

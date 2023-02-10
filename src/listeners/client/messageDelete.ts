@@ -23,7 +23,7 @@ export default class MessageDeleteListener extends Listener {
         .first();
 
       await DiscordLogManager.logAction({
-        type: DiscordLogType.MessageRemove,
+        type: DiscordLogType.MessageDelete,
         context: {
           messageId: message.id,
           channelId: message.channel.id,

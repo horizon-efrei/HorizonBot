@@ -1,10 +1,11 @@
 import { model, Schema } from 'mongoose';
 import type { LogStatusesDocument, LogStatusesModel } from '@/types/database';
-import { LogStatuses } from '@/types/database';
+import { DiscordLogType, LogStatuses } from '@/types/database';
 
 const LogStatusesSchema = new Schema<LogStatusesDocument, LogStatusesModel, null>({
   type: {
-    type: Number,
+    type: String,
+    enum: DiscordLogType,
     required: true,
   },
   status: {

@@ -15,7 +15,7 @@ export default class MessageUpdateListener extends Listener {
       return;
 
     await DiscordLogManager.logAction({
-      type: DiscordLogType.MessageEdit,
+      type: DiscordLogType.MessageUpdate,
       context: { messageId: newMessage.id, channelId: newMessage.channel.id, authorId: newMessage.author.id },
       content: { before: oldMessage.content, after: newMessage.content },
       guildId: newMessage.guild.id,

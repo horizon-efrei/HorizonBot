@@ -12,7 +12,7 @@ export default class ChannelDeleteListener extends Listener {
       return;
 
     await DiscordLogManager.logAction({
-      type: DiscordLogType.ChannelRemove,
+      type: DiscordLogType.ChannelDelete,
       context: channel.id,
       content: getContentForChannel(channel),
       guildId: channel.guild.id,

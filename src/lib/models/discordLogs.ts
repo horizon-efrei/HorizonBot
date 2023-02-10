@@ -1,9 +1,11 @@
 import { model, Schema } from 'mongoose';
 import type { DiscordLogDocument, DiscordLogModel } from '@/types/database';
+import { DiscordLogType } from '@/types/database';
 
 const DiscordLogSchema = new Schema<DiscordLogDocument, DiscordLogModel, null>({
   type: {
-    type: Number,
+    type: String,
+    enum: DiscordLogType,
     required: true,
   },
   context: {

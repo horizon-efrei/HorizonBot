@@ -25,41 +25,41 @@ export default {
   },
   logs: {
     readableEvents: {
-      [DiscordLogType.ChangeNickname]: ':label: Changement de surnom',
-      [DiscordLogType.ChangeUsername]: ':label: Changement de pseudo',
+      [DiscordLogType.MemberNicknameUpdate]: ':label: Changement de surnom',
+      [DiscordLogType.UserUsernameUpdate]: ':label: Changement de pseudo',
       [DiscordLogType.ChannelCreate]: ":couch: Création d'un salon",
       [DiscordLogType.ChannelUpdate]: ":couch: Modification d'un salon",
-      [DiscordLogType.ChannelRemove]: ":couch: Suppression d'un salon",
+      [DiscordLogType.ChannelDelete]: ":couch: Suppression d'un salon",
       [DiscordLogType.GuildJoin]: ':green_heart: Membre rejoint le serveur',
       [DiscordLogType.GuildLeave]: ':broken_heart: Membre quitte le serveur',
       [DiscordLogType.InvitePost]: ':link: Invitation Discord externe postée',
-      [DiscordLogType.MessageEdit]: ':incoming_envelope: Message modifié',
-      [DiscordLogType.MessagePost]: ':envelope_with_arrow: Message posté',
-      [DiscordLogType.MessageRemove]: ':wastebasket: Message supprimé',
+      [DiscordLogType.MessageUpdate]: ':incoming_envelope: Message modifié',
+      [DiscordLogType.MessageCreate]: ':envelope_with_arrow: Message posté',
+      [DiscordLogType.MessageDelete]: ':wastebasket: Message supprimé',
       [DiscordLogType.ReactionAdd]: ':smiley: Réaction ajoutée',
       [DiscordLogType.ReactionRemove]: ':anguished: Réaction retirée',
-      [DiscordLogType.RoleAdd]: ':beginner: Rôle ajouté',
-      [DiscordLogType.RoleRemove]: ':octagonal_sign: Rôle enlevé',
+      [DiscordLogType.MemberRoleAdd]: ':beginner: Rôle ajouté',
+      [DiscordLogType.MemberRoleRemove]: ':octagonal_sign: Rôle enlevé',
       [DiscordLogType.VoiceJoin]: ':loud_sound: Connection en vocal',
       [DiscordLogType.VoiceLeave]: ":mute: Déconnexion d'un salon vocal",
       [DiscordLogType.VoiceMove]: ':repeat: Changement de salon vocal',
     },
     simplifiedReadableEvents: {
-      [DiscordLogType.ChangeNickname]: 'changement de surnom',
-      [DiscordLogType.ChangeUsername]: 'changement de pseudo',
+      [DiscordLogType.MemberNicknameUpdate]: 'changement de surnom',
+      [DiscordLogType.UserUsernameUpdate]: 'changement de pseudo',
       [DiscordLogType.ChannelCreate]: "création d'un salon",
       [DiscordLogType.ChannelUpdate]: "modification d'un salon",
-      [DiscordLogType.ChannelRemove]: "suppression d'un salon",
+      [DiscordLogType.ChannelDelete]: "suppression d'un salon",
       [DiscordLogType.GuildJoin]: 'membre rejoint le serveur',
       [DiscordLogType.GuildLeave]: 'membre quitte le serveur',
       [DiscordLogType.InvitePost]: 'invitation Discord postée',
-      [DiscordLogType.MessageEdit]: 'message modifié',
-      [DiscordLogType.MessagePost]: 'message posté',
-      [DiscordLogType.MessageRemove]: 'message supprimé',
+      [DiscordLogType.MessageUpdate]: 'message modifié',
+      [DiscordLogType.MessageCreate]: 'message posté',
+      [DiscordLogType.MessageDelete]: 'message supprimé',
       [DiscordLogType.ReactionAdd]: 'réaction ajoutée',
       [DiscordLogType.ReactionRemove]: 'réaction retirée',
-      [DiscordLogType.RoleAdd]: 'rôle ajouté',
-      [DiscordLogType.RoleRemove]: 'rôle enlevé',
+      [DiscordLogType.MemberRoleAdd]: 'rôle ajouté',
+      [DiscordLogType.MemberRoleRemove]: 'rôle enlevé',
       [DiscordLogType.VoiceJoin]: 'connection en vocal',
       [DiscordLogType.VoiceLeave]: "déconnexion d'un salon vocal",
       [DiscordLogType.VoiceMove]: 'changement de salon vocal',
@@ -72,14 +72,14 @@ export default {
     },
     embedTitle: 'Logs automatiques',
     fields: {
-      [DiscordLogType.ChangeNickname]: {
+      [DiscordLogType.MemberNicknameUpdate]: {
         color: settings.colors.gray,
         contextName: ':busts_in_silhouette: Membres',
         contextValue: `Cible : ${userMention('{context.userId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':label: Surnom',
         contentValue: '```diff\n- {content.before}\n+ {content.after}```',
       },
-      [DiscordLogType.ChangeUsername]: {
+      [DiscordLogType.UserUsernameUpdate]: {
         color: settings.colors.gray,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: userMention('{context}'),
@@ -114,7 +114,7 @@ export default {
           permissions: '**Permissions :** Voir les changements ci-dessous',
         },
       },
-      [DiscordLogType.ChannelRemove]: {
+      [DiscordLogType.ChannelDelete]: {
         color: settings.colors.yellow,
         contextName: ':bust_in_silhouette: Salon',
         contextValue: channelMention('{context}'),
@@ -155,7 +155,7 @@ export default {
           Invitations : {content}
         `,
       },
-      [DiscordLogType.MessageEdit]: {
+      [DiscordLogType.MessageUpdate]: {
         color: settings.colors.yellow,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: userMention('{context.authorId}'),
@@ -168,7 +168,7 @@ export default {
           \`\`\`
         `,
       },
-      [DiscordLogType.MessagePost]: {
+      [DiscordLogType.MessageCreate]: {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: userMention('{context.authorId}'),
@@ -178,7 +178,7 @@ export default {
           Contenu : {content}
         `,
       },
-      [DiscordLogType.MessageRemove]: {
+      [DiscordLogType.MessageDelete]: {
         color: settings.colors.red,
         contextName: ':busts_in_silhouette: Membres',
         contextValue: `Auteur du message : ${userMention('{context.authorId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
@@ -210,14 +210,14 @@ export default {
           Réaction : {content}
         `,
       },
-      [DiscordLogType.RoleAdd]: {
+      [DiscordLogType.MemberRoleAdd]: {
         color: settings.colors.green,
         contextName: ':busts_in_silhouette: Membres',
         contextValue: `Cible : ${userMention('{context.userId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':billed_cap: Rôle ajouté',
         contentValue: '{content}',
       },
-      [DiscordLogType.RoleRemove]: {
+      [DiscordLogType.MemberRoleRemove]: {
         color: settings.colors.red,
         contextName: ':busts_in_silhouette: Membres',
         contextValue: `Cible : ${userMention('{context.userId}')}\nExécuteur : ${userMention('{context.executorId}')}`,

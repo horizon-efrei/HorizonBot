@@ -10,7 +10,7 @@ import type { LogStatuses as LogStatusesEnum } from '@/types/database';
 import { DiscordLogType } from '@/types/database';
 
 const logNameChoices = Object.entries(messages.logs.simplifiedReadableEvents)
-  .map(([value, name]) => ({ name, value: Number(value) }));
+  .map(([value, name]) => ({ name, value }));
 const logStatusChoices = Object.entries(messages.logs.readableStatuses)
   .map(([value, name]) => ({ name, value: Number(value) }));
 
@@ -38,11 +38,11 @@ export default class LogsCommand extends HorizonSubcommand<typeof config> {
           subcommand => subcommand
             .setName('edit')
             .setDescription(this.descriptions.subcommands.edit)
-            .addIntegerOption(
+            .addStringOption(
               option => option
                 .setName(Options.LogType)
                 .setDescription(this.descriptions.options.logName)
-                .setChoices(...logNameChoices, { name: 'Tous', value: -1 })
+                .setChoices(...logNameChoices, { name: 'Tous', value: 'all' })
                 .setRequired(true),
             )
             .addIntegerOption(
@@ -62,16 +62,16 @@ export default class LogsCommand extends HorizonSubcommand<typeof config> {
   }
 
   public async edit(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
-    const logType = interaction.options.getInteger(Options.LogType, true) as DiscordLogType | -1;
+    const logType = interaction.options.getString(Options.LogType, true) as DiscordLogType | 'all';
     const logStatus = interaction.options.getInteger(Options.LogStatus, true) as LogStatusesEnum;
 
     const guildId = interaction.guild.id;
     const guildLogs = this.container.client.logStatuses.get(guildId)!;
 
-    if (logType === -1) {
+    if (logType === 'all') {
       await LogStatuses.updateMany({ guildId }, { status: logStatus });
-      for (const type of Object.values(DiscordLogType).filter(Number.isInteger))
-        guildLogs.set(type as DiscordLogType, logStatus);
+      for (const type of Object.values(DiscordLogType))
+        guildLogs.set(type, logStatus);
 
       await interaction.reply(
         pupa(this.messages.updatedAllLog, { status: messages.logs.readableStatuses[logStatus] }),

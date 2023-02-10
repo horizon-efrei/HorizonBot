@@ -52,8 +52,8 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
           },
         }),
       };
-    case DiscordLogType.RoleAdd:
-    case DiscordLogType.RoleRemove:
+    case DiscordLogType.MemberRoleAdd:
+    case DiscordLogType.MemberRoleRemove:
       return {
         content: pupa(fieldTexts.contentValue, {
           ...payload,
@@ -68,9 +68,9 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
           url: getMessageUrl(payload),
         }),
       };
-    case DiscordLogType.MessagePost:
-    case DiscordLogType.MessageEdit:
-    case DiscordLogType.MessageRemove:
+    case DiscordLogType.MessageCreate:
+    case DiscordLogType.MessageUpdate:
+    case DiscordLogType.MessageDelete:
       return {
         content: pupa(fieldTexts.contentValue, {
           ...payload,
@@ -89,8 +89,8 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
           url: getMessageUrl(payload),
         }),
       };
-    case DiscordLogType.ChangeNickname:
-    case DiscordLogType.ChangeUsername:
+    case DiscordLogType.MemberNicknameUpdate:
+    case DiscordLogType.UserUsernameUpdate:
     case DiscordLogType.VoiceJoin:
     case DiscordLogType.VoiceLeave:
     case DiscordLogType.VoiceMove:
@@ -98,7 +98,7 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
         content: pupa(fieldTexts.contentValue, payload),
       };
     case DiscordLogType.ChannelCreate:
-    case DiscordLogType.ChannelRemove:
+    case DiscordLogType.ChannelDelete:
       return {
         content: pupa(fieldTexts.contentValue, {
           name: payload.content.name,
@@ -169,7 +169,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
   if (logStatus === LogStatuses.Silent)
     return;
 
-  container.logger.info(`[Logs:${DiscordLogType[payload.type]}] New logged event happened: ${JSON.stringify(payload, (k, v) => (k === 'type' ? DiscordLogType[v] : v))}`);
+  container.logger.info(`[Logs:${payload.type}] New logged event happened: ${JSON.stringify(payload)}`);
   if (logStatus === LogStatuses.Console)
     return;
 
