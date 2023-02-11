@@ -17,7 +17,7 @@ import type { EclassCreationOptions, EclassEmbedOptions } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
 import {
- ConfigEntriesChannels,
+  ConfigEntriesChannels,
   ConfigEntriesRoles,
   EclassPlace,
   EclassStatus,

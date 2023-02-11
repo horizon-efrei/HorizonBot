@@ -1,7 +1,9 @@
 import { stripIndent } from 'common-tags';
 import {
   ActivityType,
- channelMention, Formatters, TimestampStyles, userMention,
+  channelMention,
+  TimestampStyles,
+  userMention,
 } from 'discord.js';
 import { timeFormat } from '@/utils';
 
@@ -97,7 +99,7 @@ export const recordings = {
   messages: {
     noRecords: "Je n'ai trouvé aucun enregistrement de classes dans la base de données !",
     listTitle: 'Liste des enregistrements ({total})',
-    listLine: `• {topic} par ${Formatters.userMention('{professorId}')} (${timeFormat('{date}', TimestampStyles.RelativeTime)}) : {links}`,
+    listLine: `• {topic} par ${userMention('{professorId}')} (${timeFormat('{date}', TimestampStyles.RelativeTime)}) : {links}`,
     listLineLink: '[Lien {num}]({link})',
     pageDescription: '{total} enregistrement(s)',
   },
