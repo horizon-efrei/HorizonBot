@@ -30,6 +30,9 @@ export default {
       [DiscordLogType.ChannelCreate]: ":couch: Création d'un salon",
       [DiscordLogType.ChannelUpdate]: ":couch: Modification d'un salon",
       [DiscordLogType.ChannelDelete]: ":couch: Suppression d'un salon",
+      [DiscordLogType.RoleCreate]: ":couch: Création d'un rôle",
+      [DiscordLogType.RoleUpdate]: ":couch: Modification d'un rôle",
+      [DiscordLogType.RoleDelete]: ":couch: Suppression d'un rôle",
       [DiscordLogType.GuildJoin]: ':green_heart: Membre rejoint le serveur',
       [DiscordLogType.GuildLeave]: ':broken_heart: Membre quitte le serveur',
       [DiscordLogType.InvitePost]: ':link: Invitation Discord externe postée',
@@ -50,6 +53,9 @@ export default {
       [DiscordLogType.ChannelCreate]: "création d'un salon",
       [DiscordLogType.ChannelUpdate]: "modification d'un salon",
       [DiscordLogType.ChannelDelete]: "suppression d'un salon",
+      [DiscordLogType.RoleCreate]: "création d'un rôle",
+      [DiscordLogType.RoleUpdate]: "modification d'un rôle",
+      [DiscordLogType.RoleDelete]: "suppression d'un rôle",
       [DiscordLogType.GuildJoin]: 'membre rejoint le serveur',
       [DiscordLogType.GuildLeave]: 'membre quitte le serveur',
       [DiscordLogType.InvitePost]: 'invitation Discord postée',
@@ -100,7 +106,7 @@ export default {
         `,
       },
       [DiscordLogType.ChannelUpdate]: {
-        color: settings.colors.orange,
+        color: settings.colors.yellow,
         contextName: ':bust_in_silhouette: Salon',
         contextValue: channelMention('{context}'),
         contentName: ':information_source: Informations',
@@ -115,9 +121,9 @@ export default {
         },
       },
       [DiscordLogType.ChannelDelete]: {
-        color: settings.colors.yellow,
+        color: settings.colors.orange,
         contextName: ':bust_in_silhouette: Salon',
-        contextValue: channelMention('{context}'),
+        contextValue: `Exécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':information_source: Informations',
         contentValue: stripIndent`
           **Nom :** "{name}"
@@ -125,6 +131,49 @@ export default {
           **Salon Parent :** {parentIfExist} (permissions synchronisées : {synced})
           **Position :** {position}
           **Flags :** {flags}
+        `,
+      },
+      [DiscordLogType.RoleCreate]: {
+        color: settings.colors.green,
+        contextName: ':billed_cap: Rôle',
+        contextValue: `Rôle : ${roleMention('{context.roleId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
+        contentName: ':information_source: Informations',
+        contentValue: stripIndent`
+          **Nom :** "{name}"
+          **Couleur :** {hexColor}
+          **Séparé :** {hoist}
+          **Mentionable :** {mentionable}
+          **Position :** {position}
+          **Géré par une intégration :** {managed}
+        `,
+      },
+      [DiscordLogType.RoleUpdate]: {
+        color: settings.colors.yellow,
+        contextName: ':billed_cap: Rôle',
+        contextValue: `Rôle : ${roleMention('{context.roleId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
+        contentName: ':information_source: Informations',
+        contentValue: '/',
+        contentValueParts: {
+          name: '**Nom :** "{before.name}" → "{after.name}"',
+          color: '**Couleur :** {before.hexColor} → {after.hexColor}',
+          hoist: '**Séparé :** {before.hoist} → {after.hoist}',
+          mentionable: '**Mentionable :** {before.mentionable} → {after.mentionable}',
+          managed: '**Géré par une intégration :** {before.managed} → {after.managed}',
+          position: '**Position :** {before.position} → {after.position}',
+          permissions: '**Permissions :** Voir les changements ci-dessous',
+        },
+      },
+      [DiscordLogType.RoleDelete]: {
+        color: settings.colors.orange,
+        contextName: ':billed_cap: Rôle',
+        contextValue: `Exécuteur : ${userMention('{context.executorId}')}`,
+        contentName: ':information_source: Informations',
+        contentValue: stripIndent`
+          **Nom :** "{name}"
+          **Couleur :** {hexColor}
+          **Séparé :** {hoist}
+          **Mentionable :** {mentionable}
+          **Géré par une intégration :** {managed}
         `,
       },
       [DiscordLogType.GuildJoin]: {

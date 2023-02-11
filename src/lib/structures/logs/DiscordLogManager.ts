@@ -14,7 +14,7 @@ import * as CustomResolvers from '@/resolvers';
 import type { DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
 import { makeMessageLink, trimText } from '@/utils';
-import { getPermissionDetails } from './logChannelHelpers';
+import { getChannelPermissionDetails, getRolePermissionDetails } from './snapshotHelpers';
 
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
 
@@ -108,7 +108,7 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
           position: payload.content.position,
           flags: new ChannelFlagsBitField(payload.content.flags).toArray().join(', ') || 'Aucun',
         }),
-        longDetails: getPermissionDetails(guild, payload.content.permissionOverwrites),
+        longDetails: getChannelPermissionDetails(guild, payload.content.permissionOverwrites),
       };
     case DiscordLogType.ChannelUpdate: {
       const parts = (fieldTexts as typeof messages.logs.fields[DiscordLogType.ChannelUpdate]).contentValueParts;
@@ -153,6 +153,62 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
         //   payload.content.after.permissionOverwrites),
       };
     }
+    case DiscordLogType.RoleCreate:
+    case DiscordLogType.RoleDelete:
+      return {
+        content: pupa(fieldTexts.contentValue, {
+          name: payload.content.name,
+          hexColor: payload.content.hexColor,
+          hoist: payload.content.hoist ? 'Oui' : 'Non',
+          managed: payload.content.managed ? 'Oui' : 'Non',
+          mentionable: payload.content.mentionable ? 'Oui' : 'Non',
+          position: payload.content.position,
+        }),
+        longDetails: getRolePermissionDetails(payload.content.permissions),
+      };
+    case DiscordLogType.RoleUpdate: {
+      const parts = (fieldTexts as typeof messages.logs.fields[DiscordLogType.RoleUpdate]).contentValueParts;
+
+      const content = [] as string[];
+      if (payload.content.before.name !== payload.content.after.name)
+        content.push(parts.name);
+      if (payload.content.before.hexColor !== payload.content.after.hexColor)
+        content.push(parts.color);
+      if (payload.content.before.hoist !== payload.content.after.hoist)
+        content.push(parts.hoist);
+      if (payload.content.before.mentionable !== payload.content.after.mentionable)
+        content.push(parts.mentionable);
+      if (payload.content.before.managed !== payload.content.after.managed)
+        content.push(parts.managed);
+      if (payload.content.before.position !== payload.content.after.position)
+        content.push(parts.position);
+      if (payload.content.before.permissions !== payload.content.after.permissions)
+        content.push(parts.permissions);
+
+      return {
+        content: pupa(content.join('\n'), {
+          before: {
+            name: payload.content.before.name,
+            hexColor: payload.content.before.hexColor,
+            hoist: payload.content.before.hoist ? 'Oui' : 'Non',
+            managed: payload.content.before.managed ? 'Oui' : 'Non',
+            mentionable: payload.content.before.mentionable ? 'Oui' : 'Non',
+            position: payload.content.before.position,
+          },
+          after: {
+            name: payload.content.after.name,
+            hexColor: payload.content.after.hexColor,
+            hoist: payload.content.after.hoist ? 'Oui' : 'Non',
+            managed: payload.content.after.managed ? 'Oui' : 'Non',
+            mentionable: payload.content.after.mentionable ? 'Oui' : 'Non',
+            position: payload.content.after.position,
+          },
+        }),
+        // TODO: add permission diff to longDetails.
+        // longsDetails: getRolePermissionDetailsDiff(
+        //   payload.content.before.permissions, payload.content.after.permissions),
+      };
+    }
   }
 }
 
@@ -178,7 +234,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
     return;
 
   const fieldOptions = messages.logs.fields[payload.type];
-  const { content: contentValue, longDetails } = getContentValue(payload) ?? { content: "Impossible de charger plus d'informations" };
+  const { content: contentValue, longDetails } = getContentValue(payload);
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: messages.logs.embedTitle })
@@ -186,7 +242,7 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
     .setTitle(messages.logs.readableEvents[payload.type])
     .addFields([
       { name: fieldOptions.contextName, value: pupa(fieldOptions.contextValue, payload), inline: true },
-      { name: fieldOptions.contentName, value: contentValue, inline: true },
+      { name: fieldOptions.contentName, value: contentValue || "Impossible de charger plus d'informations", inline: true },
     ])
     .setTimestamp();
 

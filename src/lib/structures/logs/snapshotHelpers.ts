@@ -4,11 +4,12 @@ import type {
   Guild,
   GuildChannel,
   PermissionOverwrites,
+  Role,
   Snowflake,
 } from 'discord.js';
 import { OverwriteType, PermissionsBitField } from 'discord.js';
 import { startCase } from 'lodash';
-import type { ChannelSnapshot } from '@/types/database';
+import type { ChannelSnapshot, RoleSnapshot } from '@/types/database';
 
 interface PermissionOverwrite { id: string; type: OverwriteType; allow: PermissionsBitField; deny: PermissionsBitField }
 type SerializedPermissions = ChannelSnapshot['permissionOverwrites'];
@@ -28,7 +29,7 @@ export function serializePermissions(permissions: Collection<Snowflake, Permissi
   );
 }
 
-export function getContentForChannel(channel: GuildChannel): ChannelSnapshot {
+export function getChannelSnapshot(channel: GuildChannel): ChannelSnapshot {
   return {
     id: channel.id,
     flags: channel.flags.bitfield,
@@ -41,12 +42,26 @@ export function getContentForChannel(channel: GuildChannel): ChannelSnapshot {
   };
 }
 
-export function getPermissionDetails(
+export function getRoleSnapshot(role: Role): RoleSnapshot {
+  return {
+    id: role.id,
+    name: role.name,
+    hexColor: role.hexColor,
+    hoist: role.hoist,
+    managed: role.managed,
+    mentionable: role.mentionable,
+    permissions: role.permissions.bitfield.toString() as `${bigint}`,
+    position: role.position,
+  };
+}
+
+export function getChannelPermissionDetails(
   guild: Guild,
   permissionOverwrites: SerializedPermissions,
 ): string {
   return Object.values(permissionOverwrites)
-    .map(value => [
+    .map(value =>
+      [
         `Permissions pour ${value.type === OverwriteType.Role ? 'le rôle' : "l'utilisateur"} ${value.type === OverwriteType.Role
           ? guild.roles.cache.get(value.id)?.name
           : guild.members.cache.get(value.id)?.user.tag} :`,
@@ -56,5 +71,10 @@ export function getPermissionDetails(
     .join('\n\n');
 }
 
-// TODO: add getPermissionDetailsDiff(Guild, SerializedPermissions, SerializedPermissions): string;
-// We might want to use `xorWith(perm, perm, isEqual)` to get the differences between the two arrays.
+// TODO: add getChannelPermissionDetailsDiff(Guild, SerializedPermissions, SerializedPermissions): string;
+
+export function getRolePermissionDetails(bitfield: bigint | `${bigint}`): string {
+  return new PermissionsBitField(bitfield).toArray().map(perm => `${startCase(perm)}: ✅`).join('\n');
+}
+
+// TODO: add getRolePermissionDetailsDiff(bigint, bigint): string;

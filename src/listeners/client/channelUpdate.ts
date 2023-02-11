@@ -1,7 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import type { DMChannel, GuildChannel } from 'discord.js';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
-import { getContentForChannel } from '@/structures/logs/logChannelHelpers';
+import { getChannelSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 
 export default class ChannelUpdateListener extends Listener {
@@ -34,8 +34,8 @@ export default class ChannelUpdateListener extends Listener {
           type: DiscordLogType.ChannelUpdate,
           context: newChannel.id,
           content: {
-            before: getContentForChannel(changeSet.oldChannel),
-            after: getContentForChannel(changeSet.newChannel),
+            before: getChannelSnapshot(changeSet.oldChannel),
+            after: getChannelSnapshot(changeSet.newChannel),
           },
           guildId: newChannel.guild.id,
           severity: 1,

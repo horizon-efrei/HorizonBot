@@ -3,7 +3,7 @@ import type { DMChannel, GuildChannel } from 'discord.js';
 import Configuration from '@/models/configuration';
 import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
-import { getContentForChannel } from '@/structures/logs/logChannelHelpers';
+import { getChannelSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 
 export default class ChannelDeleteListener extends Listener {
@@ -14,7 +14,7 @@ export default class ChannelDeleteListener extends Listener {
     await DiscordLogManager.logAction({
       type: DiscordLogType.ChannelDelete,
       context: channel.id,
-      content: getContentForChannel(channel),
+      content: getChannelSnapshot(channel),
       guildId: channel.guild.id,
       severity: 1,
     });

@@ -1,7 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildChannel } from 'discord.js';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
-import { getContentForChannel } from '@/structures/logs/logChannelHelpers';
+import { getChannelSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 
 export default class ChannelCreateListener extends Listener {
@@ -9,7 +9,7 @@ export default class ChannelCreateListener extends Listener {
     await DiscordLogManager.logAction({
       type: DiscordLogType.ChannelCreate,
       context: channel.id,
-      content: getContentForChannel(channel),
+      content: getChannelSnapshot(channel),
       guildId: channel.guild.id,
       severity: 1,
     });
