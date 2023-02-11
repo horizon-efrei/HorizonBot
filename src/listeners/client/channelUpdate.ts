@@ -1,8 +1,10 @@
 import { Listener } from '@sapphire/framework';
 import type { DMChannel, GuildChannel } from 'discord.js';
+import { AuditLogEvent } from 'discord.js';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { getChannelSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
+import { nullop } from '@/utils';
 
 export default class ChannelUpdateListener extends Listener {
   private readonly _buffer = new Map<string, { oldChannel: GuildChannel; newChannel: GuildChannel }>();
@@ -30,9 +32,17 @@ export default class ChannelUpdateListener extends Listener {
         const changeSet = this._buffer.get(newChannel.id)!;
         this._buffer.delete(newChannel.id);
 
+        const auditLogs = await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate }).catch(nullop);
+        const lastChannelUpdate = auditLogs?.entries
+          .filter(entry => entry.target?.id === newChannel.id && entry.createdTimestamp > Date.now() - 5000)
+          .first();
+
         await DiscordLogManager.logAction({
           type: DiscordLogType.ChannelUpdate,
-          context: newChannel.id,
+          context: {
+            channelId: newChannel.id,
+            executorId: lastChannelUpdate?.executor?.id,
+          },
           content: {
             before: getChannelSnapshot(changeSet.oldChannel),
             after: getChannelSnapshot(changeSet.newChannel),

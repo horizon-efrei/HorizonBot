@@ -95,7 +95,7 @@ export default {
       [DiscordLogType.ChannelCreate]: {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Salon',
-        contextValue: channelMention('{context}'),
+        contextValue: `Salon : ${channelMention('{context.channelId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':information_source: Informations',
         contentValue: stripIndent`
           **Nom :** "{name}"
@@ -108,7 +108,7 @@ export default {
       [DiscordLogType.ChannelUpdate]: {
         color: settings.colors.yellow,
         contextName: ':bust_in_silhouette: Salon',
-        contextValue: channelMention('{context}'),
+        contextValue: `Salon : ${channelMention('{context.channelId}')}\nExécuteur : ${userMention('{context.executorId}')}`,
         contentName: ':information_source: Informations',
         contentValue: '/',
         contentValueParts: {

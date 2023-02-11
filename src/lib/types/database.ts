@@ -311,6 +311,11 @@ interface RoleActionReference {
   executorId: string | undefined;
 }
 
+interface ChannelActionReference {
+  channelId: string;
+  executorId: string | undefined;
+}
+
 export interface ChannelSnapshot {
   id: string;
   flags: number;
@@ -346,9 +351,9 @@ type MessageContent = string;
 export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
   & (
     /* eslint-disable @typescript-eslint/sort-type-constituents */
-    | { type: DiscordLogType.ChannelCreate; context: ChannelId; content: ChannelSnapshot }
-    | { type: DiscordLogType.ChannelUpdate; context: ChannelId; content: BeforeAfter<ChannelSnapshot> }
-    | { type: DiscordLogType.ChannelDelete; context: ChannelId; content: ChannelSnapshot }
+    | { type: DiscordLogType.ChannelCreate; context: ChannelActionReference; content: ChannelSnapshot }
+    | { type: DiscordLogType.ChannelUpdate; context: ChannelActionReference; content: BeforeAfter<ChannelSnapshot> }
+    | { type: DiscordLogType.ChannelDelete; context: ChannelActionReference; content: ChannelSnapshot }
 
     // The content is the possible invite-code used
     | { type: DiscordLogType.GuildJoin; context: UserId; content: string[] }
@@ -390,7 +395,12 @@ interface SimpleDiscordLogBase {
   severity: 1 | 2 | 3;
   guildId: string;
   type: DiscordLogType;
-  context: AuthorMessageReference | ExecutorAndAuthorMessageReference | UserActionReference | string;
+  context:
+    | AuthorMessageReference
+    | ChannelActionReference
+    | ExecutorAndAuthorMessageReference
+    | UserActionReference
+    | string;
   content:
     | BeforeAfter<ChannelSnapshot>
     | BeforeAfter<RoleSnapshot>

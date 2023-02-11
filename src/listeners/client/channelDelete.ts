@@ -1,19 +1,29 @@
 import { Listener } from '@sapphire/framework';
 import type { DMChannel, GuildChannel } from 'discord.js';
+import { AuditLogEvent } from 'discord.js';
 import Configuration from '@/models/configuration';
 import ReactionRole from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { getChannelSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
+import { nullop } from '@/utils';
 
 export default class ChannelDeleteListener extends Listener {
   public async run(channel: DMChannel | GuildChannel): Promise<void> {
     if (channel.isDMBased())
       return;
 
+    const auditLogs = await channel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelDelete }).catch(nullop);
+    const lastChannelDelete = auditLogs?.entries
+      .filter(entry => entry.target?.id === channel.id && entry.createdTimestamp > Date.now() - 2000)
+      .first();
+
     await DiscordLogManager.logAction({
       type: DiscordLogType.ChannelDelete,
-      context: channel.id,
+      context: {
+        channelId: channel.id,
+        executorId: lastChannelDelete?.executor?.id,
+      },
       content: getChannelSnapshot(channel),
       guildId: channel.guild.id,
       severity: 1,

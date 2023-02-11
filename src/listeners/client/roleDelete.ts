@@ -11,7 +11,7 @@ import { nullop } from '@/utils';
 export default class RoleDeleteListener extends Listener {
   public async run(role: Role): Promise<void> {
     const auditLogs = await role.guild.fetchAuditLogs({ type: AuditLogEvent.RoleDelete }).catch(nullop);
-    const lastRoleCreate = auditLogs?.entries
+    const lastRoleUpdate = auditLogs?.entries
       .filter(entry => entry.target?.id === role.id && entry.createdTimestamp > Date.now() - 2000)
       .first();
 
@@ -19,7 +19,7 @@ export default class RoleDeleteListener extends Listener {
       type: DiscordLogType.RoleDelete,
       context: {
         roleId: role.id,
-        executorId: lastRoleCreate?.executor?.id,
+        executorId: lastRoleUpdate?.executor?.id,
       },
       content: getRoleSnapshot(role),
       guildId: role.guild.id,

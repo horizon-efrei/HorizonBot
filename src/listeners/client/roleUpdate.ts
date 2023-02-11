@@ -16,7 +16,7 @@ export default class RoleUpdateListener extends Listener {
       || oldRole.position !== newRole.position
       || !oldRole.permissions.equals(newRole.permissions)) {
       const auditLogs = await newRole.guild.fetchAuditLogs({ type: AuditLogEvent.RoleUpdate }).catch(nullop);
-      const lastRoleCreate = auditLogs?.entries
+      const lastRoleDelete = auditLogs?.entries
         .filter(entry => entry.target?.id === newRole.id && entry.createdTimestamp > Date.now() - 2000)
         .first();
 
@@ -24,7 +24,7 @@ export default class RoleUpdateListener extends Listener {
         type: DiscordLogType.RoleUpdate,
         context: {
           roleId: newRole.id,
-          executorId: lastRoleCreate?.executor?.id,
+          executorId: lastRoleDelete?.executor?.id,
         },
         content: {
           before: getRoleSnapshot(oldRole),
