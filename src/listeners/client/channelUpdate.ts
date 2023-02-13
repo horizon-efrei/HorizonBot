@@ -1,8 +1,14 @@
 import { Listener } from '@sapphire/framework';
-import type { DMChannel, GuildChannel } from 'discord.js';
+import type {
+  Collection,
+  DMChannel,
+  GuildChannel,
+  PermissionOverwrites,
+} from 'discord.js';
 import { AuditLogEvent } from 'discord.js';
+import _ from 'lodash';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
-import { getChannelSnapshot } from '@/structures/logs/snapshotHelpers';
+import { getChannelSnapshot, serializePermissions } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
@@ -19,7 +25,7 @@ export default class ChannelUpdateListener extends Listener {
       || oldChannel.flags.bitfield !== newChannel.flags.bitfield
       || oldChannel.permissionsLocked !== newChannel.permissionsLocked
       || oldChannel.type !== newChannel.type
-      || !oldChannel.permissionOverwrites.cache.equals(newChannel.permissionOverwrites.cache)) {
+      || this._permissionChanged(oldChannel.permissionOverwrites.cache, newChannel.permissionOverwrites.cache)) {
       this._buffer.emplace(newChannel.id, {
         insert: () => ({ oldChannel, newChannel }),
         update: existing => ({ ...existing, newChannel }),
@@ -52,5 +58,26 @@ export default class ChannelUpdateListener extends Listener {
         });
       }, 3000);
     }
+  }
+
+  private _permissionChanged(
+    oldPermissionOverwrites: Collection<string, PermissionOverwrites>,
+    newPermissionOverwrites: Collection<string, PermissionOverwrites>,
+  ): boolean {
+    const oldPermissions = serializePermissions(oldPermissionOverwrites);
+    const newPermissions = serializePermissions(newPermissionOverwrites);
+
+    if (_.isEqual(oldPermissions, newPermissions))
+      return false;
+
+    const difference = _.pickBy(newPermissions, (value, key) => !_.isEqual(value, oldPermissions[key]));
+
+    // When we add a role a user to the permission overwrite, they are first added with allow: 0 and deny: 0
+    // This is not an interesting change, so we filter those out
+    const noPermissionChanges = Object.values(difference)
+      .map(({ allow, deny }) => ({ allow: Number(allow), deny: Number(deny) }))
+      .filter(({ allow, deny }) => allow !== 0 || deny !== 0);
+
+    return noPermissionChanges.length > 0;
   }
 }

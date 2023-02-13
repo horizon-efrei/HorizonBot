@@ -14,7 +14,7 @@ import * as CustomResolvers from '@/resolvers';
 import type { DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
 import { makeMessageLink, trimText } from '@/utils';
-import { getChannelPermissionDetails, getRolePermissionDetails } from './snapshotHelpers';
+import { getChannelPermissionDetails, getPermissionDetailsDiff, getRolePermissionDetails } from './snapshotHelpers';
 
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
 
@@ -111,46 +111,44 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
         longDetails: getChannelPermissionDetails(guild, payload.content.permissionOverwrites),
       };
     case DiscordLogType.ChannelUpdate: {
+      const { before, after } = payload.content;
       const parts = (fieldTexts as typeof messages.logs.fields[DiscordLogType.ChannelUpdate]).contentValueParts;
 
       const content = [] as string[];
-      if (payload.content.before.name !== payload.content.after.name)
+      if (before.name !== after.name)
         content.push(parts.name);
-      if (payload.content.before.type !== payload.content.after.type)
+      if (before.type !== after.type)
         content.push(parts.type);
-      if (payload.content.before.parentId !== payload.content.after.parentId
-        || payload.content.before.permissionsLocked !== payload.content.after.permissionsLocked)
+      if (before.parentId !== after.parentId
+        || before.permissionsLocked !== after.permissionsLocked)
         content.push(parts.parent);
-      if (payload.content.before.position !== payload.content.after.position)
+      if (before.position !== after.position)
         content.push(parts.position);
-      if (payload.content.before.flags !== payload.content.after.flags)
+      if (before.flags !== after.flags)
         content.push(parts.flags);
-      if (!isEqual(payload.content.before.permissionOverwrites, payload.content.after.permissionOverwrites))
+      if (!isEqual(before.permissionOverwrites, after.permissionOverwrites))
         content.push(parts.permissions);
 
       return {
         content: pupa(content.join('\n'), {
           before: {
-            name: payload.content.before.name,
-            type: startCase(ChannelType[payload.content.before.type]),
-            parentIfExist: payload.content.before.parentId ? channelMention(payload.content.before.parentId) : 'Aucun',
-            synced: payload.content.before.permissionsLocked ? 'Oui' : 'Non',
-            position: payload.content.before.position,
-            flags: new ChannelFlagsBitField(payload.content.before.flags).toArray().join(', ') || 'Aucun',
+            name: before.name,
+            type: startCase(ChannelType[before.type]),
+            parentIfExist: before.parentId ? channelMention(before.parentId) : 'Aucun',
+            synced: before.permissionsLocked ? 'Oui' : 'Non',
+            position: before.position,
+            flags: new ChannelFlagsBitField(before.flags).toArray().join(', ') || 'Aucun',
           },
           after: {
-            name: payload.content.after.name,
-            type: startCase(ChannelType[payload.content.after.type]),
-            parentIfExist: payload.content.after.parentId ? channelMention(payload.content.after.parentId) : 'Aucun',
-            synced: payload.content.after.permissionsLocked ? 'Oui' : 'Non',
-            position: payload.content.after.position,
-            flags: new ChannelFlagsBitField(payload.content.after.flags).toArray().join(', ') || 'Aucun',
+            name: after.name,
+            type: startCase(ChannelType[after.type]),
+            parentIfExist: after.parentId ? channelMention(after.parentId) : 'Aucun',
+            synced: after.permissionsLocked ? 'Oui' : 'Non',
+            position: after.position,
+            flags: new ChannelFlagsBitField(after.flags).toArray().join(', ') || 'Aucun',
           },
         }),
-        // TODO: add permission diff to longDetails.
-        // longsDetails: getPermissionDetailsDiff(guild,
-        //   payload.content.before.permissionOverwrites,
-        //   payload.content.after.permissionOverwrites),
+        longDetails: getPermissionDetailsDiff(guild, before.permissionOverwrites, after.permissionOverwrites),
       };
     }
     case DiscordLogType.RoleCreate:

@@ -129,7 +129,6 @@ export default {
           **Nom :** "{name}"
           **Type :** {type}
           **Salon Parent :** {parentIfExist} (permissions synchronisées : {synced})
-          **Position :** {position}
           **Flags :** {flags}
         `,
       },
