@@ -14,7 +14,12 @@ import * as CustomResolvers from '@/resolvers';
 import type { DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
 import { makeMessageLink, trimText } from '@/utils';
-import { getChannelPermissionDetails, getPermissionDetailsDiff, getRolePermissionDetails } from './snapshotHelpers';
+import {
+  getChannelPermissionDetails,
+  getPermissionDetailsDiff,
+  getRolePermissionDetails,
+  getRolePermissionDetailsDiff,
+} from './snapshotHelpers';
 
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
 
@@ -165,46 +170,45 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
         longDetails: getRolePermissionDetails(payload.content.permissions),
       };
     case DiscordLogType.RoleUpdate: {
+      const { before, after } = payload.content;
       const parts = (fieldTexts as typeof messages.logs.fields[DiscordLogType.RoleUpdate]).contentValueParts;
 
       const content = [] as string[];
-      if (payload.content.before.name !== payload.content.after.name)
+      if (before.name !== after.name)
         content.push(parts.name);
-      if (payload.content.before.hexColor !== payload.content.after.hexColor)
+      if (before.hexColor !== after.hexColor)
         content.push(parts.color);
-      if (payload.content.before.hoist !== payload.content.after.hoist)
+      if (before.hoist !== after.hoist)
         content.push(parts.hoist);
-      if (payload.content.before.mentionable !== payload.content.after.mentionable)
+      if (before.mentionable !== after.mentionable)
         content.push(parts.mentionable);
-      if (payload.content.before.managed !== payload.content.after.managed)
+      if (before.managed !== after.managed)
         content.push(parts.managed);
-      if (payload.content.before.position !== payload.content.after.position)
+      if (before.position !== after.position)
         content.push(parts.position);
-      if (payload.content.before.permissions !== payload.content.after.permissions)
+      if (before.permissions !== after.permissions)
         content.push(parts.permissions);
 
       return {
         content: pupa(content.join('\n'), {
           before: {
-            name: payload.content.before.name,
-            hexColor: payload.content.before.hexColor,
-            hoist: payload.content.before.hoist ? 'Oui' : 'Non',
-            managed: payload.content.before.managed ? 'Oui' : 'Non',
-            mentionable: payload.content.before.mentionable ? 'Oui' : 'Non',
-            position: payload.content.before.position,
+            name: before.name,
+            hexColor: before.hexColor,
+            hoist: before.hoist ? 'Oui' : 'Non',
+            managed: before.managed ? 'Oui' : 'Non',
+            mentionable: before.mentionable ? 'Oui' : 'Non',
+            position: before.position,
           },
           after: {
-            name: payload.content.after.name,
-            hexColor: payload.content.after.hexColor,
-            hoist: payload.content.after.hoist ? 'Oui' : 'Non',
-            managed: payload.content.after.managed ? 'Oui' : 'Non',
-            mentionable: payload.content.after.mentionable ? 'Oui' : 'Non',
-            position: payload.content.after.position,
+            name: after.name,
+            hexColor: after.hexColor,
+            hoist: after.hoist ? 'Oui' : 'Non',
+            managed: after.managed ? 'Oui' : 'Non',
+            mentionable: after.mentionable ? 'Oui' : 'Non',
+            position: after.position,
           },
         }),
-        // TODO: add permission diff to longDetails.
-        // longsDetails: getRolePermissionDetailsDiff(
-        //   payload.content.before.permissions, payload.content.after.permissions),
+        longDetails: getRolePermissionDetailsDiff(before.permissions, after.permissions),
       };
     }
   }

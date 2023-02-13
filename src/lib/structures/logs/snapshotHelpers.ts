@@ -145,4 +145,21 @@ export function getRolePermissionDetails(bitfield: bigint | `${bigint}`): string
   return new PermissionsBitField(bitfield).toArray().map(perm => `${_.startCase(perm)}: ✅`).join('\n');
 }
 
-// TODO: add getRolePermissionDetailsDiff(bigint, bigint): string;
+export function getRolePermissionDetailsDiff(before: bigint | `${bigint}`, after: bigint | `${bigint}`): string {
+  const beforeArray = new PermissionsBitField(before).toArray();
+  const afterArray = new PermissionsBitField(after).toArray();
+
+  const lines = [] as string[];
+
+  for (const perm of beforeArray) {
+    if (!afterArray.includes(perm))
+      lines.push(`  ${perm}: ✅ → ◽️`);
+  }
+
+  for (const perm of afterArray) {
+    if (!beforeArray.includes(perm))
+      lines.push(`  ${perm}: ◽️ → ✅`);
+  }
+
+  return lines.join('\n');
+}
