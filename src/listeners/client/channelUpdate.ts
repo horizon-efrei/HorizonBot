@@ -2,8 +2,10 @@ import { Listener } from '@sapphire/framework';
 import type {
   Collection,
   DMChannel,
+  GuildAuditLogsEntry,
   GuildChannel,
   PermissionOverwrites,
+  User,
 } from 'discord.js';
 import { AuditLogEvent } from 'discord.js';
 import _ from 'lodash';
@@ -12,36 +14,52 @@ import { getChannelSnapshot, serializePermissions } from '@/structures/logs/snap
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
+type ChannelUpdateAuditLogEntries = Collection<string, GuildAuditLogsEntry<AuditLogEvent.ChannelOverwriteUpdate>
+  | GuildAuditLogsEntry<AuditLogEvent.ChannelUpdate>>;
+
 export default class ChannelUpdateListener extends Listener {
   private readonly _buffer = new Map<string, { oldChannel: GuildChannel; newChannel: GuildChannel }>();
 
-  public run(oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel): void {
+  public async run(oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel): Promise<void> {
     if (oldChannel.isDMBased() || newChannel.isDMBased())
       return;
 
-    if (oldChannel.name !== newChannel.name
+    const propertyUpdated = oldChannel.name !== newChannel.name
       || oldChannel.parentId !== newChannel.parentId
       || oldChannel.position !== newChannel.position
       || oldChannel.flags.bitfield !== newChannel.flags.bitfield
       || oldChannel.permissionsLocked !== newChannel.permissionsLocked
-      || oldChannel.type !== newChannel.type
-      || this._permissionChanged(oldChannel.permissionOverwrites.cache, newChannel.permissionOverwrites.cache)) {
-      this._buffer.emplace(newChannel.id, {
+      || oldChannel.type !== newChannel.type;
+
+    const permissionUpdated = this._permissionChanged(
+      oldChannel.permissionOverwrites.cache,
+      newChannel.permissionOverwrites.cache,
+    );
+
+    if (propertyUpdated || permissionUpdated) {
+      const auditLogs = propertyUpdated
+        ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate }).catch(nullop)
+        : permissionUpdated
+          ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelOverwriteUpdate }).catch(nullop)
+          : null;
+
+      const lastChannelUpdate = (auditLogs?.entries as ChannelUpdateAuditLogEntries | undefined)
+        ?.filter(entry => entry.target?.id === newChannel.id && entry.createdTimestamp > Date.now() - 2000)
+        .first();
+
+      const mapKey = this._getKey(newChannel, lastChannelUpdate?.executor);
+
+      this._buffer.emplace(mapKey, {
         insert: () => ({ oldChannel, newChannel }),
         update: existing => ({ ...existing, newChannel }),
       });
 
       setTimeout(async () => {
-        if (!this._buffer.has(newChannel.id))
+        if (!this._buffer.has(mapKey))
           return;
 
-        const changeSet = this._buffer.get(newChannel.id)!;
+        const changeSet = this._buffer.get(mapKey)!;
         this._buffer.delete(newChannel.id);
-
-        const auditLogs = await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate }).catch(nullop);
-        const lastChannelUpdate = auditLogs?.entries
-          .filter(entry => entry.target?.id === newChannel.id && entry.createdTimestamp > Date.now() - 5000)
-          .first();
 
         await DiscordLogManager.logAction({
           type: DiscordLogType.ChannelUpdate,
@@ -79,5 +97,9 @@ export default class ChannelUpdateListener extends Listener {
       .filter(({ allow, deny }) => allow !== 0 || deny !== 0);
 
     return noPermissionChanges.length > 0;
+  }
+
+  private _getKey(channel: GuildChannel, executor: User | null | undefined): string {
+    return `${channel.id}-${executor?.id ?? Date.now()}`;
   }
 }
