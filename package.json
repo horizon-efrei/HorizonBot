@@ -22,6 +22,7 @@
     "url": "https://github.com/horizon-efrei/HorizonBot"
   },
   "dependencies": {
+    "@sapphire/async-queue": "^1.5.0",
     "@sapphire/decorators": "^6.0.0",
     "@sapphire/discord-utilities": "^3.0.0",
     "@sapphire/discord.js-utilities": "^6.0.0",

@@ -1,3 +1,4 @@
+import { AsyncQueue } from '@sapphire/async-queue';
 import { container } from '@sapphire/framework';
 import {
   ChannelFlagsBitField,
@@ -21,12 +22,13 @@ import {
   getRolePermissionDetailsDiff,
 } from './snapshotHelpers';
 
+const asyncQueue = new AsyncQueue();
+
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
 
 type DiscordLogWithMessageContext = DiscordLogBase & ({ context: { channelId: string; messageId: string } });
 const getMessageUrl = <T extends DiscordLogWithMessageContext>(payload: T): string =>
   makeMessageLink(payload.guildId, payload.context.channelId, payload.context.messageId);
-
 
 // eslint-disable-next-line complexity
 export function getContentValue(payload: DiscordLogBase): { content: string; longDetails?: string } {
@@ -214,7 +216,7 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
   }
 }
 
-export async function logAction(payload: DiscordLogBase): Promise<void> {
+async function logActionUnsafe(payload: DiscordLogBase): Promise<void> {
   const guild = container.client.logStatuses.get(payload.guildId);
   if (!guild)
     throw new Error(`Could not find guild with id ${payload.guildId}`);
@@ -252,4 +254,14 @@ export async function logAction(payload: DiscordLogBase): Promise<void> {
 
   if (longDetails)
     await logChannel.send({ files: [{ name: 'details.txt', attachment: Buffer.from(longDetails) }] });
+}
+
+export async function logAction(payload: DiscordLogBase): Promise<void> {
+  await asyncQueue.wait();
+
+  try {
+    await logActionUnsafe(payload);
+  } finally {
+    asyncQueue.shift();
+  }
 }
