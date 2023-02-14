@@ -107,6 +107,9 @@ export function getPermissionDetailsDiff(
       const { allow: allowedBefore, deny: deniedBefore } = value;
       const { allow: allowedAfter, deny: deniedAfter } = permsAfter[value.id];
 
+      if (_.isEqual(allowedBefore, allowedAfter) && _.isEqual(deniedBefore, deniedAfter))
+        return null;
+
       const lines = [] as string[];
 
       for (const perm of allowedBefore) {
@@ -138,6 +141,7 @@ export function getPermissionDetailsDiff(
         ...lines,
       ].join('\n');
     })
+    .filter(filterNullAndUndefinedAndEmpty)
     .join('\n\n');
 }
 
