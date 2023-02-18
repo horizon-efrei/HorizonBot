@@ -61,7 +61,15 @@ export const latex = {
       equation: 'Équation à formatter.',
     },
   },
-  messages: {},
+  messages: {
+    equationModal: {
+      title: 'Equation LaTeX',
+      textInput: {
+        label: 'Équation',
+        placeholder: 'Écris ton équation ici... e.g. \\frac{1}{2}',
+      },
+    },
+  },
 } as const;
 
 export const mergePdf = {
