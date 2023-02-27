@@ -185,7 +185,7 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
     // Keeps members who reacted to the message
     const reactionFilter = interaction.options.getString(Options.Reacted);
     if (reactionFilter) {
-      const [reactionResolvable, reactedMessageResolvable] = reactionFilter.split('@');
+      const [reactionResolvable, reactedMessageResolvable] = reactionFilter.split(' ');
       if (reactionResolvable && reactedMessageResolvable) {
         const emoji = resolveCompleteEmoji(reactionResolvable, interaction.guild);
         const reactedMessage = await Resolvers.resolveMessage(

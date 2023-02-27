@@ -10,7 +10,7 @@ export const dump = {
       format: 'Formate les membres en fonction du template donné.',
       hasAllRoles: 'Affiche les membres qui ont tous les rôles indiqués.',
       hasRoles: 'Affiche les membres qui ont au moins un des rôles indiqués.',
-      reacted: 'Affiche les membres qui ont réagi à un message.',
+      reacted: 'Membres ayant réagi à un message avec la réaction indiquée. Format: "reaction <espace> message"',
       order: 'Trie les membres par ordre alphabétique.',
       limit: 'Affiche uniquement le nombre de membres indiqué.',
       separator: "Change le séparateur entre chaque membre. Par défaut, il s'agit d'une nouvelle ligne.",
