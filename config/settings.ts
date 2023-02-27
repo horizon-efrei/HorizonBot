@@ -87,6 +87,11 @@ export default {
       slugs: ['py', 'python'],
     },
   ] as CodeLanguageResult[],
-  maintainers: [`Elliot Maisl (${userMention('188341077902753794')})`],
-  thanks: [`Kétessar Tan (${userMention('222050512684580876')}) : contributions`],
+  maintainers: [
+    `Elliot Maisl (${userMention('188341077902753794')})`,
+  ],
+  thanks: [
+    `Kétessar Tan (${userMention('222050512684580876')}) : contributions`,
+    `David Gorgette (${userMention('890084641317478400')}) : suggestions & signalements de bugs`,
+  ],
 } as const;
