@@ -221,7 +221,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
       return;
     }
 
-    await tag.remove();
+    await tag.deleteOne();
     await interaction.reply(this.messages.removedTag);
   }
 }

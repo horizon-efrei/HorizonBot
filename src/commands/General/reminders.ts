@@ -182,7 +182,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    await reminder.remove();
+    await reminder.deleteOne();
     await interaction.reply({ content: this.messages.removedReminder, ephemeral: interaction.inGuild() });
   }
 

@@ -146,7 +146,7 @@ export default class ManageContactsCommand extends HorizonSubcommand<typeof conf
       return;
     }
 
-    await contact.remove();
+    await contact.deleteOne();
 
     await interaction.reply(this.messages.removedContact);
   }
