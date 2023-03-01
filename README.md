@@ -52,6 +52,7 @@ Vous pouvez utiliser le bot pour votre propre serveur à condition de respecter 
 #### Contributeurs
 
 - [Kethash]
+- [David G.]
 
 #### License
 
@@ -70,3 +71,4 @@ HorizonBot est sous license [MIT](./LICENSE).
 <!-- Contributors -->
 [noftaly]: https://github.com/noftaly
 [Kethash]: https://github.com/Kethash
+[David G.]: https://github.com/gtedavid
