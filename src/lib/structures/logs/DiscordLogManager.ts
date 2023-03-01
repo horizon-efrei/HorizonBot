@@ -5,14 +5,15 @@ import {
   channelMention,
   ChannelType,
   EmbedBuilder,
+  hyperlink,
   roleMention,
 } from 'discord.js';
-import { isEqual, startCase } from 'lodash';
+import { differenceWith, isEqual, startCase } from 'lodash';
 import pupa from 'pupa';
 import messages from '@/config/messages';
 import DiscordLogs from '@/models/discordLogs';
 import * as CustomResolvers from '@/resolvers';
-import type { DiscordLogBase } from '@/types/database';
+import type { AttachmentInfos, DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
 import { makeMessageLink, trimText } from '@/utils';
 import {
@@ -25,6 +26,10 @@ import {
 const asyncQueue = new AsyncQueue();
 
 const listAndFormatter = new Intl.ListFormat('fr', { style: 'long', type: 'conjunction' });
+
+const attachmentsList = (attachments: AttachmentInfos[]): string => (attachments.length > 0
+  ? attachments.map(({ name, url }) => hyperlink(name, url)).join('\n')
+  : 'Aucune');
 
 type DiscordLogWithMessageContext = DiscordLogBase & ({ context: { channelId: string; messageId: string } });
 const getMessageUrl = <T extends DiscordLogWithMessageContext>(payload: T): string =>
@@ -81,9 +86,23 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
       return {
         content: pupa(fieldTexts.contentValue, {
           ...payload,
-          content: typeof payload.content === 'string'
-            ? trimText(payload.content)
-            : { before: trimText(payload.content.before, 400), after: trimText(payload.content.after, 400) },
+          content: {
+            messageContent: 'before' in payload.content
+              ? {
+                  before: trimText(payload.content.before.messageContent, 400),
+                  after: trimText(payload.content.after.messageContent, 400),
+                }
+              : trimText(payload.content.messageContent),
+            attachments: 'before' in payload.content && 'after' in payload.content
+              ? attachmentsList(
+                  differenceWith<AttachmentInfos, AttachmentInfos>(
+                    payload.content.before.attachments,
+                    payload.content.after.attachments,
+                    isEqual,
+                  ),
+                )
+              : attachmentsList(payload.content.attachments),
+          },
           url: getMessageUrl(payload),
         }),
       };

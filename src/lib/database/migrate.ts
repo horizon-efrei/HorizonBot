@@ -77,6 +77,16 @@ async function migrate(): Promise<void> {
     discordLogsTotal += (upd as { modifiedCount: number }).modifiedCount;
   }
 
+  const updMessageContent = await db.collection('discordlogs').updateMany(
+    { type: { $in: ['message-update', 'message-create', 'message-delete'] } },
+    [
+      { $set: { contentTemp: { messageContent: '$content', attachments: [] } } },
+      { $set: { content: '$contentTemp' } },
+      { $unset: ['contentTemp'] },
+    ],
+  );
+  discordLogsTotal += (updMessageContent as { modifiedCount: number }).modifiedCount;
+
   console.log(`DiscordLogs: migrated ${discordLogsTotal}\n\n`);
 
   // LogStatuses

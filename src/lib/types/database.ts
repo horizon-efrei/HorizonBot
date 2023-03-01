@@ -345,7 +345,16 @@ export interface RoleSnapshot {
 
 type UserId = string;
 type ChannelId = string;
-type MessageContent = string;
+
+export interface AttachmentInfos {
+  url: string;
+  name: string;
+}
+
+interface MessageContent {
+  messageContent: string;
+  attachments: AttachmentInfos[];
+}
 
 /** Type for the "Discord Logs"'s mongoose schema */
 export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }

@@ -30,7 +30,10 @@ export default class MessageDeleteListener extends Listener {
           authorId: message.author.id,
           executorId: lastMessageDelete?.executor?.id ?? message.author.id,
         },
-        content: message.content,
+        content: {
+          messageContent: message.content,
+          attachments: message.attachments.map(({ url, name, id }) => ({ url, name: name ?? id })),
+        },
         guildId: message.guild.id,
         severity: 1,
       });

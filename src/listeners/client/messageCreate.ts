@@ -18,7 +18,10 @@ export default class MessageListener extends Listener {
     await DiscordLogManager.logAction({
       type: DiscordLogType.MessageCreate,
       context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
-      content: message.content,
+      content: {
+        messageContent: message.content,
+        attachments: message.attachments.map(({ url, name, id }) => ({ url, name: name ?? id })),
+      },
       guildId: message.guild.id,
       severity: 1,
     });

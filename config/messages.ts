@@ -211,9 +211,10 @@ export default {
         contentValue: stripIndent`
           [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
           Contenu : \`\`\`diff
-          - {content.before}
-          + {content.after}
+          - {content.messageContent.before}
+          + {content.messageContent.after}
           \`\`\`
+          Pièces Jointes retirées : {content.attachments}
         `,
       },
       [DiscordLogType.MessageCreate]: {
@@ -223,7 +224,8 @@ export default {
         contentName: ':pencil: Nouveau message',
         contentValue: stripIndent`
           [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
-          Contenu : {content}
+          Contenu : {content.messageContent}
+          Pièces Jointes : {content.attachments}
         `,
       },
       [DiscordLogType.MessageDelete]: {
@@ -233,7 +235,8 @@ export default {
         contentName: ':pencil: Message',
         contentValue: stripIndent`
           Dans ${channelMention('{context.channelId}')}
-          Contenu : {content}
+          Contenu : {content.messageContent}
+          Pièces Jointes : {content.attachments}
         `,
       },
       [DiscordLogType.ReactionAdd]: {

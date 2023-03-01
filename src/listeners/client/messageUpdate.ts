@@ -17,7 +17,16 @@ export default class MessageUpdateListener extends Listener {
     await DiscordLogManager.logAction({
       type: DiscordLogType.MessageUpdate,
       context: { messageId: newMessage.id, channelId: newMessage.channel.id, authorId: newMessage.author.id },
-      content: { before: oldMessage.content, after: newMessage.content },
+      content: {
+        before: {
+          messageContent: oldMessage.content,
+          attachments: oldMessage.attachments.map(({ url, name, id }) => ({ url, name: name ?? id })),
+        },
+        after: {
+          messageContent: newMessage.content,
+          attachments: newMessage.attachments.map(({ url, name, id }) => ({ url, name: name ?? id })),
+        },
+      },
       guildId: newMessage.guild.id,
       severity: 1,
     });
