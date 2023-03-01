@@ -15,21 +15,9 @@
   description: Issues/PRs that reports or fixes a bug.
   color: 'D93F0B'
 
-- name: 'status: blocked'
-  description: PRs that are blocked by other issues/PRs.
-  color: 'E85247'
-- name: 'status: won''t do'
-  description: Issues and PRs that won't be treated.
-  color: 'E85247'
 - name: 'status: needs testing'
   description: PRs that need testing from the author or volunteers.
   color: 'A55124'
-- name: 'status: duplicate'
-  description: Issues/PRs that are duplicated.
-  color: 'CFD3D7'
-- name: 'status: invalid'
-  description: Issues/PRs that are invalid and won't be treated.
-  color: 'CFD3D7'
 - name: 'status: help wanted'
   description: Issues that need assistance from volunteers or PRs that need help to proceed.
   color: '008672'
@@ -42,9 +30,6 @@
 - name: 'status: approved'
   description: Issues and PRs that have been approved.
   color: '8CE098'
-- name: 'status: denied'
-  description: Issues and PRs that have been denied.
-  color: 'E85247'
 
 - name: 'priority: critical'
   description: Issues that must be fixed or PRs that must be finished and merged with MAXIMUM PRIORITY.
@@ -74,28 +59,3 @@
 - name: 'difficulty: trivial'
   description: Issues that are very easy to finish.
   color: '85E025'
-
-- name: 'scope: e-class'
-  description: Issues and PRs related to e-classes.
-  color: 'C2E0C6'
-- name: 'scope: class groups'
-  description: Issues and PRs related to class groups (i.e. class presidents or utils for within class groups).
-  color: 'C2E0C6'
-- name: 'scope: tags'
-  description: Issues and PRs related to tags.
-  color: 'C2E0C6'
-- name: 'scope: community'
-  description: Issues and PRs related to the community and the member's engagement.
-  color: 'C2E0C6'
-- name: 'scope: admin features'
-  description: Issues and PRs related to admin features (usually /src/commands/Admin).
-  color: 'C2E0C6'
-- name: 'scope: general features'
-  description: Issues and PRs related to general features (usually /src/commands/General)..
-  color: 'C2E0C6'
-- name: 'scope: professors features'
-  description: Issues and PRs related to professors features (usually /src/commands/Professors)..
-  color: 'C2E0C6'
-- name: 'scope: internal'
-  description: Issues and PRs related to the internal code itself.
-  color: 'C2E0C6'
