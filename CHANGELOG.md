@@ -6,6 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.4.0] - 2023/03/01
+
+### Added
+
+- Added a `/purge` command (fixes #44)
+- Added attachments to Message{Create,Update,Delete} logs
+- Added Channel{Create,Update,Delete} logs
+- Added Role{Create,Update,Delete} logs
+- Added special thanks to David G.
+
+### Fixed
+
+- Fixed crash by ensuring command interactions don't timeout
+- Fixed latex command when no arguments are given by showing a modal with text input
+- Fixed logs display by queuing them so they are sent in order
+- Fixed logs by sending ChangeUsername only in guilds where the member is (fixes #93)
+
+### Improved
+
+- Improved eclasses by deleting the role after a week only (fixes #91)
+- Improved `reacted` option of dump command by making it easier to use
+- Improved reminders list by ordering them by due date
+
+### Removed
+
+- Removed unused GitHub labels
+
+
 ## [1.3.1] - 2023/02/08
 
 ### Fixed
