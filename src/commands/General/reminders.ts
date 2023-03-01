@@ -125,14 +125,14 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
 
     await new PaginatedContentMessageEmbed()
       .setTemplate(new EmbedBuilder().setTitle(pupa(this.messages.listTitle, { total: reminders.size })))
-      // This is a Set, not an array!
-      // eslint-disable-next-line unicorn/no-useless-spread
-      .setItems([
-        ...reminders.map(reminder => pupa(this.messages.listLine, {
-          ...reminder.toJSON(),
-          timestamp: Math.round(reminder.date.getTime() / 1000),
-        })),
-      ])
+      .setItems(
+        [...reminders]
+          .sort((a, b) => a.date.getTime() - b.date.getTime())
+          .map(reminder => pupa(this.messages.listLine, {
+            ...reminder.toJSON(),
+            timestamp: Math.round(reminder.date.getTime() / 1000),
+          })),
+      )
       .setItemsPerPage(10)
       .make()
       .run(interaction);
