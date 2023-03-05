@@ -11,7 +11,9 @@ import { DiscordLogType, LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
 
 export default {
-  global: {},
+  global: {
+    invitationLine: '`{code}`: lien créé par {link.inviter}, utilisé {link.uses} fois.',
+  },
   errors: {
     precondition: {
       [Identifiers.PreconditionCooldown]: 'Pas si vite ! Cette commande est sous cooldown, attendez un peu avant de la réutiliser.',
@@ -181,8 +183,11 @@ export default {
         color: settings.colors.green,
         contextName: ':bust_in_silhouette: Membre',
         contextValue: userMention('{context}'),
-        contentName: ":link: Lien d'invitation",
-        contentValue: '`{code}`: lien créé par {link.inviter}, utilisé {link.uses} fois.',
+        contentName: ':information_source: Informations',
+        contentValue: stripIndent`
+          Invitation(s): {links}
+          **{nth}ème** membre.
+        `,
       },
       [DiscordLogType.GuildLeave]: {
         color: settings.colors.red,

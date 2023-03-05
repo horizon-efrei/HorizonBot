@@ -51,10 +51,14 @@ export function getContentValue(
     case DiscordLogType.GuildJoin:
       return {
         thumbnail: guild.members.cache.get(payload.context)?.avatarURL(),
-        content: payload.content
-          .map(code => pupa(fieldTexts.contentValue, { code, link: guild.invites.cache.get(code) }))
-          .join('\nou : ')
-          || 'Inconnue',
+        content: pupa(fieldTexts.contentValue, {
+          nth: guild.memberCount,
+          links: payload.content
+            .map(code => pupa(messages.global.invitationLine, {
+              code,
+              link: guild.invites.cache.get(code),
+            })).join('\nou : ') || 'Inconnue',
+          }),
       };
     case DiscordLogType.GuildLeave:
       return {
