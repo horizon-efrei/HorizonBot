@@ -24,7 +24,7 @@ export default {
     eclassRoleFormatFinished: '[Terminé le {formattedDate}] Cours {subject.classCode}: {topic}',
     eclassReminderTime: 15 * 60 * 1000, // 15 minutes
     eclassRoleExpiration: 7 * 24 * 60 * 60 * 1000, // 7 days
-    discordInviteLinkRegex: /(?:discord\.(?:gg|io|me|plus|link)|invite\.(?:gg|ink)|discord(?:app)?\.com\/invite)\/[\w-]{2,}/i,
+    discordInviteLinkRegex: /(?:discord\.(?:gg|io|me|plus|link)|invite\.(?:gg|ink)|discord(?:app)?\.com\/invite)\/(?<code>[\w-]{2,})/i,
   },
   apis: {
     latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',
