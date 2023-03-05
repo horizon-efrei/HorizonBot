@@ -59,7 +59,7 @@ export default class ChannelUpdateListener extends Listener {
           return;
 
         const changeSet = this._buffer.get(mapKey)!;
-        this._buffer.delete(newChannel.id);
+        this._buffer.delete(mapKey);
 
         await DiscordLogManager.logAction({
           type: DiscordLogType.ChannelUpdate,
