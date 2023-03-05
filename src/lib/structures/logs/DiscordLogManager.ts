@@ -1,5 +1,6 @@
 import { AsyncQueue } from '@sapphire/async-queue';
 import { container } from '@sapphire/framework';
+import dayjs from 'dayjs';
 import {
   ChannelFlagsBitField,
   channelMention,
@@ -11,6 +12,7 @@ import {
 import { differenceWith, isEqual, startCase } from 'lodash';
 import pupa from 'pupa';
 import messages from '@/config/messages';
+import settings from '@/config/settings';
 import DiscordLogs from '@/models/discordLogs';
 import * as CustomResolvers from '@/resolvers';
 import type { AttachmentInfos, DiscordLogBase } from '@/types/database';
@@ -105,6 +107,20 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
           },
           url: getMessageUrl(payload),
         }),
+      };
+    case DiscordLogType.MessageDeleteBulk:
+      return {
+        content: pupa(fieldTexts.contentValue, payload),
+        longDetails: payload.content
+          .map(msg => [
+            `[${dayjs(msg.createdAt).format(settings.configuration.dateFormat)}]`,
+            `[${msg.authorTag}]:`,
+            msg.messageContent,
+            msg.attachments.length > 0
+              ? `\n=> ${msg.attachments.length} Pièce(s) Jointe(s): ${msg.attachments.map(atc => `${atc.name} (${atc.url})`).join(', ')}`
+              : '',
+          ].join(' '))
+          .join('\n'),
       };
     case DiscordLogType.ReactionAdd:
     case DiscordLogType.ReactionRemove:

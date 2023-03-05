@@ -39,6 +39,7 @@ export default {
       [DiscordLogType.MessageUpdate]: ':incoming_envelope: Message modifié',
       [DiscordLogType.MessageCreate]: ':envelope_with_arrow: Message posté',
       [DiscordLogType.MessageDelete]: ':wastebasket: Message supprimé',
+      [DiscordLogType.MessageDeleteBulk]: ':wastebasket: Messages supprimés en masse',
       [DiscordLogType.ReactionAdd]: ':smiley: Réaction ajoutée',
       [DiscordLogType.ReactionRemove]: ':anguished: Réaction retirée',
       [DiscordLogType.MemberRoleAdd]: ':beginner: Rôle ajouté',
@@ -62,6 +63,7 @@ export default {
       [DiscordLogType.MessageUpdate]: 'message modifié',
       [DiscordLogType.MessageCreate]: 'message posté',
       [DiscordLogType.MessageDelete]: 'message supprimé',
+      [DiscordLogType.MessageDeleteBulk]: 'messages supprimés en masse',
       [DiscordLogType.ReactionAdd]: 'réaction ajoutée',
       [DiscordLogType.ReactionRemove]: 'réaction retirée',
       [DiscordLogType.MemberRoleAdd]: 'rôle ajouté',
@@ -237,6 +239,16 @@ export default {
           Dans ${channelMention('{context.channelId}')}
           Contenu : {content.messageContent}
           Pièces Jointes : {content.attachments}
+        `,
+      },
+      [DiscordLogType.MessageDeleteBulk]: {
+        color: settings.colors.red,
+        contextName: ':busts_in_silhouette: Membre',
+        contextValue: `Exécuteur : ${userMention('{context.executorId}')}`,
+        contentName: ':pencil: Messages',
+        contentValue: stripIndent`
+          Dans ${channelMention('{context.channelId}')}
+          Nombre de messages : {content.length}
         `,
       },
       [DiscordLogType.ReactionAdd]: {

@@ -259,6 +259,7 @@ export enum DiscordLogType {
   MessageCreate = 'message-create',
   MessageUpdate = 'message-update',
   MessageDelete = 'message-delete',
+  MessageDeleteBulk = 'message-delete-bulk',
 
   MemberNicknameUpdate = 'member-nickname-update',
   MemberRoleAdd = 'member-role-add',
@@ -278,12 +279,9 @@ export enum DiscordLogType {
   VoiceLeave = 'voice-leave',
 }
 
-export interface GuildLeaveUserSnapshot {
-  userId: string;
-  username: string;
-  displayName: string;
-  joinedAt: number | null;
-  roles: string[];
+interface BeforeAfter<T> {
+  before: T;
+  after: T;
 }
 
 interface AuthorMessageReference {
@@ -292,28 +290,47 @@ interface AuthorMessageReference {
   authorId: string;
 }
 
-interface ExecutorAndAuthorMessageReference extends AuthorMessageReference {
-  executorId: string;
+interface ExecutorReference {
+  executorId?: string;
 }
 
-interface BeforeAfter<T> {
-  before: T;
-  after: T;
-}
+interface ExecutorAndAuthorMessageReference extends AuthorMessageReference, ExecutorReference {}
 
-interface UserActionReference {
+interface UserActionReference extends ExecutorReference {
   userId: string;
-  executorId: string | undefined;
 }
 
-interface RoleActionReference {
+interface RoleActionReference extends ExecutorReference {
   roleId: string;
-  executorId: string | undefined;
 }
 
-interface ChannelActionReference {
+interface ChannelActionReference extends ExecutorReference {
   channelId: string;
-  executorId: string | undefined;
+}
+
+export interface AttachmentInfos {
+  url: string;
+  name: string;
+}
+
+interface MessageContent {
+  messageContent: string;
+  attachments: AttachmentInfos[];
+}
+
+export interface GuildLeaveUserSnapshot {
+  userId: string;
+  username: string;
+  displayName: string;
+  joinedAt: number | null;
+  roles: string[];
+}
+
+interface MessageSnapshot extends MessageContent {
+  messageId: string;
+  authorId: string;
+  authorTag: string;
+  createdAt: Date;
 }
 
 export interface ChannelSnapshot {
@@ -345,16 +362,9 @@ export interface RoleSnapshot {
 
 type UserId = string;
 type ChannelId = string;
-
-export interface AttachmentInfos {
-  url: string;
-  name: string;
-}
-
-interface MessageContent {
-  messageContent: string;
-  attachments: AttachmentInfos[];
-}
+type RoleId = string;
+type Invitation = string;
+type Emoji = string;
 
 /** Type for the "Discord Logs"'s mongoose schema */
 export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
@@ -365,26 +375,31 @@ export type DiscordLogBase = { severity: 1 | 2 | 3; guildId: string }
     | { type: DiscordLogType.ChannelDelete; context: ChannelActionReference; content: ChannelSnapshot }
 
     // The content is the possible invite-code used
-    | { type: DiscordLogType.GuildJoin; context: UserId; content: string[] }
+    | { type: DiscordLogType.GuildJoin; context: UserId; content: Invitation[] }
     | { type: DiscordLogType.GuildLeave; context: UserId; content: GuildLeaveUserSnapshot }
 
     // The content is the linked invites
-    | { type: DiscordLogType.InvitePost; context: AuthorMessageReference; content: string[] }
+    | { type: DiscordLogType.InvitePost; context: AuthorMessageReference; content: Invitation[] }
     | { type: DiscordLogType.MessageCreate; context: AuthorMessageReference; content: MessageContent }
     | { type: DiscordLogType.MessageUpdate; context: AuthorMessageReference; content: BeforeAfter<MessageContent> }
     | { type: DiscordLogType.MessageDelete; context: ExecutorAndAuthorMessageReference; content: MessageContent }
+    | {
+        type: DiscordLogType.MessageDeleteBulk;
+        context: ExecutorReference & { channelId: ChannelId };
+        content: MessageSnapshot[];
+      }
 
     // The content is the nickname
     | { type: DiscordLogType.MemberNicknameUpdate; context: UserActionReference; content: BeforeAfter<string> }
     // The content is the role IDs
-    | { type: DiscordLogType.MemberRoleAdd; context: UserActionReference; content: string[] }
+    | { type: DiscordLogType.MemberRoleAdd; context: UserActionReference; content: RoleId[] }
     // The content is the role IDs
-    | { type: DiscordLogType.MemberRoleRemove; context: UserActionReference; content: string[] }
+    | { type: DiscordLogType.MemberRoleRemove; context: UserActionReference; content: RoleId[] }
 
     // The content is the emoji used
-    | { type: DiscordLogType.ReactionAdd; context: ExecutorAndAuthorMessageReference; content: string }
+    | { type: DiscordLogType.ReactionAdd; context: ExecutorAndAuthorMessageReference; content: Emoji }
     // The content is the emoji used
-    | { type: DiscordLogType.ReactionRemove; context: ExecutorAndAuthorMessageReference; content: string }
+    | { type: DiscordLogType.ReactionRemove; context: ExecutorAndAuthorMessageReference; content: Emoji }
 
     | { type: DiscordLogType.RoleCreate; context: RoleActionReference; content: RoleSnapshot }
     | { type: DiscordLogType.RoleUpdate; context: RoleActionReference; content: BeforeAfter<RoleSnapshot> }
