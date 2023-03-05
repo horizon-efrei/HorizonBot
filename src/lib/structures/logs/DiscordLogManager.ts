@@ -38,7 +38,9 @@ const getMessageUrl = <T extends DiscordLogWithMessageContext>(payload: T): stri
   makeMessageLink(payload.guildId, payload.context.channelId, payload.context.messageId);
 
 // eslint-disable-next-line complexity
-export function getContentValue(payload: DiscordLogBase): { content: string; longDetails?: string } {
+export function getContentValue(
+  payload: DiscordLogBase,
+): { content: string; longDetails?: string; thumbnail?: string | null } {
   const guild = container.client.guilds.cache.get(payload.guildId);
   if (!guild)
     throw new Error(`Could not find guild with id ${payload.guildId}`);
@@ -48,6 +50,7 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
   switch (payload.type) {
     case DiscordLogType.GuildJoin:
       return {
+        thumbnail: guild.members.cache.get(payload.context)?.avatarURL(),
         content: payload.content
           .map(code => pupa(fieldTexts.contentValue, { code, link: guild.invites.cache.get(code) }))
           .join('\nou : ')
@@ -55,6 +58,7 @@ export function getContentValue(payload: DiscordLogBase): { content: string; lon
       };
     case DiscordLogType.GuildLeave:
       return {
+        thumbnail: container.client.users.cache.get(payload.context)?.avatarURL(),
         content: pupa(fieldTexts.contentValue, {
           ...payload,
           content: {
@@ -273,7 +277,7 @@ async function logActionUnsafe(payload: DiscordLogBase): Promise<void> {
     return;
 
   const fieldOptions = messages.logs.fields[payload.type];
-  const { content: contentValue, longDetails } = getContentValue(payload);
+  const { content: contentValue, longDetails, thumbnail } = getContentValue(payload);
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: messages.logs.embedTitle })
@@ -284,6 +288,9 @@ async function logActionUnsafe(payload: DiscordLogBase): Promise<void> {
       { name: fieldOptions.contentName, value: contentValue || "Impossible de charger plus d'informations", inline: true },
     ])
     .setTimestamp();
+
+  if (thumbnail)
+    embed.setThumbnail(thumbnail);
 
   await logChannel.send({ embeds: [embed] });
 
