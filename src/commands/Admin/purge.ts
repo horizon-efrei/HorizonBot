@@ -41,7 +41,9 @@ export default class PurgeCommand extends HorizonCommand<typeof config> {
         .addIntegerOption(
           option => option
             .setName(Options.Amount)
-            .setDescription(this.descriptions.options.amount).setMinValue(1),
+            .setDescription(this.descriptions.options.amount)
+            .setMinValue(2)
+            .setRequired(true),
         )
         .addUserOption(
           option => option
@@ -94,7 +96,7 @@ export default class PurgeCommand extends HorizonCommand<typeof config> {
       (message: GuildMessage): boolean => message.deletable && message.id !== response.id,
     ];
 
-    const amount = interaction.options.getInteger(Options.Amount) ?? 100;
+    const amount = interaction.options.getInteger(Options.Amount, true);
     const includes = interaction.options.getString(Options.Includes);
     const withFiles = interaction.options.getBoolean(Options.WithFiles);
     const withLinks = interaction.options.getBoolean(Options.WithLinks);
