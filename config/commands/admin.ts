@@ -206,6 +206,7 @@ export const reactionRole = {
       removePair: "Supprimer une paire de réaction/rôle d'un menu existant.",
       unique: "Choisir si l'on peut prendre qu'un rôle par utilisateur.",
       roleCondition: 'Choisir le rôle pré-requis pour utiliser le menu.',
+      image: "Choisir l'image du menu",
     },
     options: {
       messageUrl: 'URL du menu de réaction.',
@@ -215,6 +216,7 @@ export const reactionRole = {
       emoji: 'Émoji de la réaction.',
       role: 'Rôle à donner.',
       choice: 'Choix à donner.',
+      imageLink: "Lien de l'image du menu.",
     },
   },
   messages: {
@@ -222,6 +224,7 @@ export const reactionRole = {
     notAMenu: "Ce message n'est pas un menu de réaction.",
     invalidReaction: "Cette réaction n'est pas valide.",
     noRoleProvided: 'Il faut choisir quel rôle utiliser !',
+    noLinkProvided: 'Il faut définir un lien !',
 
     modals: {
       titleLabel: 'Titre du menu',
@@ -271,6 +274,10 @@ export const reactionRole = {
     removedRoleCondition: 'Tu as supprimé la condition de rôle pour ce menu.',
     roleCondition: 'La condition de rôle pour ce menu est : {role}.',
     noRoleCondition: "Il n'y a pas de condition de rôle pour ce menu.",
+
+    // Image
+    changedImage: "Tu as définit l'image pour ce menu à {link}",
+    removedImage: "Tu as supprimé l'image pour ce menu.",
   },
 } as const;
 

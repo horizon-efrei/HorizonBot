@@ -42,6 +42,7 @@ enum Options {
   Role = 'role',
   MessageUrl = 'message-url',
   Choice = 'choix',
+  ImageLink = 'lien-image',
   Emoji1 = 'emoji1',
   Role1 = 'role1',
   Emoji2 = 'emoji2',
@@ -64,6 +65,11 @@ enum OptionRoleConditionChoiceChoices {
   Add = 'ajout',
   Clear = 'tout-supprimer',
   Show = 'afficher',
+}
+
+enum OptionImageChoiceChoices {
+  Add = 'ajout',
+  Clear = 'supprimer',
 }
 
 const titleInput = new TextInputBuilder()
@@ -129,6 +135,7 @@ function * roleGenerator(this: void): Generator<RoleOptionCallback, null> {
     { name: 'remove-pair', chatInputRun: 'removePair' },
     { name: 'unique', chatInputRun: 'unique' },
     { name: 'role-condition', chatInputRun: 'roleCondition' },
+    { name: 'image', chatInputRun: 'image' },
   ],
 })
 export default class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
@@ -297,6 +304,34 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
               option => option
                 .setName(Options.Role)
                 .setDescription(this.descriptions.options.role),
+            ),
+        )
+        .addSubcommand(
+          subcommand => subcommand
+            .setName('image')
+            .setDescription(this.descriptions.subcommands.image)
+            .addStringOption(
+              option => option
+                .setName(Options.MessageUrl)
+                .setDescription(this.descriptions.options.messageUrl)
+                .setRequired(true)
+                .setAutocomplete(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.Choice)
+                .setDescription(this.descriptions.options.choice)
+                .setChoices(
+                  { name: "Définir l'image", value: OptionImageChoiceChoices.Add },
+                  { name: "Supprimer l'image", value: OptionImageChoiceChoices.Clear },
+                )
+                .setRequired(true),
+            )
+            .addStringOption(
+              option => option
+                .setName(Options.ImageLink)
+                .setDescription(this.descriptions.options.imageLink)
+                .setRequired(false),
             ),
         ),
     );
@@ -590,7 +625,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
         await interaction.reply(this.messages.removedRoleCondition);
         break;
       case OptionRoleConditionChoiceChoices.Add: {
-        const askedRole = interaction.options.getRole('role');
+        const askedRole = interaction.options.getRole(Options.Role);
         if (!askedRole) {
           await interaction.reply({ content: this.messages.noRoleProvided, ephemeral: true });
           return;
@@ -600,6 +635,45 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
         await document.save();
 
         await interaction.reply(getEmbed(pupa(this.messages.changedRoleCondition, { role: askedRole })));
+        break;
+      }
+    }
+  }
+
+  public async image(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+    const metadata = await this._resolveMenuMetadata(interaction);
+    if (metadata.isErr()) {
+      await interaction.reply({ content: metadata.unwrapErr(), ephemeral: true });
+      return;
+    }
+
+    const { rrMessage } = metadata.unwrap();
+
+    const choice = interaction.options.getString(Options.Choice, true) as OptionImageChoiceChoices;
+
+    switch (choice) {
+      case OptionImageChoiceChoices.Clear:
+        await rrMessage.edit({
+          embeds: [
+            EmbedBuilder.from(rrMessage.embeds[0]).setThumbnail(null),
+          ],
+        });
+        await interaction.reply(this.messages.removedImage);
+        break;
+      case OptionImageChoiceChoices.Add: {
+        const askedImage = interaction.options.getString(Options.ImageLink);
+        if (!askedImage) {
+          await interaction.reply({ content: this.messages.noRoleProvided, ephemeral: true });
+          return;
+        }
+
+        await rrMessage.edit({
+          embeds: [
+            EmbedBuilder.from(rrMessage.embeds[0]).setThumbnail(askedImage),
+          ],
+        });
+
+        await interaction.reply(pupa(this.messages.changedImage, { link: askedImage }));
         break;
       }
     }
