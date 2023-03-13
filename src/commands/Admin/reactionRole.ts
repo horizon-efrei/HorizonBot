@@ -6,11 +6,9 @@ import { isNullish } from '@sapphire/utilities';
 import type {
   GuildTextBasedChannel,
   InteractionReplyOptions,
-  NewsChannel,
   Role,
   SlashCommandRoleOption,
   SlashCommandStringOption,
-  TextChannel,
 } from 'discord.js';
 import {
   ActionRowBuilder,
@@ -339,7 +337,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
 
   public async create(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const uniqueRole = interaction.options.getBoolean(Options.Unique) ?? false;
-    const channel = interaction.options.getChannel(Options.Channel, true) as NewsChannel | TextChannel;
+    const channel = interaction.options.getChannel(Options.Channel, true) as GuildTextBasedChannel;
     const condition = interaction.options.getRole(Options.RoleCondition);
 
     const pairs: Array<{ reaction: string; role: Role }> = [];

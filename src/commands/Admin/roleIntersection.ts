@@ -51,7 +51,7 @@ export default class RoleIntersectionCommand extends HorizonCommand<typeof confi
       interaction.options.getRole(Options.Role5),
     ].filter(filterNullAndUndefined);
 
-    const members = await interaction.guild.members.fetch({ force: true });
+    const members = await interaction.guild.members.fetch();
     const targetedMembers = members
       .filter(member => allRoles.every(role => member.roles.cache.has(role.id)));
 
