@@ -15,6 +15,26 @@ export default class MessageListener extends Listener {
       || !message.inGuild())
       return;
 
+    await this._log(message);
+
+    const mentionedTempIntersectionRoles = this.container.client.roleIntersections
+      .filter(r => message.mentions.roles.has(r))
+      .map(roleId => message.guild.roles.resolve(roleId))
+      .filter(filterNullAndUndefined);
+    if (mentionedTempIntersectionRoles.size > 0) {
+      this.container.logger.debug(`[Intersection Roles] ${mentionedTempIntersectionRoles.size} role was just mentioned by ${message.author.username}. It will expire in two days.`);
+
+      for (const role of mentionedTempIntersectionRoles) {
+        await RoleIntersections.findOneAndUpdate(
+          { roleId: role.id, guildId: role.guild.id },
+          { expiration: Date.now() + settings.configuration.roleIntersectionExpiration },
+          { upsert: true },
+        );
+      }
+    }
+  }
+
+  private async _log(message: Message<true>): Promise<void> {
     await DiscordLogManager.logAction({
       type: DiscordLogType.MessageCreate,
       context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
@@ -40,22 +60,6 @@ export default class MessageListener extends Listener {
         guildId: message.guild.id,
         severity: 1,
       });
-    }
-
-    const mentionedTempIntersectionRoles = this.container.client.roleIntersections
-      .filter(r => message.mentions.roles.has(r))
-      .map(roleId => message.guild.roles.resolve(roleId))
-      .filter(filterNullAndUndefined);
-    if (mentionedTempIntersectionRoles.size > 0) {
-      this.container.logger.debug(`[Intersection Roles] ${mentionedTempIntersectionRoles.size} role was just mentioned by ${message.author.username}. It will expire in two days.`);
-
-      for (const role of mentionedTempIntersectionRoles) {
-        await RoleIntersections.findOneAndUpdate(
-          { roleId: role.id, guildId: role.guild.id },
-          { expiration: Date.now() + settings.configuration.roleIntersectionExpiration },
-          { upsert: true },
-        );
-      }
     }
   }
 }
