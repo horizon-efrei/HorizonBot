@@ -46,7 +46,7 @@ const allChoices = [
   ...roleChoices.map(({ name, value }) => ({ name: `Rôle : ${name}`, value })),
 ];
 
-const allowedChannels = [ChannelType.GuildNews, ChannelType.GuildText] as const;
+const allowedChannels = [ChannelType.GuildAnnouncement, ChannelType.GuildText] as const;
 type AllowedChannels = NewsChannel | TextChannel;
 
 enum Options {

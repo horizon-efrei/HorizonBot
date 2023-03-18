@@ -155,7 +155,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
               option => option
                 .setName(Options.Channel)
                 .setDescription(this.descriptions.options.channel)
-                .addChannelTypes(ChannelType.GuildNews, ChannelType.GuildText)
+                .addChannelTypes(ChannelType.GuildAnnouncement, ChannelType.GuildText)
                 .setRequired(true),
             )
             .addStringOption(multipleEmojiOptions.next().value!)
