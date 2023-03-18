@@ -22,6 +22,14 @@ const ReminderSchema = new Schema<ReminderDocument, ReminderModel>({
     type: String,
     required: true,
   },
+  reminded: {
+    type: Boolean,
+    default: false,
+  },
+  messageId: {
+    type: String,
+    required: false,
+  },
 }, { timestamps: true });
 
 ReminderSchema.post('save', async () => {

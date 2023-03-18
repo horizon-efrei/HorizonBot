@@ -318,6 +318,8 @@ export default {
   reminders: {
     alarm: ":alarm_clock: Il est l'heure ! Tu m'avais demandé de te rappeler ceci :\n>>> {description}",
     noDescription: 'Aucune description',
+    noLongerValid: "Ce rappel n'est plus valide !",
+    snoozed: `Tu as bien reporté le rappel de {duration} ! Je te rappellerai le ${timeFormat('{reminder.date}')} !`,
   },
   upcomingClasses: {
     header: '__Calendrier des séances de révisions des 7 prochains jours__\n*Il est tenu à jour automatiquement, pensez à le regarder régulièrement !*\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n',

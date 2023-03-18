@@ -230,6 +230,8 @@ export interface ReminderBase {
   date: Date;
   description: string;
   userId: string;
+  reminded: boolean;
+  messageId?: string;
 }
 
 /** Interface for the "Reminder"'s mongoose document */

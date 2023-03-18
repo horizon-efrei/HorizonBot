@@ -25,7 +25,7 @@ export default class HorizonClient extends SapphireClient {
   reactionRolesIds = new Set<string>();
   eclassRolesIds = new Set<string>();
   roleIntersections = new Set<string>();
-  reminders = new Set<ReminderDocument>();
+  reminders = new Map<string, ReminderDocument>();
   logStatuses = new Collection<string, Collection<DiscordLogType, LogStatusesEnum>>();
 
   constructor() {
@@ -122,8 +122,8 @@ export default class HorizonClient extends SapphireClient {
   public async loadReminders(): Promise<void> {
     this.reminders.clear();
     const reminders = await Reminders.find().catch(nullop);
-    if (reminders)
-      this.reminders.addAll(...reminders);
+    for (const reminder of reminders ?? [])
+      this.reminders.set(reminder.reminderId, reminder);
   }
 
   public async syncLogStatuses(): Promise<void> {

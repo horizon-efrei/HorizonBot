@@ -115,8 +115,10 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
   }
 
   public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const reminders = this.container.client.reminders.filter(rmd => rmd.userId === interaction.user.id);
-    if (!reminders || reminders.size === 0) {
+    const reminders = [...this.container.client.reminders.values()]
+      .filter(rmd => rmd.userId === interaction.user.id && !rmd.reminded);
+
+    if (!reminders || reminders.length === 0) {
       await interaction.reply({ content: this.messages.noReminders, ephemeral: true });
       return;
     }
@@ -124,9 +126,9 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
     await interaction.deferReply({ ephemeral: interaction.inGuild() });
 
     await new PaginatedContentMessageEmbed()
-      .setTemplate(new EmbedBuilder().setTitle(pupa(this.messages.listTitle, { total: reminders.size })))
+      .setTemplate(new EmbedBuilder().setTitle(pupa(this.messages.listTitle, { total: reminders.length })))
       .setItems(
-        [...reminders]
+        reminders
           .sort((a, b) => a.date.getTime() - b.date.getTime())
           .map(reminder => pupa(this.messages.listLine, {
             ...reminder.toJSON(),

@@ -14,7 +14,7 @@ declare module '@sapphire/framework' {
     reactionRolesIds: Set<string>;
     eclassRolesIds: Set<string>;
     roleIntersections: Set<string>;
-    reminders: Set<ReminderDocument>;
+    reminders: Map<string, ReminderDocument>;
     logStatuses: Collection<string, Collection<DiscordLogType, LogStatuses>>;
 
     loadReactionRoles(): Promise<void>;
