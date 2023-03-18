@@ -15,6 +15,9 @@ export default class ReminderTask extends Task {
       const user = await this.container.client.users.fetch(reminder.userId);
       await user.send(pupa(messages.reminders.alarm, reminder.toJSON())).catch(noop);
       await reminder.deleteOne();
+      this.container.client.reminders = new Set(
+        this.container.client.reminders.filter(r => r.reminderId !== reminder.reminderId),
+      );
     }
   }
 }
