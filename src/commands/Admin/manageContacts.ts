@@ -86,7 +86,7 @@ export default class ManageContactsCommand extends HorizonSubcommand<typeof conf
                 .setChoices(
                   { name: 'nom', value: OptionFieldChoices.Name },
                   { name: 'contact', value: OptionFieldChoices.Contact },
-                  { name: 'service', value: OptionFieldChoices.Team },
+                  { name: 'équipes', value: OptionFieldChoices.Team },
                   { name: 'description', value: OptionFieldChoices.Description },
                 ),
             )
