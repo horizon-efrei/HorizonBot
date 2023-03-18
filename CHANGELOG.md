@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.0] - 2023/03/18
+
+### Added
+
+- Add avatar to GuildJoin/GuildLeave log events
+- Add Nth member in GuildJoin log event
+- Add MessageDeleteBulk logs (fixes #94)
+- Add thumbnail images to reaction-roles (fixes #78)
+- Add ability to snooze reminders (fixes #43)
+
+### Fixed
+
+- Fix inaccurate channel update change set for logs
+- Fix incorrect invite link regex for invitation logs
+- Fix inconsistent terminology for manage-contacts
+- Fix non-required amount option for `/purge` (fixes #96)
+- Fix reminder not removed from cache once once finished
+
+
 ## [1.4.0] - 2023/03/01
 
 ### Added
