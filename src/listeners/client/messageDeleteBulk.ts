@@ -13,6 +13,13 @@ export default class MessageDeleteBulkListener extends Listener {
         .filter(entry => entry.target.id === channel.id && entry.createdTimestamp > Date.now() - 2000)
         .first();
 
+      const getMessageContent = (message: GuildMessage): string =>
+        message.content + (
+          message.embeds.length > 0
+            ? ` [${message.embeds.length} Embed${message.embeds.length > 1 ? 's' : ''}]`
+            : ''
+        );
+
       await DiscordLogManager.logAction({
         type: DiscordLogType.MessageDeleteBulk,
         context: {
@@ -26,7 +33,7 @@ export default class MessageDeleteBulkListener extends Listener {
             authorTag: message.author.tag,
             messageId: message.id,
             createdAt: message.createdAt,
-            messageContent: message.content,
+            messageContent: getMessageContent(message),
             attachments: message.attachments.map(({ url, name, id }) => ({ url, name: name ?? id })),
           }))
           .toArray(),
