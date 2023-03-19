@@ -170,7 +170,7 @@ export default class CodeCommand extends HorizonCommand<typeof config> {
 
     // 2.b Get the language response
     const codeInteraction = await prompter.awaitMessageComponent({
-      componentType: ComponentType.SelectMenu,
+      componentType: ComponentType.StringSelect,
       filter: int => int.customId === 'code-select-menu' && int.user.id === prompter.interaction.user.id,
     });
     if (codeInteraction.isErr())

@@ -49,7 +49,7 @@ export default class PaginatedMessageEmbedFields extends PaginatedMessage {
   public override addPage(page: PaginatedMessagePage): this {
     if (this.pages.length === 25) {
       const actions = PaginatedMessage.defaultActions.filter(action =>
-        action.type !== ComponentType.SelectMenu);
+        action.type !== ComponentType.StringSelect);
       this.setActions(actions);
     }
 

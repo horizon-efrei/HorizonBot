@@ -25,7 +25,7 @@ export default class InteractionPrompter {
       await this.interaction.reply(options);
   }
 
-  public async awaitMessageComponent<T extends ComponentType.Button | ComponentType.SelectMenu>(
+  public async awaitMessageComponent<T extends ComponentType.Button | ComponentType.StringSelect>(
     options?: AwaitMessageCollectorOptionsParams<T, true>,
   ): Promise<Result<MappedInteractionTypes[T], null>> {
     const interaction = await this.interaction.channel!.awaitMessageComponent({
