@@ -191,9 +191,8 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       );
       const submit = await answerTo.awaitModalSubmit({
         filter: int => int.isModalSubmit()
-          && int.inCachedGuild()
           && int.customId === 'reminder-edit-modal'
-          && int.member.id === answerTo.member.id,
+          && (int.inCachedGuild() ? int.member.id === answerTo.member.id : true),
         time: 900_000, // 15 minutes
       });
 
