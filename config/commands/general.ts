@@ -141,11 +141,16 @@ export const reminders = {
     // List the reminders
     noReminders: "Je n'ai trouvé aucun rappel t'étant associé dans la base de données !",
     listTitle: 'Liste de tes rappels ({total})',
-    listLine: `• \`{reminderId}\` (${timeFormat('{timestamp}', TimestampStyles.RelativeTime)}) : {description}`,
+    listLine: `• \`{reminderId}\` (${timeFormat('{date}', TimestampStyles.RelativeTime)}) : {description}`,
 
     // Edit a reminder
     editedReminder: `Ce rappel a bien été modifié, je te le rappellerai le ${timeFormat('{date}')} !`,
     invalidUsage: 'Ajoute la date ou le message à modifier.',
+    editReminderModal: {
+      title: 'Modification de votre rappel',
+      contentLabel: 'Contenu',
+      dateLabel: 'Date',
+    },
 
     // Remove a reminder
     removedReminder: 'Ce rappel a bien été supprimé !',

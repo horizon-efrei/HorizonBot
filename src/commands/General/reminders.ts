@@ -1,12 +1,22 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { filterNullAndUndefinedAndEmpty } from '@sapphire/utilities';
-import { DMChannel, EmbedBuilder } from 'discord.js';
+import dayjs from 'dayjs';
+import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
+import {
+  ActionRowBuilder,
+  DMChannel,
+  EmbedBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+} from 'discord.js';
 import pupa from 'pupa';
 import { reminders as config } from '@/config/commands/general';
 import Reminders from '@/models/reminders';
 import * as CustomResolvers from '@/resolvers';
 import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEmbed';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
+import { trimText } from '@/utils';
 
 enum Options {
   DateOrDuration = 'date-ou-duree',
@@ -134,7 +144,8 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
           .sort((a, b) => a.date.getTime() - b.date.getTime())
           .map(reminder => pupa(this.messages.listLine, {
             ...reminder.toJSON(),
-            timestamp: Math.round(reminder.date.getTime() / 1000),
+            ...reminder.normalizeDates(),
+            description: trimText(reminder.description.replace('\n', ' '), 100),
           })),
       )
       .setItemsPerPage(10)
@@ -142,7 +153,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       .run(interaction);
   }
 
-  public async edit(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
+  public async edit(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const targetId = interaction.options.getString(Options.Id, true);
     const reminder = await Reminders.findOne({ reminderId: targetId, userId: interaction.user.id });
     if (!reminder) {
@@ -150,11 +161,45 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    const dateOrDuration = interaction.options.getString(Options.DateOrDuration);
-    const content = interaction.options.getString(Options.Content);
+    let dateOrDuration = interaction.options.getString(Options.DateOrDuration);
+    let content = interaction.options.getString(Options.Content);
+
+    let answerTo: CommandInteraction<'cached'> | ModalSubmitInteraction<'cached'> = interaction;
     if (!dateOrDuration && !content) {
-      await interaction.reply({ content: this.messages.invalidUsage, ephemeral: true });
-      return;
+      await answerTo.showModal(
+        new ModalBuilder()
+          .setTitle(this.messages.editReminderModal.title)
+          .setCustomId('reminder-edit-modal')
+          .addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setLabel(this.messages.editReminderModal.contentLabel)
+                .setValue(reminder.description)
+                .setStyle(TextInputStyle.Paragraph)
+                .setCustomId('reminder-description')
+                .setRequired(true),
+            ),
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setLabel(this.messages.editReminderModal.dateLabel)
+                .setValue(dayjs(reminder.date).format('DD/MM/YYYY HH:mm'))
+                .setStyle(TextInputStyle.Short)
+                .setCustomId('reminder-date')
+                .setRequired(true),
+            ),
+          ),
+      );
+      const submit = await answerTo.awaitModalSubmit({
+        filter: int => int.isModalSubmit()
+          && int.inCachedGuild()
+          && int.customId === 'reminder-edit-modal'
+          && int.member.id === answerTo.member.id,
+        time: 900_000, // 15 minutes
+      });
+
+      answerTo = submit;
+      content = submit.fields.getTextInputValue('reminder-description');
+      dateOrDuration = submit.fields.getTextInputValue('reminder-date');
     }
 
     if (dateOrDuration) {
@@ -162,7 +207,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       if (date) {
         reminder.date = date;
       } else {
-        await interaction.reply({ content: this.messages.invalidTime, ephemeral: true });
+        await answerTo.reply({ content: this.messages.invalidTime, ephemeral: true });
         return;
       }
     }
@@ -172,7 +217,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
 
     await reminder.save();
 
-    await interaction.reply({
+    await answerTo.reply({
       content: pupa(this.messages.editedReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
       ephemeral: interaction.inGuild(),
     });
