@@ -158,7 +158,10 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
     // Keeps members who have at least one of the specified roles
     const roleFilter = interaction.options.getString(Options.HasRoles);
     if (roleFilter) {
-      const roles = [...roleFilter.matchAll(/<@&(?<id>\d{17,20})>/g)].map(match => match.groups!.id);
+      const roles = roleFilter
+        .matchAll(/<@&(?<id>\d{17,20})>/g)
+        .map(match => match.groups!.id)
+        .toArray();
       if (roles.length > 0) {
         members = members.filter(
           member => roles.some(role => member.roles.cache.has(role)),
@@ -169,7 +172,10 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
     // Keeps members who have all the specified roles
     const allRoleFilter = interaction.options.getString(Options.HasAllRoles);
     if (allRoleFilter) {
-      const roles = [...allRoleFilter.matchAll(/<@&(?<id>\d{17,20})>/g)].map(match => match.groups!.id);
+      const roles = allRoleFilter
+        .matchAll(/<@&(?<id>\d{17,20})>/g)
+        .map(match => match.groups!.id)
+        .toArray();
       if (roles.length > 0) {
         members = members.filter(
           member => roles.every(role => member.roles.cache.has(role)),
@@ -214,9 +220,16 @@ export default class DumpCommand extends HorizonCommand<typeof config> {
 
         if (reactedMessage.isOk()) {
           const usersByReaction = await Promise.all(
-            reactedMessage.unwrap().reactions.cache.mapValues(async reaction => reaction.users.fetch()).values(),
+            reactedMessage.unwrap().reactions.cache
+              .values()
+              .map(async reaction => reaction.users.fetch()),
           );
-          const reactionners = new Set(usersByReaction.flatMap(r => [...r.values()]).map(r => r.id));
+          const reactionners = new Set(
+            usersByReaction.flatMap(r1 => r1
+              .values()
+              .map(r2 => r2.id)
+              .toArray()),
+          );
           members = members.filter(member => reactionners.has(member.id));
         }
       }

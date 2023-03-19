@@ -36,46 +36,47 @@ export default class ChannelUpdateListener extends Listener {
       newChannel.permissionOverwrites.cache,
     );
 
-    if (propertyUpdated || permissionUpdated) {
-      const auditLogs = propertyUpdated
-        ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate }).catch(nullop)
-        : permissionUpdated
-          ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelOverwriteUpdate }).catch(nullop)
-          : null;
+    if (!propertyUpdated && !permissionUpdated)
+      return;
 
-      const lastChannelUpdate = (auditLogs?.entries as ChannelUpdateAuditLogEntries | undefined)
-        ?.filter(entry => entry.target?.id === newChannel.id && entry.createdTimestamp > Date.now() - 2000)
-        .first();
+    const auditLogs = propertyUpdated
+      ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate }).catch(nullop)
+      : permissionUpdated
+        ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelOverwriteUpdate }).catch(nullop)
+        : null;
 
-      const mapKey = this._getKey(newChannel, lastChannelUpdate?.executor);
+    const lastChannelUpdate = (auditLogs?.entries as ChannelUpdateAuditLogEntries | undefined)
+      ?.filter(entry => entry.target?.id === newChannel.id && entry.createdTimestamp > Date.now() - 2000)
+      .first();
 
-      this._buffer.emplace(mapKey, {
-        insert: () => ({ oldChannel, newChannel }),
-        update: existing => ({ ...existing, newChannel }),
+    const mapKey = this._getKey(newChannel, lastChannelUpdate?.executor);
+
+    this._buffer.emplace(mapKey, {
+      insert: () => ({ oldChannel, newChannel }),
+      update: existing => ({ ...existing, newChannel }),
+    });
+
+    setTimeout(async () => {
+      if (!this._buffer.has(mapKey))
+        return;
+
+      const changeSet = this._buffer.get(mapKey)!;
+      this._buffer.delete(mapKey);
+
+      await DiscordLogManager.logAction({
+        type: DiscordLogType.ChannelUpdate,
+        context: {
+          channelId: newChannel.id,
+          executorId: lastChannelUpdate?.executor?.id,
+        },
+        content: {
+          before: getChannelSnapshot(changeSet.oldChannel),
+          after: getChannelSnapshot(changeSet.newChannel),
+        },
+        guildId: newChannel.guild.id,
+        severity: 1,
       });
-
-      setTimeout(async () => {
-        if (!this._buffer.has(mapKey))
-          return;
-
-        const changeSet = this._buffer.get(mapKey)!;
-        this._buffer.delete(mapKey);
-
-        await DiscordLogManager.logAction({
-          type: DiscordLogType.ChannelUpdate,
-          context: {
-            channelId: newChannel.id,
-            executorId: lastChannelUpdate?.executor?.id,
-          },
-          content: {
-            before: getChannelSnapshot(changeSet.oldChannel),
-            after: getChannelSnapshot(changeSet.newChannel),
-          },
-          guildId: newChannel.guild.id,
-          severity: 1,
-        });
-      }, 3000);
-    }
+    }, 3000);
   }
 
   private _permissionChanged(

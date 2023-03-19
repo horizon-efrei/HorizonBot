@@ -21,7 +21,8 @@ export class ButtonHandler extends InteractionHandler {
   }
 
   public async run(interaction: ButtonInteraction): Promise<void> {
-    const reminder = [...this.container.client.reminders.values()]
+    const reminder = this.container.client.reminders
+      .values()
       .find(rem => rem.messageId === interaction.message.id);
 
     if (!reminder) {

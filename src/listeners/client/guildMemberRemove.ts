@@ -14,7 +14,10 @@ export default class GuildMemberRemoveListener extends Listener {
         displayName: member.displayName,
         joinedAt: member.joinedTimestamp,
         // Filter out the @everyone role, and keep only ids
-        roles: [...member.roles.cache.filter(role => role.rawPosition > 0).keys()],
+        roles: member.roles.cache
+          .filter(role => role.rawPosition > 0)
+          .keys()
+          .toArray(),
       },
       guildId: member.guild.id,
       severity: 1,

@@ -106,7 +106,7 @@ export default class MergePdfCommand extends HorizonCommand<typeof config> {
     const allFiles = [
       ...attachments,
       ...messages
-        .flatMap(msg => [...msg.attachments.values()])
+        .flatMap(msg => msg.attachments.values().toArray())
         .filter(file => file.contentType === 'application/pdf'),
     ].filter(filterNullAndUndefined);
 

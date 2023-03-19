@@ -136,7 +136,7 @@ export default class PurgeCommand extends HorizonCommand<typeof config> {
     }
 
     // Perform a bulk delete, throw if it returns unknown message.
-    const filteredIds = [...filtered.keys()].slice(0, amount);
+    const filteredIds = filtered.keys().take(amount).toArray();
     const result = await interaction.channel!.bulkDelete(filteredIds)
       .then(() => Result.ok())
       .catch((error) => {

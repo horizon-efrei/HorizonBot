@@ -19,7 +19,8 @@ export default class MessageDeleteBulkListener extends Listener {
           executorId: lastMessageDelete?.executor?.id,
           channelId: channel.id,
         },
-        content: [...messages.values()]
+        content: messages
+          .values()
           .map(message => ({
             authorId: message.author.id,
             authorTag: message.author.tag,
@@ -27,7 +28,8 @@ export default class MessageDeleteBulkListener extends Listener {
             createdAt: message.createdAt,
             messageContent: message.content,
             attachments: message.attachments.map(({ url, name, id }) => ({ url, name: name ?? id })),
-          })),
+          }))
+          .toArray(),
         guildId: channel.guild.id,
         severity: 1,
       });

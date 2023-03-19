@@ -33,8 +33,14 @@ export default class GuildMemberUpdateListener extends Listener {
     if (oldRoles.equals(newRoles))
       return;
 
-    const addedRoles = [...newRoles.filter(role => !oldRoles.has(role.id)).keys()];
-    const removedRoles = [...oldRoles.filter(role => !newRoles.has(role.id)).keys()];
+    const addedRoles = newRoles
+      .filter(role => !oldRoles.has(role.id))
+      .keys()
+      .toArray();
+    const removedRoles = oldRoles
+      .filter(role => !newRoles.has(role.id))
+      .keys()
+      .toArray();
 
     const auditLogs = await newMember.guild.fetchAuditLogs({ type: AuditLogEvent.MemberRoleUpdate }).catch(nullop);
     const lastMemberRoleUpdate = auditLogs?.entries.filter(entry => entry.target?.id === newMember.id).first();

@@ -115,8 +115,10 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
   }
 
   public async list(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const reminders = [...this.container.client.reminders.values()]
-      .filter(rmd => rmd.userId === interaction.user.id && !rmd.reminded);
+    const reminders = this.container.client.reminders
+      .values()
+      .filter(rmd => rmd.userId === interaction.user.id && !rmd.reminded)
+      .toArray();
 
     if (!reminders || reminders.length === 0) {
       await interaction.reply({ content: this.messages.noReminders, ephemeral: true });

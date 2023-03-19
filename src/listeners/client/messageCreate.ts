@@ -47,10 +47,11 @@ export default class MessageListener extends Listener {
     });
 
     const invites = message.content.matchAll(new RegExp(settings.configuration.discordInviteLinkRegex, 'gi'));
-    const foreignInvites = [...invites]
+    const foreignInvites = invites
       .map(invite => invite.groups?.code)
       .filter(code => code && !message.guild.invites.cache.has(code))
-      .map(code => `https://discord.gg/${code}`);
+      .map(code => `https://discord.gg/${code}`)
+      .toArray();
 
     if (foreignInvites.length > 0) {
       await DiscordLogManager.logAction({

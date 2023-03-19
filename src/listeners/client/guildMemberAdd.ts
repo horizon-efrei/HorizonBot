@@ -27,8 +27,10 @@ export default class GuildMemberAddListener extends Listener {
     const currentUses = guild.invites.cache.mapValues(invite => invite.uses ?? 0);
 
     // Get codes which are in both caches, but has increased in the second
-    const possibleUsedCode: InviteUses[] = [...previousUses.entries()]
-      .filter(([code, uses]) => currentUses.get(code) === uses + 1);
+    const possibleUsedCode: InviteUses[] = previousUses
+      .entries()
+      .filter(([code, uses]) => currentUses.get(code) === uses + 1)
+      .toArray();
 
     // Otherwise, this likely means the code was not in one of the caches, so get the difference
     possibleUsedCode.push(...previousUses

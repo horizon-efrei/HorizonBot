@@ -217,11 +217,15 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
 
     await new PaginatedContentMessageEmbed()
       .setTemplate(new EmbedBuilder().setTitle(this.messages.listTitle).setColor(settings.colors.default))
-      .setItems([...allEntriesFilled.entries()]
-        .map(([entry, { name, document }]) => pupa(
-          document ? this.messages.lineWithValue : this.messages.lineWithoutValue,
-          { name, value: document ? this._getMention(entry, document.value) : null },
-        )))
+      .setItems(
+        allEntriesFilled
+          .entries()
+          .map(([entry, { name, document }]) => pupa(
+            document ? this.messages.lineWithValue : this.messages.lineWithoutValue,
+            { name, value: document ? this._getMention(entry, document.value) : null },
+          ))
+          .toArray(),
+      )
       .setItemsPerPage(15)
       .make()
       .run(interaction);

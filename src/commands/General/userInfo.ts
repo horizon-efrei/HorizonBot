@@ -47,8 +47,6 @@ export default class UserInfoCommand extends HorizonCommand<typeof config> {
       }
     }
 
-    const roles = [...member.roles.cache.values()].filter(role => role.name !== '@everyone');
-
     const presenceContent = pupa(embedConfig.presence.content, {
       status: embedConfig.presence.status[member.presence?.status ?? 'offline'],
       presenceDetails,
@@ -57,15 +55,21 @@ export default class UserInfoCommand extends HorizonCommand<typeof config> {
     const createdContent = pupa(embedConfig.created.content, {
       creation: timeFormatter(member.user.createdAt, TimestampStyles.LongDateTime),
     });
+
     const joinedContent = pupa(embedConfig.joined.content,
       member.joinedTimestamp
         ? { joined: timeFormatter(new Date(member.joinedTimestamp), TimestampStyles.LongDateTime) }
         : { joined: embedConfig.joined.unknown });
+
     const rolesContent = member.roles.cache.size === 1
       ? embedConfig.roles.noRole
       : pupa(embedConfig.roles.content, {
         amount: member.roles.cache.size - 1,
-        roles: roles.join(', '),
+        roles: member.roles.cache
+          .values()
+          .filter(role => role.name !== '@everyone')
+          .toArray()
+          .join(', '),
       });
 
     const embed = new EmbedBuilder()

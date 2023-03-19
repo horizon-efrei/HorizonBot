@@ -36,19 +36,19 @@ export default class MessageUpdateListener extends Listener {
 
   private async _checkAntiGhostPing(oldMessage: GuildMessage, newMessage: GuildMessage): Promise<void> {
     // List of all users that were mentionned in the old message.
-    const oldUserMentions = [...oldMessage.mentions.users.values()]
+    const oldUserMentions = oldMessage.mentions.users.values()
       .filter(usr => !usr.bot && usr.id !== newMessage.author.id);
-      // List of all roles that were mentionned in the old message.
-    const oldRoleMentions = [...oldMessage.mentions.roles.values()]
+    // List of all roles that were mentionned in the old message.
+    const oldRoleMentions = oldMessage.mentions.roles.values()
       .filter(role => !role.managed);
     // List of usernames / roles name's that were mentionned in the old message.
     const oldMentions = [...oldUserMentions, ...oldRoleMentions];
 
     // List of all users that are mentionned in the new message.
-    const newUserMentions = [...newMessage.mentions.users.values()]
+    const newUserMentions = newMessage.mentions.users.values()
       .filter(usr => !usr.bot && usr.id !== newMessage.author.id);
     // List of all roles that are mentionned in the new message.
-    const newRoleMentions = [...newMessage.mentions.roles.values()]
+    const newRoleMentions = newMessage.mentions.roles.values()
       .filter(role => !role.managed);
     // List of usernames / roles name's that are mentionned in the new message.
     const newMentions = [...newUserMentions, ...newRoleMentions];
@@ -60,13 +60,13 @@ export default class MessageUpdateListener extends Listener {
     if (deletedMentions.length === 0)
       return;
 
-    // Gt all the deleted role mentions
-    const deletedRoleMentions = oldRoleMentions.filter(
+    // Get all the deleted role mentions
+    const hasDeletedRoleMentions = oldRoleMentions.some(
       oldRoleMention => !newRoleMentions.some(newRoleMention => oldRoleMention.id === newRoleMention.id),
     );
 
     // Choose the message (plural if multiple people (or a role) were ghost-ping)
-    const severalPeopleAffected = deletedMentions.length > 1 || deletedRoleMentions.length > 0;
+    const severalPeopleAffected = deletedMentions.length > 1 || hasDeletedRoleMentions;
     const baseMessage = severalPeopleAffected
       ? messages.ghostPing.alertPlural
       : messages.ghostPing.alertSingular;
