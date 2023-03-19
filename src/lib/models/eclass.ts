@@ -98,7 +98,6 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
   recordLinks: [String],
 }, { timestamps: true });
 
-
 EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string => [
   slug(professor.displayName.replace(/\s+/, ''), '_'),
   dayjs(date).format('HHmmDDMMYYYY'),

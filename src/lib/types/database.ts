@@ -149,7 +149,6 @@ export interface SubjectBase {
 /** Interface for the "Subject"'s mongoose document */
 export interface SubjectDocument extends SubjectBase, Document {}
 
-
 /** Interface for the "Subject"'s mongoose model */
 export type SubjectModel = Model<SubjectDocument>;
 // #endregion
