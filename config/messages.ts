@@ -22,8 +22,8 @@ export default {
     wrongUserInteractionReply: 'Tu ne peux pas cliquer sur ces boutons, ils sont réservés à {user}.',
   },
   ghostPing: {
-    alertSingular: ':warning: **{mentions}**, tu as été mentionné par {user.username} mais il/elle a supprimé son message. :innocent:',
-    alertPlural: ':warning: **{mentions}**, vous avez été mentionnés par {user.username} mais il/elle a supprimé son message. :innocent:',
+    alertSingular: ':warning: **{mentions}**, tu as été mentionné par {user.username} mais le message a été supprimé. :innocent:',
+    alertPlural: ':warning: **{mentions}**, vous avez été mentionnés par {user.username} mais le message a été supprimé. :innocent:',
   },
   logs: {
     readableEvents: {
