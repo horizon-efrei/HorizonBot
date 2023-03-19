@@ -36,7 +36,7 @@ export class ReminderAutocompleteHandler extends InteractionHandler {
 
     switch (focusedOption.name) {
       case 'id': {
-        const haystack = this._cache.filter(reminder => reminder.userId === interaction.user.id);
+        const haystack = this._cache.filter(reminder => reminder.userId === interaction.user.id && !reminder.reminded);
         const fuzzy = new FuzzySearch(haystack, ['reminderId', 'date', 'description'], { sort: true });
 
         const results = fuzzy.search(focusedOption.value);
