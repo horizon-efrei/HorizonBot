@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.1] - 2023/03/19
+
+### Fixed
+
+- Fixed past reminders being included in autocomplete
+
+### Improved
+
+- Add a modal to edit reminders when no options are given
+- Improve ghost-ping alert message wording
+- Add an "embed" indicator to the MessageDeleteBulk log event message list
+
+
 ## [1.5.0] - 2023/03/18
 
 ### Added
