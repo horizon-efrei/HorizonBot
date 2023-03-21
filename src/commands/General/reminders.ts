@@ -145,7 +145,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
           .map(reminder => pupa(this.messages.listLine, {
             ...reminder.toJSON(),
             ...reminder.normalizeDates(),
-            description: trimText(reminder.description.replace('\n', ' '), 100),
+            description: trimText(reminder.description.replaceAll('\n', ' '), 100),
           })),
       )
       .setItemsPerPage(10)
