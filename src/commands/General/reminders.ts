@@ -113,6 +113,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       description: interaction.options.getString(Options.Content, true),
       userId: interaction.user.id,
     });
+    this.container.client.reminders.set(reminder.reminderId, reminder);
 
     const hasDmOpened = (await interaction.user.createDM()) instanceof DMChannel;
     await interaction.reply({
@@ -215,6 +216,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       reminder.description = content;
 
     await reminder.save();
+    this.container.client.reminders.set(reminder.reminderId, reminder);
 
     await answerTo.reply({
       content: pupa(this.messages.editedReminder, { ...reminder.toJSON(), ...reminder.normalizeDates() }),
@@ -231,6 +233,8 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
     }
 
     await reminder.deleteOne();
+    this.container.client.reminders.delete(reminder.reminderId);
+
     await interaction.reply({ content: this.messages.removedReminder, ephemeral: interaction.inGuild() });
   }
 
