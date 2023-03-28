@@ -33,6 +33,7 @@
     "@sapphire/type": "^2.3.0",
     "@sapphire/utilities": "^3.11.0",
     "axios": "^0.27.2",
+    "chrono-node": "^2.6.2",
     "common-tags": "^1.8.2",
     "core-js": "^3.29.1",
     "dayjs": "^1.11.7",
