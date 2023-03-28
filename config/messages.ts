@@ -218,8 +218,8 @@ export default {
         contentValue: stripIndent`
           [Lien vers le message]({url}) (dans ${channelMention('{context.channelId}')})
           Contenu : \`\`\`diff
-          - {content.messageContent.before}
-          + {content.messageContent.after}
+          {content.messageContent.before}
+          {content.messageContent.after}
           \`\`\`
           Pièces Jointes retirées : {content.attachments}
         `,

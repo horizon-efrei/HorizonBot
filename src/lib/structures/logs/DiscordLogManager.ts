@@ -91,27 +91,33 @@ export function getContentValue(
         }),
       };
     case DiscordLogType.MessageCreate:
-    case DiscordLogType.MessageUpdate:
     case DiscordLogType.MessageDelete:
       return {
         content: pupa(fieldTexts.contentValue, {
           ...payload,
           content: {
-            messageContent: 'before' in payload.content
-              ? {
-                  before: trimText(payload.content.before.messageContent, 400),
-                  after: trimText(payload.content.after.messageContent, 400),
-                }
-              : trimText(payload.content.messageContent),
-            attachments: 'before' in payload.content && 'after' in payload.content
-              ? attachmentsList(
-                  differenceWith<AttachmentInfos, AttachmentInfos>(
-                    payload.content.before.attachments,
-                    payload.content.after.attachments,
-                    isEqual,
-                  ),
-                )
-              : attachmentsList(payload.content.attachments),
+            messageContent: trimText(payload.content.messageContent),
+            attachments: attachmentsList(payload.content.attachments),
+          },
+          url: getMessageUrl(payload),
+        }),
+      };
+    case DiscordLogType.MessageUpdate:
+      return {
+        content: pupa(fieldTexts.contentValue, {
+          ...payload,
+          content: {
+            messageContent: {
+              before: trimText(payload.content.before.messageContent, 400).split('\n').map(line => `- ${line}`).join('\n'),
+              after: trimText(payload.content.after.messageContent, 400).split('\n').map(line => `+ ${line}`).join('\n'),
+            },
+            attachments: attachmentsList(
+              differenceWith<AttachmentInfos, AttachmentInfos>(
+                payload.content.before.attachments,
+                payload.content.after.attachments,
+                isEqual,
+              ),
+            ),
           },
           url: getMessageUrl(payload),
         }),
