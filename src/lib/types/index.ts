@@ -7,6 +7,19 @@ import type {
 import type { EclassPlace, SubjectDocument } from '@/types/database';
 
 /* ******************************************* */
+/*                    Utils                    */
+/* ******************************************* */
+
+
+export type Only<T, U> = {
+  [P in keyof T]: T[P];
+} & {
+  [P in keyof U]?: never;
+};
+
+export type Either<T, U> = Only<T, U> | Only<U, T>;
+
+/* ******************************************* */
 /*  Custom Types used all across the codebase  */
 /* ******************************************* */
 

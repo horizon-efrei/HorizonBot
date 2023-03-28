@@ -10,7 +10,6 @@ import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import type { APIEmbed, JSONEncodable } from 'discord.js';
 import { ComponentType, EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
-import type { List, Number } from 'ts-toolbelt';
 import messages from '@/config/messages';
 import settings from '@/config/settings';
 
@@ -34,7 +33,7 @@ export default class PaginatedContentMessageEmbed extends PaginatedMessage {
     return this;
   }
 
-  public setItemsPerPage(itemsPerPage: List.UnionOf<Number.Range<0, 25>>): this {
+  public setItemsPerPage(itemsPerPage: number): this {
     this._itemsPerPage = itemsPerPage;
     return this;
   }
