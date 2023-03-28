@@ -86,7 +86,7 @@ enum Options {
   Topic = 'thème',
   Professor = 'professeur',
   Duration = 'duree',
-  Date = 'date',
+  DateHour = 'date-et-heure',
   TargetRole = 'role-vise',
   Place = 'lieu',
   PlaceInformation = 'lieu-information',
@@ -158,8 +158,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
             )
             .addStringOption(
               option => option
-                .setName(Options.Date)
-                .setDescription(this.descriptions.options.date)
+                .setName(Options.DateHour)
+                .setDescription(this.descriptions.options.dateHour)
                 .setRequired(true),
             )
             .addRoleOption(
@@ -262,8 +262,8 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
             )
             .addStringOption(
               option => option
-                .setName(Options.Date)
-                .setDescription(this.descriptions.options.date),
+                .setName(Options.DateHour)
+                .setDescription(this.descriptions.options.dateHour),
             )
             .addStringOption(
               option => option
@@ -349,7 +349,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     const topic = interaction.options.getString(Options.Topic, true);
     const professor = interaction.options.getMember(Options.Professor);
     const rawDuration = interaction.options.getString(Options.Duration, true);
-    const rawDate = interaction.options.getString(Options.Date, true);
+    const rawDate = interaction.options.getString(Options.DateHour, true);
     const targetRole = interaction.options.getRole(Options.TargetRole, true);
     const place = interaction.options.getString(Options.Place, true) as EclassPlace;
     const isRecorded = interaction.options.getBoolean(Options.IsRecorded, true);
@@ -456,7 +456,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     const topic = interaction.options.getString(Options.Topic);
     const professor = interaction.options.getMember(Options.Professor);
     const rawDuration = interaction.options.getString(Options.Duration);
-    const rawDate = interaction.options.getString(Options.Date);
+    const rawDate = interaction.options.getString(Options.DateHour);
     const place = interaction.options.getString(Options.Place) as EclassPlace | null;
     const isRecorded = interaction.options.getBoolean(Options.IsRecorded);
 

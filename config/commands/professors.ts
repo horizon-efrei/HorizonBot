@@ -32,7 +32,7 @@ export const eclass = {
       topic: 'Sujet du cours.',
       professor: 'Professeur en charge du cours.',
       duration: 'Durée du cours.',
-      date: 'Date à laquelle le cours est prévu.',
+      dateHour: 'Date et heure à laquelle le cours est prévu. Ex: 16/03 16h30',
       targetRole: 'Rôle visé par le cours.',
       place: 'Lieu où le cours est prévu.',
       isRecorded: 'Si le cours est enregistré.',
