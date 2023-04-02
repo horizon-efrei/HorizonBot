@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.5.3] - 2023/04/02
+
+### Improvement
+
+- Improved message update diff in logs
+- Improved clarity about the date field requiring the hour too
+- Improved date parsing by adding natural date support
+
+
 ## [1.5.2] - 2023/03/22
 
 ### Fixed
