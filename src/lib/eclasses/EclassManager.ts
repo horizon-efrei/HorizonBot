@@ -242,6 +242,18 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
 }
 
 export async function finishClass(eclass: EclassPopulatedDocument): Promise<void> {
+  // Postpone the class by 5 minutes if there are more than 5 people in the voice channel
+  if (eclass.subject.voiceChannelId) {
+    const voiceChannel = container.client
+      .guilds.resolve(eclass.guildId)
+      ?.channels.resolve(eclass.subject.voiceChannelId);
+
+    if (voiceChannel?.isVoiceBased() && voiceChannel.members.size >= 5) {
+      await Eclass.findByIdAndUpdate(eclass._id, { duration: eclass.duration + 5 * 60 * 1000 });
+      return;
+    }
+  }
+
   // Fetch the announcement message
   const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
