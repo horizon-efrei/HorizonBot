@@ -188,25 +188,27 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
   const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
-  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId).catch(nullop);
 
-  // Update its embed
-  const rawEmbed = announcementMessage.embeds[0];
-  const announcementEmbed = EmbedBuilder.from(rawEmbed);
+  if (announcementMessage) {
+    // Update its embed
+    const rawEmbed = announcementMessage.embeds[0];
+    const announcementEmbed = EmbedBuilder.from(rawEmbed);
 
-  const dateField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
-  announcementEmbed.setColor(settings.colors.orange);
-  if (dateField) {
-    dateField.value = pupa(config.messages.newClassEmbed.dateValueInProgress, eclass.normalizeDates());
-  } else {
-    announcementEmbed.addFields({
-      name: config.messages.newClassEmbed.date,
-      value: pupa(config.messages.newClassEmbed.dateValueInProgress, eclass.normalizeDates()),
-      inline: true,
-    });
+    const dateField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
+    announcementEmbed.setColor(settings.colors.orange);
+    if (dateField) {
+      dateField.value = pupa(config.messages.newClassEmbed.dateValueInProgress, eclass.normalizeDates());
+    } else {
+      announcementEmbed.addFields({
+        name: config.messages.newClassEmbed.date,
+        value: pupa(config.messages.newClassEmbed.dateValueInProgress, eclass.normalizeDates()),
+        inline: true,
+      });
+    }
+    await announcementMessage.edit({ embeds: [announcementEmbed] });
+    await announcementMessage.reactions.removeAll();
   }
-  await announcementMessage.edit({ embeds: [announcementEmbed] });
-  await announcementMessage.reactions.removeAll();
 
   // Send an embed in the corresponding text channel
   const classChannel = container.client
@@ -244,23 +246,25 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
   const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
-  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
+  const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId).catch(nullop);
 
-  // Update its embed
-  const rawEmbed = announcementMessage.embeds[0];
-  const announcementEmbed = EmbedBuilder.from(rawEmbed);
+  if (announcementMessage) {
+    // Update its embed
+    const rawEmbed = announcementMessage.embeds[0];
+    const announcementEmbed = EmbedBuilder.from(rawEmbed);
 
-  const dateField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
-  if (dateField) {
-    dateField.value = pupa(config.messages.newClassEmbed.dateValueFinished, eclass.normalizeDates());
-  } else {
-    announcementEmbed.addFields({
-      name: config.messages.newClassEmbed.date,
-      value: pupa(config.messages.newClassEmbed.dateValueFinished, eclass.normalizeDates()),
-      inline: true,
-    });
+    const dateField = rawEmbed.fields.find(field => field.name === config.messages.newClassEmbed.date);
+    if (dateField) {
+      dateField.value = pupa(config.messages.newClassEmbed.dateValueFinished, eclass.normalizeDates());
+    } else {
+      announcementEmbed.addFields({
+        name: config.messages.newClassEmbed.date,
+        value: pupa(config.messages.newClassEmbed.dateValueFinished, eclass.normalizeDates()),
+        inline: true,
+      });
+    }
+    await announcementMessage.edit({ embeds: [announcementEmbed] });
   }
-  await announcementMessage.edit({ embeds: [announcementEmbed] });
 
   // Rename the associated role
   await container.client
