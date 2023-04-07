@@ -42,39 +42,29 @@ const schoolYearRoles: Record<SchoolYear, ConfigEntriesRoles> = {
   [SchoolYear.L3]: ConfigEntriesRoles.SchoolYearL3,
 };
 
-export function createAnnouncementEmbed({
-  classChannel,
-  classId,
-  date,
-  duration,
-  end,
-  isRecorded,
-  professor,
-  subject,
-  topic,
-  place,
-  placeInformation,
-}: EclassEmbedOptions): EmbedBuilder {
+const addLineAfter = (str: string): string => `${str}\n​`;
+
+export function createAnnouncementEmbed(options: EclassEmbedOptions): EmbedBuilder {
   const texts = config.messages.newClassEmbed;
-  const embed = new EmbedBuilder()
+
+  return new EmbedBuilder()
     .setColor(settings.colors.green)
-    .setTitle(pupa(texts.title, { subject, topic }))
-    .setDescription(pupa(texts.description, { subject, classChannel, date }))
-    .setThumbnail(subject.emojiImage)
-    .setAuthor({ name: texts.author })
+    .setTitle(pupa(texts.title, options))
+    .setDescription(pupa(texts.description, options))
+    .setThumbnail(options.subject.emojiImage)
     .addFields([
-      { name: texts.date, value: pupa(texts.dateValue, { date, end }), inline: true },
-      { name: texts.duration, value: dayjs.duration(duration).humanize(), inline: true },
-      { name: texts.professor, value: professor.toString(), inline: true },
-      { name: texts.recorded, value: config.messages.recordedValues[Number(isRecorded)], inline: true },
-      { name: texts.place, value: pupa(texts.placeValues[place], { place, placeInformation, subject }), inline: true },
+      {
+        name: texts.date,
+        value: addLineAfter(pupa(texts.dateValue, options)),
+        inline: false,
+      }, {
+        name: texts.place,
+        value: addLineAfter(pupa(texts.placeValues[options.place], options)),
+        inline: false,
+      },
+      { name: texts.recorded, value: config.messages.recordedValues[Number(options.isRecorded)] },
     ])
-    .setFooter({ text: pupa(texts.footer, { classId }) });
-
-  if (classChannel.guild.iconURL())
-    embed.setAuthor({ name: texts.author, iconURL: classChannel.guild.iconURL()! });
-
-  return embed;
+    .setFooter({ text: pupa(texts.footer, options) });
 }
 
 export function getRoleNameForClass(
@@ -126,7 +116,6 @@ export async function createClass(
     classChannel,
     classId: 'Création en cours...',
     date: Math.floor(date.getTime() / 1000),
-    duration,
     end: Math.floor((date.getTime() + duration) / 1000),
     isRecorded,
     professor,

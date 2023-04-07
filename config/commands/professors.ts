@@ -130,14 +130,11 @@ export const eclass = {
     recordedLink: '[Lien]({link})',
     newClassEmbed: {
       title: '{subject.name} - {topic}',
-      description: `Cours en {classChannel} le **${timeFormat('{date}')}** !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !`,
-      author: "Ef'Réussite - Nouveau cours !",
+      description: `Cours en {classChannel} le **${timeFormat('{date}')}** par ${userMention('{professor}')} !\n\n:bulb: Réagis avec :white_check_mark: pour être rappelé en avance !\n​`,
       date: '🗓️ Date et heure',
-      dateValue: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}`,
+      dateValue: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)} (${timeFormat('{date}', TimestampStyles.RelativeTime)})`,
       dateValueInProgress: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}\n[En cours]`,
       dateValueFinished: `${timeFormat('{date}')} - ${timeFormat('{end}', TimestampStyles.ShortTime)}\n${timeFormat('{date}', TimestampStyles.RelativeTime)}\n[Terminé]`,
-      duration: '⏳ Durée prévue',
-      professor: '🧑‍🏫 Professeur',
       recorded: '🎥 Enregistré',
       place: '📍 Lieu',
       placeValues: {

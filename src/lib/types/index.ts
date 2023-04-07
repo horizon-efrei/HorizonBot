@@ -80,7 +80,6 @@ export interface EclassEmbedOptions {
   classChannel: GuildTextBasedChannel;
   classId: string;
   date: number;
-  duration: number;
   end: number;
   isRecorded: boolean;
   professor: GuildMember;

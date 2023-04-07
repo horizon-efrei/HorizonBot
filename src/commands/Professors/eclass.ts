@@ -586,7 +586,6 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
           ...eclass.normalizeDates(),
           subject: eclass.subject,
           topic: eclass.topic,
-          duration: eclass.duration,
           professor: await guild.members.fetch(eclass.professorId),
           classChannel,
           classId: eclass.classId,
