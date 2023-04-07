@@ -19,6 +19,11 @@ module.exports = {
     'class-methods-use-this': 'off',
 
     'no-await-in-loop': 'off',
+
+    'no-irregular-whitespace': ['error', {
+      skipStrings: true,
+      skipTemplates: true,
+    }],
   },
   settings: {
     'import/parsers': {
