@@ -16,6 +16,11 @@ import {
   splitText,
 } from '@/utils';
 
+/**
+ * This is a workaround because Discord doesn't let us edit published messages (in announcement channels) more
+ * than 3 times per 60 minutes. So we try to edit the message, or if we can't, we delete it and send a new one.
+ */
+// FIXME: We should really use some kind of queue or a back-off algorithm to group requests together.
 async function updateMessage(
   message: GuildMessage,
   channel: GuildTextBasedChannel,
