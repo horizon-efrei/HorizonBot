@@ -9,7 +9,7 @@ import { EclassStatus, EclassStep } from '@/types/database';
 @ApplyOptions<TaskOptions>({ interval: 2 * 60 * 1000 /* Every 2 minutes */ })
 export default class ManageEclassTask extends Task {
   public async run(): Promise<void> {
-    const eclasses = Eclass.find({
+    const eclasses = await Eclass.find({
       // This queries find classes that:
       // - are planned, and we are 15 minutes before (to send a reminder)
       // - are planned, and we reached the beginning (to start it)
@@ -33,7 +33,7 @@ export default class ManageEclassTask extends Task {
       }],
     });
 
-    for await (const eclass of eclasses) {
+    for (const eclass of eclasses) {
       if (eclass.status === EclassStatus.Planned && eclass.step === EclassStep.None)
         await EclassManager.remindClass(eclass);
       else if (eclass.status === EclassStatus.Planned && eclass.step === EclassStep.Reminded)

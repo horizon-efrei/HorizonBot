@@ -8,9 +8,9 @@ export default class EmojiUpdateListener extends Listener {
       return;
 
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const affectedReactionRoles = ReactionRole.find({ 'reactionRolePairs.reaction': oldEmoji.toString() });
+    const affectedReactionRoles = await ReactionRole.find({ 'reactionRolePairs.reaction': oldEmoji.toString() });
 
-    for await (const reactionRole of affectedReactionRoles) {
+    for (const reactionRole of affectedReactionRoles) {
       for (const [i, pair] of reactionRole.reactionRolePairs.entries()) {
         if (pair.reaction === oldEmoji.toString())
           reactionRole.reactionRolePairs.set(i, { role: pair.role, reaction: newEmoji.toString() });
