@@ -15,7 +15,7 @@ import Reminders from '@/models/reminders';
 import ConfigurationManager from '@/structures/ConfigurationManager';
 import TaskStore from '@/structures/tasks/TaskStore';
 import type { LogStatusesBase, ReminderDocument } from '@/types/database';
-import { DiscordLogType, LogStatuses as LogStatusesEnum } from '@/types/database';
+import { DiscordLogType, EclassStatus, LogStatuses as LogStatusesEnum } from '@/types/database';
 import { nullop } from '@/utils';
 
 export default class HorizonClient extends SapphireClient {
@@ -24,6 +24,7 @@ export default class HorizonClient extends SapphireClient {
 
   reactionRolesIds = new Set<string>();
   eclassRolesIds = new Set<string>();
+  currentlyRunningEclassIds = new Set<string>();
   roleIntersections = new Set<string>();
   reminders = new Map<string, ReminderDocument>();
   logStatuses = new Collection<string, Collection<DiscordLogType, LogStatusesEnum>>();
@@ -112,11 +113,15 @@ export default class HorizonClient extends SapphireClient {
   public async loadEclassRoles(): Promise<void> {
     this.eclassRolesIds.clear();
     const eclassRoles = await Eclass.find().catch(nullop);
-    if (eclassRoles) {
-      this.eclassRolesIds.addAll(...eclassRoles
-        .map(document => document?.announcementMessageId)
-        .filter(filterNullAndUndefined));
-    }
+    if (eclassRoles)
+      this.eclassRolesIds.addAll(...eclassRoles.map(document => document.announcementMessageId));
+  }
+
+  public async loadCurrentlyRunningEclassIds(): Promise<void> {
+    this.currentlyRunningEclassIds.clear();
+    const eclasses = await Eclass.find({ status: EclassStatus.InProgress }).catch(nullop);
+    if (eclasses)
+      this.currentlyRunningEclassIds.addAll(...eclasses.map(document => document.classId));
   }
 
   public async loadReminders(): Promise<void> {

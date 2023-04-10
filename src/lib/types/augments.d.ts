@@ -12,6 +12,7 @@ declare module '@sapphire/framework' {
     configManager: ConfigurationManager;
     remainingCompilerApiCredits: number;
     reactionRolesIds: Set<string>;
+    currentlyRunningEclassIds: Set<string>;
     eclassRolesIds: Set<string>;
     roleIntersections: Set<string>;
     reminders: Map<string, ReminderDocument>;
@@ -19,6 +20,7 @@ declare module '@sapphire/framework' {
 
     loadReactionRoles(): Promise<void>;
     loadEclassRoles(): Promise<void>;
+    loadCurrentlyRunningEclassIds(): Promise<void>;
     loadReminders(): Promise<void>;
     checkValidity(): void;
     syncLogStatuses(): Promise<void>;

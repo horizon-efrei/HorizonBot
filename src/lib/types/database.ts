@@ -491,3 +491,26 @@ export interface ContactDocument extends ContactBase, Document {}
 /** Interface for the "Contact"'s mongoose model */
 export type ContactModel = Model<ContactDocument>;
 // #endregion
+
+/* ************************************* */
+/*  Eclass Participation Database Types  */
+/* ************************************* */
+
+// #region Eclass Participation Database Types
+/** Type for the "EclassParticipation"'s mongoose schema */
+export interface EclassParticipationBase {
+  anonUserId: string;
+  classId: string;
+  joinedAt: Date;
+  leftAt: Date | null;
+  isSubscribed: boolean;
+}
+
+/** Simplified interface for the "EclassParticipation"'s mongoose document */
+export interface EclassParticipationDocument extends EclassParticipationBase, Document {}
+
+/** Interface for the "EclassParticipation"'s mongoose model */
+export interface EclassParticipationModel extends Model<EclassParticipationDocument> {
+  generateHash(id: string): string;
+}
+// #endregion

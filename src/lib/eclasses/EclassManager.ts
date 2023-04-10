@@ -13,6 +13,7 @@ import { eclass as config } from '@/config/commands/professors';
 import settings from '@/config/settings';
 import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
 import Eclass from '@/models/eclass';
+import EclassParticipation from '@/models/eclassParticipation';
 import type { EclassCreationOptions, EclassEmbedOptions } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';
@@ -184,6 +185,26 @@ export async function createClass(
 }
 
 export async function startClass(eclass: EclassPopulatedDocument): Promise<void> {
+  container.client.currentlyRunningEclassIds.add(eclass.classId);
+
+  // Create initial participations
+  if (eclass.subject.voiceChannelId) {
+    const voiceChannel = container.client
+      .guilds.resolve(eclass.guildId)
+      ?.channels.resolve(eclass.subject.voiceChannelId);
+
+    if (voiceChannel?.isVoiceBased() && voiceChannel.members.size > 0) {
+      await EclassParticipation.insertMany(
+        voiceChannel.members.map(member => ({
+          classId: eclass.classId,
+          anonUserId: EclassParticipation.generateHash(member.id),
+          joinedAt: new Date(),
+          isSubscribed: eclass.subscriberIds.includes(member.id),
+        })),
+      );
+    }
+  }
+
   // Fetch the announcement message
   const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
@@ -242,6 +263,14 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
 }
 
 export async function finishClass(eclass: EclassPopulatedDocument): Promise<void> {
+  container.client.currentlyRunningEclassIds.delete(eclass.classId);
+
+  // Update participations
+  await EclassParticipation.updateMany(
+    { classId: eclass.classId, leftAt: null },
+    { leftAt: new Date() },
+  );
+
   // Postpone the class by 5 minutes if there are more than 5 people in the voice channel
   if (eclass.subject.voiceChannelId) {
     const voiceChannel = container.client
