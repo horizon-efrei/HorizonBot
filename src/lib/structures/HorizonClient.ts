@@ -56,6 +56,7 @@ export default class HorizonClient extends SapphireClient {
     void this._loadCompilerApiCredits();
     void this.loadReactionRoles();
     void this.loadEclassRoles();
+    void this.loadCurrentlyRunningEclassIds();
     void this.loadReminders();
 
     this.configManager = new ConfigurationManager();
