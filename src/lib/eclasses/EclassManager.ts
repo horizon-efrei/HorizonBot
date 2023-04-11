@@ -196,7 +196,7 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
     if (voiceChannel?.isVoiceBased() && voiceChannel.members.size > 0) {
       await EclassParticipation.insertMany(
         voiceChannel.members.map(member => ({
-          classId: eclass.classId,
+          eclass: eclass._id,
           anonUserId: EclassParticipation.generateHash(member.id),
           joinedAt: new Date(),
           isSubscribed: eclass.subscriberIds.includes(member.id),
@@ -267,7 +267,7 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
 
   // Update participations
   await EclassParticipation.updateMany(
-    { classId: eclass.classId, leftAt: null },
+    { eclass: eclass._id, leftAt: null },
     { leftAt: new Date() },
   );
 

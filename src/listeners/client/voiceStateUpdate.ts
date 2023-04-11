@@ -39,7 +39,7 @@ export default class VoiceStateUpdateListener extends Listener {
     if (eclass) {
       await EclassParticipation.create({
         anonUserId: EclassParticipation.generateHash(state.member!.id),
-        classId: eclass.classId,
+        eclass: eclass._id,
         joinedAt: new Date(),
         isSubscribed: eclass.subscriberIds.includes(state.member!.id),
       });
@@ -66,7 +66,7 @@ export default class VoiceStateUpdateListener extends Listener {
     const eclass = eclassesInProgress.find(c => c.subject.voiceChannelId === state.channel!.id);
     if (eclass) {
       await EclassParticipation.findOneAndUpdate(
-        { anonUserId: EclassParticipation.generateHash(state.member!.id), classId: eclass.classId, leftAt: null },
+        { anonUserId: EclassParticipation.generateHash(state.member!.id), eclass: eclass._id, leftAt: null },
         { leftAt: new Date() },
       );
     }
@@ -94,7 +94,7 @@ export default class VoiceStateUpdateListener extends Listener {
       await EclassParticipation.findOneAndUpdate(
         {
           anonUserId: EclassParticipation.generateHash(oldState.member!.id),
-          classId: leavingEclass.classId,
+          eclass: leavingEclass._id,
           leftAt: null,
         },
         { leftAt: new Date() },
@@ -105,7 +105,7 @@ export default class VoiceStateUpdateListener extends Listener {
     if (joiningEclass) {
       await EclassParticipation.create({
         anonUserId: EclassParticipation.generateHash(newState.member!.id),
-        classId: joiningEclass.classId,
+        eclass: joiningEclass._id,
         joinedAt: new Date(),
         isSubscribed: joiningEclass.subscriberIds.includes(newState.member!.id),
       });

@@ -21,9 +21,11 @@ const EclassParticipationSchema = new Schema<EclassParticipationDocument, Eclass
     type: String,
     required: true,
   },
-  classId: {
-    type: String,
+  eclass: {
+    type: Schema.Types.ObjectId,
+    ref: 'Eclass',
     required: true,
+    autopopulate: true,
   },
   joinedAt: {
     type: Date,

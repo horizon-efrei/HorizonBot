@@ -113,6 +113,7 @@ interface EclassBaseDocument extends EclassBase, Document {
 export interface EclassDocument extends EclassBaseDocument {
   subject: SubjectDocument['_id'];
 }
+
 /** Interface for the "Eclass"'s mongoose document, when the subject field is populated */
 export interface EclassPopulatedDocument extends EclassBaseDocument {
   subject: SubjectDocument;
@@ -500,14 +501,21 @@ export type ContactModel = Model<ContactDocument>;
 /** Type for the "EclassParticipation"'s mongoose schema */
 export interface EclassParticipationBase {
   anonUserId: string;
-  classId: string;
+  eclass: EclassDocument | Types.ObjectId;
   joinedAt: Date;
   leftAt: Date | null;
   isSubscribed: boolean;
 }
 
 /** Simplified interface for the "EclassParticipation"'s mongoose document */
-export interface EclassParticipationDocument extends EclassParticipationBase, Document {}
+export interface EclassParticipationDocument extends EclassParticipationBase, Document {
+  eclass: EclassDocument['_id'];
+}
+
+/** Interface for the "Eclass"'s mongoose document, when the subject field is populated */
+export interface EclassParticipationPopulatedDocument extends EclassParticipationBase {
+  eclass: EclassDocument;
+}
 
 /** Interface for the "EclassParticipation"'s mongoose model */
 export interface EclassParticipationModel extends Model<EclassParticipationDocument> {
