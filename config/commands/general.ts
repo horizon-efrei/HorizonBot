@@ -135,7 +135,7 @@ export const reminders = {
     invalidTime: "Cette durée ou cette date n'est pas valide.",
 
     // Create a reminder
-    createdReminder: `D'accord, je te rappellerai ça le ${timeFormat('{date}')} ! Ce rappel a l'ID \`{reminderId}\`.\n\n:bulb: Tu peux maintenant **entrer des dates de manière plus naturelle** tel que "Aujourd'hui à 15h" ou "Après-demain à 10h" (voire même "ajrd à 13h30") !`,
+    createdReminder: `D'accord, je te rappellerai ça le ${timeFormat('{date}')} ! Ce rappel a l'ID \`{reminderId}\`.`,
     openDm: "\n:warning: Tes messages privés ne sont pas ouverts ou tu m'as bloqué, je ne pourrai donc pas t'envoyer le message de rappel ! Active-les ou débloque-moi pour les recevoir.",
 
     // List the reminders
