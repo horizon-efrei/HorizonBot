@@ -12,7 +12,7 @@ const days = {
   dimanche: 0,
 };
 
-const nextDay = (day: keyof typeof days): number => ((days[day] - new Date().getDay()) + 7) % 8;
+const nextDay = (day: keyof typeof days): number => ((days[day] - new Date().getDay()) + 7) % 7 || 7;
 
 const isPast = (date: Date): boolean => date.getTime() < Date.now();
 
@@ -27,7 +27,7 @@ export default function resolveDate(parameter: string, options?: { canBePast: bo
     // in two weeks. You have effectively no way to tell it "this monday" with the French locale.
     // Thus the following hack.
     .replace(
-      new RegExp(`(${Object.keys(days).join('|')})`, 'i'),
+      new RegExp(`(${Object.keys(days).join('|')})(?! prochain)`, 'i'),
       (_, day: keyof typeof days) => `dans ${nextDay(day)} jours`,
     );
 
