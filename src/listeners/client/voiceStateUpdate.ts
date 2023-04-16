@@ -1,9 +1,10 @@
-import { Listener } from '@sapphire/framework';
+import { Listener, Option } from '@sapphire/framework';
 import type { VoiceState } from 'discord.js';
 import Eclass from '@/models/eclass';
 import EclassParticipation from '@/models/eclassParticipation';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
-import { DiscordLogType } from '@/types/database';
+import type { EclassPopulatedDocument } from '@/types/database';
+import { DiscordLogType, EclassStatus, EclassStep } from '@/types/database';
 
 export default class VoiceStateUpdateListener extends Listener {
   public async run(oldState: VoiceState, newState: VoiceState): Promise<void> {
@@ -27,21 +28,13 @@ export default class VoiceStateUpdateListener extends Listener {
       severity: 1,
     });
 
-    if (this.container.client.currentlyRunningEclassIds.size === 0)
-      return;
-
-    // TODO: Cache this
-    const eclassesInProgress = await Eclass.find({
-      classId: { $in: this.container.client.currentlyRunningEclassIds.values().toArray() },
-    });
-
-    const eclass = eclassesInProgress.find(c => c.subject.voiceChannelId === state.channel!.id);
-    if (eclass) {
+    const eclass = await this._eclassesInProgressInChannel(state.channel!.id);
+    if (eclass.isSome()) {
       await EclassParticipation.create({
         anonUserId: EclassParticipation.generateHash(state.member!.id),
-        eclass: eclass._id,
+        eclass: eclass.unwrap()._id,
         joinedAt: new Date(),
-        isSubscribed: eclass.subscriberIds.includes(state.member!.id),
+        isSubscribed: eclass.unwrap().subscriberIds.includes(state.member!.id),
       });
     }
   }
@@ -58,15 +51,14 @@ export default class VoiceStateUpdateListener extends Listener {
     if (this.container.client.currentlyRunningEclassIds.size === 0)
       return;
 
-    // TODO: Cache this
-    const eclassesInProgress = await Eclass.find({
-      classId: { $in: this.container.client.currentlyRunningEclassIds.values().toArray() },
-    });
-
-    const eclass = eclassesInProgress.find(c => c.subject.voiceChannelId === state.channel!.id);
-    if (eclass) {
+    const eclass = await this._eclassesInProgressInChannel(state.channel!.id);
+    if (eclass.isSome()) {
       await EclassParticipation.findOneAndUpdate(
-        { anonUserId: EclassParticipation.generateHash(state.member!.id), eclass: eclass._id, leftAt: null },
+        {
+          anonUserId: EclassParticipation.generateHash(state.member!.id),
+          eclass: eclass.unwrap()._id,
+          leftAt: null,
+        },
         { leftAt: new Date() },
       );
     }
@@ -84,31 +76,40 @@ export default class VoiceStateUpdateListener extends Listener {
     if (this.container.client.currentlyRunningEclassIds.size === 0)
       return;
 
-    // TODO: Cache this
-    const eclassesInProgress = await Eclass.find({
-      classId: { $in: this.container.client.currentlyRunningEclassIds.values().toArray() },
-    });
-
-    const leavingEclass = eclassesInProgress.find(c => c.subject.voiceChannelId === oldState.channel!.id);
-    if (leavingEclass) {
+    const leavingEclass = await this._eclassesInProgressInChannel(oldState.channel!.id);
+    if (leavingEclass.isSome()) {
       await EclassParticipation.findOneAndUpdate(
         {
           anonUserId: EclassParticipation.generateHash(oldState.member!.id),
-          eclass: leavingEclass._id,
+          eclass: leavingEclass.unwrap()._id,
           leftAt: null,
         },
         { leftAt: new Date() },
       );
     }
 
-    const joiningEclass = eclassesInProgress.find(c => c.subject.voiceChannelId === newState.channel!.id);
-    if (joiningEclass) {
+    const joiningEclass = await this._eclassesInProgressInChannel(newState.channel!.id);
+    if (joiningEclass.isSome()) {
       await EclassParticipation.create({
         anonUserId: EclassParticipation.generateHash(newState.member!.id),
-        eclass: joiningEclass._id,
+        eclass: joiningEclass.unwrap()._id,
         joinedAt: new Date(),
-        isSubscribed: joiningEclass.subscriberIds.includes(newState.member!.id),
+        isSubscribed: joiningEclass.unwrap().subscriberIds.includes(newState.member!.id),
       });
     }
+  }
+
+  private async _eclassesInProgressInChannel(channelId: string): Promise<Option<EclassPopulatedDocument>> {
+    // TODO: Cache/memoize the result of the database call for a few minutes
+    const eclassesInProgress = await Eclass.find({
+      $or: [
+        { step: EclassStep.Prepared },
+        { end: { $gte: new Date(Date.now() - 5 * 60 * 1000), $lte: new Date(Date.now() + 5 * 60 * 1000) } },
+        { status: EclassStatus.InProgress },
+      ],
+    });
+
+    const eclass = eclassesInProgress.find(c => c.subject.voiceChannelId === channelId);
+    return Option.from(eclass);
   }
 }

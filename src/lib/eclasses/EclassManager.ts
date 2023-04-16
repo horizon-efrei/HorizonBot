@@ -187,24 +187,6 @@ export async function createClass(
 export async function startClass(eclass: EclassPopulatedDocument): Promise<void> {
   container.client.currentlyRunningEclassIds.add(eclass.classId);
 
-  // Create initial participations
-  if (eclass.subject.voiceChannelId) {
-    const voiceChannel = container.client
-      .guilds.resolve(eclass.guildId)
-      ?.channels.resolve(eclass.subject.voiceChannelId);
-
-    if (voiceChannel?.isVoiceBased() && voiceChannel.members.size > 0) {
-      await EclassParticipation.insertMany(
-        voiceChannel.members.map(member => ({
-          eclass: eclass._id,
-          anonUserId: EclassParticipation.generateHash(member.id),
-          joinedAt: new Date(),
-          isSubscribed: eclass.subscriberIds.includes(member.id),
-        })),
-      );
-    }
-  }
-
   // Fetch the announcement message
   const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
@@ -452,6 +434,24 @@ export async function removeRecordLink(eclass: EclassPopulatedDocument, recordLi
 }
 
 export async function prepareClass(eclass: EclassPopulatedDocument): Promise<void> {
+  // Create initial participations
+  if (eclass.subject.voiceChannelId) {
+    const voiceChannel = container.client
+      .guilds.resolve(eclass.guildId)
+      ?.channels.resolve(eclass.subject.voiceChannelId);
+
+    if (voiceChannel?.isVoiceBased() && voiceChannel.members.size > 0) {
+      await EclassParticipation.insertMany(
+        voiceChannel.members.map(member => ({
+          eclass: eclass._id,
+          anonUserId: EclassParticipation.generateHash(member.id),
+          joinedAt: new Date(),
+          isSubscribed: eclass.subscriberIds.includes(member.id),
+        })),
+      );
+    }
+  }
+
   // Mark the class as prepared before sending reminders, so that if this takes more than 2 minutes, we don't
   // prepare the class again
   await Eclass.findByIdAndUpdate(eclass._id, { step: EclassStep.Prepared });
