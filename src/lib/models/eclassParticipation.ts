@@ -20,9 +20,11 @@ const EclassParticipationSchema = new Schema<EclassParticipationDocument, Eclass
   anonUserId: {
     type: String,
     required: true,
+    index: true,
   },
   eclass: {
     type: Schema.Types.ObjectId,
+    index: true,
     ref: 'Eclass',
     required: true,
     autopopulate: true,
