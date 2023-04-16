@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.6.0] - 2023/04/16
+
+### Added
+
+- Add (anonymous) tracking of eclass participations
+- Add automatic postponig of eclasses end date if people are still in the channel
+
+### Fixed
+
+- Fix crash when fetching removed announcement message
+- Fix mention formatting in eclass announcement
+- Fix logs not being sent when a permission overwrite is removed
+- Fix fatal error in logs when removing a permission overwrite
+
+### Improved
+
+- Improve "New Eclass" embed design
+- Improve "Eclass Started" embed design
+- Improve channel executor heuristics in logs
+- Removed tip about date formatting in reminders
+- Improve date parsing by adding natural date support
+
+
 ## [1.5.3] - 2023/04/02
 
 ### Improvement
