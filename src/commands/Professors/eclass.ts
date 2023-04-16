@@ -523,7 +523,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
         return;
       }
 
-      if (eclass.step === EclassStep.Reminded && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
+      if (eclass.step === EclassStep.Prepared && dayjs(date).isAfter(dayjs().add(15, 'minutes')))
         eclass.step = EclassStep.None;
     }
 

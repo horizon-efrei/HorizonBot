@@ -22,7 +22,7 @@ export default {
     shortDayFormat: 'DD/MM',
     eclassRoleFormat: 'Cours {subject.classCode}: {topic} ({formattedDate})',
     eclassRoleFormatFinished: '[Terminé le {formattedDate}] Cours {subject.classCode}: {topic}',
-    eclassReminderTime: 15 * 60 * 1000, // 15 minutes
+    eclassPrepareBefore: 15 * 60 * 1000, // 15 minutes
     eclassRoleExpiration: 7 * 24 * 60 * 60 * 1000, // 7 days
     discordInviteLinkRegex: /(?:discord\.(?:gg|io|me|plus|link)|invite\.(?:gg|ink)|discord(?:app)?\.com\/invite)\/(?<code>[\w-]{2,})/i,
   },

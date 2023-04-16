@@ -451,9 +451,10 @@ export async function removeRecordLink(eclass: EclassPopulatedDocument, recordLi
   container.logger.debug(`[e-class:${eclass.classId}] Removed record link.`);
 }
 
-export async function remindClass(eclass: EclassPopulatedDocument): Promise<void> {
-  // Mark the reminder as sent
-  await Eclass.findByIdAndUpdate(eclass._id, { step: EclassStep.Reminded });
+export async function prepareClass(eclass: EclassPopulatedDocument): Promise<void> {
+  // Mark the class as prepared before sending reminders, so that if this takes more than 2 minutes, we don't
+  // prepare the class again
+  await Eclass.findByIdAndUpdate(eclass._id, { step: EclassStep.Prepared });
 
   // Resolve the associated channel
   const guild = container.client.guilds.resolve(eclass.guildId);
@@ -495,7 +496,7 @@ export async function remindClass(eclass: EclassPopulatedDocument): Promise<void
   const reminder = pupa(config.messages.remindClassPrivateNotification, payload);
   await massSend(guild, eclass.subscriberIds, reminder);
 
-  container.logger.debug(`[e-class:${eclass.classId}] Sent reminders.`);
+  container.logger.debug(`[e-class:${eclass.classId}] Prepared class.`);
 }
 
 export async function subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {

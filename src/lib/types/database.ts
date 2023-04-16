@@ -64,7 +64,7 @@ export enum EclassStatus {
 /** Enum for the eclass' current steps */
 export enum EclassStep {
   None = 'none',
-  Reminded = 'reminded',
+  Prepared = 'prepared',
   CleanedUp = 'cleaned-up',
 }
 

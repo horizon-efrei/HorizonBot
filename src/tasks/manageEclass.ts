@@ -17,30 +17,30 @@ export default class ManageEclassTask extends Task {
       // - are finished since a week (to delete its associated role)
       $or: [{
         status: EclassStatus.Planned,
-        date: { $lte: Date.now() + settings.configuration.eclassReminderTime },
+        date: { $lte: Date.now() + settings.configuration.eclassPrepareBefore },
         step: EclassStep.None,
       }, {
         status: EclassStatus.Planned,
         date: { $lte: Date.now() },
-        step: EclassStep.Reminded,
+        step: EclassStep.Prepared,
       }, {
         status: EclassStatus.InProgress,
         end: { $lte: Date.now() },
       }, {
         status: EclassStatus.Finished,
         end: { $lte: Date.now() - settings.configuration.eclassRoleExpiration },
-        step: EclassStep.Reminded,
+        step: EclassStep.Prepared,
       }],
     });
 
     for (const eclass of eclasses) {
       if (eclass.status === EclassStatus.Planned && eclass.step === EclassStep.None)
-        await EclassManager.remindClass(eclass);
-      else if (eclass.status === EclassStatus.Planned && eclass.step === EclassStep.Reminded)
+        await EclassManager.prepareClass(eclass);
+      else if (eclass.status === EclassStatus.Planned && eclass.step === EclassStep.Prepared)
         await EclassManager.startClass(eclass);
       else if (eclass.status === EclassStatus.InProgress)
         await EclassManager.finishClass(eclass);
-      else if (eclass.status === EclassStatus.Finished && eclass.step === EclassStep.Reminded)
+      else if (eclass.status === EclassStatus.Finished && eclass.step === EclassStep.Prepared)
         await EclassManager.cleanupClass(eclass);
     }
   }
