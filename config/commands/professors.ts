@@ -217,12 +217,11 @@ export const eclass = {
     startClassEmbed: {
       title: 'Le cours en {eclass.subject.name} va commencer !',
       author: "Ef'Réussite - Un cours commence !",
-      baseDescription: `Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par ${userMention('{eclass.professorId}')} commence !\n\n:round_pushpin: Il aura lieu {where}\n\n{isRecorded}`,
+      baseDescription: `Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par ${userMention('{eclass.professorId}')} commence !\n\n:round_pushpin: Il a lieu {where}\n\n{isRecorded}\n\n:microphone2: **PENSEZ À COUPER VOTRE MICRO !**`,
       descriptionAllChannels: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannelId}')}, et le salon vocal est ${channelMention('{eclass.subject.voiceChannelId}')}.`,
       descriptionTextChannel: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannelId}')}.`,
       descriptionIsRecorded: ':red_circle: Le cours est enregistré !',
       descriptionIsNotRecorded: ":warning: Le cours n'est pas enregistré !",
-      footer: 'ID : {classId}',
     },
 
     // Finish subcommand

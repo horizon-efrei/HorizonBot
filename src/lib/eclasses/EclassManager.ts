@@ -222,7 +222,6 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
   const embed = new EmbedBuilder()
     .setColor(settings.colors.primary)
     .setTitle(pupa(texts.title, { eclass }))
-    .setAuthor({ name: texts.author, iconURL: announcementChannel.guild.iconURL()! })
     .setDescription(pupa(texts.baseDescription, {
       eclass,
       isRecorded: eclass.isRecorded ? texts.descriptionIsRecorded : texts.descriptionIsNotRecorded,
@@ -230,8 +229,7 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
         eclass.subject.voiceChannelId ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
       ),
       where: config.messages.where(eclass),
-    }))
-    .setFooter({ text: pupa(texts.footer, eclass) });
+    }));
 
   await classChannel?.send({
     content: pupa(config.messages.startClassNotification, eclass.toJSON()),
