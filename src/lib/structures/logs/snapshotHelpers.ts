@@ -105,6 +105,15 @@ export function getPermissionDetailsDiff(
   return Object.values(permsBefore)
     .map((value) => {
       const { allow: allowedBefore, deny: deniedBefore } = value;
+
+      if (!permsAfter[value.id]) {
+        return [
+          `Permissions pour ${getReadableTarget(value.id, value.type, guild)} (retiré) :`,
+          ...allowedBefore.map(perm => `  ${perm}: ✅ → ◽️`),
+          ...deniedBefore.map(perm => `  ${perm}: ❌ → ◽️`),
+        ].join('\n');
+      }
+
       const { allow: allowedAfter, deny: deniedAfter } = permsAfter[value.id];
 
       if (_.isEqual(allowedBefore, allowedAfter) && _.isEqual(deniedBefore, deniedAfter))
