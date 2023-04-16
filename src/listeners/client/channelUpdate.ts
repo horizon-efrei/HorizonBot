@@ -14,8 +14,12 @@ import { getChannelSnapshot, serializePermissions } from '@/structures/logs/snap
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-type ChannelUpdateAuditLogEntries = Collection<string, GuildAuditLogsEntry<AuditLogEvent.ChannelOverwriteUpdate>
-  | GuildAuditLogsEntry<AuditLogEvent.ChannelUpdate>>;
+type ChannelUpdateAuditLogEntries = Collection<
+  string,
+  | GuildAuditLogsEntry<AuditLogEvent.ChannelOverwriteDelete>
+  | GuildAuditLogsEntry<AuditLogEvent.ChannelOverwriteUpdate>
+  | GuildAuditLogsEntry<AuditLogEvent.ChannelUpdate>
+>;
 
 export default class ChannelUpdateListener extends Listener {
   private readonly _buffer = new Map<string, { oldChannel: GuildChannel; newChannel: GuildChannel }>();
@@ -39,14 +43,29 @@ export default class ChannelUpdateListener extends Listener {
     if (!propertyUpdated && !permissionUpdated)
       return;
 
-    const auditLogs = propertyUpdated
-      ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate }).catch(nullop)
-      : permissionUpdated
-        ? await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelOverwriteUpdate }).catch(nullop)
-        : null;
+    let auditLogs: ChannelUpdateAuditLogEntries | null = null;
 
-    const lastChannelUpdate = (auditLogs?.entries as ChannelUpdateAuditLogEntries | undefined)
-      ?.filter(entry => entry.target?.id === newChannel.id && entry.createdTimestamp > Date.now() - 2000)
+    if (propertyUpdated) {
+      const result = await newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelUpdate }).catch(nullop);
+      if (result)
+        auditLogs = result.entries;
+    } else if (permissionUpdated) {
+        // Start the audit log fetches in parallel
+        const result = await Promise.all([
+          newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelOverwriteUpdate }).catch(nullop),
+          newChannel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelOverwriteDelete }).catch(nullop),
+        ]);
+
+        const [updateLogs, deleteLogs] = result;
+
+        // Merge the results
+        if (updateLogs)
+          auditLogs = updateLogs.entries;
+        if (deleteLogs)
+          auditLogs = auditLogs?.concat(deleteLogs.entries) ?? deleteLogs.entries;
+    }
+    const lastChannelUpdate = auditLogs
+      ?.filter(entry => entry.targetId === newChannel.id && entry.createdTimestamp > Date.now() - 2000)
       .first();
 
     const mapKey = this._getKey(newChannel, lastChannelUpdate?.executor);
