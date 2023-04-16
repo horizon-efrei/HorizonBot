@@ -86,13 +86,18 @@ export default class ChannelUpdateListener extends Listener {
     const oldPermissions = serializePermissions(oldPermissionOverwrites);
     const newPermissions = serializePermissions(newPermissionOverwrites);
 
+    // If no permission changed, then return false
     if (_.isEqual(oldPermissions, newPermissions))
       return false;
 
-    const difference = _.pickBy(newPermissions, (value, key) => !_.isEqual(value, oldPermissions[key]));
+    // If some permissions are removed, then return true
+    if (_.some(oldPermissions, (value, key) => !_.isEqual(value, newPermissions[key])))
+      return true;
 
+    // If some permissions are added, then we need to check further whether they are interesting changes.
     // When we add a role a user to the permission overwrite, they are first added with allow: 0 and deny: 0
     // This is not an interesting change, so we filter those out
+    const difference = _.pickBy(newPermissions, (value, key) => !_.isEqual(value, oldPermissions[key]));
     const noPermissionChanges = Object.values(difference)
       .map(({ allow, deny }) => ({ allow: Number(allow), deny: Number(deny) }))
       .filter(({ allow, deny }) => allow !== 0 || deny !== 0);
