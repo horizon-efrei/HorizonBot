@@ -648,7 +648,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
 
     // Cancel the class & confirm.
     await EclassManager.cancelClass(eclass);
-    await buttonInteraction.update(this.messages.successfullyCanceled);
+    await interaction.editReply(this.messages.successfullyCanceled);
   }
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.InProgress] })
