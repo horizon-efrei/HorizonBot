@@ -18,10 +18,15 @@ const isPast = (date: Date): boolean => date.getTime() < Date.now();
 
 export default function resolveDate(parameter: string, options?: { canBePast: boolean }): Result<Date, 'dateError'> {
   const expandedParameter = parameter
-    .replace(/ajrd/i, 'aujourd\'hui')
+    .replace(/ajrd/i, "aujourd'hui")
     .replace(/apr[eè]s[ -]demain/i, 'dans 2 jours')
     .replace(/dm/i, 'demain')
     .replace(/apdm/i, 'dans 2 jours')
+    // With the French locale, the chrono-node's CasualTimeParser are very badly setup and don't take into account all
+    // possibilities or variations of the suffixes. Thus the following hack.
+    .replace(/apr[eè]s[ -]midi|apr[eè]m/i, 'à 14h')
+    .replace(/(?:[aà] )?midi/i, 'à 12h')
+    .replace(/(?:[aà] )?minuit/i, 'à 00h')
     // With the French locale, chrono-node fails to parse weekdays correctly. If you say "monday" but you are tuesday,
     // it will reference the day before, not the next monday, and if you say "next monday" it will reference the monday
     // in two weeks. You have effectively no way to tell it "this monday" with the French locale.
