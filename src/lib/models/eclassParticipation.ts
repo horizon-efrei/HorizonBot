@@ -46,4 +46,4 @@ const EclassParticipationSchema = new Schema<EclassParticipationDocument, Eclass
 
 EclassParticipationSchema.statics.generateHash = generateHashFactory();
 
-export default model<EclassParticipationDocument, EclassParticipationModel>('EclassParticipation', EclassParticipationSchema);
+export const EclassParticipation = model<EclassParticipationDocument, EclassParticipationModel>('EclassParticipation', EclassParticipationSchema);

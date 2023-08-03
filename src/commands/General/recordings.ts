@@ -4,14 +4,14 @@ import { EmbedBuilder } from 'discord.js';
 import { groupBy } from 'lodash';
 import pupa from 'pupa';
 import { recordings as config } from '@/config/commands/general';
-import messages from '@/config/messages';
-import settings from '@/config/settings';
-import Eclass from '@/models/eclass';
+import { messages } from '@/config/messages';
+import { settings } from '@/config/settings';
+import { Eclass } from '@/models/eclass';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import type { EclassPopulatedDocument } from '@/types/database';
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class RecordingsCommand extends HorizonCommand<typeof config> {
+export class RecordingsCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

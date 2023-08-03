@@ -6,7 +6,7 @@ import { getChannelSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class ChannelCreateListener extends Listener {
+export class ChannelCreateListener extends Listener {
   public async run(channel: GuildChannel): Promise<void> {
     const auditLogs = await channel.guild.fetchAuditLogs({ type: AuditLogEvent.ChannelCreate }).catch(nullop);
     const lastChannelCreate = auditLogs?.entries

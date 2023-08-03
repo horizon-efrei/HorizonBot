@@ -10,9 +10,9 @@ import {
 } from 'discord.js';
 import pupa from 'pupa';
 import { setup as config } from '@/config/commands/admin';
-import settings from '@/config/settings';
-import Configuration from '@/models/configuration';
-import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEmbed';
+import { settings } from '@/config/settings';
+import { Configuration } from '@/models/configuration';
+import { PaginatedContentMessageEmbed } from '@/structures/PaginatedContentMessageEmbed';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import type { ConfigEntries, ConfigurationDocument } from '@/types/database';
 import { ConfigEntriesChannels, ConfigEntriesRoles } from '@/types/database';
@@ -65,7 +65,7 @@ enum Options {
     { name: 'see', chatInputRun: 'see' },
   ],
 })
-export default class SetupCommand extends HorizonSubcommand<typeof config> {
+export class SetupCommand extends HorizonSubcommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

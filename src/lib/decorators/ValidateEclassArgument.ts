@@ -1,7 +1,7 @@
 import { container } from '@sapphire/framework';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
-import Eclass from '@/models/eclass';
+import { Eclass } from '@/models/eclass';
 import type { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import type { EclassStatus } from '@/types/database';
 import { ConfigEntriesRoles } from '@/types/database';
@@ -10,7 +10,7 @@ interface ValidationOptions {
   statusIn?: EclassStatus[];
 }
 
-export default function ValidateEclassArgument(options?: ValidationOptions): MethodDecorator {
+export function ValidateEclassArgument(options?: ValidationOptions): MethodDecorator {
   return (_target, _key, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
 

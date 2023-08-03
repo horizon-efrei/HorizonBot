@@ -4,14 +4,14 @@ import { EmbedBuilder } from 'discord.js';
 import { groupBy } from 'lodash';
 import pupa from 'pupa';
 import { contacts as config } from '@/config/commands/general';
-import messages from '@/config/messages';
-import settings from '@/config/settings';
-import Contact from '@/models/contact';
+import { messages } from '@/config/messages';
+import { settings } from '@/config/settings';
+import { Contact } from '@/models/contact';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import type { ContactDocument } from '@/types/database';
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class ContactsCommand extends HorizonCommand<typeof config> {
+export class ContactsCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

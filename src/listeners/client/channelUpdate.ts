@@ -21,7 +21,7 @@ type ChannelUpdateAuditLogEntries = Collection<
   | GuildAuditLogsEntry<AuditLogEvent.ChannelUpdate>
 >;
 
-export default class ChannelUpdateListener extends Listener {
+export class ChannelUpdateListener extends Listener {
   private readonly _buffer = new Map<string, { oldChannel: GuildChannel; newChannel: GuildChannel }>();
 
   public async run(oldChannel: DMChannel | GuildChannel, newChannel: DMChannel | GuildChannel): Promise<void> {

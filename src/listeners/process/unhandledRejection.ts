@@ -3,7 +3,7 @@ import type { ListenerOptions } from '@sapphire/framework';
 import { Listener } from '@sapphire/framework';
 
 @ApplyOptions<ListenerOptions>({ emitter: process })
-export default class UnhandledRejectionListener extends Listener {
+export class UnhandledRejectionListener extends Listener {
   public run(error: unknown, promise: PromiseRejectedResult): void {
     if (error instanceof Error) {
       this.container.logger.fatal(`Unhandled Rejection: ${error.name}: ${error.message} (reason: ${promise.reason})`);

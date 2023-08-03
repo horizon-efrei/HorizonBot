@@ -1,12 +1,12 @@
 import { Listener, Option } from '@sapphire/framework';
 import type { VoiceState } from 'discord.js';
-import Eclass from '@/models/eclass';
-import EclassParticipation from '@/models/eclassParticipation';
+import { Eclass } from '@/models/eclass';
+import { EclassParticipation } from '@/models/eclassParticipation';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import type { EclassPopulatedDocument } from '@/types/database';
 import { DiscordLogType, EclassStatus, EclassStep } from '@/types/database';
 
-export default class VoiceStateUpdateListener extends Listener {
+export class VoiceStateUpdateListener extends Listener {
   public async run(oldState: VoiceState, newState: VoiceState): Promise<void> {
     if (!oldState.member || !newState.member)
       return;

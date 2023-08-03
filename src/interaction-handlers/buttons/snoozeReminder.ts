@@ -3,8 +3,8 @@ import type { Option } from '@sapphire/framework';
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ButtonInteraction } from 'discord.js';
 import pupa from 'pupa';
-import messages from '@/config/messages';
-import Reminders from '@/models/reminders';
+import { messages } from '@/config/messages';
+import { Reminder } from '@/models/reminders';
 import type { ReminderDocument } from '@/types/database';
 
 const validButtonIds = new Set(['snooze-10min', 'snooze-30min', 'snooze-1h', 'snooze-1d']);
@@ -51,7 +51,7 @@ export class ButtonHandler extends InteractionHandler {
         break;
     }
 
-    const newReminder = await Reminders.findByIdAndUpdate<ReminderDocument>(
+    const newReminder = await Reminder.findByIdAndUpdate<ReminderDocument>(
       reminder._id,
       { $set: { date: Date.now() + offset, reminded: false } },
       { new: true },

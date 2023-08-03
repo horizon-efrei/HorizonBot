@@ -16,7 +16,7 @@ const nextDay = (day: keyof typeof days): number => ((days[day] - new Date().get
 
 const isPast = (date: Date): boolean => date.getTime() < Date.now();
 
-export default function resolveDate(parameter: string, options?: { canBePast: boolean }): Result<Date, 'dateError'> {
+export function resolveDate(parameter: string, options?: { canBePast: boolean }): Result<Date, 'dateError'> {
   const expandedParameter = parameter
     .replace(/ajrd/i, "aujourd'hui")
     .replace(/apr[eè]s[ -]demain/i, 'dans 2 jours')

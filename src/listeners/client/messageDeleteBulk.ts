@@ -6,7 +6,7 @@ import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class MessageDeleteBulkListener extends Listener {
+export class MessageDeleteBulkListener extends Listener {
   public async run(messages: Collection<Snowflake, GuildMessage>, channel: GuildTextBasedChannel): Promise<void> {
       const auditLogs = await channel.guild.fetchAuditLogs({ type: AuditLogEvent.MessageBulkDelete }).catch(nullop);
       const lastMessageDelete = auditLogs?.entries

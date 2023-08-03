@@ -3,13 +3,13 @@ import dayjs from 'dayjs';
 import { EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { statistics as config } from '@/config/commands/general';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import pkg from '@/root/package.json';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import { getGitRev } from '@/utils';
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class StatisticsCommand extends HorizonCommand<typeof config> {
+export class StatisticsCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

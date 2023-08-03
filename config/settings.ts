@@ -2,7 +2,7 @@ import { userMention } from 'discord.js';
 import type { ColorResolvable } from 'discord.js';
 import type { CodeLanguageResult } from '@/types';
 
-export default {
+export const settings = {
   colors: {
     primary: '#5bb78f' as ColorResolvable,
     default: '#439bf2' as ColorResolvable,

@@ -10,10 +10,10 @@ import type {
 import { EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { eclass as config } from '@/config/commands/professors';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
-import Eclass from '@/models/eclass';
-import EclassParticipation from '@/models/eclassParticipation';
+import { Eclass } from '@/models/eclass';
+import { EclassParticipation } from '@/models/eclassParticipation';
 import type { EclassCreationOptions, EclassEmbedOptions } from '@/types';
 import { SchoolYear } from '@/types';
 import type { EclassPopulatedDocument } from '@/types/database';

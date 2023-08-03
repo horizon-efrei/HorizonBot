@@ -2,9 +2,9 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { EmbedBuilder, PermissionsBitField } from 'discord.js';
 import pupa from 'pupa';
 import { logs as config } from '@/config/commands/admin';
-import messages from '@/config/messages';
-import LogStatuses from '@/models/logStatuses';
-import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEmbed';
+import { messages } from '@/config/messages';
+import { LogStatuses } from '@/models/logStatuses';
+import { PaginatedContentMessageEmbed } from '@/structures/PaginatedContentMessageEmbed';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import type { LogStatuses as LogStatusesEnum } from '@/types/database';
 import { DiscordLogType } from '@/types/database';
@@ -26,7 +26,7 @@ enum Options {
     { name: 'list', chatInputRun: 'list' },
   ],
 })
-export default class LogsCommand extends HorizonSubcommand<typeof config> {
+export class LogsCommand extends HorizonSubcommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

@@ -6,11 +6,11 @@ import {
   GuildChannel,
   Role,
 } from 'discord.js';
-import Configuration from '@/models/configuration';
+import { Configuration } from '@/models/configuration';
 import type { ConfigEntries, ConfigEntriesChannels, ConfigEntryHolds } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class ConfigurationManager {
+export class ConfigurationManager {
   private readonly _entries = new Collection<
     string,
     { guildId: string; name: ConfigEntries; value: ConfigEntryHolds }

@@ -1,13 +1,13 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
-import Eclass from '@/models/eclass';
-import Task from '@/structures/tasks/Task';
+import { Eclass } from '@/models/eclass';
+import { Task } from '@/structures/tasks/Task';
 import type { TaskOptions } from '@/structures/tasks/Task';
 import { EclassStatus, EclassStep } from '@/types/database';
 
 @ApplyOptions<TaskOptions>({ interval: 2 * 60 * 1000 /* Every 2 minutes */ })
-export default class ManageEclassTask extends Task {
+export class ManageEclassTask extends Task {
   public async run(): Promise<void> {
     const eclasses = await Eclass.find({
       // This queries find classes that:

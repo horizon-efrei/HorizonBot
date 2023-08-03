@@ -1,6 +1,6 @@
 import { model, Schema } from 'mongoose';
 import type { LogStatusesDocument, LogStatusesModel } from '@/types/database';
-import { DiscordLogType, LogStatuses } from '@/types/database';
+import { DiscordLogType, LogStatuses as LogStatusesEnum } from '@/types/database';
 
 const LogStatusesSchema = new Schema<LogStatusesDocument, LogStatusesModel, null>({
   type: {
@@ -10,7 +10,7 @@ const LogStatusesSchema = new Schema<LogStatusesDocument, LogStatusesModel, null
   },
   status: {
     type: Number,
-    enum: Object.values(LogStatuses).filter(Number.isInteger),
+    enum: Object.values(LogStatusesEnum).filter(Number.isInteger),
     required: true,
   },
   guildId: {
@@ -19,4 +19,4 @@ const LogStatusesSchema = new Schema<LogStatusesDocument, LogStatusesModel, null
   },
 }, { timestamps: true });
 
-export default model<LogStatusesDocument, LogStatusesModel>('LogStatuses', LogStatusesSchema);
+export const LogStatuses = model<LogStatusesDocument, LogStatusesModel>('LogStatuses', LogStatusesSchema);

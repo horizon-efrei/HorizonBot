@@ -8,7 +8,7 @@ interface EprofOrStaffOptions {
   isOriginalEprof?: boolean;
 }
 
-export default function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDecorator {
+export function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDecorator {
   return (_target, _key, descriptor: PropertyDescriptor): PropertyDescriptor => {
     const originalMethod = descriptor.value;
 

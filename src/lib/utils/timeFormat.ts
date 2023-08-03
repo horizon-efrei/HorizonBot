@@ -7,6 +7,6 @@ import type { TimestampStylesString } from 'discord.js';
  * @param style The style to use, defaults to the full date
  * @returns The Discord-formatted time
  */
-export default function timeFormat(date: string, style?: TimestampStylesString): string {
+export function timeFormat(date: string, style?: TimestampStylesString): string {
    return typeof style === 'string' ? `<t:${date}:${style}>` : `<t:${date}>`;
  }

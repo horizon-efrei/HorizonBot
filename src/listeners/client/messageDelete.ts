@@ -2,15 +2,15 @@ import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { AuditLogEvent, User } from 'discord.js';
 import pupa from 'pupa';
-import messages from '@/config/messages';
-import settings from '@/config/settings';
-import ReactionRole from '@/models/reactionRole';
+import { messages } from '@/config/messages';
+import { settings } from '@/config/settings';
+import { ReactionRole } from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
 import { noop, nullop } from '@/utils';
 
-export default class MessageDeleteListener extends Listener {
+export class MessageDeleteListener extends Listener {
   public async run(message: Message): Promise<void> {
     if (message.system || message.partial || message.channel.partial || !message.inGuild())
       return;

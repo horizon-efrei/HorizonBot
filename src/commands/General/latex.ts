@@ -7,7 +7,7 @@ import {
   TextInputStyle,
 } from 'discord.js';
 import { latex as config } from '@/config/commands/general';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
@@ -29,7 +29,7 @@ const equationModal = new ModalBuilder()
   );
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class LatexCommand extends HorizonCommand<typeof config> {
+export class LatexCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

@@ -1,8 +1,8 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildEmoji } from 'discord.js';
-import ReactionRole from '@/models/reactionRole';
+import { ReactionRole } from '@/models/reactionRole';
 
-export default class EmojiUpdateListener extends Listener {
+export class EmojiUpdateListener extends Listener {
   public async run(oldEmoji: GuildEmoji, newEmoji: GuildEmoji): Promise<void> {
     if (oldEmoji.toString() === newEmoji.toString())
       return;

@@ -130,4 +130,4 @@ EclassSchema.methods.getStatus = function (this: EclassDocument): string {
 
 EclassSchema.plugin(autopopulate);
 
-export default model<EclassDocument, EclassModel>('Eclass', EclassSchema);
+export const Eclass = model<EclassDocument, EclassModel>('Eclass', EclassSchema);

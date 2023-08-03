@@ -10,12 +10,12 @@ import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import type { APIEmbed, EmbedField, JSONEncodable } from 'discord.js';
 import { ComponentType, EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
-import messages from '@/config/messages';
-import settings from '@/config/settings';
+import { messages } from '@/config/messages';
+import { settings } from '@/config/settings';
 
 type EmbedFields = Array<Omit<EmbedField, 'inline'>>;
 
-export default class PaginatedMessageEmbedFields extends PaginatedMessage {
+export class PaginatedMessageEmbedFields extends PaginatedMessage {
   private _embedTemplate: APIEmbed = {};
   private _totalPages = 0;
   private _items: EmbedFields = [];

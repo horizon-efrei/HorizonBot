@@ -4,7 +4,7 @@ import type { Option } from '@sapphire/framework';
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 import FuzzySearch from 'fuzzy-search';
-import Contact from '@/models/contact';
+import { Contact } from '@/models/contact';
 import type { ContactDocument } from '@/types/database';
 
 @ApplyOptions<InteractionHandler.Options>({

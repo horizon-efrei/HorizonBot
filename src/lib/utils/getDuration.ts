@@ -61,7 +61,7 @@ function convert(num: number, type: string): number {
  * @returns The duration in milliseconds
  * @throws {TypeError} If the given duration is invalid, it will throw a TypeError
  */
-function getDuration(val: string): number {
+export function getDuration(val: string): number {
   let abs: number;
   let total = 0;
   if (val.length > 0 && val.length < 101) {
@@ -93,5 +93,3 @@ function getDuration(val: string): number {
   }
   throw new TypeError('Value is an empty string, an invalid number, or too long (>100).');
 }
-
-export default getDuration;

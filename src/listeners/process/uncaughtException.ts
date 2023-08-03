@@ -3,7 +3,7 @@ import type { ListenerOptions } from '@sapphire/framework';
 import { Listener } from '@sapphire/framework';
 
 @ApplyOptions<ListenerOptions>({ emitter: process })
-export default class UncaughtExceptionListener extends Listener {
+export class UncaughtExceptionListener extends Listener {
   public run(error: Error): void {
     this.container.logger.fatal(`Uncaught Exception: ${error.name}: ${error.message}`);
     this.container.logger.fatal(error.stack);

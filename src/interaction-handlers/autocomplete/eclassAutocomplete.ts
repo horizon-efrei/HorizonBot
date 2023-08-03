@@ -5,8 +5,8 @@ import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework
 import dayjs from 'dayjs';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 import FuzzySearch from 'fuzzy-search';
-import settings from '@/config/settings';
-import Eclass from '@/models/eclass';
+import { settings } from '@/config/settings';
+import { Eclass } from '@/models/eclass';
 import type { EclassDocument } from '@/types/database';
 import { EclassStatus } from '@/types/database';
 import { trimText } from '@/utils';

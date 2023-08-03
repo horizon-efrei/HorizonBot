@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { EmbedBuilder, time as timeFormatter, TimestampStyles } from 'discord.js';
 import pupa from 'pupa';
 import { userInfo as config } from '@/config/commands/general';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
@@ -10,7 +10,7 @@ enum Options {
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class UserInfoCommand extends HorizonCommand<typeof config> {
+export class UserInfoCommand extends HorizonCommand<typeof config> {
     public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
       registry.registerChatInputCommand(
         command => command

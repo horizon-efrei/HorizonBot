@@ -7,7 +7,7 @@
 
 type BooleanFn<T extends unknown[], R extends boolean = boolean> = (...args: T) => R;
 
-export default function andMix<
+export function andMix<
   T extends unknown[],
   R extends boolean,
 >(...fns: ReadonlyArray<BooleanFn<T, R>>): BooleanFn<T, R> {

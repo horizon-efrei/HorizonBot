@@ -19,14 +19,14 @@ import {
 import pupa from 'pupa';
 
 import { eclass as config } from '@/config/commands/professors';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import { IsEprofOrStaff, ValidateEclassArgument } from '@/decorators';
 import * as EclassManager from '@/eclasses/EclassManager';
 import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
-import Eclass from '@/models/eclass';
-import Subject from '@/models/subject';
-import * as CustomResolvers from '@/resolvers';
-import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
+import { Eclass } from '@/models/eclass';
+import { Subject } from '@/models/subject';
+import { resolveDate, resolveDuration } from '@/resolvers';
+import { PaginatedMessageEmbedFields } from '@/structures/PaginatedMessageEmbedFields';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import type { SchoolYear } from '@/types';
 import {
@@ -114,7 +114,7 @@ type Interaction = HorizonSubcommand.ChatInputInteraction<'cached'>;
     { name: 'info', chatInputRun: 'info' },
   ],
 })
-export default class EclassCommand extends HorizonSubcommand<typeof config> {
+export class EclassCommand extends HorizonSubcommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
     registry.registerChatInputCommand(
       command => command
@@ -365,13 +365,13 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    const duration = CustomResolvers.resolveDuration(rawDuration);
+    const duration = resolveDuration(rawDuration);
     if (duration.isErr()) {
       await interaction.reply({ content: this.messages.invalidDuration, ephemeral: true });
       return;
     }
 
-    const date = CustomResolvers.resolveDate(rawDate);
+    const date = resolveDate(rawDate);
     if (date.isErr()) {
       await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
       return;
@@ -464,7 +464,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     let date: Date | null = null;
 
     if (rawDuration) {
-      const durationResult = CustomResolvers.resolveDuration(rawDuration);
+      const durationResult = resolveDuration(rawDuration);
       if (durationResult.isErr()) {
         await interaction.reply({ content: this.messages.invalidDuration, ephemeral: true });
         return;
@@ -473,7 +473,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
     }
 
     if (rawDate) {
-      const dateResult = CustomResolvers.resolveDate(rawDate);
+      const dateResult = resolveDate(rawDate);
       if (dateResult.isErr()) {
         await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
         return;

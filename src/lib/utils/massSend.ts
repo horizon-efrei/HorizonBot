@@ -1,6 +1,6 @@
 import type { Guild } from 'discord.js';
 import { noop, nullop } from './noop';
-import sleep from './sleep';
+import { sleep } from './sleep';
 
 /**
  * Send DMs to a list of guild-members, with throttling.
@@ -8,7 +8,7 @@ import sleep from './sleep';
  * @param memberIds The list of member IDs
  * @param text The text to send
  */
-export default async function massSend(guild: Guild, memberIds: string[], text: string): Promise<void> {
+export async function massSend(guild: Guild, memberIds: string[], text: string): Promise<void> {
   const shouldThrottle = memberIds.length > 30;
 
   for (const [i, memberId] of memberIds.entries()) {

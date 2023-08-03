@@ -4,7 +4,7 @@ import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class UserUpdateListener extends Listener {
+export class UserUpdateListener extends Listener {
   public async run(oldUser: User, newUser: User): Promise<void> {
     if (oldUser.username !== newUser.username) {
       for (const [guildId, guild] of this.container.client.guilds.cache) {

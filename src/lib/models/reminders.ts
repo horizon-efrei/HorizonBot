@@ -49,4 +49,4 @@ ReminderSchema.methods.normalizeDates = function (this: ReminderDocument): { dat
   };
 };
 
-export default model<ReminderDocument, ReminderModel>('Reminders', ReminderSchema);
+export const Reminder = model<ReminderDocument, ReminderModel>('Reminders', ReminderSchema);

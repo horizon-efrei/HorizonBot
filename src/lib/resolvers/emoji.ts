@@ -12,7 +12,7 @@ function getFromGuild(guild: Guild, parameter: string): GuildEmoji | undefined {
   return guild.emojis.cache.get(parsed);
 }
 
-export default function resolveEmoji(parameter: string, guild: Guild): Result<string, 'emojiError'> {
+export function resolveEmoji(parameter: string, guild: Guild): Result<string, 'emojiError'> {
   if (!parameter)
     return err('emojiError');
 

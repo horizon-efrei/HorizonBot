@@ -23,4 +23,4 @@ const ContactSchema = new Schema<ContactDocument, ContactModel, null>({
   },
 }, { timestamps: true });
 
-export default model<ContactDocument, ContactModel>('Contact', ContactSchema);
+export const Contact = model<ContactDocument, ContactModel>('Contact', ContactSchema);

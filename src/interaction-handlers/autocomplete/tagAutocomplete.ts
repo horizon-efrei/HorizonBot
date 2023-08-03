@@ -4,7 +4,7 @@ import type { Option } from '@sapphire/framework';
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 import FuzzySearch from 'fuzzy-search';
-import Tags from '@/models/tags';
+import { Tag } from '@/models/tags';
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Autocomplete,
@@ -44,7 +44,7 @@ export class TagAutocompleteHandler extends InteractionHandler {
 
   private async _updateCache(guildId: string): Promise<void> {
     if (!this._cacheDate || this._cacheDate.getTime() < Date.now() - 10_000) {
-      const tags = await Tags.find({ guildId });
+      const tags = await Tag.find({ guildId });
       this._cache = tags.map(t => t.name);
       this._cacheDate = new Date();
     }

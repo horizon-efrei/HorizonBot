@@ -15,7 +15,7 @@ import isBetween from 'dayjs/plugin/isBetween';
 import isToday from 'dayjs/plugin/isToday';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import mongoose from 'mongoose';
-import HorizonClient from '@/structures/HorizonClient';
+import { HorizonClient } from '@/structures/HorizonClient';
 
 console.log('Starting the bot...');
 

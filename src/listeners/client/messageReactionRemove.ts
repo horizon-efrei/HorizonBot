@@ -1,15 +1,15 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember, MessageReaction, User } from 'discord.js';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import * as EclassManager from '@/eclasses/EclassManager';
-import Eclass from '@/models/eclass';
-import ReactionRole from '@/models/reactionRole';
+import { Eclass } from '@/models/eclass';
+import { ReactionRole } from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import type { GuildMessage } from '@/types';
 import { DiscordLogType } from '@/types/database';
 import { noop, nullop } from '@/utils';
 
-export default class MessageReactionRemoveListener extends Listener {
+export class MessageReactionRemoveListener extends Listener {
   public async run(reaction: MessageReaction, user: User): Promise<void> {
     if (reaction.message.system
       || user.bot

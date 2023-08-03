@@ -2,11 +2,11 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { ChannelType, EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { serverInfo as config } from '@/config/commands/general';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class ServerInfoCommand extends HorizonCommand<typeof config> {
+export class ServerInfoCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

@@ -10,7 +10,7 @@ import { Result } from '@sapphire/framework';
 import { PermissionsBitField, RESTJSONErrorCodes } from 'discord.js';
 import pupa from 'pupa';
 import { purge as config } from '@/config/commands/admin';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import type { GuildMessage } from '@/types';
 import { andMix } from '@/utils';
@@ -30,7 +30,7 @@ enum Options {
 const anyUrlRegex = /ht{2}ps?:\/{2}[\w-]{2,}\.[\w-]{2,}/i;
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class PurgeCommand extends HorizonCommand<typeof config> {
+export class PurgeCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

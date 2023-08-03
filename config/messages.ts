@@ -6,11 +6,11 @@ import {
   TimestampStyles,
   userMention,
 } from 'discord.js';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import { DiscordLogType, LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
 
-export default {
+export const messages = {
   global: {
     invitationLine: '`{code}`: lien créé par {link.inviter}, utilisé {link.uses} fois.',
   },

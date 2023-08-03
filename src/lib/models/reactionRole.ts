@@ -33,4 +33,4 @@ ReactionRoleSchema.methods.getMessageLink = function (this: ReactionRoleDocument
   return makeMessageLink(this.guildId, this.channelId, this.messageId);
 };
 
-export default model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);
+export const ReactionRole = model<ReactionRoleDocument, ReactionRoleModel>('ReactionRole', ReactionRoleSchema);

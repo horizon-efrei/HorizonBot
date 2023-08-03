@@ -54,4 +54,4 @@ const SubjectSchema = new Schema<SubjectDocument, SubjectModel, null>({
   },
 }, { timestamps: true });
 
-export default model<SubjectDocument, SubjectModel>('Subject', SubjectSchema);
+export const Subject = model<SubjectDocument, SubjectModel>('Subject', SubjectSchema);

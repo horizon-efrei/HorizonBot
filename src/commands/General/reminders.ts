@@ -12,9 +12,9 @@ import {
 } from 'discord.js';
 import pupa from 'pupa';
 import { reminders as config } from '@/config/commands/general';
-import Reminders from '@/models/reminders';
+import { Reminder } from '@/models/reminders';
 import * as CustomResolvers from '@/resolvers';
-import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEmbed';
+import { PaginatedContentMessageEmbed } from '@/structures/PaginatedContentMessageEmbed';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import { trimText } from '@/utils';
 
@@ -33,7 +33,7 @@ enum Options {
     { name: 'remove', chatInputRun: 'remove' },
   ],
 })
-export default class RemindersCommand extends HorizonSubcommand<typeof config> {
+export class RemindersCommand extends HorizonSubcommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
     registry.registerChatInputCommand(
       command => command
@@ -108,7 +108,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    const reminder = await Reminders.create({
+    const reminder = await Reminder.create({
       date,
       description: interaction.options.getString(Options.Content, true),
       userId: interaction.user.id,
@@ -156,7 +156,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
 
   public async edit(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const targetId = interaction.options.getString(Options.Id, true);
-    const reminder = await Reminders.findOne({ reminderId: targetId, userId: interaction.user.id });
+    const reminder = await Reminder.findOne({ reminderId: targetId, userId: interaction.user.id });
     if (!reminder) {
       await interaction.reply({ content: this.messages.invalidReminder, ephemeral: true });
       return;
@@ -226,7 +226,7 @@ export default class RemindersCommand extends HorizonSubcommand<typeof config> {
 
   public async remove(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
     const targetId = interaction.options.getString(Options.Id, true);
-    const reminder = await Reminders.findOne({ reminderId: targetId, userId: interaction.user.id });
+    const reminder = await Reminder.findOne({ reminderId: targetId, userId: interaction.user.id });
     if (!reminder) {
       await interaction.reply({ content: this.messages.invalidReminder, ephemeral: true });
       return;

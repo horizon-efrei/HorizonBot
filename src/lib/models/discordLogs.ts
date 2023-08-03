@@ -28,4 +28,4 @@ const DiscordLogSchema = new Schema<DiscordLogDocument, DiscordLogModel, null>({
   },
 }, { timestamps: true });
 
-export default model<DiscordLogDocument, DiscordLogModel>('DiscordLogs', DiscordLogSchema);
+export const DiscordLog = model<DiscordLogDocument, DiscordLogModel>('DiscordLogs', DiscordLogSchema);

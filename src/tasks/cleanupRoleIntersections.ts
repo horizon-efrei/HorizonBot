@@ -1,13 +1,13 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { filterNullAndUndefined } from '@sapphire/utilities';
-import RoleIntersections from '@/models/roleIntersections';
-import Task from '@/structures/tasks/Task';
+import { RoleIntersection } from '@/models/roleIntersections';
+import { Task } from '@/structures/tasks/Task';
 import type { TaskOptions } from '@/structures/tasks/Task';
 
 @ApplyOptions<TaskOptions>({ cron: '0 * * * *' })
-export default class CleanupRoleIntersectionsTask extends Task {
+export class CleanupRoleIntersectionsTask extends Task {
   public async run(): Promise<void> {
-    const roleIntersections = await RoleIntersections.find({ expiration: { $lte: Date.now() } });
+    const roleIntersections = await RoleIntersection.find({ expiration: { $lte: Date.now() } });
     const roles = roleIntersections
       .map(({ guildId, roleId }) => this.container.client.guilds.resolve(guildId)?.roles.resolve(roleId))
       .filter(filterNullAndUndefined);

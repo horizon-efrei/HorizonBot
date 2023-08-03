@@ -6,7 +6,7 @@ import { limits as config } from '@/config/commands/admin';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class LimitsCommand extends HorizonCommand<typeof config> {
+export class LimitsCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

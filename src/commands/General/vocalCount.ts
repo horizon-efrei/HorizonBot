@@ -6,7 +6,7 @@ import { vocalCount as config } from '@/config/commands/general';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class VocalCountCommand extends HorizonCommand<typeof config> {
+export class VocalCountCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

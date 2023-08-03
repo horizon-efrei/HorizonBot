@@ -24,7 +24,7 @@ interface EvalReturnType {
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class EvalCommand extends HorizonCommand<typeof config> {
+export class EvalCommand extends HorizonCommand<typeof config> {
   private readonly _maxRunTime = 60_000;
 
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {

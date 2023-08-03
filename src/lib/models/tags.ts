@@ -25,4 +25,4 @@ const TagSchema = new Schema<TagDocument, TagModel, null>({
   },
 }, { timestamps: true });
 
-export default model<TagDocument, TagModel>('Tags', TagSchema);
+export const Tag = model<TagDocument, TagModel>('Tags', TagSchema);

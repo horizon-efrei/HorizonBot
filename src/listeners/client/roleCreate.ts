@@ -6,7 +6,7 @@ import { getRoleSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class RoleCreateListener extends Listener {
+export class RoleCreateListener extends Listener {
   public async run(role: Role): Promise<void> {
     const auditLogs = await role.guild.fetchAuditLogs({ type: AuditLogEvent.RoleCreate }).catch(nullop);
     const lastRoleCreate = auditLogs?.entries

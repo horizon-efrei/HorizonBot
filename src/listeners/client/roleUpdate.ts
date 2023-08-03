@@ -6,7 +6,7 @@ import { getRoleSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class RoleUpdateListener extends Listener {
+export class RoleUpdateListener extends Listener {
   public async run(oldRole: Role, newRole: Role): Promise<void> {
     if (oldRole.name !== newRole.name
       || oldRole.hexColor !== newRole.hexColor

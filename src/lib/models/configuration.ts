@@ -18,4 +18,4 @@ const ConfigurationSchema = new Schema<ConfigurationDocument, ConfigurationModel
   },
 }, { timestamps: true });
 
-export default model<ConfigurationDocument, ConfigurationModel>('Configuration', ConfigurationSchema);
+export const Configuration = model<ConfigurationDocument, ConfigurationModel>('Configuration', ConfigurationSchema);

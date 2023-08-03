@@ -1,12 +1,12 @@
 import { Listener } from '@sapphire/framework';
 import { filterNullAndUndefined } from '@sapphire/utilities';
 import type { Message } from 'discord.js';
-import settings from '@/config/settings';
-import RoleIntersections from '@/models/roleIntersections';
-import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
+import { settings } from '@/config/settings';
+import { RoleIntersection } from '@/models/roleIntersections';
+import { logAction } from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
-export default class MessageListener extends Listener {
+export class MessageListener extends Listener {
   public async run(message: Message): Promise<void> {
     if (message.author.bot
       || message.partial
@@ -25,7 +25,7 @@ export default class MessageListener extends Listener {
       this.container.logger.debug(`[Intersection Roles] ${mentionedTempIntersectionRoles.size} role was just mentioned by ${message.author.username}. It will expire in two days.`);
 
       for (const role of mentionedTempIntersectionRoles) {
-        await RoleIntersections.findOneAndUpdate(
+        await RoleIntersection.findOneAndUpdate(
           { roleId: role.id, guildId: role.guild.id },
           { expiration: Date.now() + settings.configuration.roleIntersectionExpiration },
           { upsert: true },
@@ -35,7 +35,7 @@ export default class MessageListener extends Listener {
   }
 
   private async _log(message: Message<true>): Promise<void> {
-    await DiscordLogManager.logAction({
+    await logAction({
       type: DiscordLogType.MessageCreate,
       context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
       content: {
@@ -54,7 +54,7 @@ export default class MessageListener extends Listener {
       .toArray();
 
     if (foreignInvites.length > 0) {
-      await DiscordLogManager.logAction({
+      await logAction({
         type: DiscordLogType.InvitePost,
         context: { messageId: message.id, channelId: message.channel.id, authorId: message.author.id },
         content: foreignInvites,

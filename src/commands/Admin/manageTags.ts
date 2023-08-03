@@ -8,7 +8,7 @@ import {
 } from 'discord.js';
 import pupa from 'pupa';
 import { manageTags as config } from '@/config/commands/admin';
-import Tags from '@/models/tags';
+import { Tag } from '@/models/tags';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 
 const inOrWithout = (inEmbed: boolean): string => config.messages[inEmbed ? 'inEmbed' : 'withoutEmbed'];
@@ -40,7 +40,7 @@ enum Options {
     { name: 'in-embed', chatInputRun: 'inEmbed' },
   ],
 })
-export default class ManageTagsCommand extends HorizonSubcommand<typeof config> {
+export class ManageTagsCommand extends HorizonSubcommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
     registry.registerChatInputCommand(
       command => command
@@ -146,7 +146,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
       time: 900_000, // 15 minutes
     });
 
-    await Tags.create({
+    await Tag.create({
       name,
       content: submit.fields.getTextInputValue('content'),
       isEmbed,
@@ -156,7 +156,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
   }
 
   public async edit(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
-    const tag = await Tags.findOne({ name: interaction.options.getString(Options.Name, true) });
+    const tag = await Tag.findOne({ name: interaction.options.getString(Options.Name, true) });
     if (!tag) {
       await interaction.reply({ content: this.messages.invalidTag, ephemeral: true });
       return;
@@ -182,14 +182,14 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
   }
 
   public async rename(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const tag = await Tags.findOne({ name: interaction.options.getString(Options.Name, true) });
+    const tag = await Tag.findOne({ name: interaction.options.getString(Options.Name, true) });
     if (!tag) {
       await interaction.reply({ content: this.messages.invalidTag, ephemeral: true });
       return;
     }
 
     const newName = interaction.options.getString(Options.NewName, true);
-    const existing = await Tags.findOne({ name: { $regex: new RegExp(newName, 'i') }, guildId: interaction.guildId });
+    const existing = await Tag.findOne({ name: { $regex: new RegExp(newName, 'i') }, guildId: interaction.guildId });
     if (existing) {
       await interaction.reply({ content: this.messages.invalidNewName, ephemeral: true });
       return;
@@ -202,7 +202,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
   }
 
   public async inEmbed(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const tag = await Tags.findOne({ name: interaction.options.getString(Options.Name, true) });
+    const tag = await Tag.findOne({ name: interaction.options.getString(Options.Name, true) });
     if (!tag) {
       await interaction.reply({ content: this.messages.invalidTag, ephemeral: true });
       return;
@@ -215,7 +215,7 @@ export default class ManageTagsCommand extends HorizonSubcommand<typeof config> 
   }
 
   public async remove(interaction: HorizonSubcommand.ChatInputInteraction): Promise<void> {
-    const tag = await Tags.findOne({ name: interaction.options.getString(Options.Name, true) });
+    const tag = await Tag.findOne({ name: interaction.options.getString(Options.Name, true) });
     if (!tag) {
       await interaction.reply({ content: this.messages.invalidTag, ephemeral: true });
       return;

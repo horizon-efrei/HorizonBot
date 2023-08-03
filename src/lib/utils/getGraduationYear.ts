@@ -12,7 +12,7 @@ const yearsLeft = {
  * @param schoolYear The school year
  * @returns The year the students will graduate
  */
-export default function getGraduationYear(schoolYear: SchoolYear): number {
+export function getGraduationYear(schoolYear: SchoolYear): number {
   const today = dayjs();
   if (today.month() >= 7) // If current month is August or after
     return today.year() + yearsLeft[schoolYear];

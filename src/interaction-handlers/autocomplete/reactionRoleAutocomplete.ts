@@ -4,7 +4,7 @@ import type { Option } from '@sapphire/framework';
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction, TextChannel } from 'discord.js';
 import FuzzySearch from 'fuzzy-search';
-import ReactionRole from '@/models/reactionRole';
+import { ReactionRole } from '@/models/reactionRole';
 import { makeMessageLink, trimText } from '@/utils';
 
 interface CachedReactionRole {

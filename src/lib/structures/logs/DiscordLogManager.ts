@@ -11,9 +11,9 @@ import {
 } from 'discord.js';
 import { differenceWith, isEqual, startCase } from 'lodash';
 import pupa from 'pupa';
-import messages from '@/config/messages';
-import settings from '@/config/settings';
-import DiscordLogs from '@/models/discordLogs';
+import { messages } from '@/config/messages';
+import { settings } from '@/config/settings';
+import { DiscordLog } from '@/models/discordLogs';
 import * as CustomResolvers from '@/resolvers';
 import type { AttachmentInfos, DiscordLogBase } from '@/types/database';
 import { ConfigEntriesChannels, DiscordLogType, LogStatuses } from '@/types/database';
@@ -274,7 +274,7 @@ async function logActionUnsafe(payload: DiscordLogBase): Promise<void> {
   if (logStatus === LogStatuses.Disabled)
     return;
 
-  await DiscordLogs.create(payload);
+  await DiscordLog.create(payload);
   if (logStatus === LogStatuses.Silent)
     return;
 

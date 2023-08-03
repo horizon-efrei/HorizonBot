@@ -47,7 +47,7 @@ function * attachmentGenerator(this: void): Generator<AttachmentOptionCallback, 
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class MergePdfCommand extends HorizonCommand<typeof config> {
+export class MergePdfCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     const multipleAttachmentOptions = attachmentGenerator();
 

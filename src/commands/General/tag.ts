@@ -2,9 +2,9 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { EmbedBuilder } from 'discord.js';
 import pupa from 'pupa';
 import { tag as config } from '@/config/commands/general';
-import settings from '@/config/settings';
-import Tags from '@/models/tags';
-import PaginatedContentMessageEmbed from '@/structures/PaginatedContentMessageEmbed';
+import { settings } from '@/config/settings';
+import { Tag } from '@/models/tags';
+import { PaginatedContentMessageEmbed } from '@/structures/PaginatedContentMessageEmbed';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
@@ -12,7 +12,7 @@ enum Options {
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class TagCommand extends HorizonCommand<typeof config> {
+export class TagCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command
@@ -30,10 +30,10 @@ export default class TagCommand extends HorizonCommand<typeof config> {
 
   public override async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
     const name = interaction.options.getString(Options.Name);
-    const tag = await Tags.findOne({ guildId: interaction.guildId, name });
+    const tag = await Tag.findOne({ guildId: interaction.guildId, name });
 
     if (!tag) {
-      const tags = await Tags.find({ guildId: interaction.guildId });
+      const tags = await Tag.find({ guildId: interaction.guildId });
       if (tags.length === 0) {
         await interaction.reply({ content: this.messages.noTags, ephemeral: true });
         return;

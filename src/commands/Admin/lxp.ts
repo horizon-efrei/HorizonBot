@@ -2,8 +2,8 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { PermissionsBitField } from 'discord.js';
 import pupa from 'pupa';
 import { lxp as config } from '@/config/commands/admin';
-import settings from '@/config/settings';
-import Eclass from '@/models/eclass';
+import { settings } from '@/config/settings';
+import { Eclass } from '@/models/eclass';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import { EclassStatus } from '@/types/database';
 import { firstSemesterDay } from '@/utils';
@@ -14,7 +14,7 @@ interface AggregatedEclass {
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class LxpCommand extends HorizonCommand<typeof config> {
+export class LxpCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

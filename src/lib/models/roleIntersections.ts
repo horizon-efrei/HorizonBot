@@ -16,4 +16,4 @@ const RoleIntersectionSchema = new Schema<RoleIntersectionDocument, RoleIntersec
   },
 }, { timestamps: true });
 
-export default model<RoleIntersectionDocument, RoleIntersectionModel>('RoleIntersection', RoleIntersectionSchema);
+export const RoleIntersection = model<RoleIntersectionDocument, RoleIntersectionModel>('RoleIntersection', RoleIntersectionSchema);

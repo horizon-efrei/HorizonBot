@@ -5,7 +5,7 @@ import { ping as config } from '@/config/commands/general';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class PingCommand extends HorizonCommand<typeof config> {
+export class PingCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

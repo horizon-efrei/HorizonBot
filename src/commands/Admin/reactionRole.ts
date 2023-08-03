@@ -22,10 +22,10 @@ import {
 } from 'discord.js';
 import pupa from 'pupa';
 import { reactionRole as config } from '@/config/commands/admin';
-import settings from '@/config/settings';
-import ReactionRole from '@/models/reactionRole';
-import * as CustomResolvers from '@/resolvers';
-import PaginatedMessageEmbedFields from '@/structures/PaginatedMessageEmbedFields';
+import { settings } from '@/config/settings';
+import { ReactionRole } from '@/models/reactionRole';
+import { resolveEmoji } from '@/resolvers';
+import { PaginatedMessageEmbedFields } from '@/structures/PaginatedMessageEmbedFields';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import type { GuildMessage } from '@/types';
 import type { ReactionRoleDocument } from '@/types/database';
@@ -136,7 +136,7 @@ function * roleGenerator(this: void): Generator<RoleOptionCallback, null> {
     { name: 'image', chatInputRun: 'image' },
   ],
 })
-export default class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
+export class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonSubcommand.Registry): void {
     const multipleEmojiOptions = emojiGenerator();
     const multipleRoleOptions = roleGenerator();
@@ -348,7 +348,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
       if (!emoji || !role)
         continue;
 
-      const reaction = CustomResolvers.resolveEmoji(emoji, interaction.guild);
+      const reaction = resolveEmoji(emoji, interaction.guild);
 
       if (reaction.isOk()
         && !pairs.map(r => r.reaction).includes(reaction.unwrap())
@@ -527,7 +527,7 @@ export default class ReactionRoleCommand extends HorizonSubcommand<typeof config
     const { rrMessage, document } = metadata.unwrap();
 
     const emojiQuery = interaction.options.getString('emoji', true);
-    const resultReaction = CustomResolvers.resolveEmoji(emojiQuery, interaction.guild);
+    const resultReaction = resolveEmoji(emojiQuery, interaction.guild);
     if (resultReaction.isErr()) {
       await interaction.reply({ content: this.messages.invalidReaction, ephemeral: true });
       return;

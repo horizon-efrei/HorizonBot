@@ -6,7 +6,7 @@ import type { GuildMember } from 'discord.js';
 import { PermissionsBitField, userMention } from 'discord.js';
 import pupa from 'pupa';
 import { dump as config } from '@/config/commands/admin';
-import settings from '@/config/settings';
+import { settings } from '@/config/settings';
 import { resolveCompleteEmoji } from '@/resolvers';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
@@ -67,7 +67,7 @@ function memberFormatterFactory(format: string, dateFormat: string): (member: Gu
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class DumpCommand extends HorizonCommand<typeof config> {
+export class DumpCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
       command => command

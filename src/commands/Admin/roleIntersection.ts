@@ -15,7 +15,7 @@ enum Options {
 }
 
 @ApplyOptions<HorizonCommand.Options>(config)
-export default class RoleIntersectionCommand extends HorizonCommand<typeof config> {
+export class RoleIntersectionCommand extends HorizonCommand<typeof config> {
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     const roleDescription = this.descriptions.options.role;
 

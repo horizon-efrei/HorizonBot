@@ -5,7 +5,7 @@ import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class GuildMemberUpdateListener extends Listener {
+export class GuildMemberUpdateListener extends Listener {
   public run(oldMember: GuildMember, newMember: GuildMember): void {
     void this._logNicknameChanges(oldMember, newMember);
     void this._logRoleChanges(oldMember, newMember);

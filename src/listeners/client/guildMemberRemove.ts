@@ -3,7 +3,7 @@ import type { GuildMember } from 'discord.js';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { DiscordLogType } from '@/types/database';
 
-export default class GuildMemberRemoveListener extends Listener {
+export class GuildMemberRemoveListener extends Listener {
   public async run(member: GuildMember): Promise<void> {
     await DiscordLogManager.logAction({
       type: DiscordLogType.GuildLeave,

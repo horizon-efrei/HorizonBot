@@ -1,14 +1,14 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildTextBasedChannel, Role } from 'discord.js';
 import { AuditLogEvent } from 'discord.js';
-import Configuration from '@/models/configuration';
-import ReactionRole from '@/models/reactionRole';
+import { Configuration } from '@/models/configuration';
+import { ReactionRole } from '@/models/reactionRole';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
 import { getRoleSnapshot } from '@/structures/logs/snapshotHelpers';
 import { DiscordLogType } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class RoleDeleteListener extends Listener {
+export class RoleDeleteListener extends Listener {
   public async run(role: Role): Promise<void> {
     const auditLogs = await role.guild.fetchAuditLogs({ type: AuditLogEvent.RoleDelete }).catch(nullop);
     const lastRoleUpdate = auditLogs?.entries

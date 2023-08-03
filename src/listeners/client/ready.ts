@@ -2,12 +2,12 @@ import { ApplyOptions } from '@sapphire/decorators';
 import type { ListenerOptions } from '@sapphire/framework';
 import { Listener } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
-import Eclass from '@/models/eclass';
-import ReactionRole from '@/models/reactionRole';
+import { Eclass } from '@/models/eclass';
+import { ReactionRole } from '@/models/reactionRole';
 import { EclassStatus } from '@/types/database';
 
 @ApplyOptions<ListenerOptions>({ once: true })
-export default class ReadyListener extends Listener {
+export class ReadyListener extends Listener {
   public async run(): Promise<void> {
     this.container.client.checkValidity();
 

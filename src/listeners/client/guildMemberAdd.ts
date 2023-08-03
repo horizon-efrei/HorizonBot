@@ -5,7 +5,7 @@ import { DiscordLogType } from '@/types/database';
 
 type InviteUses = [code: string, uses: number];
 
-export default class GuildMemberAddListener extends Listener {
+export class GuildMemberAddListener extends Listener {
   public async run(member: GuildMember): Promise<void> {
     const usedInvite = await this._getUsedInvites(member.guild);
 

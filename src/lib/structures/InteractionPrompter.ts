@@ -9,7 +9,7 @@ import type {
 } from 'discord.js';
 import { nullop } from '@/utils';
 
-export default class InteractionPrompter {
+export class InteractionPrompter {
   private _lastInteraction: MessageComponentInteraction;
 
   constructor(

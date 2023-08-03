@@ -1,26 +1,26 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import pupa from 'pupa';
-import messages from '@/config/messages';
-import Reminders from '@/models/reminders';
-import Task from '@/structures/tasks/Task';
+import { messages } from '@/config/messages';
+import { Reminder } from '@/models/reminders';
+import { Task } from '@/structures/tasks/Task';
 import type { TaskOptions } from '@/structures/tasks/Task';
 
 @ApplyOptions<TaskOptions>({ cron: '* * * * *' })
-export default class ReminderTask extends Task {
+export class ReminderTask extends Task {
   public async run(): Promise<void> {
     // Remove all reminders if they have been reminded more than a week ago
-    const remindersToRemove = await Reminders.find({
+    const remindersToRemove = await Reminder.find({
       reminded: true,
       date: { $lte: Date.now() - 7 * 24 * 60 * 60 * 1000 },
     });
 
-    await Reminders.deleteMany({ _id: { $in: remindersToRemove.map(r => r._id) } });
+    await Reminder.deleteMany({ _id: { $in: remindersToRemove.map(r => r._id) } });
     for (const reminder of remindersToRemove)
       this.container.client.reminders.delete(reminder.reminderId);
 
     // Find all reminders that are due and have not been reminded yet
-    const reminders = await Reminders.find({ date: { $lte: Date.now() }, reminded: false });
+    const reminders = await Reminder.find({ date: { $lte: Date.now() }, reminded: false });
 
     for (const reminder of reminders) {
       const user = await this.container.client.users.fetch(reminder.userId);

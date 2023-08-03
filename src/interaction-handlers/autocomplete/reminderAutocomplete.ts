@@ -5,8 +5,8 @@ import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework
 import dayjs from 'dayjs';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 import FuzzySearch from 'fuzzy-search';
-import settings from '@/config/settings';
-import Reminder from '@/models/reminders';
+import { settings } from '@/config/settings';
+import { Reminder } from '@/models/reminders';
 import type { ReminderDocument } from '@/types/database';
 import { trimText } from '@/utils';
 

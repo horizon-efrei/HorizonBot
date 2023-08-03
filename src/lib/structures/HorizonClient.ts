@@ -7,18 +7,18 @@ import {
   Partials,
   PermissionsBitField,
 } from 'discord.js';
-import settings from '@/config/settings';
-import Eclass from '@/models/eclass';
-import LogStatuses from '@/models/logStatuses';
-import ReactionRole from '@/models/reactionRole';
-import Reminders from '@/models/reminders';
-import ConfigurationManager from '@/structures/ConfigurationManager';
-import TaskStore from '@/structures/tasks/TaskStore';
+import { settings } from '@/config/settings';
+import { Eclass } from '@/models/eclass';
+import { LogStatuses } from '@/models/logStatuses';
+import { ReactionRole } from '@/models/reactionRole';
+import { Reminder } from '@/models/reminders';
+import { ConfigurationManager } from '@/structures/ConfigurationManager';
+import { TaskStore } from '@/structures/tasks/TaskStore';
 import type { LogStatusesBase, ReminderDocument } from '@/types/database';
 import { DiscordLogType, EclassStatus, LogStatuses as LogStatusesEnum } from '@/types/database';
 import { nullop } from '@/utils';
 
-export default class HorizonClient extends SapphireClient {
+export class HorizonClient extends SapphireClient {
   configManager: ConfigurationManager;
   remainingCompilerApiCredits = 0;
 
@@ -127,7 +127,7 @@ export default class HorizonClient extends SapphireClient {
 
   public async loadReminders(): Promise<void> {
     this.reminders.clear();
-    const reminders = await Reminders.find().catch(nullop);
+    const reminders = await Reminder.find().catch(nullop);
     for (const reminder of reminders ?? [])
       this.reminders.set(reminder.reminderId, reminder);
   }
