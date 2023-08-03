@@ -35,7 +35,7 @@ const main = async (): Promise<void> => {
     client.logger.info('[Main] Logged in!');
   } catch (error: unknown) {
     client.logger.fatal(error as Error);
-    client.destroy();
+    await client.destroy();
     throw (error as Error);
   }
 };

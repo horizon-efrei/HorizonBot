@@ -510,7 +510,7 @@ export default class EclassCommand extends HorizonSubcommand<typeof config> {
       notificationMessages.push(this.messages.pingEditedDate);
     }
 
-    if (duration || date) {
+    if (duration ?? date) {
       const chosenDate = new Date(eclass.date);
       if (!EclassManager.validateDateSpan(chosenDate)) {
         await answerTo.reply({ content: this.messages.invalidDate, ephemeral: true });

@@ -64,7 +64,7 @@ export default class EvalCommand extends HorizonCommand<typeof config> {
     const result = (output.result || String.fromCodePoint(8203)) as string;
     const messageWithoutResult = pupa(config.messages.output, {
       output: '{output}',
-      type: codeBlock('ts', output.type),
+      type: codeBlock('ts', output.type.toString()),
       time: output.time,
     });
     const showedResult = trimText(result, 1900 - messageWithoutResult.length);

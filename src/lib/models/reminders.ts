@@ -36,7 +36,7 @@ ReminderSchema.post('save', async () => {
   if (container.client)
     await container.client.loadReminders();
 });
-ReminderSchema.post('remove', async () => {
+ReminderSchema.post(['deleteOne', 'deleteMany'], async () => {
   if (container.client)
     await container.client.loadReminders();
 });

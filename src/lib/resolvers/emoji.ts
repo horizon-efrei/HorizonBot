@@ -3,7 +3,7 @@ import type { Result } from '@sapphire/framework';
 import { err, ok } from '@sapphire/framework';
 import { isNullish } from '@sapphire/utilities';
 import type { Guild, GuildEmoji } from 'discord.js';
-import nodeEmoji from 'node-emoji';
+import * as nodeEmoji from 'node-emoji';
 
 function getFromGuild(guild: Guild, parameter: string): GuildEmoji | undefined {
   const parsed = EmojiRegex.exec(parameter)?.[3];

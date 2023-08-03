@@ -188,7 +188,7 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    if (channel || role) {
+    if (channel ?? role) {
       const entries = await Configuration.find({ guildId: interaction.guild.id, value: (channel ?? role)!.id });
       await interaction.reply(entries.length > 0
         ? pupa(this.messages.associatedKeys, { keys: entries.map(e => allEntries[e.name]).join(' `, `') })
@@ -212,8 +212,12 @@ export default class SetupCommand extends HorizonSubcommand<typeof config> {
     const definedEntries = await Configuration.find({ guildId: interaction.guildId });
 
     const allEntriesFilled = new Map<ConfigEntries, { name: string; document: ConfigurationDocument | undefined }>();
-    for (const [entry, name] of Object.entries(allEntries))
-      allEntriesFilled.set(entry as ConfigEntries, { name, document: definedEntries.find(e => e.name === entry) });
+    for (const [entry, name] of Object.entries(allEntries)) {
+      allEntriesFilled.set(entry as ConfigEntries, {
+        name,
+        document: definedEntries.find(e => e.name === (entry as ConfigEntries)),
+      });
+    }
 
     await new PaginatedContentMessageEmbed()
       .setTemplate(new EmbedBuilder().setTitle(this.messages.listTitle).setColor(settings.colors.default))

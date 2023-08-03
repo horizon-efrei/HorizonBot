@@ -146,7 +146,7 @@ export const eclass = {
       footer: 'ID : {classId}',
     },
 
-    schoolYearChoices: (): Array<APIApplicationCommandOptionChoice<string>> => [
+    schoolYearChoices: (): Array<APIApplicationCommandOptionChoice<SchoolYear>> => [
       { name: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, value: SchoolYear.L1 },
       { name: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, value: SchoolYear.L2 },
       { name: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, value: SchoolYear.L3 },

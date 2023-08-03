@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prefer-top-level-await */
 import '@sapphire/plugin-logger/register';
 import 'core-js/proposals/array-unique';
 import 'core-js/proposals/collection-methods';

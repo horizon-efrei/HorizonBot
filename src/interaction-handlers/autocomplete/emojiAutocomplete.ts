@@ -3,7 +3,7 @@ import { AutoCompleteLimits } from '@sapphire/discord-utilities';
 import type { Option } from '@sapphire/framework';
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
-import emoji from 'node-emoji';
+import * as emoji from 'node-emoji';
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Autocomplete,
@@ -23,7 +23,7 @@ export class EmojiAutocompleteHandler extends InteractionHandler {
 
     const results = emoji.search(focusedOption.value);
     return this.some(results.map(match => ({
-      name: `${match.emoji} (${match.key})`,
+      name: `${match.emoji} (${match.name})`,
       value: match.emoji,
     })));
   }
