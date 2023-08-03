@@ -112,10 +112,8 @@ export async function updateUpcomingClassesForGuild(
   allUpcomingClasses?: EclassPopulatedDocument[],
 ): Promise<void> {
   const channel = await container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
-  if (!channel) {
-    container.logger.warn(`[Upcoming Classes] Needing to update week's upcoming classes but no announcement channel was found for guild ${guildId}. Set up an announcement channel with "/setup set-channel name:${ConfigEntriesChannels.WeekUpcomingClasses} channel:<channel>"`);
+  if (!channel)
     return;
-  }
 
   let upcomingClasses: EclassPopulatedDocument[];
   if (isNullish(allUpcomingClasses)) {
