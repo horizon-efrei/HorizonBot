@@ -1,7 +1,7 @@
 import '@sapphire/plugin-logger/register';
+import 'core-js/actual/iterator';
 import 'core-js/proposals/array-unique';
 import 'core-js/proposals/collection-methods';
-import 'core-js/proposals/iterator-helpers-stage-3-2';
 import 'core-js/proposals/map-upsert';
 import 'dayjs/locale/fr';
 import 'dotenv/config';

@@ -32,7 +32,7 @@ export class HorizonClient extends SapphireClient {
   constructor() {
     super({
       logger: {
-        level: LogLevel.Debug,
+        level: LogLevel.Info,
       },
       loadDefaultErrorListeners: true,
       intents: [
