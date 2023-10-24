@@ -26,8 +26,11 @@ dayjs.extend(isBetween);
 dayjs.extend(isToday);
 
 const main = async (): Promise<void> => {
-  await mongoose.connect(process.env.MONGO_URI);
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+  } catch (error: unknown) {
 
+  }
   const client = new HorizonClient();
 
   try {
