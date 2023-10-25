@@ -1,17 +1,17 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import {
-  ActionRowBuilder,
+  ActionRowBuilder, Attachment, AttachmentBuilder, Message,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
 import { latex as config } from '@/config/commands/general';
-import { settings } from '@/config/settings';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
   Equation = 'equation',
+  BG_COLOR = "#FFF"
 }
 
 const equationModal = new ModalBuilder()
@@ -49,34 +49,50 @@ export class LatexCommand extends HorizonCommand<typeof config> {
     let replyTo: CommandInteraction<'cached'> | ModalSubmitInteraction<'cached'> = interaction;
 
     let equation = interaction.options.getString(Options.Equation);
-    require("mathjax").init({
-      loader: {load: ['input/tex', 'output/svg']}
-    // @ts-ignore
-    }).then((MathJax) => {
-      const svg = MathJax.tex2svg(equation, {display: true})
-      const {convert} = require("convert-svg-to-png")
-      let converted1 = convert(MathJax.startup.adaptor.outerHTML(svg));
-      Promise.resolve(converted1).then((converted) => {
-        console.log(converted);
-        interaction.reply(converted);
-      })
-      // interaction.reply(converted);
-    })
-    return;
-    // if (!equation) {
-    //   // Show a modal with a text input
-    //   await interaction.showModal(equationModal);
-    //   const submit = await interaction.awaitModalSubmit({
-    //     filter: int => int.isModalSubmit()
-    //       && int.inCachedGuild()
-    //       && int.customId === 'equation-modal'
-    //       && int.member.id === interaction.member.id,
-    //     time: 900_000, // 15 minutes
-    //   });
-    //
-    //   replyTo = submit;
-    //   equation = submit.fields.getTextInputValue('equation');
-    // }
-    // await replyTo.reply(settings.apis.latex + encodeURIComponent(equation));
+
+    if (!equation) {
+      // Show a modal with a text input
+      await interaction.showModal(equationModal);
+      const submit = await interaction.awaitModalSubmit({
+        filter: int => int.isModalSubmit()
+          && int.inCachedGuild()
+          && int.customId === 'equation-modal'
+          && int.member.id === interaction.member.id,
+        time: 900_000, // 15 minutes
+      });
+
+      replyTo = submit;
+      equation = submit.fields.getTextInputValue('equation');
+    }
+
+    try {
+      const MathJax = await require("mathjax").init({
+        loader: { load: ['input/tex', 'output/svg'] }
+      });
+
+      const svg = await MathJax.tex2svg(equation, {display: true}).children[0];
+      const sharp = require("sharp");
+
+      sharp(Buffer.from(MathJax.startup.adaptor.outerHTML(svg)))
+        .resize({width: 1024})
+        .extend({top: 50, bottom: 50, left: 50, right: 50, background: Options.BG_COLOR})
+        .flatten({background: Options.BG_COLOR})
+        .toBuffer()
+        .then((data: any) => {
+          replyTo.reply({files: [new AttachmentBuilder(data).setName("output.png")]});
+        })
+        .catch((err: any) => {
+          console.error(err);
+          /* reply to the interaction */
+        });
+    } catch (e) {
+      if (e.toString().includes("MathJax retry")) {
+        console.log(e)
+        await replyTo.reply({ content: "Je vous prie de retenter votre commande.", ephemeral: true });
+      } else {
+        await replyTo.reply({ content: "Ça n'a pas l'air d'être une équation valide !", ephemeral: true });
+      }
+    }
+
   }
 }
