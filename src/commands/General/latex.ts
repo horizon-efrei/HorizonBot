@@ -73,17 +73,18 @@ export class LatexCommand extends HorizonCommand<typeof config> {
       const sharp = require("sharp");
 
       sharp(Buffer.from(MathJax.startup.adaptor.outerHTML(svg)))
-        .resize({width: 1024})
-        .extend({top: 50, bottom: 50, left: 50, right: 50, background: Options.BG_COLOR})
-        .flatten({background: Options.BG_COLOR})
+        .resize({width: 1024}) // sinon l'image est trop petite et pixellisée
+        .extend({top: 50, bottom: 50, left: 50, right: 50, background: Options.BG_COLOR}) // padding
+        .flatten({background: Options.BG_COLOR}) // arrière-plan de couleur
         .toBuffer()
         .then((data: any) => {
           replyTo.reply({files: [new AttachmentBuilder(data).setName("output.png")]});
         })
         .catch((err: any) => {
           console.error(err);
-          /* reply to the interaction */
+          replyTo.reply({ content: "Une erreur est survenue lors de la génération de l'image.", ephemeral: true });
         });
+
     } catch (e) {
       if (e.toString().includes("MathJax retry")) {
         console.log(e)
