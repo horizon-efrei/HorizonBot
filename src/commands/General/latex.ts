@@ -1,8 +1,7 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import {
-  ActionRowBuilder, Attachment, AttachmentBuilder, Message,
-  ModalBuilder,
+  ActionRowBuilder, AttachmentBuilder, ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
