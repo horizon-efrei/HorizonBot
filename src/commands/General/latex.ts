@@ -45,8 +45,8 @@ function findError(node: any, attribute: string): string | null {
 @ApplyOptions<HorizonCommand.Options>(config)
 export class LatexCommand extends HorizonCommand<typeof config> {
   private MathJax: any = require("mathjax").init({
-    loader: { load: ['input/tex', 'output/svg', '[tex]/ams', '[tex]/color', '[tex]/mathtools', '[tex]/physics'] },
-    tex: {packages: {'[+]': ['ams', 'color', 'mathtools', 'physics']}}
+    loader: { load: ['input/tex', 'output/svg', '[tex]/ams', '[tex]/color', '[tex]/mathtools', '[tex]/physics', '[tex]/unicode', '[tex]/textmacros'] },
+    tex: {packages: {'[+]': ['ams', 'color', 'mathtools', 'physics', 'unicode', 'textmacros']}}
   });
 
   private async parseAndGenerate(equation: string): Promise<Buffer> {
@@ -62,7 +62,7 @@ export class LatexCommand extends HorizonCommand<typeof config> {
     const pad = equation.length > 40 ? 45 : 4;
     return sharp(Buffer.from(svgText))
       .resize({
-        width: equation.length > 40 ? 1024 : Math.max(Math.floor(3 * equation.length), 64)
+        width: equation.length > 40 ? 1200 : Math.max(Math.floor(3 * equation.length), 64)
       }) // sinon l'image est trop petite et pixellisée
       .extend({
         top: pad,
