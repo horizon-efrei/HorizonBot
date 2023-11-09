@@ -1,12 +1,14 @@
-import {ApplyOptions} from '@sapphire/decorators';
-import type {CommandInteraction, ModalSubmitInteraction} from 'discord.js';
-import {ActionRowBuilder, AttachmentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,} from 'discord.js';
-import {latex as config} from '@/config/commands/general';
-import {HorizonCommand} from '@/structures/commands/HorizonCommand';
-import sharp from "sharp";
+import { ApplyOptions } from '@sapphire/decorators';
+import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
+import {
+ ActionRowBuilder, AttachmentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
+} from 'discord.js';
+import sharp from 'sharp';
+import { latex as config } from '@/config/commands/general';
+import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 
 enum Options {
-  Equation = 'equation'
+  Equation = 'equation',
 }
 
 const equationModal = new ModalBuilder()
@@ -24,18 +26,17 @@ const equationModal = new ModalBuilder()
   );
 
 function findError(node: any, attribute: string): string | null {
-  if (node.attributes && node.attributes[attribute]) {
+  if (node.attributes?.[attribute])
     return node.attributes[attribute];
-  }
 
   if (node.children) {
     for (const child of node.children) {
-      if (child.kind === "defs") continue;
+      if (child.kind === 'defs')
+continue;
 
       const result = findError(child, attribute);
-      if (result) {
+      if (result)
         return result;
-      }
     }
   }
 
@@ -44,36 +45,24 @@ function findError(node: any, attribute: string): string | null {
 
 @ApplyOptions<HorizonCommand.Options>(config)
 export class LatexCommand extends HorizonCommand<typeof config> {
-  private MathJax: any = require("mathjax").init({
-    loader: { load: ['input/tex', 'output/svg', '[tex]/ams', '[tex]/color', '[tex]/mathtools', '[tex]/physics', '[tex]/unicode', '[tex]/textmacros'] },
-    tex: {packages: {'[+]': ['ams', 'color', 'mathtools', 'physics', 'unicode', 'textmacros']}}
+  private readonly _mathJax: any = require('mathjax').init({
+    loader: {
+      load: [
+        'input/tex',
+        'output/svg',
+        '[tex]/ams',
+        '[tex]/color',
+        '[tex]/mathtools',
+        '[tex]/physics',
+        '[tex]/unicode',
+        '[tex]/textmacros',
+      ],
+    },
+    tex: { packages: { '[+]': ['ams', 'color', 'mathtools', 'physics', 'unicode', 'textmacros'] } },
+  }).then((readyMJ: object) => {
+    // Explicitement bypass le readonly et effectivement faire un await dans à l'initialisation
+    (this as any)._mathJax = readyMJ;
   });
-
-  private async parseAndGenerate(equation: string): Promise<Buffer> {
-    const svg = (await this.MathJax).tex2svg(equation, {display: true}).children[0];
-
-    const svgText = (await this.MathJax).startup.adaptor.outerHTML(svg);
-
-    // MathJax ne renvoie pas d'erreur si l'équation est invalide, il faut donc vérifier nous-même
-    const svgError = findError(svg, "data-mjx-error");
-    if (svgError)
-      throw new EvalError(svgError);
-
-    const pad = equation.length > 40 ? 45 : 4;
-    return sharp(Buffer.from(svgText))
-      .resize({
-        width: equation.length > 40 ? 1200 : Math.max(Math.floor(3 * equation.length), 64)
-      }) // sinon l'image est trop petite et pixellisée
-      .extend({
-        top: pad,
-        bottom: pad,
-        left: pad,
-        right: pad,
-        background: "#FFF"
-      }) // padding
-      .flatten({background: "#FFF"}) // arrière-plan de couleur
-      .toBuffer();
-  }
 
   public override registerApplicationCommands(registry: HorizonCommand.Registry): void {
     registry.registerChatInputCommand(
@@ -88,22 +77,6 @@ export class LatexCommand extends HorizonCommand<typeof config> {
             .setDescription(this.descriptions.options.equation),
         ),
     );
-  }
-
-  private async tryToGenerate(replyTo: CommandInteraction<"cached"> | ModalSubmitInteraction<"cached">, equation: string, attempt: number): Promise<void> {
-    if (attempt > 3)
-      throw new Error("MathJax retry limit reached");
-
-    try {
-      const result = await this.parseAndGenerate(equation);
-      await replyTo.reply({files: [new AttachmentBuilder(result).setName("output.png")]});
-    }
-    catch (e) {
-      if (e.toString().includes("MathJax retry"))
-        await this.tryToGenerate(replyTo, equation, attempt + 1);
-      else
-        throw e;
-    }
   }
 
   public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction<'cached'>): Promise<void> {
@@ -127,21 +100,61 @@ export class LatexCommand extends HorizonCommand<typeof config> {
     }
 
     try {
-      await this.tryToGenerate(replyTo, equation, 0);
+      await this._tryToGenerate(replyTo, equation, 0);
     } catch (e) {
       if (e instanceof EvalError) {
         await replyTo.reply({
-          content: "Ça n'a pas l'air d'être une équation valide ! Le message d'erreur LaTeX est :\n" +
-            `\`${e.message}\``,
-          ephemeral: true
+          content: "Ça n'a pas l'air d'être une équation valide ! Le message d'erreur LaTeX est :\n"
+            + `\`${e.message}\``,
+          ephemeral: true,
         });
       } else {
         await replyTo.reply({
           content: "L'image de la formule n'a pas pu être générée.",
-          ephemeral: true
+          ephemeral: true,
         });
       }
     }
+  }
 
+  private async _parseAndGenerate(equation: string): Promise<Buffer> {
+    const svg = this._mathJax.tex2svg(equation, { display: true }).children[0];
+
+    const svgText: string = this._mathJax.startup.adaptor.outerHTML(svg);
+
+    // MathJax ne renvoie pas d'erreur si l'équation est invalide, il faut donc vérifier nous-même
+    const svgError = findError(svg, 'data-mjx-error');
+    if (svgError)
+      throw new EvalError(svgError);
+
+    const pad = equation.length > 40 ? 45 : 4;
+    return sharp(Buffer.from(svgText))
+      .resize({
+        width: equation.length > 40 ? 1200 : Math.max(Math.floor(8 * equation.length), 64),
+      }) // Sinon l'image est trop petite et pixellisée
+      .extend({
+        top: pad,
+        bottom: pad,
+        left: pad,
+        right: pad,
+        background: '#FFF',
+      }) // Padding
+      .flatten({ background: '#FFF' }) // Arrière-plan de couleur
+      .toBuffer();
+  }
+
+  private async _tryToGenerate(replyTo: CommandInteraction<'cached'> | ModalSubmitInteraction<'cached'>, equation: string, attempt: number): Promise<void> {
+    if (attempt > 3)
+      throw new Error('MathJax retry limit reached');
+
+    try {
+      const result = await this._parseAndGenerate(equation);
+      await replyTo.reply({ files: [new AttachmentBuilder(result).setName('output.png')] });
+    } catch (e) {
+      if (e.toString().includes('MathJax retry'))
+        await this._tryToGenerate(replyTo, equation, attempt + 1);
+      else
+        throw e;
+    }
   }
 }
