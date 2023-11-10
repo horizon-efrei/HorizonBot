@@ -127,16 +127,13 @@ export class LatexCommand extends HorizonCommand<typeof config> {
     if (svgError)
       throw new EvalError(svgError);
 
-    const pad = equation.length > 40 ? 45 : 4;
     return sharp(Buffer.from(svgText))
-      .resize({
-        width: equation.length > 40 ? 1200 : Math.max(Math.floor(8 * equation.length), 64),
-      }) // Sinon l'image est trop petite et pixellisée
+      .resize({ width: Math.min(Math.floor(6 * equation.length), 1024) })
       .extend({
-        top: pad,
-        bottom: pad,
-        left: pad,
-        right: pad,
+        top: 10,
+        bottom: 10,
+        left: 10,
+        right: 10,
         background: '#FFF',
       }) // Padding
       .flatten({ background: '#FFF' }) // Arrière-plan de couleur
