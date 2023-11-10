@@ -14,7 +14,8 @@
   "keywords": [],
   "author": "Elliot 'noftaly' Maisl",
   "contributors": [
-    "Kethash"
+    "Kethash",
+    "Niilyx"
   ],
   "license": "MIT",
   "repository": {
@@ -42,6 +43,7 @@
     "fuzzy-search": "^3.2.1",
     "lodash": "^4.17.21",
     "marked": "^8.0.0",
+    "mathjax": "^3.2.2",
     "module-alias": "^2.2.3",
     "mongoose": "^7.5.0",
     "mongoose-autopopulate": "^1.0.1",
@@ -51,6 +53,7 @@
     "pdf-merger-js": "^4.3.0",
     "pupa": "^2.1.1",
     "reflect-metadata": "^0.1.13",
+    "sharp": "^0.32.6",
     "slug": "^8.2.3",
     "source-map-support": "^0.5.21"
   },

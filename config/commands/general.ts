@@ -69,6 +69,8 @@ export const latex = {
         placeholder: 'Écris ton équation ici... e.g. \\frac{1}{2}',
       },
     },
+    invalidEquation: "Cette équation n'est pas valide ! Le message d'erreur LaTeX est :\n`{msg}`",
+    genericError: "L'image de la formule n'a pas pu être générée.",
   },
 } as const;
 
