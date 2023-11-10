@@ -5,6 +5,7 @@ import {
 } from 'discord.js';
 // @ts-expect-error: MathJax doesn't have types
 import { init as initMathJax } from 'mathjax';
+import pupa from 'pupa';
 import sharp from 'sharp';
 import { latex as config } from '@/config/commands/general';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -112,13 +113,12 @@ export class LatexCommand extends HorizonCommand<typeof config> {
     } catch (e) {
       if (e instanceof EvalError) {
         await replyTo.reply({
-          content: "Ça n'a pas l'air d'être une équation valide ! Le message d'erreur LaTeX est :\n"
-            + `\`${e.message}\``,
+          content: pupa(this.messages.invalidEquation, { msg: e.message }),
           ephemeral: true,
         });
       } else {
         await replyTo.reply({
-          content: "L'image de la formule n'a pas pu être générée.",
+          content: this.messages.genericError,
           ephemeral: true,
         });
       }
