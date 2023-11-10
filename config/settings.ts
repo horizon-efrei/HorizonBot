@@ -27,7 +27,6 @@ export const settings = {
     discordInviteLinkRegex: /(?:discord\.(?:gg|io|me|plus|link)|invite\.(?:gg|ink)|discord(?:app)?\.com\/invite)\/(?<code>[\w-]{2,})/i,
   },
   apis: {
-    latex: 'https://chart.apis.google.com/chart?cht=tx&chf=bg,s,FFFFFF00&chco=FFFFFF&chl=',
     compiler: 'https://api.jdoodle.com/v1/execute',
     compilerCredits: 'https://api.jdoodle.com/v1/credit-spent',
   },
@@ -93,5 +92,6 @@ export const settings = {
   thanks: [
     `Kétessar Tan (${userMention('222050512684580876')}) : contributions`,
     `David Gorgette (${userMention('890084641317478400')}) : suggestions & signalements de bugs`,
+    `Idir Nait Meddour (${userMention('280682698740203521')}) : contributions`,
   ],
 } as const;
