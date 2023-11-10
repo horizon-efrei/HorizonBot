@@ -3,6 +3,8 @@ import type { CommandInteraction, ModalSubmitInteraction } from 'discord.js';
 import {
  ActionRowBuilder, AttachmentBuilder, ModalBuilder, TextInputBuilder, TextInputStyle,
 } from 'discord.js';
+// @ts-expect-error: MathJax doesn't have types
+import { init as initMathJax } from 'mathjax';
 import sharp from 'sharp';
 import { latex as config } from '@/config/commands/general';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
@@ -25,6 +27,7 @@ const equationModal = new ModalBuilder()
     ),
   );
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function findError(node: any, attribute: string): string | null {
   if (node.attributes?.[attribute])
     return node.attributes[attribute];
@@ -32,7 +35,7 @@ function findError(node: any, attribute: string): string | null {
   if (node.children) {
     for (const child of node.children) {
       if (child.kind === 'defs')
-continue;
+        continue;
 
       const result = findError(child, attribute);
       if (result)
@@ -45,7 +48,8 @@ continue;
 
 @ApplyOptions<HorizonCommand.Options>(config)
 export class LatexCommand extends HorizonCommand<typeof config> {
-  private readonly _mathJax: any = require('mathjax').init({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private readonly _mathJax: any = initMathJax({
     loader: {
       load: [
         'input/tex',
@@ -58,9 +62,12 @@ export class LatexCommand extends HorizonCommand<typeof config> {
         '[tex]/textmacros',
       ],
     },
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     tex: { packages: { '[+]': ['ams', 'color', 'mathtools', 'physics', 'unicode', 'textmacros'] } },
+    // eslint-disable-next-line unicorn/consistent-function-scoping
   }).then((readyMJ: object) => {
-    // Explicitement bypass le readonly et effectivement faire un await dans à l'initialisation
+    // Explicitly bypass the readonly to effectively use an await at the initialization of MathJax
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (this as any)._mathJax = readyMJ;
   });
 
@@ -100,7 +107,8 @@ export class LatexCommand extends HorizonCommand<typeof config> {
     }
 
     try {
-      await this._tryToGenerate(replyTo, equation, 0);
+      const result = await this._tryToGenerate(equation);
+      await replyTo.reply({ files: [new AttachmentBuilder(result).setName('output.png')] });
     } catch (e) {
       if (e instanceof EvalError) {
         await replyTo.reply({
@@ -122,7 +130,7 @@ export class LatexCommand extends HorizonCommand<typeof config> {
 
     const svgText: string = this._mathJax.startup.adaptor.outerHTML(svg);
 
-    // MathJax ne renvoie pas d'erreur si l'équation est invalide, il faut donc vérifier nous-même
+    // MathJax doesn't return an error if the equation is invalid, so we have to check ourselves
     const svgError = findError(svg, 'data-mjx-error');
     if (svgError)
       throw new EvalError(svgError);
@@ -136,22 +144,21 @@ export class LatexCommand extends HorizonCommand<typeof config> {
         right: 10,
         background: '#FFF',
       }) // Padding
-      .flatten({ background: '#FFF' }) // Arrière-plan de couleur
+      .flatten({ background: '#FFF' }) // Colored background
       .toBuffer();
   }
 
-  private async _tryToGenerate(replyTo: CommandInteraction<'cached'> | ModalSubmitInteraction<'cached'>, equation: string, attempt: number): Promise<void> {
+  private async _tryToGenerate(equation: string, attempt = 0): Promise<Buffer> {
     if (attempt > 3)
       throw new Error('MathJax retry limit reached');
 
     try {
-      const result = await this._parseAndGenerate(equation);
-      await replyTo.reply({ files: [new AttachmentBuilder(result).setName('output.png')] });
+      return this._parseAndGenerate(equation);
     } catch (e) {
       if (e.toString().includes('MathJax retry'))
-        await this._tryToGenerate(replyTo, equation, attempt + 1);
-      else
-        throw e;
+        return this._tryToGenerate(equation, attempt + 1);
+
+      throw e;
     }
   }
 }
