@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.7.0] - 2023/11/10
+
+### Fixed
+
+- Fix no reply being sent when cancelling an eclass
+
+### Improved
+
+- Improve equation rendering by using MathJax (thanks @Niilyx)
+- Improve relative time parsing for reminders and eclasses
+
+
 ## [1.6.0] - 2023/04/16
 
 ### Added
