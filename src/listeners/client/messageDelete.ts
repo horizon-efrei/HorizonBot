@@ -40,7 +40,7 @@ export class MessageDeleteListener extends Listener {
     }
 
     if (this.container.client.reactionRolesIds.has(message.id)) {
-      await ReactionRole.findOneAndRemove({ messageId: message.id });
+      await ReactionRole.findOneAndDelete({ messageId: message.id });
       this.container.client.reactionRolesIds.delete(message.id);
       this.container.logger.debug(`[Reaction Roles] Removed reaction-role message ${message.id} because it was deleted. (url: ${message.url})`);
     }
