@@ -1,4 +1,3 @@
-import type { PieceContext } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import type { CacheType } from 'discord.js';
 import type { SubcommandConfiguration } from '@/types';
@@ -7,7 +6,7 @@ export abstract class HorizonSubcommand<Config extends SubcommandConfiguration> 
   descriptions: Config['descriptions'];
   messages: Config['messages'];
 
-  constructor(context: PieceContext, options: HorizonSubcommand.Options) {
+  constructor(context: HorizonSubcommand.LoaderContext, options: HorizonSubcommand.Options) {
     super(context, options);
 
     this.descriptions = options.descriptions;
@@ -19,7 +18,7 @@ export abstract class HorizonSubcommand<Config extends SubcommandConfiguration> 
 export namespace HorizonSubcommand {
   export type Options = Subcommand.Options & SubcommandConfiguration;
   export type JSON = Subcommand.JSON;
-  export type Context = Subcommand.Context;
+  export type LoaderContext = Subcommand.LoaderContext;
   export type RunInTypes = Subcommand.RunInTypes;
   export type ChatInputInteraction<Cached extends CacheType = CacheType> =
     Subcommand.ChatInputCommandInteraction<Cached>;

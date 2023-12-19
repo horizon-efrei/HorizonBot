@@ -33,7 +33,7 @@ export abstract class Task extends Piece {
   private _scheduleCron: cron.ScheduledTask;
   private readonly _callback: (() => Promise<void>) | null;
 
-  constructor(context: Piece.Context, options: TaskOptions) {
+  constructor(context: Piece.LoaderContext<'tasks'>, options: TaskOptions) {
     super(context, options);
 
     this.interval = options.interval;
