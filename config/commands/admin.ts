@@ -120,50 +120,43 @@ export const manageContacts = {
   },
 } as const;
 
-export const manageTags = {
+export const manageFaq = {
   descriptions: {
-    name: 'manage-tags',
-    command: 'Gérer les "tags" (messages dynamiques, entièrement configurable directement via discord).',
+    name: 'manage-faq',
+    command: 'Gérer les faq.',
     subcommands: {
-      create: 'Créer un nouveau tag.',
-      edit: 'Modifier un tag.',
-      remove: 'Supprimer un tag.',
-      rename: 'Renommer un tag.',
-      inEmbed: "Choisir si le tag s'affiche dans un embed ou non.",
+      create: 'Créer une nouvelle entrée.',
+      edit: 'Modifier une réponse.',
+      remove: 'Supprimer une entrée.',
+      rename: 'Renommer une question.',
     },
     options: {
-      name: 'Nom du tag.',
-      inEmbed: "Si le tag s'affiche dans un embed ou non.",
-      newName: 'Nouveau nom du tag.',
+      name: 'Question.',
+      newName: 'Nouvelle question.',
     },
   },
   messages: {
     // Global
-    invalidTag: "Ce nom de tag n'est pas valide.",
+    invalidQuestion: "Cette question n'est pas valide.",
     modals: {
-      contentLabel: 'Contenu du tag',
-      contentPlaceholder: 'Entrez le contenu du tag ici.',
-      createTitle: 'Créer un tag',
-      editTitle: 'Modifier le tag {name}',
+      contentLabel: 'Réponse',
+      contentPlaceholder: 'Entrez la réponse à la question ici.',
+      createTitle: 'Créer une entée',
+      editTitle: 'Modifier la question {name}',
     },
 
-    // Create tag
-    createdTag: 'Ce tag a bien été créé !',
+    // Create entry
+    createdEntry: 'Cette entrée a bien été créée !',
 
-    // Edit tag
-    editedTag: 'Ce tag a bien été modifié !',
+    // Edit entry
+    editedEntry: 'Cette réponse a bien été modifiée !',
 
-    // Remove tag
-    removedTag: 'Ce tag a bien été supprimé !',
+    // Remove entry
+    removedEntry: 'Cette entrée a bien été supprimé !',
 
-    // Rename tag
-    renamedTag: 'Ce tag a bien été renommé !',
-    invalidNewName: "Ce nouveau nom de tag n'est pas valide.",
-
-    // Set in an embed (or not)
-    editedTagEmbed: 'Ce tag sera maintenant affiché {inOrWithout} embed !',
-    inEmbed: 'dans un',
-    withoutEmbed: 'sans',
+    // Rename entry
+    renamedEntry: 'Cette question a bien été changée !',
+    invalidNewName: "Cette nouvelle question n'est pas valide.",
   },
 } as const;
 
@@ -212,6 +205,7 @@ export const reactionRole = {
       messageUrl: 'URL du menu de réaction.',
       channel: 'Salon où envoyer le menu.',
       unique: "Si l'on peut prendre qu'un rôle par utilisateur.",
+      removeMessage: 'Supprimer le message du menu également.',
       roleCondition: 'Rôle pré-requis pour utiliser le menu.',
       emoji: 'Émoji de la réaction.',
       role: 'Rôle à donner.',

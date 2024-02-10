@@ -199,24 +199,23 @@ export type RoleIntersectionModel = Model<RoleIntersectionDocument>;
 // #endregion
 
 /* ******************** */
-/*  Tag Database Types  */
+/*  Faq Database Types  */
 /* ******************** */
 
-// #region Tag Database Types
-/** Interface for the "Tag"'s mongoose schema */
-export interface TagBase {
+// #region Faq Database Types
+/** Interface for the "Faq"'s mongoose schema */
+export interface FaqBase {
   name: string;
   content: string;
   uses: number;
-  isEmbed: boolean;
   guildId: string;
 }
 
-/** Interface for the "Tag"'s mongoose document */
-export interface TagDocument extends TagBase, Document {}
+/** Interface for the "Faq"'s mongoose document */
+export interface FaqDocument extends FaqBase, Document {}
 
-/** Interface for the "Tag"'s mongoose model */
-export type TagModel = Model<TagDocument>;
+/** Interface for the "Faq"'s mongoose model */
+export type FaqModel = Model<FaqDocument>;
 // #endregion
 
 /* ************************* */

@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
-import type { TagDocument, TagModel } from '@/types/database';
+import type { FaqDocument, FaqModel } from '@/types/database';
 
-const TagSchema = new Schema<TagDocument, TagModel, null>({
+const FaqSchema = new Schema<FaqDocument, FaqModel, null>({
   name: {
     type: String,
     required: true,
@@ -15,14 +15,10 @@ const TagSchema = new Schema<TagDocument, TagModel, null>({
     type: Number,
     default: 0,
   },
-  isEmbed: {
-    type: Boolean,
-    default: false,
-  },
   guildId: {
     type: String,
     required: true,
   },
 }, { timestamps: true });
 
-export const Tag = model<TagDocument, TagModel>('Tags', TagSchema);
+export const Faq = model<FaqDocument, FaqModel>('Faq', FaqSchema);

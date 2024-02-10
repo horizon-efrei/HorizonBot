@@ -204,24 +204,17 @@ export const statistics = {
   },
 } as const;
 
-export const tag = {
+export const faq = {
   descriptions: {
-    name: 'tag',
-    command: 'Consulter les "tags" (messages dynamiques, entièrement configurable directement via discord).',
+    name: 'faq',
+    command: 'Consulter les questions fréquentes.',
     options: {
-      name: 'Nom du tag.',
+      name: 'Question.',
     },
   },
   messages: {
-    modals: {
-      contentLabel: 'Contenu du tag',
-      contentPlaceholder: 'Entrez le contenu du tag ici.',
-      createTitle: 'Créer un tag',
-      editTitle: 'Modifier le tag {name}',
-    },
-
-    noTags: "Aucun tag n'a été créé !",
-    listTitle: 'Liste des tags ({total})',
+    noEntries: "Aucune entrée n'a été créée !",
+    listTitle: 'Liste des questions ({total})',
     listLine: '• `{name}` : {uses} utilisations',
   },
 } as const;

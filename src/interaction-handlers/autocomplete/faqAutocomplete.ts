@@ -4,12 +4,12 @@ import type { Option } from '@sapphire/framework';
 import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
 import type { ApplicationCommandOptionChoiceData, AutocompleteInteraction } from 'discord.js';
 import FuzzySearch from 'fuzzy-search';
-import { Tag } from '@/models/tags';
+import { Faq } from '@/models/faq';
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Autocomplete,
 })
-export class TagAutocompleteHandler extends InteractionHandler {
+export class FaqAutocompleteHandler extends InteractionHandler {
   private _cache: string[] = [];
   private _cacheDate: Date | null = null;
 
@@ -23,7 +23,7 @@ export class TagAutocompleteHandler extends InteractionHandler {
   public override async parse(
     interaction: AutocompleteInteraction<'cached'>,
   ): Promise<Option<ApplicationCommandOptionChoiceData[]>> {
-    if (!['manage-tags', 'tag'].includes(interaction.commandName))
+    if (!['manage-faq', 'faq'].includes(interaction.commandName))
       return this.none();
 
     const focusedOption = interaction.options.getFocused(true);
@@ -44,8 +44,8 @@ export class TagAutocompleteHandler extends InteractionHandler {
 
   private async _updateCache(guildId: string): Promise<void> {
     if (!this._cacheDate || this._cacheDate.getTime() < Date.now() - 10_000) {
-      const tags = await Tag.find({ guildId });
-      this._cache = tags.map(t => t.name);
+      const questions = await Faq.find({ guildId });
+      this._cache = questions.map(t => t.name);
       this._cacheDate = new Date();
     }
   }

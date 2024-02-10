@@ -10,7 +10,6 @@ import 'reflect-metadata';
 import 'source-map-support/register';
 
 import mongoose from 'mongoose';
-import { EclassStep } from '@/types/database';
 
 async function migrate(): Promise<void> {
   const client = new mongoose.mongo.MongoClient(process.env.MONGO_URI);
@@ -19,16 +18,17 @@ async function migrate(): Promise<void> {
 
   console.log('Starting migration...');
 
-  // Eclass
-  // step: EclassStep.Reminded => step: EclassStep.Prepared
-  console.log('Eclass: updating...');
+  // Tags
+  // - rename the "tags" collection to "faq"
+  // - remove "isEmbed" property
+  console.log('Tags: updating...');
+  await db.collection('tags').rename('faqs');
+  await db.collection('faqs').updateMany({}, [{ $unset: 'isEmbed' }]);
+  console.log('Tags: renamed collection\n\n');
 
-  const upd = await db.collection('eclasses').updateMany(
-    { step: 'reminded' },
-    { $set: { step: EclassStep.Prepared } },
-  );
+  await db.collection('tags').rename('faq');
 
-  console.log(`Eclass: migrated ${(upd as { modifiedCount: number }).modifiedCount}\n\n`);
+  console.log('Tags: renamed collection\n\n');
 
   console.log('Migration complete');
 }

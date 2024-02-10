@@ -35,6 +35,7 @@ enum Options {
   Channel = 'salon',
   Unique = 'unique',
   RoleCondition = 'role-condition',
+  RemoveMessage = 'supprime-message',
   Emoji = 'emoji',
   // eslint-disable-next-line @typescript-eslint/no-shadow
   Role = 'role',
@@ -216,6 +217,12 @@ export class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
                 .setDescription(this.descriptions.options.messageUrl)
                 .setRequired(true)
                 .setAutocomplete(true),
+            )
+            .addBooleanOption(
+              option => option
+                .setName(Options.RemoveMessage)
+                .setDescription(this.descriptions.options.removeMessage)
+                .setRequired(false),
             ),
         )
         .addSubcommand(
@@ -466,8 +473,12 @@ export class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
 
     const { rrMessage } = metadata.unwrap();
 
-    // We delete it, and the "messageDelete" listener will take care of the rest.
-    await rrMessage.delete();
+    await ReactionRole.findOneAndDelete({ messageId: rrMessage.id });
+    this.container.client.reactionRolesIds.delete(rrMessage.id);
+
+    if (interaction.options.getBoolean(Options.RemoveMessage))
+      await rrMessage.delete();
+
     await interaction.reply(this.messages.removedMenu);
   }
 
