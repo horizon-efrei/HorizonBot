@@ -28,7 +28,7 @@ export class EclassAutocompleteHandler extends InteractionHandler {
   public override async parse(
     interaction: AutocompleteInteraction,
   ): Promise<Option<ApplicationCommandOptionChoiceData[]>> {
-    if (interaction.commandName !== 'eclass')
+    if (interaction.commandName !== 'eclass' && interaction.commandName !== 'analytics')
       return this.none();
 
     const focusedOption = interaction.options.getFocused(true);
@@ -36,8 +36,9 @@ export class EclassAutocompleteHandler extends InteractionHandler {
     await this._updateCache();
 
     switch (focusedOption.name) {
+      case 'class-id':
       case 'id': {
-        const subcommandName = interaction.options.getSubcommand(true);
+        const subcommandName = interaction.options.getSubcommand(false);
 
         let pool: EclassDocument[] = [];
         switch (subcommandName) {
@@ -54,6 +55,9 @@ export class EclassAutocompleteHandler extends InteractionHandler {
             break;
           case 'record':
             pool = this._cache;
+            break;
+          default:
+            pool = this._cache.filter(eclass => eclass.status === EclassStatus.Finished);
             break;
         }
 

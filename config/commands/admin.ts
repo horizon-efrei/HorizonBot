@@ -1,6 +1,91 @@
 import { stripIndent } from 'common-tags';
-import { hideLinkEmbed, RESTJSONErrorCodes, userMention } from 'discord.js';
+import {
+  hideLinkEmbed,
+  hyperlink,
+  RESTJSONErrorCodes,
+  TimestampStyles,
+  userMention,
+} from 'discord.js';
 import { LogStatuses } from '@/types/database';
+import { timeFormat } from '@/utils';
+
+export const analytics = {
+  descriptions: {
+    name: 'analytics',
+    command: "Consulter diverses données aggrégées sur l'utilisation dont les utilisateurs font d'Ef'Réussite",
+    options: {
+      query: 'Type de données à consulter.',
+      classId: 'Pour: joins-over-time | Identifiant de la classe à analyser',
+      after: 'Pour: totals | Date après laquelle les classes et participations doivent être comptées',
+    },
+  },
+  messages: {
+    attendanceHeatmap: stripIndent`
+      ## Heatmap de participation
+      > Nombre de participants aux cours (personnes s'étant connectés au salon vocal d'un cours pendant qu'il était encore en cours) jour par jour.
+
+      {content}
+    `,
+    averageAttendanceDuration: stripIndent`
+      ## Durée moyenne de participation
+      > Durée moyenne de participation aux cours selon si les participants s'étaient préalablement inscrits ou non.
+
+      **Pour les participants inscrits :** {subscribed}
+      **Pour les participants non-inscrits :** {unsubscribed}
+    `,
+    eclassPopularity: stripIndent`
+      ## Popularité des cours
+      > Nombre de participants aux cours (personnes s'étant connectés au salon vocal d'un cours pendant qu'il était encore en cours) par cours, selon si les participants s'étaient préalablement inscrits ou non.
+
+      {content}
+    `,
+    eclassPopularityLine: `- ${hyperlink('{eclass.topic}', hideLinkEmbed('{link}'))} : {count} participations (inscrits : {subscribedCount}, non-inscrits : {nonSubscribedCount})`,
+    eclassNotFound: "La classe demandée n'a pas été trouvée, vérifiez que vous avez bien donné son identifiant.",
+    joinsOverTime: stripIndent`
+      ## Connexions au serveur vocal
+      > Nombre de connexions au salon vocal de la classe demandée, par groupe de 5 minutes.
+
+      {content}
+    `,
+    joinsOverTimeLine: `- ${timeFormat('{date}', TimestampStyles.LongDate)} : {total} participations (inscrits : {isSubscribed}, non-inscrits : {notSubscribed})`,
+    subscriptionImpact: stripIndent`
+      ## Impact des inscriptions préalables
+      > Mesure la différence dans l'utilisations des cours entre les participants préalablements inscrits et non-inscrits. La rétention est si oui ou non l'utilisateur s'est connecté une seconde fois à un cours différent.
+
+      **Pour les participants inscrits ({subscribed.count}) :**
+      Durée moyenne de participation : {subscribed.averageDuration}
+      Rétention : {subscribed.retention}%
+
+      **Pour les participants non-inscrits ({unsubscribed.count}) :**
+      Durée moyenne de participation : {unsubscribed.averageDuration}
+      Rétention : {unsubscribed.retention}%
+    `,
+    totals: stripIndent`
+      ## Totaux
+      > Nombre de classes et de participations depuis la date demandée, ou depuis le début du serveur si aucune date n'est donnée.
+
+      **Nombre de cours :** {eclassCount}
+      **Durée totale des cours :** {eclassDuration}
+      **Nombre total de participations :** {participations}
+    `,
+    retentionRate: stripIndent`
+      ## Taux de rétention
+      > Mesure la proportion de participants qui se sont connectés à un autre cours, différent, après leur toute première participation.
+
+      **Pour les participants inscrits :** {subscribed}
+      **Pour les participants non-inscrits :** {unsubscribed}
+    `,
+    pipelines: [
+      { title: 'Heatmap de participation', value: "Nombre de participants aux cours (personnes s'étant connectés au salon vocal d'un cours pendant qu'il était encore en cours) jour par jour." },
+      { title: 'Durée moyenne de participation', value: "Durée moyenne de participation aux cours selon si les participants s'étaient préalablement inscrits ou non." },
+      { title: 'Popularité des cours', value: "Nombre de participants aux cours (personnes s'étant connectés au salon vocal d'un cours pendant qu'il était encore en cours) par cours, selon si les participants s'étaient préalablement inscrits ou non." },
+      { title: 'Connexions au serveur vocal', value: 'Nombre de connexions au salon vocal de la classe demandée, par groupe de 5 minutes.' },
+      { title: 'Impact des inscriptions préalables', value: "Mesure la différence dans l'utilisations des cours entre les participants préalablements inscrits et non-inscrits. La rétention est si oui ou non l'utilisateur s'est connecté une seconde fois à un cours différent." },
+      { title: 'Totaux', value: "Nombre de classes et de participations depuis la date demandée, ou depuis le début du serveur si aucune date n'est donnée." },
+      { title: 'Taux de rétention', value: 'Mesure la proportion de participants qui se sont connectés à un autre cours, différent, après leur toute première participation.' },
+    ],
+  },
+} as const;
 
 export const dump = {
   descriptions: {
