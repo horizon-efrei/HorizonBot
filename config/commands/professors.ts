@@ -10,7 +10,7 @@ import {
 import { SchoolYear } from '@/types';
 import type { SubjectBase } from '@/types/database';
 import { EclassPlace, EclassStatus } from '@/types/database';
-import { getGraduationYear, timeFormat } from '@/utils';
+import { timeFormat } from '@/utils';
 
 export const eclass = {
   descriptions: {
@@ -146,11 +146,11 @@ export const eclass = {
       footer: 'ID : {classId}',
     },
 
-    schoolYearChoices: (): Array<APIApplicationCommandOptionChoice<SchoolYear>> => [
-      { name: `L1 - Promo ${getGraduationYear(SchoolYear.L1)}`, value: SchoolYear.L1 },
-      { name: `L2 - Promo ${getGraduationYear(SchoolYear.L2)}`, value: SchoolYear.L2 },
-      { name: `L3 - Promo ${getGraduationYear(SchoolYear.L3)}`, value: SchoolYear.L3 },
-    ],
+    schoolYearChoices: [
+      { name: 'L1', value: SchoolYear.L1 },
+      { name: 'L2', value: SchoolYear.L2 },
+      { name: 'L3', value: SchoolYear.L3 },
+    ] as Array<APIApplicationCommandOptionChoice<SchoolYear>>,
     placeChoices: [
       { name: 'Sur Discord', value: EclassPlace.Discord },
       { name: 'Sur le Campus', value: EclassPlace.OnSite },

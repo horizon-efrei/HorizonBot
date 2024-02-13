@@ -5,7 +5,6 @@ export { extractCodeBlocks } from './extractCodeBlocks';
 export { firstSemesterDay } from './firstSemesterDay';
 export { getDuration } from './getDuration';
 export { getGitRev } from './getGitRev';
-export { getGraduationYear } from './getGraduationYear';
 export { makeMessageLink } from './makeMessageLink';
 export { massSend } from './massSend';
 export { noop, nullop } from './noop';

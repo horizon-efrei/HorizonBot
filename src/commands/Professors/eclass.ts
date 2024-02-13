@@ -129,7 +129,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
                 .setName(Options.SchoolYear)
                 .setDescription(this.descriptions.options.schoolYear)
                 .setRequired(true)
-                .setChoices(...this.messages.schoolYearChoices()),
+                .setChoices(...this.messages.schoolYearChoices),
             )
             .addStringOption(
               option => option
@@ -190,7 +190,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
               option => option
                 .setName(Options.SchoolYear)
                 .setDescription(this.descriptions.options.schoolYear)
-                .setChoices(...this.messages.schoolYearChoices()),
+                .setChoices(...this.messages.schoolYearChoices),
             )
             .addIntegerOption(
               option => option
@@ -762,7 +762,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
     if (schoolYear) {
       filters.push(eclass => eclass.subject.schoolYear === schoolYear);
       filterDescriptions.push(pupa(this.messages.statusFilter, {
-        value: this.messages.schoolYearChoices().find(({ value }) => value === schoolYear),
+        value: this.messages.schoolYearChoices.find(({ value }) => value === schoolYear),
       }));
     }
 
