@@ -1,10 +1,12 @@
 import { Listener } from '@sapphire/framework';
 import { filterNullAndUndefined } from '@sapphire/utilities';
 import type { Message } from 'discord.js';
+import pupa from 'pupa';
+import { messages } from '@/config/messages';
 import { settings } from '@/config/settings';
 import { RoleIntersection } from '@/models/roleIntersections';
 import { logAction } from '@/structures/logs/DiscordLogManager';
-import { DiscordLogType } from '@/types/database';
+import { ConfigEntriesChannels, DiscordLogType } from '@/types/database';
 
 export class MessageListener extends Listener {
   public async run(message: Message): Promise<void> {
@@ -17,21 +19,9 @@ export class MessageListener extends Listener {
 
     await this._log(message);
 
-    const mentionedTempIntersectionRoles = this.container.client.roleIntersections
-      .filter(r => message.mentions.roles.has(r))
-      .map(roleId => message.guild.roles.resolve(roleId))
-      .filter(filterNullAndUndefined);
-    if (mentionedTempIntersectionRoles.size > 0) {
-      this.container.logger.debug(`[Intersection Roles] ${mentionedTempIntersectionRoles.size} role was just mentioned by ${message.author.username}. It will expire in two days.`);
+    await this._handleTempIntersectionRoles(message);
 
-      for (const role of mentionedTempIntersectionRoles) {
-        await RoleIntersection.findOneAndUpdate(
-          { roleId: role.id, guildId: role.guild.id },
-          { expiration: Date.now() + settings.configuration.roleIntersectionExpiration },
-          { upsert: true },
-        );
-      }
-    }
+    await this._handlePreAnnouncements(message);
   }
 
   private async _log(message: Message<true>): Promise<void> {
@@ -62,5 +52,39 @@ export class MessageListener extends Listener {
         severity: 1,
       });
     }
+  }
+
+  private async _handleTempIntersectionRoles(message: Message<true>): Promise<void> {
+    const mentionedTempIntersectionRoles = this.container.client.roleIntersections
+      .filter(r => message.mentions.roles.has(r))
+      .map(roleId => message.guild.roles.resolve(roleId))
+      .filter(filterNullAndUndefined);
+    if (mentionedTempIntersectionRoles.size > 0) {
+      this.container.logger.debug(`[Intersection Roles] ${mentionedTempIntersectionRoles.size} role was just mentioned by ${message.author.username}. It will expire in two days.`);
+
+      for (const role of mentionedTempIntersectionRoles) {
+        await RoleIntersection.findOneAndUpdate(
+          { roleId: role.id, guildId: role.guild.id },
+          { expiration: Date.now() + settings.configuration.roleIntersectionExpiration },
+          { upsert: true },
+        );
+      }
+    }
+  }
+
+  private async _handlePreAnnouncements(message: Message<true>): Promise<void> {
+    const channel = this.container.client.configManager.getFromCache(
+      ConfigEntriesChannels.PreAnnouncements,
+      message.guildId,
+    );
+
+    if (message.channel.id !== channel?.id)
+      return;
+
+    const thread = await message.startThread({ name: messages.preAnnouncements.threadName });
+    await thread.send({
+      content: pupa(messages.preAnnouncements.threadMessage, { author: message.author }),
+      components: [...messages.preAnnouncements.copyButton.components],
+    });
   }
 }

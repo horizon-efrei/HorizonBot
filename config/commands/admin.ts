@@ -8,6 +8,7 @@ import {
 } from 'discord.js';
 import { LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
+import { settings } from '../settings';
 
 export const analytics = {
   descriptions: {
@@ -84,6 +85,41 @@ export const analytics = {
       { title: 'Totaux', value: "Nombre de classes et de participations depuis la date demandée, ou depuis le début du serveur si aucune date n'est donnée." },
       { title: 'Taux de rétention', value: 'Mesure la proportion de participants qui se sont connectés à un autre cours, différent, après leur toute première participation.' },
     ],
+  },
+} as const;
+
+export const announcements = {
+  descriptions: {
+    name: 'announcements',
+    command: 'Gérer les annonces à envoyer',
+    subcommands: {
+      send: 'Envoyer une annonce',
+      edit: 'Modifier une annonce déjà envoyée',
+    },
+    options: {
+      channel: "Salon où envoyer l'annonce.",
+      messageLink: 'Lien du message à utiliser',
+    },
+  },
+  messages: {
+    errorThreadOnly: 'Cette commande doit être utilisée dans un fil de discussion !',
+    errorNoStarterMessage: 'Impossible de trouver le message de départ de ce fil de discussion...',
+    errorMultipleWebhooks: stripIndent`
+      Il y a plusieurs webhooks commençant par "\`${settings.configuration.announcementWebhookPrefix}\`" pour ce salon, je ne sais pas lequel utiliser… Supprimez les webhooks en trop et réessayez.
+      Pour supprimer un webhook d'un salon, allez dans les paramètres du salon, puis "Intégrations" > "Voir les webhooks". Cliquez sur celui que vous voulez supprimer, puis "Supprimer le webhook".
+    `,
+    errorWebhookSend: "Impossible d'envoyer l'annonce, vérifiez que le bot a bien la permission d'envoyer des messages dans ce salon, et que l'annonce ne dépasse pas 2000 caractères.",
+    success: ':white_check_mark: Annonce envoyée avec succès !',
+    announcementSent: stripIndent`
+      :white_check_mark: L'annonce a été publiée.
+      Si tu te rends compte que le message doit être modifié, pas de soucis.
+      - Tu peux modifier le message d'annonce originel, en haut du fil, puis taper \`/announcement edit\`
+      - Si tu n'es pas l'auteur du message, tu peux cliquer sur le bouton ci-dessous pour recevoir le message en texte pur, le copier/coller, puis l'envoyer dans ce salon avec les modifications effectuées. Ensuite, tape \`/announcement edit message:<lien du message>\`, avec le lien du message obtenu en faisant clique droit sur le message > copier le lien.
+
+      Si tu dois re-modifier le message, tu peux répéter l'opération autant de fois que nécessaire en tapant \`/announcement edit\` pour utiliser le message originel, ou en tapant en précisant le lien vers un message de ce fil pour utiliser un autre message.
+    `,
+    errorMessageNotFound: 'Impossible de trouver le message demandé, vérifiez que le lien soit correct.',
+    errorDestinationChannelNotFound: "Impossible de trouver le salon où envoyer l'annonce, vérifiez qu'il existe toujours.",
   },
 } as const;
 

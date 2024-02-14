@@ -25,6 +25,8 @@ export const settings = {
     eclassPrepareBefore: 15 * 60 * 1000, // 15 minutes
     eclassRoleExpiration: 7 * 24 * 60 * 60 * 1000, // 7 days
     discordInviteLinkRegex: /(?:discord\.(?:gg|io|me|plus|link)|invite\.(?:gg|ink)|discord(?:app)?\.com\/invite)\/(?<code>[\w-]{2,})/i,
+    announcementWebhookPrefix: 'Horizon —',
+    announcementWebhookAvatar: 'https://cdn.discordapp.com/icons/827518251608178728/3f066f2e311cac3391786c1b1872adc7.webp',
   },
   apis: {
     compiler: 'https://api.jdoodle.com/v1/execute',

@@ -8,6 +8,27 @@ import type {
 import type { Document, Model, Types } from 'mongoose';
 import type { SchoolYear, TeachingUnit } from '@/types';
 
+/* ************************************ */
+/*  AnnouncementMessage Database Types  */
+/* ************************************ */
+
+// #region Configuration Database Types
+/** Interface for the "AnnouncementMessage"'s mongoose schema */
+export interface AnnouncementMessageBase {
+  announcementChannelId: string;
+  announcementMessageId: string;
+  preAnnouncementChannelId: string;
+  preAnnouncementThreadId: string;
+  guildId: string;
+}
+
+/** Interface for the "AnnouncementMessage"'s mongoose document */
+export interface AnnouncementMessageDocument extends AnnouncementMessageBase, Document {}
+
+/** Interface for the "AnnouncementMessage"'s mongoose model */
+export type AnnouncementMessageModel = Model<AnnouncementMessageDocument>;
+// #endregion
+
 /* ****************************** */
 /*  Configuration Database Types  */
 /* ****************************** */
@@ -20,6 +41,7 @@ export enum ConfigEntriesChannels {
   ClassAnnouncementL3 = 'channel-class-announcement-l3',
   Logs = 'channel-logs',
   WeekUpcomingClasses = 'channel-week-upcoming-classes',
+  PreAnnouncements = 'channel-pre-announcements',
 }
 
 export enum ConfigEntriesRoles {

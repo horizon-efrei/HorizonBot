@@ -23,6 +23,7 @@ const channelEntries = {
   [ConfigEntriesChannels.ClassAnnouncementL3]: 'Annonces L3',
   [ConfigEntriesChannels.WeekUpcomingClasses]: 'Cours de la semaine',
   [ConfigEntriesChannels.Logs]: 'Logs',
+  [ConfigEntriesChannels.PreAnnouncements]: 'Pré-Annonces',
 } as const;
 
 const roleEntries = {

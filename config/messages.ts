@@ -1,6 +1,9 @@
 import { Identifiers } from '@sapphire/framework';
 import { stripIndent } from 'common-tags';
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
   channelMention,
   roleMention,
   TimestampStyles,
@@ -326,5 +329,37 @@ export const messages = {
     noClasses: 'Aucune séance de prévue !',
     today: " (Aujourd'hui)",
     classLine: `• ({eclass.subject.schoolYear}) {beginHour}-{endHour}: {eclass.topic} ${channelMention('{eclass.subject.textChannelId}')} (par ${userMention('{eclass.professorId}')}) [${roleMention('{eclass.targetRoleId}')}]\n`,
+  },
+  preAnnouncements: {
+    threadName: "Message d'annonce",
+    threadMessage: stripIndent`
+      :green_circle:  Tu viens de créer un brouillon de message d'annonce !
+      > Ce n'est pas ce que tu voulais faire ? Pas de panique, tu peux supprimer ton message et le renvoyer dans le bon salon ou le bon thread, ou tu peux le laisser ici et ignorer ce message, comme si c'était un thread normal.
+      ### Que faire à partir de maintenant ? :face_with_raised_eyebrow:
+      Tu peux mentionner les personnes chargées de relire, corriger et valider ce message, qui peuvent proposer des modifications dans ce fil de discussion. ${userMention('{author.id}')}, tu es en charge d'appliquer ces modifications en modifiant ton message original.
+      ### Prêt à envoyer ? :incoming_envelope:
+      Si l'annonce te paraît correcte et que toutes les personnes intéressées ont donné leur accord, alors tu peux envoyer le message en tapant la commande \`/announcement send salon:<salon d'annonce>\`
+      ### Une modification à faire ? :pencil:
+      Si tu te rends compte que le message doit être modifié, pas de soucis.
+      - Tu peux modifier le message d'annonce originel, en haut du fil, puis taper \`/announcement edit\`
+      - Si tu n'es pas l'auteur du message, tu peux cliquer sur le bouton ci-dessous pour recevoir le message en texte pur, le copier/coller, puis l'envoyer dans ce salon avec les modifications effectuées. Ensuite, tape \`/announcement edit message:<lien du message>\`, avec le lien du message obtenu en faisant clique droit sur le message > copier le lien.
+
+      Si tu dois re-modifier le message, tu peux répéter l'opération autant de fois que nécessaire en tapant \`/announcement edit\` pour utiliser le message originel, ou en tapant en précisant le lien vers un message de ce fil pour utiliser un autre message.
+    `,
+    noAnnouncement: "Impossible de trouver un message d'annonce associé à ce thread.",
+    copyButton: {
+      components: [
+        new ActionRowBuilder<ButtonBuilder>().setComponents(
+          new ButtonBuilder()
+            .setCustomId('pre-announcement-copy')
+            .setEmoji('📋')
+            .setLabel('Copier')
+            .setStyle(ButtonStyle.Secondary),
+        ),
+      ],
+      noAnnouncementChannel: "Impossible de trouver le salon d'annonce dans lequel a été envoyée l'annonce associée à ce thread.",
+      noAnnouncementMessage: "Impossible de trouver le message d'annonce associé à ce thread.",
+      success: "Voici ci-joint le message d'annonce tel-quel, prêt à être copié !",
+    },
   },
 } as const;
