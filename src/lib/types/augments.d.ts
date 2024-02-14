@@ -18,11 +18,9 @@ declare module '@sapphire/framework' {
     reminders: Map<string, ReminderDocument>;
     logStatuses: Collection<string, Collection<DiscordLogType, LogStatuses>>;
 
-    loadReactionRoles(): Promise<void>;
-    loadEclassRoles(): Promise<void>;
-    loadCurrentlyRunningEclassIds(): Promise<void>;
-    loadReminders(): Promise<void>;
+    loading: Promise<void>;
+
     checkValidity(): void;
-    syncLogStatuses(): Promise<void>;
+    cacheReminders(): Promise<void>;
   }
 }

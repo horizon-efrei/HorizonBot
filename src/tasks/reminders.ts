@@ -15,7 +15,8 @@ export class ReminderTask extends Task {
       date: { $lte: Date.now() - 7 * 24 * 60 * 60 * 1000 },
     });
 
-    await Reminder.deleteMany({ _id: { $in: remindersToRemove.map(r => r._id) } });
+    if (remindersToRemove.length > 0)
+      await Reminder.deleteMany({ _id: { $in: remindersToRemove.map(r => r._id) } });
     for (const reminder of remindersToRemove)
       this.container.client.reminders.delete(reminder.reminderId);
 

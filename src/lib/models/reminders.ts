@@ -34,11 +34,11 @@ const ReminderSchema = new Schema<ReminderDocument, ReminderModel>({
 
 ReminderSchema.post('save', async () => {
   if (container.client)
-    await container.client.loadReminders();
+    await container.client.cacheReminders();
 });
 ReminderSchema.post(['deleteOne', 'deleteMany'], async () => {
   if (container.client)
-    await container.client.loadReminders();
+    await container.client.cacheReminders();
 });
 
 ReminderSchema.methods.normalizeDates = function (this: ReminderDocument): { date: number } {
