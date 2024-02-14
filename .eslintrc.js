@@ -14,6 +14,9 @@ module.exports = {
     // It cannot resolve TypeScript's path aliases. See https://github.com/mysticatea/eslint-plugin-node/issues/233
     'node/no-missing-import': 'off',
 
+    // Incorrectly reports some ESNext core-js polyfills.
+    'unicorn/no-unnecessary-polyfills': 'off',
+
     'no-await-in-loop': 'off',
 
     'no-irregular-whitespace': ['error', {
