@@ -12,7 +12,7 @@ const validButtonIds = new Set(['snooze-10min', 'snooze-30min', 'snooze-1h', 'sn
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Button,
 })
-export class ButtonHandler extends InteractionHandler {
+export class SnoozeReminderButtonHandler extends InteractionHandler {
   public override parse(interaction: ButtonInteraction): Option<never> {
     if (!validButtonIds.has(interaction.customId))
       return this.none();

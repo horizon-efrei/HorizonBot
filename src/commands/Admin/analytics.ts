@@ -9,12 +9,12 @@ import {
   TimestampStyles,
 } from 'discord.js';
 import pupa from 'pupa';
-import { resolveDate } from '@/app/lib/resolvers';
 import { analytics as config } from '@/config/commands/admin';
 import { messages } from '@/config/messages';
 import { settings } from '@/config/settings';
 import { Eclass } from '@/models/eclass';
 import { EclassParticipation } from '@/models/eclassParticipation';
+import { resolveDate } from '@/resolvers';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
 import type { EclassDocument } from '@/types/database';
 import { makeMessageLink } from '@/utils';

@@ -11,7 +11,7 @@ import type { ConfigEntries, ConfigEntriesChannels, ConfigEntryHolds } from '@/t
 import { nullop } from '@/utils';
 
 export class ConfigurationManager {
-  private readonly _entries = new Collection<
+  private readonly _cache = new Collection<
     string,
     { guildId: string; name: ConfigEntries; value: ConfigEntryHolds }
   >();
@@ -24,12 +24,12 @@ export class ConfigurationManager {
       { upsert: true },
     );
 
-    this._entries.set(this._getKey(name, value.guild.id), { guildId, name, value });
+    this._cache.set(this._getKey(name, value.guild.id), { guildId, name, value });
   }
 
   public async remove(name: ConfigEntries, guild: Guild): Promise<void> {
     await Configuration.findOneAndDelete({ guildId: guild.id, name });
-    this._entries.delete(this._getKey(name, guild.id));
+    this._cache.delete(this._getKey(name, guild.id));
   }
 
   public getFromCache<
@@ -37,8 +37,8 @@ export class ConfigurationManager {
     Return = T extends ConfigEntriesChannels ? GuildTextBasedChannel : Role,
   >(name: T, guildId: string): Return | undefined {
     const key = this._getKey(name, guildId);
-    if (this._entries.has(key))
-      return this._entries.get(key)!.value as unknown as Return;
+    if (this._cache.has(key))
+      return this._cache.get(key)!.value as unknown as Return;
   }
 
   public async get<
@@ -46,14 +46,14 @@ export class ConfigurationManager {
     Return = T extends ConfigEntriesChannels ? GuildTextBasedChannel : Role,
   >(name: T, guildId: string): Promise<Return | undefined> {
     const key = this._getKey(name, guildId);
-    if (this._entries.has(key))
-      return this._entries.get(key)!.value as unknown as Return;
+    if (this._cache.has(key))
+      return this._cache.get(key)!.value as unknown as Return;
 
     const result = await Configuration.findOne({ guildId, name }).catch(nullop);
     if (result?.value) {
       const resolved = this._resolve(result.value, guildId);
       if (resolved) {
-        this._entries.set(key, { guildId, name, value: resolved });
+        this._cache.set(key, { guildId, name, value: resolved });
         return resolved as unknown as Return;
       }
     }
@@ -67,7 +67,7 @@ export class ConfigurationManager {
     for (const document of documents) {
       const value = this._resolve(document.value, document.guildId);
       if (value) {
-        this._entries.set(
+        this._cache.set(
           this._getKey(document.name, document.guildId),
           { guildId: document.guildId, name: document.name, value },
         );
