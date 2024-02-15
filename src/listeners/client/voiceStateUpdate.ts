@@ -100,7 +100,6 @@ export class VoiceStateUpdateListener extends Listener {
   }
 
   private async _eclassesInProgressInChannel(channelId: string): Promise<Option<EclassDocument>> {
-    // TODO: Cache/memoize the result of the database call for a few minutes
     const eclassesInProgress = await Eclass.find({
       $or: [
         { step: EclassStep.Prepared },

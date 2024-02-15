@@ -49,7 +49,7 @@ function findError(node: any, attribute: string): string | null {
 
 @ApplyOptions<HorizonCommand.Options>(config)
 export class LatexCommand extends HorizonCommand<typeof config> {
-  // TODO: move to top-level await when supported
+  // FIXME: move to top-level await when supported
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly _mathJax: any = initMathJax({
     loader: {

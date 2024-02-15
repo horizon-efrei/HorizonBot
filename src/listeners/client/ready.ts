@@ -45,7 +45,7 @@ export class ReadyListener extends Listener {
   private async _cacheReactionRoleMenus(): Promise<void> {
     const reactionRoles = await ReactionRole.find();
     for (const rr of reactionRoles) {
-      // TODO: Improve the "remove-if-fail" logic. What if the channel was deleted? What if we just don't have perm?
+      // FIXME: Improve the "remove-if-fail" logic. What if the channel was deleted? What if we just don't have perm?
       const channel = this.container.client.channels.cache.get(rr.channelId) as TextChannel;
       channel?.messages.fetch(rr.messageId)
         .catch(async () => {
