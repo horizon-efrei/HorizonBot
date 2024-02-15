@@ -16,7 +16,7 @@ import { Eclass } from '@/models/eclass';
 import { EclassParticipation } from '@/models/eclassParticipation';
 import type { EclassCreationOptions, EclassEmbedOptions } from '@/types';
 import { SchoolYear } from '@/types';
-import type { EclassPopulatedDocument } from '@/types/database';
+import type { EclassDocument } from '@/types/database';
 import {
   ConfigEntriesChannels,
   ConfigEntriesRoles,
@@ -25,6 +25,7 @@ import {
   EclassStep,
 } from '@/types/database';
 import {
+  getEmojiImage,
   massSend,
   noop,
   nullop,
@@ -52,7 +53,7 @@ export function createAnnouncementEmbed(options: EclassEmbedOptions): EmbedBuild
     .setColor(settings.colors.green)
     .setTitle(pupa(texts.title, options))
     .setDescription(pupa(texts.description, options))
-    .setThumbnail(options.subject.emojiImage)
+    .setThumbnail(getEmojiImage(options.subject.emoji))
     .addFields([
       {
         name: texts.date,
@@ -69,14 +70,14 @@ export function createAnnouncementEmbed(options: EclassEmbedOptions): EmbedBuild
 }
 
 export function getRoleNameForClass(
-  { formattedDate, subject, topic }: Pick<EclassPopulatedDocument, 'subject' | 'topic'> & { formattedDate: string },
+  { formattedDate, subject, topic }: Pick<EclassDocument, 'subject' | 'topic'> & { formattedDate: string },
 ): string {
   const baseRoleName = pupa(settings.configuration.eclassRoleFormat, { subject, topic: '{topic}', formattedDate });
   const remainingLength = RoleLimits.MaximumNameLength - baseRoleName.length + '{topic}'.length;
   return pupa(baseRoleName, { topic: trimText(topic, remainingLength) });
 }
 
-export function getRoleNameForFinishedClass(eclass: EclassPopulatedDocument): string {
+export function getRoleNameForFinishedClass(eclass: EclassDocument): string {
   const formattedDate = dayjs(eclass.end).format(settings.configuration.shortDayFormat);
   const baseRoleName = pupa(settings.configuration.eclassRoleFormatFinished, { subject: eclass.subject, topic: '{topic}', formattedDate });
   const remainingLength = RoleLimits.MaximumNameLength - baseRoleName.length + '{topic}'.length;
@@ -88,7 +89,7 @@ export async function createClass(
   {
     date, subject, topic, duration, professor, isRecorded, targetRole, place, placeInformation,
   }: EclassCreationOptions,
-): Promise<Result<EclassPopulatedDocument, string>> {
+): Promise<Result<EclassDocument, string>> {
   // Prepare the date
   const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
 
@@ -159,7 +160,7 @@ export async function createClass(
     classId,
     guildId: classChannel.guild.id,
     topic,
-    subject,
+    subjectId: subject.id,
     date: date.getTime(),
     duration,
     professorId: professor.id,
@@ -184,7 +185,7 @@ export async function createClass(
   return Result.ok(eclass);
 }
 
-export async function startClass(eclass: EclassPopulatedDocument): Promise<void> {
+export async function startClass(eclass: EclassDocument): Promise<void> {
   container.client.currentlyRunningEclassIds.add(eclass.classId);
 
   // Fetch the announcement message
@@ -242,7 +243,7 @@ export async function startClass(eclass: EclassPopulatedDocument): Promise<void>
   container.logger.debug(`[e-class:${eclass.classId}] Started class.`);
 }
 
-export async function finishClass(eclass: EclassPopulatedDocument): Promise<void> {
+export async function finishClass(eclass: EclassDocument): Promise<void> {
   container.client.currentlyRunningEclassIds.delete(eclass.classId);
 
   // Update participations
@@ -302,7 +303,7 @@ export async function finishClass(eclass: EclassPopulatedDocument): Promise<void
   container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
 }
 
-export async function cleanupClass(eclass: EclassPopulatedDocument): Promise<void> {
+export async function cleanupClass(eclass: EclassDocument): Promise<void> {
   // Remove the associated role
   await container.client
     .guilds.cache.get(eclass.guildId)
@@ -314,7 +315,7 @@ export async function cleanupClass(eclass: EclassPopulatedDocument): Promise<voi
   container.logger.debug(`[e-class:${eclass.classId}] Cleaned up class.`);
 }
 
-export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void> {
+export async function cancelClass(eclass: EclassDocument): Promise<void> {
   // Fetch the announcement message
   const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
@@ -348,7 +349,7 @@ export async function cancelClass(eclass: EclassPopulatedDocument): Promise<void
 }
 
 export async function addRecordLink(
-  eclass: EclassPopulatedDocument,
+  eclass: EclassDocument,
   recordLink: string,
   silent = false,
 ): Promise<void> {
@@ -397,7 +398,7 @@ export async function addRecordLink(
   container.logger.debug(`[e-class:${eclass.classId}] Added record link.`);
 }
 
-export async function removeRecordLink(eclass: EclassPopulatedDocument, recordLink: string): Promise<void> {
+export async function removeRecordLink(eclass: EclassDocument, recordLink: string): Promise<void> {
   // Fetch the announcement message
   const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
@@ -431,7 +432,7 @@ export async function removeRecordLink(eclass: EclassPopulatedDocument, recordLi
   container.logger.debug(`[e-class:${eclass.classId}] Removed record link.`);
 }
 
-export async function prepareClass(eclass: EclassPopulatedDocument): Promise<void> {
+export async function prepareClass(eclass: EclassDocument): Promise<void> {
   // Create initial participations
   if (eclass.subject.voiceChannelId) {
     const voiceChannel = container.client
@@ -497,7 +498,7 @@ export async function prepareClass(eclass: EclassPopulatedDocument): Promise<voi
   container.logger.debug(`[e-class:${eclass.classId}] Prepared class.`);
 }
 
-export async function subscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
+export async function subscribeMember(member: GuildMember, eclass: EclassDocument): Promise<void> {
   if (eclass.status !== EclassStatus.Planned)
     return;
   if (eclass.professorId === member.id)
@@ -518,7 +519,7 @@ export async function subscribeMember(member: GuildMember, eclass: EclassPopulat
   container.logger.debug(`[e-class:${eclass.classId}] Subscribed member ${member.id} (${member.user.tag}).`);
 }
 
-export async function unsubscribeMember(member: GuildMember, eclass: EclassPopulatedDocument): Promise<void> {
+export async function unsubscribeMember(member: GuildMember, eclass: EclassDocument): Promise<void> {
   if (eclass.status !== EclassStatus.Planned)
     return;
 
@@ -542,12 +543,12 @@ export function validateDateSpan(date: Date): boolean {
 }
 
 export async function checkOverlaps(
-  data: Partial<Pick<EclassPopulatedDocument, 'classId'>> & Pick<EclassPopulatedDocument, 'date' | 'duration' | 'professorId' | 'subject'>,
+  data: Partial<Pick<EclassDocument, 'classId'>> & Pick<EclassDocument, 'date' | 'duration' | 'professorId' | 'subject'>,
 ): Promise<Option<string>> {
   const myStart = data.date;
   const myEnd = new Date(myStart.getTime() + data.duration);
 
-  const allOverlapping = await Eclass.find<EclassPopulatedDocument>({
+  const allOverlapping = await Eclass.find<EclassDocument>({
     classId: { $ne: data.classId },
     status: EclassStatus.Planned,
     date: { $lte: myEnd },

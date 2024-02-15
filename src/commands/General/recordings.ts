@@ -8,7 +8,7 @@ import { messages } from '@/config/messages';
 import { settings } from '@/config/settings';
 import { Eclass } from '@/models/eclass';
 import { HorizonCommand } from '@/structures/commands/HorizonCommand';
-import type { EclassPopulatedDocument } from '@/types/database';
+import type { EclassDocument } from '@/types/database';
 
 @ApplyOptions<HorizonCommand.Options>(config)
 export class RecordingsCommand extends HorizonCommand<typeof config> {
@@ -22,7 +22,7 @@ export class RecordingsCommand extends HorizonCommand<typeof config> {
   }
 
   public async chatInputRun(interaction: HorizonCommand.ChatInputInteraction): Promise<void> {
-    const classes: EclassPopulatedDocument[] = await Eclass.find({ recordLinks: { $not: { $size: 0 } } });
+    const classes: EclassDocument[] = await Eclass.find({ recordLinks: { $not: { $size: 0 } } });
     if (classes.length === 0) {
       await interaction.reply(this.messages.noRecords);
       return;

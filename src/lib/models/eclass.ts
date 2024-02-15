@@ -31,11 +31,9 @@ const EclassSchema = new Schema<EclassDocument, EclassModel>({
     type: String,
     required: true,
   },
-  subject: {
-    type: Schema.Types.ObjectId,
-    ref: 'Subject',
+  subjectId: {
+    type: String,
     required: true,
-    autopopulate: true,
   },
   date: {
     type: Date,
@@ -127,6 +125,14 @@ EclassSchema.methods.normalizeDates = function (
 EclassSchema.methods.getStatus = function (this: EclassDocument): string {
   return eclassConfig.messages.statuses[this.status];
 };
+
+EclassSchema.post('init', function (this: EclassDocument) {
+  const subject = container.client.subjectsManager.getById(this.subjectId);
+  if (!subject)
+    throw new Error(`Could not find [eclass:${this.classId}] subject (${this.subjectId}).`);
+
+  this.subject = subject;
+});
 
 EclassSchema.plugin(autopopulate);
 

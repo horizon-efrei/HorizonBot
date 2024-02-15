@@ -26,9 +26,15 @@ async function migrate(): Promise<void> {
   await db.collection('faqs').updateMany({}, [{ $unset: 'isEmbed' }]);
   console.log('Tags: renamed collection\n\n');
 
-  await db.collection('tags').rename('faq');
-
-  console.log('Tags: renamed collection\n\n');
+  // Eclass
+  // - rename "subject" to "subjectId"
+  // - make "subjectId" a string rather than an ObjectId
+  console.log('Eclass: updating...');
+  await db.collection('eclasses').updateMany({}, [
+    { $set: { subjectId: { $toString: '$subject' } } },
+    { $unset: 'subject' },
+  ]);
+  console.log('Eclass: updated collection\n\n');
 
   console.log('Migration complete');
 }

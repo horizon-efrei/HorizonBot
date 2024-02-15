@@ -2,6 +2,7 @@ import type { Collection } from 'discord.js';
 import type { ConfigurationManager } from '@/structures/ConfigurationManager';
 import type { TaskStore } from '@/structures/tasks/TaskStore';
 import type { DiscordLogType, LogStatuses, ReminderDocument } from '@/types/database';
+import type { SubjectsManager } from '../structures/SubjectsManager';
 
 declare module '@sapphire/framework' {
   interface StoreRegistryEntries {
@@ -10,6 +11,7 @@ declare module '@sapphire/framework' {
 
   interface SapphireClient {
     configManager: ConfigurationManager;
+    subjectsManager: SubjectsManager;
     remainingCompilerApiCredits: number;
     reactionRolesIds: Set<string>;
     currentlyRunningEclassIds: Set<string>;

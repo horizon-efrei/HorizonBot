@@ -8,7 +8,7 @@ import {
   userMention,
 } from 'discord.js';
 import { SchoolYear } from '@/types';
-import type { SubjectBase } from '@/types/database';
+import type { SubjectEntry } from '@/types/database';
 import { EclassPlace, EclassStatus } from '@/types/database';
 import { timeFormat } from '@/utils';
 
@@ -89,7 +89,7 @@ export const eclass = {
     },
     recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
     where: ({ place, placeInformation, subject }: {
-      place: EclassPlace; placeInformation: string | null; subject: SubjectBase;
+      place: EclassPlace; placeInformation: string | null; subject: SubjectEntry;
     }): string => {
       switch (place) {
         case EclassPlace.Discord:

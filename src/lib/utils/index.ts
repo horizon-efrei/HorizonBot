@@ -4,6 +4,7 @@ export { convertSize } from './convertSize';
 export { extractCodeBlocks } from './extractCodeBlocks';
 export { firstSemesterDay } from './firstSemesterDay';
 export { getDuration } from './getDuration';
+export { getEmojiImage } from './getEmojiImage';
 export { getGitRev } from './getGitRev';
 export { makeMessageLink } from './makeMessageLink';
 export { massSend } from './massSend';

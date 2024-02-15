@@ -4,7 +4,7 @@ import type {
   Message,
   Role,
 } from 'discord.js';
-import type { EclassPlace, SubjectDocument } from '@/types/database';
+import type { EclassPlace, SubjectEntry } from '@/types/database';
 
 /* ******************************************* */
 /*                    Utils                    */
@@ -62,11 +62,12 @@ export enum TeachingUnit {
   ComputerScience = 'Informatique',
   Mathematics = 'Mathématiques',
   PhysicsElectronics = 'Physique & Électronique',
+  Biology = 'Biologie',
 }
 
 export interface EclassCreationOptions {
   date: Date;
-  subject: SubjectDocument;
+  subject: SubjectEntry;
   topic: string;
   duration: number;
   professor: GuildMember;
@@ -83,7 +84,7 @@ export interface EclassEmbedOptions {
   end: number;
   isRecorded: boolean;
   professor: GuildMember;
-  subject: SubjectDocument;
+  subject: SubjectEntry;
   place: EclassPlace;
   placeInformation: string | null;
   topic: string;

@@ -16,9 +16,11 @@ import { TaskStore } from '@/structures/tasks/TaskStore';
 import type { DiscordLogType, LogStatuses as LogStatusesEnum, ReminderDocument } from '@/types/database';
 import { EclassStatus } from '@/types/database';
 import { nullop } from '@/utils';
+import { SubjectsManager } from './SubjectsManager';
 
 export class HorizonClient extends SapphireClient {
   configManager: ConfigurationManager;
+  subjectsManager: SubjectsManager;
   remainingCompilerApiCredits = 0;
 
   reactionRolesIds = new Set<string>();
@@ -113,6 +115,9 @@ export class HorizonClient extends SapphireClient {
   private async _startCaches(): Promise<void> {
     await this._loadCompilerApiCredits();
 
+    this.logger.info('[Offline Cache] Caching subjects...');
+    await this._cacheSubjects();
+
     this.logger.info('[Offline Cache] Caching reaction roles...');
     await this._cacheReactionRoles();
 
@@ -142,6 +147,11 @@ export class HorizonClient extends SapphireClient {
 
     this.remainingCompilerApiCredits = 200 - response.data.used;
     this.logger.info(`[Compiler API] ${200 - this.remainingCompilerApiCredits}/200 credits used (${this.remainingCompilerApiCredits} remaining).`);
+  }
+
+  private async _cacheSubjects(): Promise<void> {
+    this.subjectsManager = new SubjectsManager(process.env.GOOGLE_SHEET_ID!);
+    await this.subjectsManager.refresh();
   }
 
   private async _cacheReactionRoles(): Promise<void> {

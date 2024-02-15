@@ -6,7 +6,7 @@ import type {
   Role,
 } from 'discord.js';
 import type { Document, Model, Types } from 'mongoose';
-import type { SchoolYear, TeachingUnit } from '@/types';
+import type { SchoolYear, TeachingUnit } from '.';
 
 /* ************************************ */
 /*  AnnouncementMessage Database Types  */
@@ -70,9 +70,9 @@ export interface ConfigurationDocument extends ConfigurationBase, Document {}
 export type ConfigurationModel = Model<ConfigurationDocument>;
 // #endregion
 
-/* ****************************** */
+/* *********************** */
 /*  Eclass Database Types  */
-/* ****************************** */
+/* *********************** */
 
 // #region Eclass Database Types
 /** Enum for the eclass' current status */
@@ -103,7 +103,7 @@ export interface EclassBase {
   classId: string;
   guildId: string;
   topic: string;
-  subject: SubjectDocument | Types.ObjectId;
+  subjectId: string;
   date: Date;
   duration: number;
   end: Date;
@@ -122,23 +122,14 @@ export interface EclassBase {
 }
 
 /** Interface for the "Eclass"'s mongoose document */
-interface EclassBaseDocument extends EclassBase, Document {
+export interface EclassDocument extends EclassBase, Document {
   subscriberIds: Types.Array<string>;
+  subject: SubjectEntry;
   getMessageLink(): string;
   formatDates(): { date: string; end: string; duration: string };
   getStatus(): string;
   normalizeDates(formatDuration: true): { date: number; end: number; duration: string };
   normalizeDates(formatDuration?: false): { date: number; end: number; duration: number };
-}
-
-/** Interface for the "Eclass"'s mongoose document, when the subject field is not populated */
-export interface EclassDocument extends EclassBaseDocument {
-  subject: SubjectDocument['_id'];
-}
-
-/** Interface for the "Eclass"'s mongoose document, when the subject field is populated */
-export interface EclassPopulatedDocument extends EclassBaseDocument {
-  subject: SubjectDocument;
 }
 
 /** Interface for the "Eclass"'s mongoose model */
@@ -147,33 +138,25 @@ export interface EclassModel extends Model<EclassDocument> {
 }
 // #endregion
 
-/* ****************************** */
-/*  Subject Database Types  */
-/* ****************************** */
+/* **************************** */
+/*  Subject Google Sheet Types  */
+/* **************************** */
 
 // #region Subject Database Types
-/** Interface for the "Subject"'s mongoose schema */
-export interface SubjectBase {
+/** Interface for the "Subject" Google Sheet row schema */
+export interface SubjectEntry {
+  active: boolean;
+  id: string;
   name: string;
-  nameEnglish: string;
-  slug: string;
   emoji: string;
-  emojiImage: string;
   classCode: string;
-  moodleLink: string;
-  docsLink: string;
   teachingUnit: TeachingUnit;
   schoolYear: SchoolYear;
+  guildId: string;
   textChannelId: string;
-  textDocsChannelId?: string;
-  voiceChannelId?: string;
+  textDocsChannelId: string | undefined;
+  voiceChannelId: string;
 }
-
-/** Interface for the "Subject"'s mongoose document */
-export interface SubjectDocument extends SubjectBase, Document {}
-
-/** Interface for the "Subject"'s mongoose model */
-export type SubjectModel = Model<SubjectDocument>;
 // #endregion
 
 /* ***************************** */
@@ -493,9 +476,9 @@ export interface LogStatusesDocument extends LogStatusesBase, Document {}
 export type LogStatusesModel = Model<LogStatusesDocument>;
 // #endregion
 
-/* ***************************** */
-/*     Contact Database Types    */
-/* ***************************** */
+/* ************************ */
+/*  Contact Database Types  */
+/* ************************ */
 
 // #region Contact Database Types
 /** Type for the "Contact"'s mongoose schema */

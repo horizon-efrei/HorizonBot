@@ -7,7 +7,7 @@ import pupa from 'pupa';
 import { messages } from '@/config/messages';
 import { Eclass } from '@/models/eclass';
 import type { GuildMessage } from '@/types';
-import type { EclassDocument, EclassPopulatedDocument } from '@/types/database';
+import type { EclassDocument } from '@/types/database';
 import { ConfigEntriesChannels, EclassStatus } from '@/types/database';
 import {
   capitalize,
@@ -87,7 +87,7 @@ function generateUpcomingClassesMessage(upcomingClasses: EclassDocument[]): stri
 
 async function updateUpcomingClasses(
   channel: GuildTextBasedChannel,
-  upcomingClasses: EclassPopulatedDocument[],
+  upcomingClasses: EclassDocument[],
 ): Promise<void> {
   const content = generateUpcomingClassesMessage(upcomingClasses);
   const chunks = splitText(content);
@@ -104,18 +104,18 @@ async function updateUpcomingClasses(
   }
 
   if (i < allBotMessages.length)
-    allBotMessages.slice(i).map(async msg => await msg.delete());
+    await Promise.all(allBotMessages.slice(i).map(async msg => await msg.delete()));
 }
 
 export async function updateUpcomingClassesForGuild(
   guildId: string,
-  allUpcomingClasses?: EclassPopulatedDocument[],
+  allUpcomingClasses?: EclassDocument[],
 ): Promise<void> {
   const channel = await container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
   if (!channel)
     return;
 
-  let upcomingClasses: EclassPopulatedDocument[];
+  let upcomingClasses: EclassDocument[];
   if (isNullish(allUpcomingClasses)) {
     upcomingClasses = await Eclass.find({
       $and: [

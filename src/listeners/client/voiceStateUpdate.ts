@@ -3,7 +3,7 @@ import type { VoiceState } from 'discord.js';
 import { Eclass } from '@/models/eclass';
 import { EclassParticipation } from '@/models/eclassParticipation';
 import * as DiscordLogManager from '@/structures/logs/DiscordLogManager';
-import type { EclassPopulatedDocument } from '@/types/database';
+import type { EclassDocument } from '@/types/database';
 import { DiscordLogType, EclassStatus, EclassStep } from '@/types/database';
 
 export class VoiceStateUpdateListener extends Listener {
@@ -99,7 +99,7 @@ export class VoiceStateUpdateListener extends Listener {
     }
   }
 
-  private async _eclassesInProgressInChannel(channelId: string): Promise<Option<EclassPopulatedDocument>> {
+  private async _eclassesInProgressInChannel(channelId: string): Promise<Option<EclassDocument>> {
     // TODO: Cache/memoize the result of the database call for a few minutes
     const eclassesInProgress = await Eclass.find({
       $or: [

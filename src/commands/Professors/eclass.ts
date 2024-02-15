@@ -24,14 +24,13 @@ import { IsEprofOrStaff, ValidateEclassArgument } from '@/decorators';
 import * as EclassManager from '@/eclasses/EclassManager';
 import * as EclassMessagesManager from '@/eclasses/EclassMessagesManager';
 import { Eclass } from '@/models/eclass';
-import { Subject } from '@/models/subject';
 import { resolveDate, resolveDuration } from '@/resolvers';
 import { PaginatedMessageEmbedFields } from '@/structures/PaginatedMessageEmbedFields';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
 import type { SchoolYear } from '@/types';
 import {
+  EclassDocument,
   EclassPlace,
-  EclassPopulatedDocument,
   EclassStatus,
   EclassStep,
 } from '@/types/database';
@@ -81,7 +80,6 @@ enum OptionRecordChoiceChoices {
 enum Options {
   // eslint-disable-next-line @typescript-eslint/no-shadow
   SchoolYear = 'promo',
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   Subject = 'matière',
   Topic = 'thème',
   Professor = 'professeur',
@@ -359,7 +357,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    const subject = await Subject.findOne({ classCode: rawSubject });
+    const subject = this.container.client.subjectsManager.getByClassCode(rawSubject);
     if (!subject) {
       await interaction.reply({ content: this.messages.invalidSubject, ephemeral: true });
       return;
@@ -442,7 +440,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async start(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+  public async start(interaction: Interaction, eclass: EclassDocument): Promise<void> {
     // Start the class & confirm.
     await EclassManager.startClass(eclass);
     await interaction.reply(this.messages.successfullyStarted);
@@ -450,7 +448,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async edit(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+  public async edit(interaction: Interaction, eclass: EclassDocument): Promise<void> {
     const shouldPing = interaction.options.getBoolean(Options.ShouldPing) ?? false;
 
     const topic = interaction.options.getString(Options.Topic);
@@ -625,7 +623,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.Planned, EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async cancel(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+  public async cancel(interaction: Interaction, eclass: EclassDocument): Promise<void> {
     await interaction.reply({
       content: this.messages.confirmCancel,
       components: [yesNoButtonsRow],
@@ -653,7 +651,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
 
   @ValidateEclassArgument({ statusIn: [EclassStatus.InProgress] })
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async finish(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+  public async finish(interaction: Interaction, eclass: EclassDocument): Promise<void> {
     // Finish the class & confirm.
     await EclassManager.finishClass(eclass);
     await interaction.reply(this.messages.successfullyFinished);
@@ -661,7 +659,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
 
   @ValidateEclassArgument()
   @IsEprofOrStaff({ isOriginalEprof: true })
-  public async record(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+  public async record(interaction: Interaction, eclass: EclassDocument): Promise<void> {
     const action = interaction.options.getString(Options.Choice, true) as OptionRecordChoiceChoices;
 
     let link: Result<URL, string> | null = null;
@@ -718,11 +716,11 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
   }
 
   @ValidateEclassArgument()
-  public async info(interaction: Interaction, eclass: EclassPopulatedDocument): Promise<void> {
+  public async info(interaction: Interaction, eclass: EclassDocument): Promise<void> {
     const payload = {
       ...eclass.toJSON(),
       ...eclass.normalizeDates(true),
-      subject: eclass.subject.toJSON(),
+      subject: eclass.subject,
       status: capitalize(this.messages.rawStatuses[eclass.status]),
       where: this.messages.where(eclass),
       recorded: oneLine`
@@ -753,9 +751,9 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
   public async list(interaction: Interaction): Promise<void> {
     // TODO: Add filter by date (before/after)
     // TODO: Add ability to combine same filters with each-other
-    const eclasses: EclassPopulatedDocument[] = await Eclass.find({ guildId: interaction.guild.id });
+    const eclasses: EclassDocument[] = await Eclass.find({ guildId: interaction.guild.id });
 
-    const filters: Array<(eclass: EclassPopulatedDocument) => boolean> = [];
+    const filters: Array<(eclass: EclassDocument) => boolean> = [];
     const filterDescriptions: string[] = [];
 
     const schoolYear = interaction.options.getString(Options.SchoolYear) as SchoolYear | null;

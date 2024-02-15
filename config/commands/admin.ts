@@ -6,6 +6,7 @@ import {
   TimestampStyles,
   userMention,
 } from 'discord.js';
+import { ValidationError } from '@/app/lib/structures/SubjectsManager';
 import { LogStatuses } from '@/types/database';
 import { timeFormat } from '@/utils';
 import { settings } from '../settings';
@@ -440,5 +441,33 @@ export const setup = {
     listTitle: 'Liste des valeurs',
     lineWithValue: '**{name}** : {value}',
     lineWithoutValue: '**{name}** : Aucune valeur associée',
+  },
+} as const;
+
+export const subjects = {
+  descriptions: {
+    name: 'subjects',
+    command: 'Gérer les matières définies sur le Google Sheet.',
+    subcommands: {
+      test: 'Vérifie que le Google Sheet est valide.',
+      refresh: 'Raffraichir les matières dans le bot en re-téléchargeant les données du Google Sheet.',
+    },
+  },
+  messages: {
+    refreshSuccess: 'Les matières ont bien été raffraichies !',
+    validationSuccess: 'La feuille est valide !',
+    validationErrors: 'Il y a des erreurs dans la feuille :\n{errors}',
+    errorLine: '- **Ligne {row} :** {error}',
+    errors: {
+      [ValidationError.DuplicatedIdentifier]: "L'idenfiant choisit n'est pas unique.",
+      [ValidationError.InvalidEmoji]: "L'emoji n'est pas valide.",
+      [ValidationError.DuplicatedClassCode]: "Le code de classe n'est pas unique.",
+      [ValidationError.InvalidTeachingUnit]: "L'unité d'enseignement n'est pas valide. Vérifie que ce soit bien une des valeurs du menu déroulant.",
+      [ValidationError.InvalidSchoolYear]: "L'année scolaire n'est pas valide. Vérifie que ce soit bien une des valeurs du menu déroulant.",
+      [ValidationError.InvalidGuild]: "Le serveur discord n'existe pas.",
+      [ValidationError.InvalidTextChannel]: "Le salon de texte n'existe pas.",
+      [ValidationError.InvalidTextDocsChannel]: "Le salon de texte pour les documents n'existe pas.",
+      [ValidationError.InvalidTextVoiceChannel]: "Le salon vocal n'existe pas.",
+    },
   },
 } as const;

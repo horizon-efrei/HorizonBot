@@ -31,6 +31,9 @@ export class ReadyListener extends Listener {
     this.container.logger.info('[Online Cache] Loading log statuses...');
     await this._loadLogStatuses();
 
+    this.container.logger.info('[Online Cache] Validating subjects...');
+    await this._validateSubjects();
+
     this.container.logger.info('[Online Cache] All caching done!');
   }
 
@@ -80,5 +83,14 @@ export class ReadyListener extends Listener {
       }
     }
     await LogStatuses.insertMany(docs);
+  }
+
+  private async _validateSubjects(): Promise<void> {
+    const errors = await this.container.client.subjectsManager.validate();
+    if (errors.length > 0) {
+      this.container.logger.error('[Subjects] The following errors were found in the subjects sheet:');
+      for (const error of errors)
+        this.container.logger.error(`[Subjects] Row ${error.row}: ${error.error}`);
+    }
   }
 }
