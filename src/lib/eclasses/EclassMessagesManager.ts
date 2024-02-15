@@ -58,7 +58,7 @@ function generateUpcomingClassesMessage(upcomingClasses: EclassDocument[]): stri
   // Sort the upcoming classes by date.
   upcomingClasses.sort((a, b) => a.date.getTime() - b.date.getTime());
   // Group together classes that are the same day
-  const classGroupsObj = groupBy(upcomingClasses, val => val.date);
+  const classGroupsObj = groupBy(upcomingClasses, val => val.date.toLocaleDateString());
   const classGroups = Object.values(classGroupsObj);
   // Sort the groups we get by date, because we don't necessarily want Monday to be the first day displayed
   classGroups.sort((grpA, grpB) => grpA[0].date.getTime() - grpB[0].date.getTime());
