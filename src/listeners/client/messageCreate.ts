@@ -55,7 +55,7 @@ export class MessageListener extends Listener {
   }
 
   private async _handleTempIntersectionRoles(message: Message<true>): Promise<void> {
-    const mentionedTempIntersectionRoles = this.container.client.roleIntersections
+    const mentionedTempIntersectionRoles = this.container.caches.roleIntersections
       .filter(r => message.mentions.roles.has(r))
       .map(roleId => message.guild.roles.resolve(roleId))
       .filter(filterNullAndUndefined);
@@ -73,7 +73,7 @@ export class MessageListener extends Listener {
   }
 
   private async _handlePreAnnouncements(message: Message<true>): Promise<void> {
-    const channel = this.container.client.configManager.getFromCache(
+    const channel = this.container.configManager.getFromCache(
       ConfigEntriesChannels.PreAnnouncements,
       message.guildId,
     );

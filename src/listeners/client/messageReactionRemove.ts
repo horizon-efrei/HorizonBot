@@ -40,11 +40,11 @@ export class MessageReactionRemoveListener extends Listener {
     }
 
     // If we are reacting to a reaction role
-    if (this.container.client.reactionRolesIds.has(reaction.message.id))
+    if (this.container.caches.reactionRolesIds.has(reaction.message.id))
       await this._handleReactionRole(reaction, member, message);
 
     // If we are reacting to an eclass role
-    if (this.container.client.eclassRolesIds.has(reaction.message.id) && reaction.emoji.name === settings.emojis.yes)
+    if (this.container.caches.eclassRolesIds.has(reaction.message.id) && reaction.emoji.name === settings.emojis.yes)
       await this._handleEclassRole(reaction, member, message);
   }
 
@@ -55,7 +55,7 @@ export class MessageReactionRemoveListener extends Listener {
   ): Promise<void> {
     const document = await ReactionRole.findOne({ messageId: message.id });
     if (!document) {
-      this.container.client.reactionRolesIds.delete(message.id);
+      this.container.caches.reactionRolesIds.delete(message.id);
       return;
     }
 

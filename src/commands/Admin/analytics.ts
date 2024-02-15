@@ -233,7 +233,7 @@ export class AnalyticsCommand extends HorizonCommand<typeof config> {
   }
 
   private _getMessageLink(eclass: EclassDocument): string {
-    const channel = this.container.client.configManager.getFromCache(eclass.announcementChannelId, eclass.guildId);
+    const channel = this.container.configManager.getFromCache(eclass.announcementChannelId, eclass.guildId);
     if (!channel)
       throw new Error(`Could not find [eclass:${eclass.classId}] announcement's channel (${eclass.announcementChannelId}).`);
     return makeMessageLink(eclass.guildId, channel.id, eclass.announcementMessageId);

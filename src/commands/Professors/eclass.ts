@@ -357,7 +357,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
-    const subject = this.container.client.subjectsManager.getByClassCode(rawSubject);
+    const subject = this.container.subjectsManager.getByClassCode(rawSubject);
     if (!subject) {
       await interaction.reply({ content: this.messages.invalidSubject, ephemeral: true });
       return;
@@ -573,7 +573,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
     const classChannel = answerTo.guild.channels.resolve(eclass.subject.textChannelId) as GuildTextBasedChannel;
 
     // Fetch the announcement message
-    const originalChannel = await this.container.client.configManager.get(eclass.announcementChannelId, guild.id);
+    const originalChannel = await this.container.configManager.get(eclass.announcementChannelId, guild.id);
     if (originalChannel) {
       const originalMessage = await originalChannel.messages.fetch(eclass.announcementMessageId);
 

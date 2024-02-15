@@ -17,7 +17,7 @@ export class ReadyListener extends Listener {
     this.container.client.checkValidity();
 
     this.container.logger.info('[Online Cache] Caching configured channels and roles...');
-    await this.container.client.configManager.loadAll();
+    await this.container.configManager.loadAll();
 
     this.container.logger.info('[Online Cache] Caching invites...');
     await this._cacheInvites();
@@ -51,7 +51,7 @@ export class ReadyListener extends Listener {
         .catch(async () => {
           // If we failed to fetch the message, it is likely that it has been deleted, so we remove it too.
           await ReactionRole.findByIdAndDelete(rr._id);
-          this.container.client.reactionRolesIds.delete(rr.messageId);
+          this.container.caches.reactionRolesIds.delete(rr.messageId);
         });
     }
   }
@@ -59,7 +59,7 @@ export class ReadyListener extends Listener {
   private async _cacheEclassAnnouncements(): Promise<void> {
     const eclasses = await Eclass.find({ status: EclassStatus.Planned });
     for (const eclass of eclasses) {
-      const channel = await this.container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
+      const channel = await this.container.configManager.get(eclass.announcementChannelId, eclass.guildId);
       channel?.messages.fetch(eclass.announcementMessageId)
         .catch(() => {
           this.container.logger.warn(`[Eclass] Failed to fetch announcement message for eclass ${eclass._id}.`);
@@ -72,12 +72,12 @@ export class ReadyListener extends Listener {
     const docs: LogStatusesBase[] = [];
 
     for (const guildId of this.container.client.guilds.cache.keys()) {
-      this.container.client.logStatuses.set(guildId, new Collection());
+      this.container.caches.logStatuses.set(guildId, new Collection());
 
       for (const type of Object.values(DiscordLogType)) {
         const currentSetting = logs.find(log => log.guildId === guildId && log.type === type);
 
-        this.container.client.logStatuses.get(guildId)!.set(type, currentSetting?.status ?? LogStatusesEnum.Discord);
+        this.container.caches.logStatuses.get(guildId)!.set(type, currentSetting?.status ?? LogStatusesEnum.Discord);
         if (!currentSetting)
           docs.push({ guildId, type, status: LogStatusesEnum.Discord });
       }
@@ -86,7 +86,7 @@ export class ReadyListener extends Listener {
   }
 
   private async _validateSubjects(): Promise<void> {
-    const errors = await this.container.client.subjectsManager.validate();
+    const errors = await this.container.subjectsManager.validate();
     if (errors.length > 0) {
       this.container.logger.error('[Subjects] The following errors were found in the subjects sheet:');
       for (const error of errors)

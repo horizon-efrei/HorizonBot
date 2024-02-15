@@ -93,7 +93,7 @@ export async function createClass(
   // Prepare the date
   const formattedDate = dayjs(date).format(settings.configuration.dateFormat);
 
-  targetRole ??= await container.client.configManager.get(schoolYearRoles[subject.schoolYear], interaction.guildId);
+  targetRole ??= await container.configManager.get(schoolYearRoles[subject.schoolYear], interaction.guildId);
   if (!targetRole) {
     container.logger.warn('[e-class:not-created] A new e-class was planned but no school year role found, unable to create.');
     return Result.err(config.messages.unconfiguredRole);
@@ -104,7 +104,7 @@ export async function createClass(
     return Result.err(config.messages.alreadyExists);
 
   // Get the corresponding channels
-  const announcementChannel = await container.client.configManager
+  const announcementChannel = await container.configManager
     .get(classAnnouncement[subject.schoolYear], interaction.guild.id);
   if (!announcementChannel) {
     container.logger.warn('[e-class:not-created] A new e-class was planned but no announcement channel was found, unable to create.');
@@ -145,7 +145,7 @@ export async function createClass(
   await announcementMessage.react(settings.emojis.yes);
   if (announcementMessage.crosspostable)
     await announcementMessage.crosspost();
-  container.client.eclassRolesIds.add(announcementMessage.id);
+  container.caches.eclassRolesIds.add(announcementMessage.id);
 
   // Create the role
   const role = await interaction.guild.roles.create({
@@ -186,10 +186,10 @@ export async function createClass(
 }
 
 export async function startClass(eclass: EclassDocument): Promise<void> {
-  container.client.currentlyRunningEclassIds.add(eclass.classId);
+  container.caches.currentlyRunningEclassIds.add(eclass.classId);
 
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
+  const announcementChannel = await container.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId).catch(nullop);
@@ -244,7 +244,7 @@ export async function startClass(eclass: EclassDocument): Promise<void> {
 }
 
 export async function finishClass(eclass: EclassDocument): Promise<void> {
-  container.client.currentlyRunningEclassIds.delete(eclass.classId);
+  container.caches.currentlyRunningEclassIds.delete(eclass.classId);
 
   // Update participations
   await EclassParticipation.updateMany(
@@ -265,7 +265,7 @@ export async function finishClass(eclass: EclassDocument): Promise<void> {
   }
 
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
+  const announcementChannel = await container.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId).catch(nullop);
@@ -317,7 +317,7 @@ export async function cleanupClass(eclass: EclassDocument): Promise<void> {
 
 export async function cancelClass(eclass: EclassDocument): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
+  const announcementChannel = await container.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
@@ -331,7 +331,7 @@ export async function cancelClass(eclass: EclassDocument): Promise<void> {
   await announcementMessage.reactions.removeAll();
 
   // Remove from cache
-  container.client.eclassRolesIds.delete(announcementMessage.id);
+  container.caches.eclassRolesIds.delete(announcementMessage.id);
 
   // Remove the associated role
   await container.client
@@ -354,7 +354,7 @@ export async function addRecordLink(
   silent = false,
 ): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
+  const announcementChannel = await container.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);
@@ -400,7 +400,7 @@ export async function addRecordLink(
 
 export async function removeRecordLink(eclass: EclassDocument, recordLink: string): Promise<void> {
   // Fetch the announcement message
-  const announcementChannel = await container.client.configManager.get(eclass.announcementChannelId, eclass.guildId);
+  const announcementChannel = await container.configManager.get(eclass.announcementChannelId, eclass.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${eclass.classId} announcement's channel (${eclass.announcementChannelId}).`);
   const announcementMessage = await announcementChannel.messages.fetch(eclass.announcementMessageId);

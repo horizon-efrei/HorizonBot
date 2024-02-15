@@ -48,7 +48,7 @@ export class VoiceStateUpdateListener extends Listener {
       severity: 1,
     });
 
-    if (this.container.client.currentlyRunningEclassIds.size === 0)
+    if (this.container.caches.currentlyRunningEclassIds.size === 0)
       return;
 
     const eclass = await this._eclassesInProgressInChannel(state.channel!.id);
@@ -73,7 +73,7 @@ export class VoiceStateUpdateListener extends Listener {
       severity: 1,
     });
 
-    if (this.container.client.currentlyRunningEclassIds.size === 0)
+    if (this.container.caches.currentlyRunningEclassIds.size === 0)
       return;
 
     const leavingEclass = await this._eclassesInProgressInChannel(oldState.channel!.id);

@@ -16,7 +16,7 @@ export function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDecorator {
       if (!eclass && options?.isOriginalEprof)
         throw new TypeError('The third argument of IsEprofOrStaff is required if Options.isOriginalEprof is true. This likely mean you forgot the ValidateEclassArgument decorator.');
 
-      const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
+      const staffRole = await container.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
       const userHighestRolePosition = interaction.member.roles.highest.position;
       // Check if the user is a staff member or better
       if (staffRole && userHighestRolePosition >= staffRole.position) {
@@ -25,7 +25,7 @@ export function IsEprofOrStaff(options?: EprofOrStaffOptions): MethodDecorator {
       }
 
       // Check if the user is not an eprof
-      const eprofRole = await container.client.configManager.get(ConfigEntriesRoles.Eprof, interaction.guild.id);
+      const eprofRole = await container.configManager.get(ConfigEntriesRoles.Eprof, interaction.guild.id);
       if (eprofRole && !interaction.member.roles.cache.has(eprofRole.id)) {
         await interaction.reply(config.messages.onlyProfessor);
         return;

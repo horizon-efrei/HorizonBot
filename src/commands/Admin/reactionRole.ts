@@ -399,7 +399,7 @@ export class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
     for (const rr of pairs)
       await reactionRoleMessage.react(rr.reaction);
 
-    this.container.client.reactionRolesIds.add(reactionRoleMessage.id);
+    this.container.caches.reactionRolesIds.add(reactionRoleMessage.id);
     await ReactionRole.create({
       messageId: reactionRoleMessage.id,
       channelId: reactionRoleMessage.channel.id,
@@ -474,7 +474,7 @@ export class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
     const { rrMessage } = metadata.unwrap();
 
     await ReactionRole.findOneAndDelete({ messageId: rrMessage.id });
-    this.container.client.reactionRolesIds.delete(rrMessage.id);
+    this.container.caches.reactionRolesIds.delete(rrMessage.id);
 
     if (interaction.options.getBoolean(Options.RemoveMessage))
       await rrMessage.delete();
@@ -703,7 +703,7 @@ export class ReactionRoleCommand extends HorizonSubcommand<typeof config> {
     if (!rrMessage.inGuild())
       return Result.err(this.messages.notAMenu);
 
-    const isRrMenu = this.container.client.reactionRolesIds.has(rrMessage.id);
+    const isRrMenu = this.container.caches.reactionRolesIds.has(rrMessage.id);
     if (!isRrMenu)
       return Result.err(this.messages.notAMenu);
 

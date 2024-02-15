@@ -26,7 +26,7 @@ export function ValidateEclassArgument(options?: ValidationOptions): MethodDecor
       }
 
       // Check if the professor is the right one
-      const staffRole = await container.client.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
+      const staffRole = await container.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
       if (interaction.member.id !== eclass.professorId
         && staffRole
         && !interaction.member.roles.cache.has(staffRole.id)) {

@@ -1,10 +1,17 @@
 import type {
+  Collection,
   GuildMember,
   GuildTextBasedChannel,
   Message,
   Role,
 } from 'discord.js';
-import type { EclassPlace, SubjectEntry } from '@/types/database';
+import type {
+  DiscordLogType,
+  EclassPlace,
+  LogStatuses,
+  ReminderDocument,
+  SubjectEntry,
+} from '@/types/database';
 
 /* ******************************************* */
 /*                    Utils                    */
@@ -22,34 +29,6 @@ export type Either<T, U> = Only<T, U> | Only<U, T>;
 /* ******************************************* */
 /*  Custom Types used all across the codebase  */
 /* ******************************************* */
-
-export interface CommandDescriptionOptions {
-  name: string;
-  command: string;
-  options?: Record<string, string>;
-}
-
-export interface ContextMenuCommandDescriptionOptions {
-  name: string;
-  command?: never;
-}
-
-export interface SubcommandDescriptionOptions {
-  name: string;
-  command: string;
-  subcommands?: Record<string, string>;
-  options?: Record<string, string>;
-}
-
-export interface CommandConfiguration {
-  descriptions: CommandDescriptionOptions | ContextMenuCommandDescriptionOptions;
-  messages: object;
-}
-
-export interface SubcommandConfiguration {
-  descriptions: SubcommandDescriptionOptions;
-  messages: object;
-}
 
 export enum SchoolYear {
   L1 = 'L1',
@@ -90,12 +69,53 @@ export interface EclassEmbedOptions {
   topic: string;
 }
 
-export type GuildMessage = Message<true>;
-
 export interface CodeLanguageResult {
   display: string;
   language: string;
   version: string;
   versionIndex: string;
   slugs: string[];
+}
+
+/* ************************************************ */
+/*  System types used for internal implementations  */
+/* ************************************************ */
+
+export type GuildMessage = Message<true>;
+
+export interface CommandDescriptionOptions {
+  name: string;
+  command: string;
+  options?: Record<string, string>;
+}
+
+export interface ContextMenuCommandDescriptionOptions {
+  name: string;
+  command?: never;
+}
+
+export interface SubcommandDescriptionOptions {
+  name: string;
+  command: string;
+  subcommands?: Record<string, string>;
+  options?: Record<string, string>;
+}
+
+export interface CommandConfiguration {
+  descriptions: CommandDescriptionOptions | ContextMenuCommandDescriptionOptions;
+  messages: object;
+}
+
+export interface SubcommandConfiguration {
+  descriptions: SubcommandDescriptionOptions;
+  messages: object;
+}
+
+export interface CacheManager {
+  reactionRolesIds: Set<string>;
+  eclassRolesIds: Set<string>;
+  currentlyRunningEclassIds: Set<string>;
+  roleIntersections: Set<string>;
+  reminders: Map<string, ReminderDocument>;
+  logStatuses: Collection<string, Collection<DiscordLogType, LogStatuses>>;
 }

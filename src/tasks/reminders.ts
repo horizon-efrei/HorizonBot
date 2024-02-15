@@ -18,7 +18,7 @@ export class ReminderTask extends Task {
     if (remindersToRemove.length > 0)
       await Reminder.deleteMany({ _id: { $in: remindersToRemove.map(r => r._id) } });
     for (const reminder of remindersToRemove)
-      this.container.client.reminders.delete(reminder.reminderId);
+      this.container.caches.reminders.delete(reminder.reminderId);
 
     // Find all reminders that are due and have not been reminded yet
     const reminders = await Reminder.find({ date: { $lte: Date.now() }, reminded: false });
@@ -53,7 +53,7 @@ export class ReminderTask extends Task {
       reminder.reminded = true;
       await reminder.save();
 
-      this.container.client.reminders.set(reminder.reminderId, reminder);
+      this.container.caches.reminders.set(reminder.reminderId, reminder);
     }
   }
 }

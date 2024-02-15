@@ -71,7 +71,7 @@ export class RoleIntersectionCommand extends HorizonCommand<typeof config> {
       await member.roles.add(newRole);
 
     if (!isPersistent)
-      this.container.client.roleIntersections.add(newRole.id);
+      this.container.caches.roleIntersections.add(newRole.id);
 
     await interaction.followUp(
       pupa(

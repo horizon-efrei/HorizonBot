@@ -35,7 +35,7 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
   public async test(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     await interaction.deferReply({ ephemeral: true });
 
-    const errors = await this.container.client.subjectsManager.validate();
+    const errors = await this.container.subjectsManager.validate();
     if (errors.length === 0) {
       await interaction.followUp(this.messages.validationSuccess);
     } else {
@@ -54,9 +54,9 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
   public async refresh(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     await interaction.deferReply({ ephemeral: true });
 
-    const errors = await this.container.client.subjectsManager.validate();
+    const errors = await this.container.subjectsManager.validate();
     if (errors.length === 0) {
-      await this.container.client.subjectsManager.refresh();
+      await this.container.subjectsManager.refresh();
       await interaction.followUp(this.messages.refreshSuccess);
     } else {
       await interaction.followUp(pupa(this.messages.validationErrors, {

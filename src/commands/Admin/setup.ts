@@ -157,7 +157,7 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
     const query = interaction.options.getString(Options.Name, true) as ConfigEntriesChannels;
     const channel = interaction.options.getChannel(Options.Channel, true) as AllowedChannels;
 
-    await this.container.client.configManager.set(query, channel);
+    await this.container.configManager.set(query, channel);
 
     await interaction.reply(this.messages.successfullyDefined);
   }
@@ -166,7 +166,7 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
     const query = interaction.options.getString(Options.Name, true) as ConfigEntriesRoles;
     const role = interaction.options.getRole(Options.Role, true);
 
-    await this.container.client.configManager.set(query, role);
+    await this.container.configManager.set(query, role);
 
     await interaction.reply(this.messages.successfullyDefined);
   }
@@ -174,7 +174,7 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
   public async remove(interaction: HorizonSubcommand.ChatInputInteraction<'cached'>): Promise<void> {
     const query = interaction.options.getString(Options.Name, true) as ConfigEntries;
 
-    await this.container.client.configManager.remove(query, interaction.guild);
+    await this.container.configManager.remove(query, interaction.guild);
 
     await interaction.reply(this.messages.successfullyUndefined);
   }

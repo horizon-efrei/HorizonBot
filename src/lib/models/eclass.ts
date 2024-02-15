@@ -103,7 +103,7 @@ EclassSchema.statics.generateId = (professor: GuildMember, date: Date): string =
 ].join('_');
 
 EclassSchema.methods.getMessageLink = function (this: EclassDocument): string {
-  const announcementChannel = container.client.configManager.getFromCache(this.announcementChannelId, this.guildId);
+  const announcementChannel = container.configManager.getFromCache(this.announcementChannelId, this.guildId);
   if (!announcementChannel)
     throw new Error(`Could not find [eclass:${this.classId}] announcement's channel (${this.announcementChannelId}).`);
   return makeMessageLink(this.guildId, announcementChannel.id, this.announcementMessageId);
@@ -127,7 +127,7 @@ EclassSchema.methods.getStatus = function (this: EclassDocument): string {
 };
 
 EclassSchema.post('init', function (this: EclassDocument) {
-  const subject = container.client.subjectsManager.getById(this.subjectId);
+  const subject = container.subjectsManager.getById(this.subjectId);
   if (!subject)
     throw new Error(`Could not find [eclass:${this.classId}] subject (${this.subjectId}).`);
 

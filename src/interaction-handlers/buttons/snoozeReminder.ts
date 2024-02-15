@@ -21,7 +21,7 @@ export class SnoozeReminderButtonHandler extends InteractionHandler {
   }
 
   public async run(interaction: ButtonInteraction): Promise<void> {
-    const reminder = this.container.client.reminders
+    const reminder = this.container.caches.reminders
       .values()
       .find(rem => rem.messageId === interaction.message.id);
 
@@ -57,7 +57,7 @@ export class SnoozeReminderButtonHandler extends InteractionHandler {
       { new: true },
     );
 
-    this.container.client.reminders.set(reminder.reminderId, newReminder!);
+    this.container.caches.reminders.set(reminder.reminderId, newReminder!);
 
     await interaction.reply(
       pupa(messages.reminders.snoozed, {

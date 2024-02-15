@@ -66,7 +66,7 @@ export class RoleDeleteListener extends Listener {
     if (affectedConfigurations.length > 0) {
       const names = affectedConfigurations.map(conf => conf.name);
       for (const entry of names)
-        await this.container.client.configManager.remove(entry, role.guild);
+        await this.container.configManager.remove(entry, role.guild);
       this.container.logger.debug(`[Configuration] Removed configuration entries ${names.join(', ')} because the role ${role.id} (@${role.name}) was deleted.`);
     }
   }

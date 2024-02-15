@@ -111,7 +111,7 @@ export async function updateUpcomingClassesForGuild(
   guildId: string,
   allUpcomingClasses?: EclassDocument[],
 ): Promise<void> {
-  const channel = await container.client.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
+  const channel = await container.configManager.get(ConfigEntriesChannels.WeekUpcomingClasses, guildId);
   if (!channel)
     return;
 

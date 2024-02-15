@@ -266,7 +266,7 @@ export function getContentValue(
 }
 
 async function logActionUnsafe(payload: DiscordLogBase): Promise<void> {
-  const guild = container.client.logStatuses.get(payload.guildId);
+  const guild = container.caches.logStatuses.get(payload.guildId);
   if (!guild)
     throw new Error(`Could not find guild with id ${payload.guildId}`);
 
@@ -282,7 +282,7 @@ async function logActionUnsafe(payload: DiscordLogBase): Promise<void> {
   if (logStatus === LogStatuses.Console)
     return;
 
-  const logChannel = await container.client.configManager.get(ConfigEntriesChannels.Logs, payload.guildId);
+  const logChannel = await container.configManager.get(ConfigEntriesChannels.Logs, payload.guildId);
   if (!logChannel)
     return;
 

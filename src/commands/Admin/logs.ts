@@ -66,7 +66,7 @@ export class LogsCommand extends HorizonSubcommand<typeof config> {
     const logStatus = interaction.options.getInteger(Options.LogStatus, true) as LogStatusesEnum;
 
     const guildId = interaction.guild.id;
-    const guildLogs = this.container.client.logStatuses.get(guildId)!;
+    const guildLogs = this.container.caches.logStatuses.get(guildId)!;
 
     if (logType === 'all') {
       await LogStatuses.updateMany({ guildId }, { status: logStatus });

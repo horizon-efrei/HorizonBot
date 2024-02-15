@@ -39,7 +39,7 @@ export class SubjectsAutocompleteHandler extends InteractionHandler {
 
   private _updateCache(): void {
     if (!this._cacheDate || this._cacheDate.getTime() < Date.now() - 60_000) {
-      this._cache = this.container.client.subjectsManager.rows.filter(row => row.active);
+      this._cache = this.container.subjectsManager.rows.filter(row => row.active);
       this._cacheDate = new Date();
     }
   }

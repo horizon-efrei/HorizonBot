@@ -1,4 +1,4 @@
-import { LogLevel, SapphireClient } from '@sapphire/framework';
+import { container, LogLevel, SapphireClient } from '@sapphire/framework';
 import { filterNullAndUndefined } from '@sapphire/utilities';
 import axios from 'axios';
 import {
@@ -13,24 +13,17 @@ import { ReactionRole } from '@/models/reactionRole';
 import { Reminder } from '@/models/reminders';
 import { ConfigurationManager } from '@/structures/ConfigurationManager';
 import { TaskStore } from '@/structures/tasks/TaskStore';
-import type { DiscordLogType, LogStatuses as LogStatusesEnum, ReminderDocument } from '@/types/database';
+import type { DiscordLogType, LogStatuses, ReminderDocument } from '@/types/database';
 import { EclassStatus } from '@/types/database';
 import { nullop } from '@/utils';
+import type { CacheManager } from '../types';
 import { SubjectsManager } from './SubjectsManager';
 
 export class HorizonClient extends SapphireClient {
-  configManager: ConfigurationManager;
-  subjectsManager: SubjectsManager;
-  remainingCompilerApiCredits = 0;
+  public remainingCompilerApiCredits = 0;
 
-  reactionRolesIds = new Set<string>();
-  eclassRolesIds = new Set<string>();
-  currentlyRunningEclassIds = new Set<string>();
-  roleIntersections = new Set<string>();
-  reminders = new Map<string, ReminderDocument>();
-  logStatuses = new Collection<string, Collection<DiscordLogType, LogStatusesEnum>>();
   // eslint-disable-next-line unicorn/consistent-function-scoping
-  loading = new Promise<void>((resolve) => {
+  public readonly loading = new Promise<void>((resolve) => {
     this._finishedLoading = resolve;
   });
 
@@ -58,8 +51,18 @@ export class HorizonClient extends SapphireClient {
       partials: [Partials.Channel],
     });
 
+    container.configManager = new ConfigurationManager();
+    container.subjectsManager = new SubjectsManager(process.env.GOOGLE_SHEET_ID!);
+    container.caches = {
+      reactionRolesIds: new Set<string>(),
+      eclassRolesIds: new Set<string>(),
+      currentlyRunningEclassIds: new Set<string>(),
+      roleIntersections: new Set<string>(),
+      reminders: new Map<string, ReminderDocument>(),
+      logStatuses: new Collection<string, Collection<DiscordLogType, LogStatuses>>(),
+    } satisfies CacheManager;
+
     this.stores.register(new TaskStore());
-    this.configManager = new ConfigurationManager();
 
     void this._startCaches();
   }
@@ -106,10 +109,10 @@ export class HorizonClient extends SapphireClient {
   }
 
   public async cacheReminders(): Promise<void> {
-    this.reminders.clear();
+    container.caches.reminders.clear();
     const reminders = await Reminder.find().catch(nullop);
     for (const reminder of reminders ?? [])
-      this.reminders.set(reminder.reminderId, reminder);
+      container.caches.reminders.set(reminder.reminderId, reminder);
   }
 
   private async _startCaches(): Promise<void> {
@@ -150,31 +153,30 @@ export class HorizonClient extends SapphireClient {
   }
 
   private async _cacheSubjects(): Promise<void> {
-    this.subjectsManager = new SubjectsManager(process.env.GOOGLE_SHEET_ID!);
-    await this.subjectsManager.refresh();
+    await container.subjectsManager.refresh();
   }
 
   private async _cacheReactionRoles(): Promise<void> {
-    this.reactionRolesIds.clear();
+    container.caches.reactionRolesIds.clear();
     const reactionRoles = await ReactionRole.find().catch(nullop);
     if (reactionRoles) {
-      this.reactionRolesIds.addAll(...reactionRoles
+      container.caches.reactionRolesIds.addAll(...reactionRoles
         .map(document => document?.messageId)
         .filter(filterNullAndUndefined));
     }
   }
 
   private async _cacheEclassRoles(): Promise<void> {
-    this.eclassRolesIds.clear();
+    container.caches.eclassRolesIds.clear();
     const eclassRoles = await Eclass.find().catch(nullop);
     if (eclassRoles)
-      this.eclassRolesIds.addAll(...eclassRoles.map(document => document.announcementMessageId));
+      container.caches.eclassRolesIds.addAll(...eclassRoles.map(document => document.announcementMessageId));
   }
 
   private async _cacheCurrentlyRunningEclassIds(): Promise<void> {
-    this.currentlyRunningEclassIds.clear();
+    container.caches.currentlyRunningEclassIds.clear();
     const eclasses = await Eclass.find({ status: EclassStatus.InProgress }).catch(nullop);
     if (eclasses)
-      this.currentlyRunningEclassIds.addAll(...eclasses.map(document => document.classId));
+      container.caches.currentlyRunningEclassIds.addAll(...eclasses.map(document => document.classId));
   }
 }
