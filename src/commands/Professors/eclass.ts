@@ -371,12 +371,12 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
 
     const date = resolveDate(rawDate);
     if (date.isErr()) {
-      await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
+      await interaction.reply({ content: this.messages.invalidDate[date.unwrapErr()], ephemeral: true });
       return;
     }
 
     if (!EclassManager.validateDateSpan(date.unwrap())) {
-      await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
+      await interaction.reply({ content: this.messages.invalidDate.datePeriodError, ephemeral: true });
       return;
     }
 
@@ -473,7 +473,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
     if (rawDate) {
       const dateResult = resolveDate(rawDate);
       if (dateResult.isErr()) {
-        await interaction.reply({ content: this.messages.invalidDate, ephemeral: true });
+        await interaction.reply({ content: this.messages.invalidDate[dateResult.unwrapErr()], ephemeral: true });
         return;
       }
       date = dateResult.unwrap();
@@ -511,7 +511,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
     if (duration ?? date) {
       const chosenDate = new Date(eclass.date);
       if (!EclassManager.validateDateSpan(chosenDate)) {
-        await answerTo.reply({ content: this.messages.invalidDate, ephemeral: true });
+        await answerTo.reply({ content: this.messages.invalidDate.datePeriodError, ephemeral: true });
         return;
       }
 

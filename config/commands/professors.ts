@@ -57,7 +57,10 @@ export const eclass = {
     invalidProfessor: 'Le professeur entré est invalide. Il te suffit de le mentionner avec un `@` comme tu le ferrais dans un message.',
     invalidSubject: "La matière entrée est invalide. Entre son code cours (ex: `TI304`), en faisant attention à ce qu'il te soit proposé. Sinon, cela signifie que la matière n'est pas disponible. Si tu penses que c'est un problème, contact un responsable eProf.",
     invalidDuration: 'Cette durée est invalide. Il faut entrer une durée en anglais ou en français.\nTu peux par exemple entrer `30min` pour 30 minutes et `2h` pour 2 heures. Tu peux également combiner ces durées ensemble : `2h30min` ou `1h45`.',
-    invalidDate: "Cette date est invalide. Vérifie bien qu'elle ne soit pas passée, qu'elle soit prévue pour dans moins de 2 mois et qu'elle soit au format `jj/MM HH:mm`.",
+    invalidDate: {
+      dateError: "Impossible de comprendre cette date ! Vérifie qu'elle soit au format `jj/MM HH:mm` (ou que ce soit [une date compréhensible par le bot](<https://github.com/horizon-efrei/HorizonBot/wiki/Gestion-des-dates>)).",
+      datePeriodError: "Cette date est invalide. Vérifie qu'elle ne soit pas passée et qu'elle soit prévue pour dans moins de 2 mois.",
+    },
     invalidTeamsUrl: "Le lien de la réunion Microsoft Teams donné n'est pas valide.",
     invalidRecordLink: "Le lien de l'enregistrement donné n'est pas valide.",
     placeInformationModal: {

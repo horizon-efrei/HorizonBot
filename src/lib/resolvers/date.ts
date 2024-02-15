@@ -16,7 +16,7 @@ const nextDay = (day: keyof typeof days): number => ((days[day] - new Date().get
 
 const isPast = (date: Date): boolean => date.getTime() < Date.now();
 
-export function resolveDate(parameter: string, options?: { canBePast: boolean }): Result<Date, 'dateError'> {
+export function resolveDate(parameter: string, options?: { canBePast: boolean }): Result<Date, 'dateError' | 'datePeriodError'> {
   const expandedParameter = parameter
     .replace(/ajrd/i, "aujourd'hui")
     .replace(/apr[eè]s[ -]demain/i, 'dans 2 jours')
@@ -38,8 +38,9 @@ export function resolveDate(parameter: string, options?: { canBePast: boolean })
 
   const date = chrono.parseDate(expandedParameter);
 
-  // TODO: Separate error for past dates
-  if (!date || (!options?.canBePast && isPast(date)))
+  if (!date)
     return err('dateError');
+  if (!options?.canBePast && isPast(date))
+    return err('datePeriodError');
   return ok(date);
 }
