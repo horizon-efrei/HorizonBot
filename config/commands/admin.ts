@@ -1,14 +1,13 @@
 import { stripIndent } from 'common-tags';
 import {
   hideLinkEmbed,
-  hyperlink,
   RESTJSONErrorCodes,
   TimestampStyles,
   userMention,
 } from 'discord.js';
 import { ValidationError } from '@/app/lib/structures/SubjectsManager';
 import { LogStatuses } from '@/types/database';
-import { timeFormat } from '@/utils';
+import { hyperlinkHideEmbed, timeFormat } from '@/utils';
 import { settings } from '../settings';
 
 export const analytics = {
@@ -41,7 +40,7 @@ export const analytics = {
 
       {content}
     `,
-    eclassPopularityLine: `- ${hyperlink('{eclass.topic}', hideLinkEmbed('{link}'))} : {count} participations (inscrits : {subscribedCount}, non-inscrits : {nonSubscribedCount})`,
+    eclassPopularityLine: `- ${hyperlinkHideEmbed('{eclass.topic}', '{link}')} : {count} participations (inscrits : {subscribedCount}, non-inscrits : {nonSubscribedCount})`,
     eclassNotFound: "La classe demandée n'a pas été trouvée, vérifiez que vous avez bien donné son identifiant.",
     joinsOverTime: stripIndent`
       ## Connexions au serveur vocal

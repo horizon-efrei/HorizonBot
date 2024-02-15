@@ -10,7 +10,7 @@ import {
 import { SchoolYear } from '@/types';
 import type { SubjectEntry } from '@/types/database';
 import { EclassPlace, EclassStatus } from '@/types/database';
-import { timeFormat } from '@/utils';
+import { hyperlinkHideEmbed, timeFormat } from '@/utils';
 
 export const eclass = {
   descriptions: {
@@ -100,7 +100,9 @@ export const eclass = {
         case EclassPlace.OnSite:
           return `sur le campus (salle ${placeInformation ?? 'inconnue'})`;
         case EclassPlace.Teams:
-          return `sur Microsoft Teams (lien de la réunion : ${hideLinkEmbed(placeInformation ?? 'inconnu')})`;
+          return placeInformation
+            ? `sur ${hyperlinkHideEmbed('Microsoft Teams', placeInformation)}`
+            : 'sur icrosoft Teams (lien inconnu)';
         case EclassPlace.Other:
           return `sur "${placeInformation ?? 'inconnu'}"`;
       }
@@ -186,8 +188,8 @@ export const eclass = {
     // Start subcommand
     successfullyStarted: 'Le cours a bien été lancé !',
     startClassNotification: `:bell: ${roleMention('{classRoleId}')}, le cours commence !`,
-    remindClassNotification: `:bell: ${roleMention('{classRoleId}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}, {where}`,
-    remindClassPrivateNotification: `:bell: Tu t'es inscrit au cours "{topic}". Il commence ${timeFormat('{date}', TimestampStyles.RelativeTime)} ! Tiens-toi prêt :\\)\nIl se passera {where}.`,
+    remindClassNotification: `:bell: ${roleMention('{classRoleId}')} rappel : le cours commence ${timeFormat('{date}', TimestampStyles.RelativeTime)}, {where}\n{isRecorded}`,
+    remindClassPrivateNotification: `:bell: Tu t'es inscrit au cours "{topic}". Il commence ${timeFormat('{date}', TimestampStyles.RelativeTime)} ! Tiens-toi prêt :\\)\nIl se passera {where}.\n{isRecorded}`,
     alertProfessor: stripIndent`
       Bonjour, ton cours "{topic}" (en {subject.name}) va commencer dans environ 15 minutes.
       Voici quelques conseils et rappels pour le bon déroulement du cours :
@@ -212,7 +214,7 @@ export const eclass = {
     `,
     alertProfessorComplements: {
       startRecord: "- Lance ton logiciel d'enregistrement pour filmer le cours ;",
-      registerRecording: `- Télécharge ton enregistrement sur ce lien ${hideLinkEmbed(process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`/eclass record {classId} add <ton lien>\` ;`,
+      registerRecording: `- Télécharge ton enregistrement ${hyperlinkHideEmbed('sur le Sharepoint', process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`/eclass record id:{cours} choix:"Ajouter le lien" lien:{ton lien}\` ;`,
       isRecorded: 'soit',
       isNotRecorded: 'ne soit pas',
     },

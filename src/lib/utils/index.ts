@@ -6,6 +6,7 @@ export { firstSemesterDay } from './firstSemesterDay';
 export { getDuration } from './getDuration';
 export { getEmojiImage } from './getEmojiImage';
 export { getGitRev } from './getGitRev';
+export { hyperlinkHideEmbed } from './hyperlinkHideEmbed';
 export { makeMessageLink } from './makeMessageLink';
 export { massSend } from './massSend';
 export { noop, nullop } from './noop';
