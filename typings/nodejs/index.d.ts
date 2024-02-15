@@ -10,6 +10,7 @@ declare namespace NodeJS {
 
     MONGO_URI: string;
     ECLASS_DRIVE_URL: string;
+    ECLASS_DRIVE_TUTORIAL_URL: string;
     /* eslint-enable @typescript-eslint/naming-convention */
   }
 }

@@ -225,7 +225,7 @@ export async function startClass(eclass: EclassDocument): Promise<void> {
     .setTitle(pupa(texts.title, { eclass }))
     .setDescription(pupa(texts.baseDescription, {
       eclass,
-      isRecorded: eclass.isRecorded ? texts.descriptionIsRecorded : texts.descriptionIsNotRecorded,
+      isRecorded: config.messages.recordedSentences[Number(eclass.isRecorded)],
       textChannels: pupa(
         eclass.subject.voiceChannelId ? texts.descriptionAllChannels : texts.descriptionTextChannel, { eclass },
       ),
@@ -252,12 +252,13 @@ export async function finishClass(eclass: EclassDocument): Promise<void> {
     { leftAt: new Date() },
   );
 
+  const guild = container.client.guilds.resolve(eclass.guildId);
+  if (!guild)
+    return;
+
   // Postpone the class by 5 minutes if there are more than 5 people in the voice channel
   if (eclass.subject.voiceChannelId) {
-    const voiceChannel = container.client
-      .guilds.resolve(eclass.guildId)
-      ?.channels.resolve(eclass.subject.voiceChannelId);
-
+    const voiceChannel = guild.channels.resolve(eclass.subject.voiceChannelId);
     if (voiceChannel?.isVoiceBased() && voiceChannel.members.size >= 5) {
       await Eclass.findByIdAndUpdate(eclass._id, { duration: eclass.duration + 5 * 60 * 1000 });
       return;
@@ -289,16 +290,24 @@ export async function finishClass(eclass: EclassDocument): Promise<void> {
   }
 
   // Rename the associated role
-  await container.client
-    .guilds.cache.get(eclass.guildId)
-    ?.roles.cache.get(eclass.classRoleId)
-    ?.setName(getRoleNameForFinishedClass(eclass));
+  await guild.roles.cache.get(eclass.classRoleId)?.setName(getRoleNameForFinishedClass(eclass));
 
   // Mark the class as finished
   await Eclass.findByIdAndUpdate(eclass._id, { status: EclassStatus.Finished });
 
   // Edit the global week-upcoming-classes announcement messages
   await EclassMessagesManager.updateUpcomingClassesForGuild(eclass.guildId);
+
+  // Congratulate the professor
+  const professor = await guild.members.fetch(eclass.professorId).catch(nullop);
+  await professor?.send(
+    pupa(config.messages.congratulateProfessor, {
+      ...eclass.toJSON(),
+      ...eclass.normalizeDates(),
+      where: config.messages.where(eclass),
+      recordedTutorial: eclass.isRecorded ? pupa(config.messages.recordedTutorial, eclass.toJSON()) : '',
+    }),
+  ).catch(nullop);
 
   container.logger.debug(`[e-class:${eclass.classId}] Ended class.`);
 }
@@ -487,6 +496,7 @@ export async function prepareClass(eclass: EclassDocument): Promise<void> {
   const payload = {
     ...eclass.toJSON(),
     ...eclass.normalizeDates(),
+    isRecorded: config.messages.recordedSentences[Number(eclass.isRecorded)],
     where: config.messages.where(eclass),
   };
   await classChannel.send(pupa(config.messages.remindClassNotification, payload));

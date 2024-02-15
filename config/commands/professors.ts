@@ -91,6 +91,7 @@ export const eclass = {
       [EclassStatus.Canceled]: 'annulé',
     },
     recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
+    recordedSentences: [':red_circle: Le cours est enregistré !', ":warning: Le cours n'est pas enregistré !"],
     where: ({ place, placeInformation, subject }: {
       place: EclassPlace; placeInformation: string | null; subject: SubjectEntry;
     }): string => {
@@ -194,27 +195,27 @@ export const eclass = {
       Bonjour, ton cours "{topic}" (en {subject.name}) va commencer dans environ 15 minutes.
       Voici quelques conseils et rappels pour le bon déroulement du cours :
 
-      **AVANT**
+      ### Avant
       - Prépare les documents et logiciels dont tu vas te servir pour animer le cours ;
       - Rend toi {where} ;
       {beforeChecklist}
 
-      **PENDANT**
+      ### Pendant
       - Je lancerai le cours automatiquement autour de l'heure définie (${timeFormat('{date}', TimestampStyles.LongDateTime)}), et je mentionnerai toutes les personnes directement intéressées par le cours ;
       - Anime ton cours comme tu le souhaites, en essayant d'être le plus clair possible dans tes propos ;
       - N'hésite-pas à demander à des fauteurs de trouble de partir, ou prévient un membre du staff si besoin ;
 
-      **APRÈS**
-      - J'arrêterai le cours automatiquement au bout de la durée prévue. Ce n'est pas grave s'il dure plus ou moins longtemps. Tu peux l'arrêter manuellement avec \`/eclass finish {classId}\`
+      ### Après
+      - J'arrêterai le cours automatiquement au bout de la durée prévue. Ce n'est pas grave s'il dure plus ou moins longtemps. Tu peux l'arrêter manuellement avec \`/eclass finish id:{classId}\`
       {afterChecklist}
 
-      :warning: Rappel : il a été prévu que le cours {isIsNot} enregistré ! Tu peux changer cela avec \`/eclass edit {classId} record {notIsRecorded}\`.
+      :warning: Rappel : il a été prévu que le cours {isIsNot} enregistré ! Tu peux changer cela avec \`/eclass edit id:{classId} est-enregistré:{notIsRecorded}\`.
 
       Bon courage !
     `,
     alertProfessorComplements: {
       startRecord: "- Lance ton logiciel d'enregistrement pour filmer le cours ;",
-      registerRecording: `- Télécharge ton enregistrement ${hyperlinkHideEmbed('sur le Sharepoint', process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`/eclass record id:{cours} choix:"Ajouter le lien" lien:{ton lien}\` ;`,
+      registerRecording: `- Télécharge ton enregistrement ${hyperlinkHideEmbed('sur le Sharepoint', process.env.ECLASS_DRIVE_URL)}. Si tu n'as pas les permissions nécessaires, contact un responsable eProf (rôle "Respo eProf"). Ensuite, lance la commande \`/eclass record id:{classId} choix:"Ajouter le lien" lien:<ton lien>\` ;`,
       isRecorded: 'soit',
       isNotRecorded: 'ne soit pas',
     },
@@ -225,12 +226,23 @@ export const eclass = {
       baseDescription: `Le cours en **{eclass.subject.name}** sur "**{eclass.topic}**" présenté par ${userMention('{eclass.professorId}')} commence !\n\n:round_pushpin: Il a lieu {where}\n\n{isRecorded}\n\n:microphone2: **PENSEZ À COUPER VOTRE MICRO !**`,
       descriptionAllChannels: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannelId}')}, et le salon vocal est ${channelMention('{eclass.subject.voiceChannelId}')}.`,
       descriptionTextChannel: `Le salon textuel associé est ${channelMention('{eclass.subject.textChannelId}')}.`,
-      descriptionIsRecorded: ':red_circle: Le cours est enregistré !',
-      descriptionIsNotRecorded: ":warning: Le cours n'est pas enregistré !",
     },
 
     // Finish subcommand
     successfullyFinished: 'Le cours a bien été terminé !',
+    recordedTutorial: stripIndent`
+      :clapper: Le cours était enregistré ! Pense bien à convertir le fichier en .mp4 si ca n'en ai pas déjà un, puis télécharge-le ${hyperlinkHideEmbed('sur le Sharepoint', process.env.ECLASS_DRIVE_URL)}. Enfin, créé un lien d'accès __public__, et ajoute-le au cours avec \`/eclass record id:{classId} choix:"Ajouter le lien" lien:<ton lien>\`.
+      > Consulte ${hyperlinkHideEmbed('notre tutoriel', process.env.ECLASS_DRIVE_TUTORIAL_URL)} pour une explication plus approfondie. Contacte un responsable eProf si tu as des questions !
+    `,
+    congratulateProfessor: stripIndent`
+      :robot: J'ai détecté que le cours s'est terminé. Au nom de l'équipe d'Ef'Réussite, merci !
+      > Partage-nous ton expérience sur le Discord de l'équipe :slight_smile:
+
+      :moneybag: Tu peux dors et déjà demander ton LXP sur ${hyperlinkHideEmbed('la plateforme myEfrei', 'https://www.myefrei.fr/portal/student/lxp/actions/6532456a0ab3b133914fdb80')}.
+      > Fait attention au semestre que tu choisis, et aux dates limites de dépot de LXP si tu donnes le cours en fin de semestre ! En cas de doute, consulte les annonces du Discord de l'équipe Horizon, ou contacte un responsable eProf.
+
+      {recordedTutorial}
+    `,
 
     // Cancel subcommand
     confirmCancel: ":warning: __Si tu t'es trompé dans la création du cours, utilise `/eclass edit` plutôt. Annuler et recréer le cours aura pour effet de mentionner les intéressés deux fois.__\n\nEs-tu sûr de vouloir annuler ce cours ? **Cette action est irrévocable.**",
