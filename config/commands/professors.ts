@@ -103,7 +103,7 @@ export const eclass = {
         case EclassPlace.Teams:
           return placeInformation
             ? `sur ${hyperlinkHideEmbed('Microsoft Teams', placeInformation)}`
-            : 'sur icrosoft Teams (lien inconnu)';
+            : 'sur Microsoft Teams (lien inconnu)';
         case EclassPlace.Other:
           return `sur "${placeInformation ?? 'inconnu'}"`;
       }

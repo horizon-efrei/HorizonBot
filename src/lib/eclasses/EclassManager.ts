@@ -489,6 +489,7 @@ export async function prepareClass(eclass: EclassDocument): Promise<void> {
         ? config.messages.alertProfessorComplements.isRecorded
         : config.messages.alertProfessorComplements.isNotRecorded,
       notIsRecorded: (!eclass.isRecorded).toString(),
+      subject: eclass.subject,
     }),
   ).catch(nullop);
 

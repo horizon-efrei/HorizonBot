@@ -809,6 +809,7 @@ export class EclassCommand extends HorizonSubcommand<typeof config> {
             ...eclass.normalizeDates(true),
             status: capitalize(this.messages.rawStatuses[eclass.status]),
             where: this.messages.where(eclass),
+            subject: eclass.subject,
           };
           return {
             name: pupa(this.messages.listFieldTitle, eclassInfos),
