@@ -6,6 +6,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [1.8.0] - 2024/02/16
+
+### Added
+
+- Add a new analytics command
+- Add webhook announcements management
+- Use a google sheet as a database for subjects
+- Add a thank you message to eprofs when class finishes with some helpful tips
+
+### Fixed
+
+- Fix grouping of eclasses per day in upcoming classes message
+
+### Improved
+
+- Rename tags to faq
+- Improve faq editing by adding content in the edit input of the modal
+- Improve date error messages by showing a different message if the date is invalid or in the past/too far in the future
+
+### Removed
+
+- Remove graduation year from school year choice list when creating an eclass. This makes it more future proof in case the command isn't updated to Discord when a new graduation year comes.
+- Remove the faq embed feature, as we can now integrate link in plain messages
+
+### Internal
+
+- Simplify GitHub labels
+- Reorganize TODOs and FIXMEs
+- Move managers to container instead of client
+- Improve caching mechanism
+- Remove an invalid LaTeX component
+- Upgrade dependencies
+
+
 ## [1.7.0] - 2023/11/10
 
 ### Fixed
