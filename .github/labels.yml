@@ -1,9 +1,6 @@
 - name: 'carl-replacement'
   description: Issues that allows us to replace CarlBot
   color: '9C004F'
-- name: 'approved'
-  description: Issues and PRs that have been approved.
-  color: '8CE098'
 
 - name: 'question'
   description: Issues that asks a question.
