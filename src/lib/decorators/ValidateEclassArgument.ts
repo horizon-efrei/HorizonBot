@@ -7,6 +7,7 @@ import type { EclassStatus } from '@/types/database';
 import { ConfigEntriesRoles } from '@/types/database';
 
 interface ValidationOptions {
+  isOriginalEprof?: boolean;
   statusIn?: EclassStatus[];
 }
 
@@ -28,6 +29,7 @@ export function ValidateEclassArgument(options?: ValidationOptions): MethodDecor
       // Check if the professor is the right one
       const staffRole = await container.configManager.get(ConfigEntriesRoles.Staff, interaction.guild.id);
       if (interaction.member.id !== eclass.professorId
+        && options?.isOriginalEprof
         && staffRole
         && !interaction.member.roles.cache.has(staffRole.id)) {
         await interaction.reply({ content: config.messages.editUnauthorized, ephemeral: true });
