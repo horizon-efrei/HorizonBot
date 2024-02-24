@@ -44,7 +44,7 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
                 .setName(Options.Channel)
                 .setDescription(this.descriptions.options.channel)
                 .setRequired(true)
-                .addChannelTypes(ChannelType.GuildText),
+                .addChannelTypes(ChannelType.GuildText, ChannelType.GuildAnnouncement),
             ),
         )
         .addSubcommand(
