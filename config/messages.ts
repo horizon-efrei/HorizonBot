@@ -340,7 +340,7 @@ export const messages = {
       - Tu peux modifier le message d'annonce originel, en haut du fil, puis taper \`/announcement edit\`
       - Si tu n'es pas l'auteur du message, tu peux cliquer sur le bouton ci-dessous pour recevoir le message en texte pur, le copier/coller, puis l'envoyer dans ce salon avec les modifications effectuées. Ensuite, tape \`/announcement edit message:<lien du message>\`, avec le lien du message obtenu en faisant clique droit sur le message > copier le lien.
 
-      Si tu dois re-modifier le message, tu peux répéter l'opération autant de fois que nécessaire en tapant \`/announcement edit\` pour utiliser le message originel, ou en tapant en précisant le lien vers un message de ce fil pour utiliser un autre message.
+      Si tu dois re-modifier le message, tu peux répéter l'opération autant de fois que nécessaire en tapant \`/announcement edit\` pour utiliser le message originel, ou en précisant le lien vers un message de ce fil pour utiliser un autre message.
     `,
     noAnnouncement: "Impossible de trouver un message d'annonce associé à ce thread.",
     copyButton: {

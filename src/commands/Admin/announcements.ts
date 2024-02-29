@@ -8,12 +8,13 @@ import type {
   Webhook,
 } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
+import pupa from 'pupa';
 import { announcements as config } from '@/config/commands/admin';
 import { messages } from '@/config/messages';
 import { settings } from '@/config/settings';
 import { AnnouncementMessage } from '@/models/announcementMessage';
 import { HorizonSubcommand } from '@/structures/commands/HorizonSubcommand';
-import { nullop } from '@/utils';
+import { makeMessageLink, nullop } from '@/utils';
 
 enum Options {
   Channel = 'salon',
@@ -82,11 +83,13 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
       return;
     }
 
+    let announcementLink: string;
     try {
       const announcementMessage = await webhook.unwrap().send({
         content: starterMessage.content,
         files: starterMessage.attachments.map(attachment => attachment.url),
       });
+      announcementLink = announcementMessage.url;
 
       await AnnouncementMessage.create({
         announcementChannelId: destinationChannel.id,
@@ -103,7 +106,7 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
     await interaction.followUp(this.messages.success);
 
     await interaction.channel.send({
-      content: this.messages.announcementSent,
+      content: pupa(this.messages.announcementSent(), { interaction, messageLink: announcementLink }),
       components: [...messages.preAnnouncements.copyButton.components],
     });
   }
@@ -180,8 +183,13 @@ export class SetupCommand extends HorizonSubcommand<typeof config> {
 
     await interaction.followUp(this.messages.success);
 
+    const announcementLink = makeMessageLink(
+      interaction.guildId,
+      messageData.announcementChannelId,
+      messageData.announcementMessageId,
+    );
     await interaction.channel.send({
-      content: this.messages.announcementSent,
+      content: pupa(this.messages.announcementSent(true), { interaction, announcementLink }),
       components: [...messages.preAnnouncements.copyButton.components],
     });
   }

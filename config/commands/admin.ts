@@ -110,9 +110,9 @@ export const announcements = {
     `,
     errorWebhookSend: "Impossible d'envoyer l'annonce, vérifiez que le bot a bien la permission d'envoyer des messages dans ce salon, et que l'annonce ne dépasse pas 2000 caractères.",
     success: ':white_check_mark: Annonce envoyée avec succès !',
-    announcementSent: stripIndent`
-      :white_check_mark: L'annonce a été publiée.
-      Si tu te rends compte que le message doit être modifié, pas de soucis.
+    announcementSent: (isEdit = false) => stripIndent`
+      :white_check_mark: L'annonce a été ${isEdit ? 'modifiée' : 'publiée'}, {interaction.user} : {announcementLink}.
+      Si tu te rends compte que le message doit être${isEdit ? ' encore' : ''} modifié, pas de soucis.
       - Tu peux modifier le message d'annonce originel, en haut du fil, puis taper \`/announcement edit\`
       - Si tu n'es pas l'auteur du message, tu peux cliquer sur le bouton ci-dessous pour recevoir le message en texte pur, le copier/coller, puis l'envoyer dans ce salon avec les modifications effectuées. Ensuite, tape \`/announcement edit message:<lien du message>\`, avec le lien du message obtenu en faisant clique droit sur le message > copier le lien.
 
