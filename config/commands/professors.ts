@@ -91,7 +91,7 @@ export const eclass = {
       [EclassStatus.Canceled]: 'annulé',
     },
     recordedValues: ['Non :x:', 'Oui :white_check_mark:'],
-    recordedSentences: [':red_circle: Le cours est enregistré !', ":warning: Le cours n'est pas enregistré !"],
+    recordedSentences: [":warning: Le cours n'est pas enregistré !", ':red_circle: Le cours est enregistré !'],
     where: ({ place, placeInformation, subject }: {
       place: EclassPlace; placeInformation: string | null; subject: SubjectEntry;
     }): string => {
